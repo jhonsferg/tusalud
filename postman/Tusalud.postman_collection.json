@@ -1,0 +1,4173 @@
+{
+  "info": {
+    "_postman_id": "6b0d7c1e-3f5a-4e1b-9a7c-2d4e8f9a1c01",
+    "name": "TuSalud API",
+    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 07, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "item": [
+    {
+      "name": "00 - Autenticación",
+      "description": "Inicio de sesión de los usuarios semilla (guarda un token por rol), registro de un paciente nuevo y casos de error (401 / 400).",
+      "auth": {
+        "type": "noauth"
+      },
+      "item": [
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve token JWT de tipo Bearer', () => {",
+                  "    pm.expect(j.token).to.be.a('string').and.not.empty;",
+                  "    pm.expect(j.tokenType).to.eql('Bearer');",
+                  "    pm.expect(j.expiresIn).to.be.above(0);",
+                  "});",
+                  "pm.test('Email y rol ADMIN correctos', () => {",
+                  "    pm.expect(j.email).to.eql('admin@tusalud.com');",
+                  "    pm.expect(j.roles.some(r => String(r).toUpperCase().includes('ADMIN'))).to.be.true;",
+                  "});",
+                  "setVar('adminToken', j.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicia sesión como administrador y guarda el JWT en `adminToken`.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "login"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"Admin123!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIuLi4ifQ.firma\",\n  \"tokenType\": \"Bearer\",\n  \"expiresIn\": 86400000,\n  \"usuarioId\": 1,\n  \"email\": \"admin@tusalud.com\",\n  \"nombreCompleto\": \"Usuario\",\n  \"roles\": [\n    \"ROLE_ADMIN\"\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login Médico (Dr. García)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve token JWT de tipo Bearer', () => {",
+                  "    pm.expect(j.token).to.be.a('string').and.not.empty;",
+                  "    pm.expect(j.tokenType).to.eql('Bearer');",
+                  "    pm.expect(j.expiresIn).to.be.above(0);",
+                  "});",
+                  "pm.test('Email y rol MEDICO correctos', () => {",
+                  "    pm.expect(j.email).to.eql('dr.garcia@tusalud.com');",
+                  "    pm.expect(j.roles.some(r => String(r).toUpperCase().includes('MEDICO'))).to.be.true;",
+                  "});",
+                  "setVar('medicoToken', j.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicia sesión como el Dr. Luis García (Cardiología) y guarda el JWT en `medicoToken`.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "login"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIuLi4ifQ.firma\",\n  \"tokenType\": \"Bearer\",\n  \"expiresIn\": 86400000,\n  \"usuarioId\": 1,\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"nombreCompleto\": \"Usuario\",\n  \"roles\": [\n    \"ROLE_MEDICO\"\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login Médico (Dra. López)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve token JWT de tipo Bearer', () => {",
+                  "    pm.expect(j.token).to.be.a('string').and.not.empty;",
+                  "    pm.expect(j.tokenType).to.eql('Bearer');",
+                  "    pm.expect(j.expiresIn).to.be.above(0);",
+                  "});",
+                  "pm.test('Email y rol MEDICO correctos', () => {",
+                  "    pm.expect(j.email).to.eql('dra.lopez@tusalud.com');",
+                  "    pm.expect(j.roles.some(r => String(r).toUpperCase().includes('MEDICO'))).to.be.true;",
+                  "});",
+                  "setVar('medico2Token', j.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicia sesión como la Dra. Carmen López (Pediatría) y guarda el JWT en `medico2Token`.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dra.lopez@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "login"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"dra.lopez@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIuLi4ifQ.firma\",\n  \"tokenType\": \"Bearer\",\n  \"expiresIn\": 86400000,\n  \"usuarioId\": 1,\n  \"email\": \"dra.lopez@tusalud.com\",\n  \"nombreCompleto\": \"Usuario\",\n  \"roles\": [\n    \"ROLE_MEDICO\"\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login Paciente (Juan Pérez)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve token JWT de tipo Bearer', () => {",
+                  "    pm.expect(j.token).to.be.a('string').and.not.empty;",
+                  "    pm.expect(j.tokenType).to.eql('Bearer');",
+                  "    pm.expect(j.expiresIn).to.be.above(0);",
+                  "});",
+                  "pm.test('Email y rol PACIENTE correctos', () => {",
+                  "    pm.expect(j.email).to.eql('juan.perez@correo.com');",
+                  "    pm.expect(j.roles.some(r => String(r).toUpperCase().includes('PACIENTE'))).to.be.true;",
+                  "});",
+                  "setVar('pacienteToken', j.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicia sesión como el paciente Juan Pérez y guarda el JWT en `pacienteToken`.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "login"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"juan.perez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIuLi4ifQ.firma\",\n  \"tokenType\": \"Bearer\",\n  \"expiresIn\": 86400000,\n  \"usuarioId\": 1,\n  \"email\": \"juan.perez@correo.com\",\n  \"nombreCompleto\": \"Usuario\",\n  \"roles\": [\n    \"ROLE_PACIENTE\"\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login Paciente 2 (María Rodríguez)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve token JWT de tipo Bearer', () => {",
+                  "    pm.expect(j.token).to.be.a('string').and.not.empty;",
+                  "    pm.expect(j.tokenType).to.eql('Bearer');",
+                  "    pm.expect(j.expiresIn).to.be.above(0);",
+                  "});",
+                  "pm.test('Email y rol PACIENTE correctos', () => {",
+                  "    pm.expect(j.email).to.eql('maria.rodriguez@correo.com');",
+                  "    pm.expect(j.roles.some(r => String(r).toUpperCase().includes('PACIENTE'))).to.be.true;",
+                  "});",
+                  "setVar('paciente2Token', j.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicia sesión como la paciente María Rodríguez y guarda el JWT en `paciente2Token`.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria.rodriguez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "login"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"maria.rodriguez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIuLi4ifQ.firma\",\n  \"tokenType\": \"Bearer\",\n  \"expiresIn\": 86400000,\n  \"usuarioId\": 1,\n  \"email\": \"maria.rodriguez@correo.com\",\n  \"nombreCompleto\": \"Usuario\",\n  \"roles\": [\n    \"ROLE_PACIENTE\"\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Registrar nuevo paciente",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "const ts = Date.now();",
+                  "setVar('nuevoPacienteEmail', 'paciente.' + ts + '@correo.com');",
+                  "setVar('nuevoPacienteDni', String(Math.floor(10000000 + Math.random() * 90000000)));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve token y datos del paciente', () => {",
+                  "    pm.expect(j.token).to.be.a('string').and.not.empty;",
+                  "    pm.expect(j.email).to.eql(pm.variables.get('nuevoPacienteEmail'));",
+                  "    pm.expect(j.nombreCompleto).to.include('Carlos');",
+                  "    pm.expect(j.roles.some(r => String(r).toUpperCase().includes('PACIENTE'))).to.be.true;",
+                  "});",
+                  "setVar('nuevoPacienteToken', j.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "register"]
+            },
+            "description": "Registro público de un paciente. El pre-request genera email y DNI únicos para que la colección pueda re-ejecutarse sobre la misma base de datos.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Carlos\",\n  \"apellido\": \"Mendoza\",\n  \"email\": \"{{nuevoPacienteEmail}}\",\n  \"password\": \"Paciente123!\",\n  \"telefono\": \"987654321\",\n  \"dni\": \"{{nuevoPacienteDni}}\",\n  \"fechaNacimiento\": \"1992-04-15\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "register"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Carlos\",\n  \"apellido\": \"Mendoza\",\n  \"email\": \"{{nuevoPacienteEmail}}\",\n  \"password\": \"Paciente123!\",\n  \"telefono\": \"987654321\",\n  \"dni\": \"{{nuevoPacienteDni}}\",\n  \"fechaNacimiento\": \"1992-04-15\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIuLi4ifQ.firma\",\n  \"tokenType\": \"Bearer\",\n  \"expiresIn\": 86400000,\n  \"usuarioId\": 6,\n  \"email\": \"carlos.mendoza@correo.com\",\n  \"nombreCompleto\": \"Carlos Mendoza\",\n  \"roles\": [\n    \"ROLE_PACIENTE\"\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login nuevo paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Token emitido para el nuevo paciente', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.token).to.be.a('string').and.not.empty;",
+                  "    pm.expect(j.email).to.eql(pm.variables.get('nuevoPacienteEmail'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Verifica que el paciente recién registrado puede iniciar sesión.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{nuevoPacienteEmail}}\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login con contraseña incorrecta (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(401);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});",
+                  "pm.test('No devuelve token', () => pm.expect(pm.response.json()).to.not.have.property('token'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Credenciales inválidas: debe responder 401 sin token.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"ClaveIncorrecta1!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 401 Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "login"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"ClaveIncorrecta1!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-10-12T10:15:30\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Credenciales inválidas\",\n  \"path\": \"/api/v1/auth/login\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Registro con datos inválidos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(400);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});",
+                  "pm.test('validationErrors incluye los campos inválidos', () => {",
+                  "    const ve = pm.response.json().validationErrors;",
+                  "    pm.expect(ve).to.be.an('object');",
+                  "    ['nombre', 'email', 'password', 'telefono', 'dni', 'fechaNacimiento'].forEach(c => pm.expect(ve, c).to.have.property(c));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "register"]
+            },
+            "description": "Cuerpo que viola las validaciones (email, contraseña corta, teléfono, DNI y fecha futura): debe responder 400 con el mapa `validationErrors`.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"\",\n  \"apellido\": \"Mendoza\",\n  \"email\": \"no-es-un-email\",\n  \"password\": \"123\",\n  \"telefono\": \"12345\",\n  \"dni\": \"12AB\",\n  \"fechaNacimiento\": \"2099-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 400 Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "auth", "register"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"\",\n  \"apellido\": \"Mendoza\",\n  \"email\": \"no-es-un-email\",\n  \"password\": \"123\",\n  \"telefono\": \"12345\",\n  \"dni\": \"12AB\",\n  \"fechaNacimiento\": \"2099-01-01\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-10-12T10:15:30\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Error de validación\",\n  \"path\": \"/api/v1/auth/register\",\n  \"validationErrors\": {\n    \"email\": \"El email no tiene un formato válido\",\n    \"password\": \"La contraseña debe tener entre 8 y 72 caracteres\",\n    \"telefono\": \"El teléfono debe tener 9 dígitos\",\n    \"dni\": \"El DNI debe tener 8 dígitos\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 - Especialidades",
+      "description": "CRUD de especialidades. Lectura para cualquier usuario autenticado; alta/edición/baja solo ADMIN (token `adminToken` heredado de la carpeta).",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{adminToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "Listar especialidades",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = asList(pm.response.json());",
+                  "pm.test('Incluye las especialidades semilla', () => {",
+                  "    const nombres = lista.map(e => norm(e.nombre));",
+                  "    ['cardiologia', 'pediatria', 'medicina general', 'dermatologia'].forEach(n => pm.expect(nombres, n).to.include(n));",
+                  "});",
+                  "const cardio = lista.find(e => norm(e.nombre) === 'cardiologia');",
+                  "if (cardio) { setVar('especialidadCardiologiaId', cardio.id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/especialidades",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "especialidades"]
+            },
+            "description": "Lista todas las especialidades (como paciente). Guarda el id de Cardiología en `especialidadCardiologiaId`.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/especialidades",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "especialidades"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": 1,\n    \"nombre\": \"Cardiología\",\n    \"descripcion\": \"Enfermedades del corazón\"\n  },\n  {\n    \"id\": 2,\n    \"nombre\": \"Pediatría\",\n    \"descripcion\": \"Atención de niños\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Crear especialidad",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "setVar('especialidadNombre', 'Especialidad QA ' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Especialidad creada con id y nombre', () => {",
+                  "    pm.expect(j.id).to.be.a('number');",
+                  "    pm.expect(j.nombre).to.eql(pm.variables.get('especialidadNombre'));",
+                  "});",
+                  "setVar('especialidadId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/especialidades",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "especialidades"]
+            },
+            "description": "Crea una especialidad con nombre único (generado en el pre-request) y guarda su id en `especialidadId`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"{{especialidadNombre}}\",\n  \"descripcion\": \"Especialidad creada desde Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/especialidades",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "especialidades"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"{{especialidadNombre}}\",\n  \"descripcion\": \"Especialidad creada desde Postman\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 5,\n  \"nombre\": \"Especialidad QA 1760262930000\",\n  \"descripcion\": \"Especialidad creada desde Postman\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Obtener especialidad por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Datos de la especialidad', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(String(j.id)).to.eql(String(pm.variables.get('especialidadId')));",
+                  "    pm.expect(j.nombre).to.eql(pm.variables.get('especialidadNombre'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/especialidades/{{especialidadId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "especialidades", "{{especialidadId}}"]
+            },
+            "description": "Obtiene la especialidad recién creada."
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/especialidades/{{especialidadId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "especialidades", "{{especialidadId}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 5,\n  \"nombre\": \"Especialidad QA 1760262930000\",\n  \"descripcion\": \"Especialidad creada desde Postman\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Actualizar especialidad",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "setVar('especialidadNombre', 'Especialidad QA Editada ' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Cambios aplicados', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.nombre).to.eql(pm.variables.get('especialidadNombre'));",
+                  "    pm.expect(j.descripcion).to.eql('Descripción actualizada desde Postman');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/especialidades/{{especialidadId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "especialidades", "{{especialidadId}}"]
+            },
+            "description": "Actualiza nombre y descripción. El nuevo nombre se guarda en `especialidadNombre`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"{{especialidadNombre}}\",\n  \"descripcion\": \"Descripción actualizada desde Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/especialidades/{{especialidadId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "especialidades", "{{especialidadId}}"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"{{especialidadNombre}}\",\n  \"descripcion\": \"Descripción actualizada desde Postman\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 5,\n  \"nombre\": \"Especialidad QA 1760262930000\",\n  \"descripcion\": \"Descripción actualizada desde Postman\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear especialidad duplicada (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(409);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/especialidades",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "especialidades"]
+            },
+            "description": "Intenta crear otra especialidad con el mismo nombre: debe responder 409.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"{{especialidadNombre}}\",\n  \"descripcion\": \"Duplicada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 409 Conflict",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/especialidades",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "especialidades"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"{{especialidadNombre}}\",\n  \"descripcion\": \"Duplicada\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-10-12T10:15:30\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Ya existe una especialidad con ese nombre\",\n  \"path\": \"/api/v1/especialidades\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Paciente intenta crear especialidad (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(403);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/especialidades",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "especialidades"]
+            },
+            "description": "Un PACIENTE no puede crear especialidades: 403.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"No permitida\",\n  \"descripcion\": \"Debe fallar\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 403 Forbidden",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/especialidades",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "especialidades"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"No permitida\",\n  \"descripcion\": \"Debe fallar\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-10-12T10:15:30\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"No tiene permisos para realizar esta operación\",\n  \"path\": \"/api/v1/especialidades\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Eliminar especialidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/especialidades/{{especialidadId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "especialidades", "{{especialidadId}}"]
+            },
+            "description": "Elimina la especialidad creada (sin médicos asociados): 204."
+          },
+          "response": [
+            {
+              "name": "Ejemplo 204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/especialidades/{{especialidadId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "especialidades", "{{especialidadId}}"]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Obtener especialidad eliminada (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(404);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/especialidades/{{especialidadId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "especialidades", "{{especialidadId}}"]
+            },
+            "description": "Tras eliminarla, la especialidad ya no existe: 404."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Médicos y Horarios",
+      "description": "Consulta de médicos, alta de un médico nuevo (ADMIN) y gestión de sus horarios de atención y disponibilidad.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{adminToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "Listar médicos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = asList(pm.response.json());",
+                  "const garcia = lista.find(m => m.email === 'dr.garcia@tusalud.com');",
+                  "const lopez = lista.find(m => m.email === 'dra.lopez@tusalud.com');",
+                  "pm.test('Incluye a los médicos semilla', () => {",
+                  "    pm.expect(garcia, 'Dr. García').to.be.an('object');",
+                  "    pm.expect(lopez, 'Dra. López').to.be.an('object');",
+                  "});",
+                  "if (garcia) { setVar('medicoGarciaId', garcia.id); }",
+                  "if (lopez) { setVar('medicoLopezId', lopez.id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos"]
+            },
+            "description": "Lista los médicos (como paciente). Localiza al Dr. García y a la Dra. López por email y guarda sus ids en `medicoGarciaId` y `medicoLopezId`.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/medicos",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "medicos"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": 1,\n    \"usuarioId\": 8,\n    \"nombre\": \"Luis\",\n    \"apellido\": \"García\",\n    \"nombreCompleto\": \"Luis García\",\n    \"email\": \"dr.garcia@tusalud.com\",\n    \"telefono\": \"912345678\",\n    \"colegiatura\": \"CMP-12345\",\n    \"consultorio\": \"Consultorio 204\",\n    \"precioConsulta\": 180,\n    \"especialidadId\": 1,\n    \"especialidadNombre\": \"Cardiología\",\n    \"estado\": \"ACTIVO\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Filtrar médicos por especialidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = asList(pm.response.json());",
+                  "pm.test('Todos son de Cardiología', () => {",
+                  "    pm.expect(lista.length).to.be.above(0);",
+                  "    lista.forEach(m => pm.expect(String(m.especialidadId)).to.eql(String(pm.variables.get('especialidadCardiologiaId'))));",
+                  "});",
+                  "pm.test('Incluye al Dr. García', () => pm.expect(lista.map(m => m.email)).to.include('dr.garcia@tusalud.com'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos?especialidadId={{especialidadCardiologiaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos"],
+              "query": [
+                {
+                  "key": "especialidadId",
+                  "value": "{{especialidadCardiologiaId}}"
+                }
+              ]
+            },
+            "description": "Filtra médicos de Cardiología: todos deben pertenecer a esa especialidad e incluir al Dr. García.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener médico por id (Dr. García)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Datos del Dr. García', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.colegiatura).to.eql('CMP-12345');",
+                  "    pm.expect(norm(j.especialidadNombre)).to.eql('cardiologia');",
+                  "    pm.expect(j.nombreCompleto).to.include('Garc');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/{{medicoGarciaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos", "{{medicoGarciaId}}"]
+            },
+            "description": "Detalle del Dr. García.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear especialidad para el nuevo médico",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "setVar('especialidadMedicoNombre', 'Neurología QA ' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Especialidad creada', () => pm.expect(j.id).to.be.a('number'));",
+                  "setVar('especialidadMedicoId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/especialidades",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "especialidades"]
+            },
+            "description": "Crea una especialidad nueva (nombre único) que se asignará al médico. Guarda el id en `especialidadMedicoId`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"{{especialidadMedicoNombre}}\",\n  \"descripcion\": \"Especialidad para pruebas de médicos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear médico",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "const ts = String(Date.now());",
+                  "setVar('medicoEmail', 'medico.' + ts + '@tusalud.com');",
+                  "setVar('medicoColegiatura', 'CMP-' + ts.slice(-8));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Médico creado con los datos enviados', () => {",
+                  "    pm.expect(j.id).to.be.a('number');",
+                  "    pm.expect(j.usuarioId).to.be.a('number');",
+                  "    pm.expect(j.email).to.eql(pm.variables.get('medicoEmail'));",
+                  "    pm.expect(j.colegiatura).to.eql(pm.variables.get('medicoColegiatura'));",
+                  "    pm.expect(String(j.especialidadId)).to.eql(String(pm.variables.get('especialidadMedicoId')));",
+                  "    pm.expect(j.nombreCompleto).to.eql('Ana Torres');",
+                  "    pm.expect(Number(j.precioConsulta)).to.eql(180);",
+                  "    pm.expect(j).to.have.property('estado');",
+                  "});",
+                  "setVar('medicoId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos"]
+            },
+            "description": "Alta de un médico (crea también su usuario con ROLE_MEDICO). Email y colegiatura únicos generados en el pre-request. Guarda el id en `medicoId`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ana\",\n  \"apellido\": \"Torres\",\n  \"email\": \"{{medicoEmail}}\",\n  \"password\": \"Medico123!\",\n  \"telefono\": \"912345678\",\n  \"colegiatura\": \"{{medicoColegiatura}}\",\n  \"consultorio\": \"Consultorio 204\",\n  \"precioConsulta\": 180.00,\n  \"especialidadId\": {{especialidadMedicoId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/medicos",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "medicos"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"nombre\": \"Ana\",\n  \"apellido\": \"Torres\",\n  \"email\": \"{{medicoEmail}}\",\n  \"password\": \"Medico123!\",\n  \"telefono\": \"912345678\",\n  \"colegiatura\": \"{{medicoColegiatura}}\",\n  \"consultorio\": \"Consultorio 204\",\n  \"precioConsulta\": 180.00,\n  \"especialidadId\": {{especialidadMedicoId}}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 3,\n  \"usuarioId\": 8,\n  \"nombre\": \"Ana\",\n  \"apellido\": \"Torres\",\n  \"nombreCompleto\": \"Ana Torres\",\n  \"email\": \"medico.1760262930000@tusalud.com\",\n  \"telefono\": \"912345678\",\n  \"colegiatura\": \"CMP-62930000\",\n  \"consultorio\": \"Consultorio 204\",\n  \"precioConsulta\": 180,\n  \"especialidadId\": 6,\n  \"especialidadNombre\": \"Neurología QA 1760262930000\",\n  \"estado\": \"ACTIVO\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Eliminar especialidad con médicos (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(409);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/especialidades/{{especialidadMedicoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "especialidades",
+                "{{especialidadMedicoId}}"
+              ]
+            },
+            "description": "No se puede eliminar una especialidad con médicos asociados: 409."
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente intenta crear médico (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(403);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos"]
+            },
+            "description": "Solo ADMIN puede dar de alta médicos: 403.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"No\",\n  \"apellido\": \"Permitido\",\n  \"email\": \"no.permitido@tusalud.com\",\n  \"password\": \"Medico123!\",\n  \"telefono\": \"912345678\",\n  \"colegiatura\": \"CMP-00000\",\n  \"consultorio\": \"X\",\n  \"precioConsulta\": 100.00,\n  \"especialidadId\": {{especialidadMedicoId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Agregar horario al médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Horario creado', () => {",
+                  "    pm.expect(j.id).to.be.a('number');",
+                  "    pm.expect(String(j.medicoId)).to.eql(String(pm.variables.get('medicoId')));",
+                  "    pm.expect(j.diaSemana).to.eql('MONDAY');",
+                  "    pm.expect(hhmm(j.horaInicio)).to.eql('08:00');",
+                  "    pm.expect(hhmm(j.horaFin)).to.eql('12:00');",
+                  "    pm.expect(j.duracionCitaMinutos).to.eql(30);",
+                  "});",
+                  "setVar('horarioId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/{{medicoId}}/horarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos", "{{medicoId}}", "horarios"]
+            },
+            "description": "Agrega un bloque de atención los lunes de 08:00 a 12:00 (citas de 30 min). Guarda el id en `horarioId`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diaSemana\": \"MONDAY\",\n  \"horaInicio\": \"08:00\",\n  \"horaFin\": \"12:00\",\n  \"duracionCitaMinutos\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/medicos/{{medicoId}}/horarios",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "medicos", "{{medicoId}}", "horarios"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"diaSemana\": \"MONDAY\",\n  \"horaInicio\": \"08:00\",\n  \"horaFin\": \"12:00\",\n  \"duracionCitaMinutos\": 30\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 12,\n  \"medicoId\": 3,\n  \"diaSemana\": \"MONDAY\",\n  \"horaInicio\": \"08:00\",\n  \"horaFin\": \"12:00\",\n  \"duracionCitaMinutos\": 30\n}"
+            }
+          ]
+        },
+        {
+          "name": "Agregar horario superpuesto (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(409);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/{{medicoId}}/horarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos", "{{medicoId}}", "horarios"]
+            },
+            "description": "Bloque del mismo día que se superpone con el existente (10:00-14:00): 409.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diaSemana\": \"MONDAY\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"14:00\",\n  \"duracionCitaMinutos\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 409 Conflict",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/medicos/{{medicoId}}/horarios",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "medicos", "{{medicoId}}", "horarios"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"diaSemana\": \"MONDAY\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"14:00\",\n  \"duracionCitaMinutos\": 30\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-10-12T10:15:30\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"El horario se superpone con otro bloque existente\",\n  \"path\": \"/api/v1/medicos/3/horarios\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Agregar horario con duración inválida (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(400);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});",
+                  "pm.test('validationErrors.duracionCitaMinutos', () => pm.expect(pm.response.json().validationErrors).to.have.property('duracionCitaMinutos'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/{{medicoId}}/horarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos", "{{medicoId}}", "horarios"]
+            },
+            "description": "Duración menor a 10 minutos: 400 con `validationErrors.duracionCitaMinutos`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diaSemana\": \"TUESDAY\",\n  \"horaInicio\": \"08:00\",\n  \"horaFin\": \"12:00\",\n  \"duracionCitaMinutos\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar horarios del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = asList(pm.response.json());",
+                  "pm.test('Contiene el horario creado', () => {",
+                  "    pm.expect(lista.length).to.eql(1);",
+                  "    pm.expect(String(lista[0].id)).to.eql(String(pm.variables.get('horarioId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/{{medicoId}}/horarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos", "{{medicoId}}", "horarios"]
+            },
+            "description": "Lista los horarios del médico nuevo: debe contener exactamente el bloque creado."
+          },
+          "response": []
+        },
+        {
+          "name": "Disponibilidad del médico (próximo lunes)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "const d = new Date();",
+                  "d.setDate(d.getDate() + 1);",
+                  "while (d.getDay() !== 1) { d.setDate(d.getDate() + 1); }",
+                  "setVar('fechaLunes', fmt(d));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Horarios disponibles generados', () => {",
+                  "    pm.expect(String(j.medicoId)).to.eql(String(pm.variables.get('medicoId')));",
+                  "    pm.expect(String(j.fecha)).to.eql(pm.variables.get('fechaLunes'));",
+                  "    const slots = j.horariosDisponibles.map(hhmm);",
+                  "    pm.expect(slots.length).to.eql(8);",
+                  "    pm.expect(slots[0]).to.eql('08:00');",
+                  "    pm.expect(slots[7]).to.eql('11:30');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/{{medicoId}}/disponibilidad?fecha={{fechaLunes}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "medicos",
+                "{{medicoId}}",
+                "disponibilidad"
+              ],
+              "query": [
+                {
+                  "key": "fecha",
+                  "value": "{{fechaLunes}}"
+                }
+              ]
+            },
+            "description": "Disponibilidad del médico nuevo el próximo lunes: 8 horarios de 30 min entre 08:00 y 11:30."
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/medicos/{{medicoId}}/disponibilidad?fecha={{fechaLunes}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "v1",
+                    "medicos",
+                    "{{medicoId}}",
+                    "disponibilidad"
+                  ],
+                  "query": [
+                    {
+                      "key": "fecha",
+                      "value": "{{fechaLunes}}"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"medicoId\": 3,\n  \"medicoNombre\": \"Ana Torres\",\n  \"fecha\": \"2026-10-19\",\n  \"horariosDisponibles\": [\n    \"08:00\",\n    \"08:30\",\n    \"09:00\",\n    \"09:30\",\n    \"10:00\",\n    \"10:30\",\n    \"11:00\",\n    \"11:30\"\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Eliminar horario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/{{medicoId}}/horarios/{{horarioId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "medicos",
+                "{{medicoId}}",
+                "horarios",
+                "{{horarioId}}"
+              ]
+            },
+            "description": "Elimina el bloque de horario: 204."
+          },
+          "response": [
+            {
+              "name": "Ejemplo 204 No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/medicos/{{medicoId}}/horarios/{{horarioId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "v1",
+                    "medicos",
+                    "{{medicoId}}",
+                    "horarios",
+                    "{{horarioId}}"
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Listar horarios del Dr. García",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = asList(pm.response.json());",
+                  "pm.test('Atiende de lunes a viernes', () => {",
+                  "    const dias = lista.map(h => h.diaSemana);",
+                  "    ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'].forEach(d => pm.expect(dias).to.include(d));",
+                  "    pm.expect(dias).to.not.include('SUNDAY');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/{{medicoGarciaId}}/horarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos", "{{medicoGarciaId}}", "horarios"]
+            },
+            "description": "Horarios semilla del Dr. García (lunes a viernes 08:00-13:00).",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - Citas (Paciente)",
+      "description": "Reserva de citas como paciente (Juan Pérez, `pacienteToken`). Busca dinámicamente el primer horario libre del Dr. García en días hábiles, por lo que la colección se puede re-ejecutar.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{pacienteToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "Consultar disponibilidad del Dr. García",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "const baseUrl = pm.variables.get('baseUrl');",
+                  "const token = pm.variables.get('pacienteToken');",
+                  "const medicoId = pm.variables.get('medicoGarciaId');",
+                  "let d = (() => { const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate() + 1); })();",
+                  "let intentos = 0;",
+                  "const siguienteHabil = x => { const n = new Date(x.getFullYear(), x.getMonth(), x.getDate() + 1); while (n.getDay() === 0 || n.getDay() === 6) { n.setDate(n.getDate() + 1); } return n; };",
+                  "while (d.getDay() === 0 || d.getDay() === 6) { d.setDate(d.getDate() + 1); }",
+                  "const buscar = () => {",
+                  "    const fecha = fmt(d);",
+                  "    pm.sendRequest({",
+                  "        url: baseUrl + '/api/v1/medicos/' + medicoId + '/disponibilidad?fecha=' + fecha,",
+                  "        method: 'GET',",
+                  "        header: { Authorization: 'Bearer ' + token }",
+                  "    }, (err, res) => {",
+                  "        const slots = (!err && res.code === 200) ? (res.json().horariosDisponibles || []) : [];",
+                  "        if (slots.length > 0 || intentos >= 60) {",
+                  "            setVar('fechaCita', fecha);",
+                  "            console.log('Fecha con disponibilidad: ' + fecha + ' (' + slots.length + ' horarios libres)');",
+                  "        } else {",
+                  "            intentos++;",
+                  "            d = siguienteHabil(d);",
+                  "            buscar();",
+                  "        }",
+                  "    });",
+                  "};",
+                  "buscar();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Hay horarios disponibles para la fecha', () => {",
+                  "    pm.expect(String(j.fecha)).to.eql(pm.variables.get('fechaCita'));",
+                  "    pm.expect(j.horariosDisponibles).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "if (j.horariosDisponibles && j.horariosDisponibles.length) {",
+                  "    setVar('fechaHoraCita', pm.variables.get('fechaCita') + 'T' + hhmm(j.horariosDisponibles[0]) + ':00');",
+                  "}",
+                  "const h = new Date();",
+                  "setVar('hoy', fmt(h));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/{{medicoGarciaId}}/disponibilidad?fecha={{fechaCita}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "medicos",
+                "{{medicoGarciaId}}",
+                "disponibilidad"
+              ],
+              "query": [
+                {
+                  "key": "fecha",
+                  "value": "{{fechaCita}}"
+                }
+              ]
+            },
+            "description": "El pre-request parte del siguiente día hábil y, mediante `pm.sendRequest`, avanza día a día (máx. 60 días hábiles) hasta encontrar uno con horarios libres; lo guarda en `fechaCita`. El test guarda el primer horario libre en `fechaHoraCita` (yyyy-MM-ddTHH:mm:ss)."
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/medicos/{{medicoGarciaId}}/disponibilidad?fecha={{fechaCita}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "v1",
+                    "medicos",
+                    "{{medicoGarciaId}}",
+                    "disponibilidad"
+                  ],
+                  "query": [
+                    {
+                      "key": "fecha",
+                      "value": "{{fechaCita}}"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"medicoId\": 1,\n  \"medicoNombre\": \"Luis García\",\n  \"fecha\": \"2026-10-13\",\n  \"horariosDisponibles\": [\n    \"08:00\",\n    \"08:30\",\n    \"09:00\",\n    \"09:30\",\n    \"10:00\",\n    \"10:30\",\n    \"11:00\",\n    \"11:30\",\n    \"12:00\",\n    \"12:30\"\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Crear cita",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Cita creada en estado PENDIENTE', () => {",
+                  "    pm.expect(j.id).to.be.a('number');",
+                  "    pm.expect(j.estado).to.eql('PENDIENTE');",
+                  "    pm.expect(String(j.fechaHora).substring(0, 16)).to.eql(pm.variables.get('fechaHoraCita').substring(0, 16));",
+                  "    pm.expect(String(j.medicoId)).to.eql(String(pm.variables.get('medicoGarciaId')));",
+                  "    pm.expect(norm(j.especialidad)).to.eql('cardiologia');",
+                  "    pm.expect(Number(j.monto)).to.be.above(0);",
+                  "    pm.expect(j.pacienteNombre).to.include('Juan');",
+                  "});",
+                  "setVar('citaId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas"]
+            },
+            "description": "Reserva la cita en `fechaHoraCita`. Debe quedar PENDIENTE con el monto de la consulta. Guarda el id en `citaId`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"fechaHora\": \"{{fechaHoraCita}}\",\n  \"motivo\": \"Control cardiológico de rutina\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 201 Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/citas",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "citas"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"fechaHora\": \"{{fechaHoraCita}}\",\n  \"motivo\": \"Control cardiológico de rutina\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 15,\n  \"fechaHora\": \"2026-10-13T08:00:00\",\n  \"motivo\": \"Control cardiológico de rutina\",\n  \"estado\": \"PENDIENTE\",\n  \"monto\": 150,\n  \"medicoId\": 1,\n  \"medicoNombre\": \"Luis García\",\n  \"especialidad\": \"Cardiología\",\n  \"consultorio\": \"Consultorio 101\",\n  \"pacienteId\": 1,\n  \"pacienteNombre\": \"Juan Pérez\",\n  \"pacienteDni\": \"45678912\",\n  \"createdAt\": \"2026-10-12T10:15:30\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reservar el mismo horario (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(409);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas"]
+            },
+            "description": "Otra paciente intenta reservar el mismo horario del mismo médico: 409.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"fechaHora\": \"{{fechaHoraCita}}\",\n  \"motivo\": \"Intento de doble reserva\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo 409 Conflict",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/citas",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "citas"]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"fechaHora\": \"{{fechaHoraCita}}\",\n  \"motivo\": \"Intento de doble reserva\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-10-12T10:15:30\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"El horario seleccionado ya está reservado\",\n  \"path\": \"/api/v1/citas\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cita en día sin horario - domingo (409)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "const d = new Date();",
+                  "d.setDate(d.getDate() + 1);",
+                  "while (d.getDay() !== 0) { d.setDate(d.getDate() + 1); }",
+                  "setVar('fechaHoraDomingo', fmt(d) + 'T09:00:00');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(409);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas"]
+            },
+            "description": "El Dr. García no atiende domingos: 409.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"fechaHora\": \"{{fechaHoraDomingo}}\",\n  \"motivo\": \"Cita en domingo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cita fuera del bloque horario (409)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "setVar('fechaHoraFueraBloque', pm.variables.get('fechaCita') + 'T16:00:00');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(409);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas"]
+            },
+            "description": "Día hábil pero a las 16:00, fuera del bloque 08:00-13:00 del Dr. García: 409.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"fechaHora\": \"{{fechaHoraFueraBloque}}\",\n  \"motivo\": \"Cita fuera de horario\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cita en el pasado (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(400);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});",
+                  "pm.test('validationErrors.fechaHora', () => pm.expect(pm.response.json().validationErrors).to.have.property('fechaHora'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas"]
+            },
+            "description": "La fecha y hora debe ser futura: 400 con `validationErrors.fechaHora`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"fechaHora\": \"2020-01-06T09:00:00\",\n  \"motivo\": \"Fecha pasada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otra paciente consulta la cita (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(403);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{citaId}}"]
+            },
+            "description": "Una paciente que no es dueña de la cita no puede verla: 403.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro médico consulta la cita (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(403);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{citaId}}"]
+            },
+            "description": "La Dra. López no es la médica de la cita: 403.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medico2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mis citas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = asList(pm.response.json());",
+                  "pm.test('Incluye la cita creada', () => pm.expect(lista.map(c => String(c.id))).to.include(String(pm.variables.get('citaId'))));",
+                  "pm.test('Todas pertenecen al paciente', () => lista.forEach(c => pm.expect(c.pacienteNombre).to.include('Juan')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/mis-citas?inicio={{hoy}}&fin={{fechaCita}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "mis-citas"],
+              "query": [
+                {
+                  "key": "inicio",
+                  "value": "{{hoy}}"
+                },
+                {
+                  "key": "fin",
+                  "value": "{{fechaCita}}"
+                }
+              ]
+            },
+            "description": "Citas del paciente autenticado en el rango [hoy, fechaCita]: incluye la cita creada."
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/citas/mis-citas?inicio={{hoy}}&fin={{fechaCita}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "citas", "mis-citas"],
+                  "query": [
+                    {
+                      "key": "inicio",
+                      "value": "{{hoy}}"
+                    },
+                    {
+                      "key": "fin",
+                      "value": "{{fechaCita}}"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": 15,\n    \"fechaHora\": \"2026-10-13T08:00:00\",\n    \"motivo\": \"Control cardiológico de rutina\",\n    \"estado\": \"PENDIENTE\",\n    \"monto\": 150,\n    \"medicoId\": 1,\n    \"medicoNombre\": \"Luis García\",\n    \"especialidad\": \"Cardiología\",\n    \"consultorio\": \"Consultorio 101\",\n    \"pacienteId\": 1,\n    \"pacienteNombre\": \"Juan Pérez\",\n    \"pacienteDni\": \"45678912\",\n    \"createdAt\": \"2026-10-12T10:15:30\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Obtener cita por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Detalle de la cita', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(String(j.id)).to.eql(String(pm.variables.get('citaId')));",
+                  "    pm.expect(j.estado).to.eql('PENDIENTE');",
+                  "    pm.expect(j.motivo).to.eql('Control cardiológico de rutina');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{citaId}}"]
+            },
+            "description": "El paciente dueño puede ver el detalle de su cita."
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "citas", "{{citaId}}"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 15,\n  \"fechaHora\": \"2026-10-13T08:00:00\",\n  \"motivo\": \"Control cardiológico de rutina\",\n  \"estado\": \"PENDIENTE\",\n  \"monto\": 150,\n  \"medicoId\": 1,\n  \"medicoNombre\": \"Luis García\",\n  \"especialidad\": \"Cardiología\",\n  \"consultorio\": \"Consultorio 101\",\n  \"pacienteId\": 1,\n  \"pacienteNombre\": \"Juan Pérez\",\n  \"pacienteDni\": \"45678912\",\n  \"createdAt\": \"2026-10-12T10:15:30\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 - Citas (Médico)",
+      "description": "Flujo del médico (Dr. García, `medicoToken`): agenda del día, confirmar y atender la cita, y transiciones de estado inválidas.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{medicoToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "Mi agenda del día",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = asList(pm.response.json());",
+                  "pm.test('La agenda contiene la cita', () => pm.expect(lista.map(c => String(c.id))).to.include(String(pm.variables.get('citaId'))));",
+                  "pm.test('Todas las citas son del día consultado', () => lista.forEach(c => pm.expect(String(c.fechaHora).substring(0, 10)).to.eql(pm.variables.get('fechaCita'))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/me/agenda?fecha={{fechaCita}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos", "me", "agenda"],
+              "query": [
+                {
+                  "key": "fecha",
+                  "value": "{{fechaCita}}"
+                }
+              ]
+            },
+            "description": "Agenda del médico autenticado para `fechaCita`: contiene la cita reservada."
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/medicos/me/agenda?fecha={{fechaCita}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "medicos", "me", "agenda"],
+                  "query": [
+                    {
+                      "key": "fecha",
+                      "value": "{{fechaCita}}"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": 15,\n    \"fechaHora\": \"2026-10-13T08:00:00\",\n    \"motivo\": \"Control cardiológico de rutina\",\n    \"estado\": \"PENDIENTE\",\n    \"monto\": 150,\n    \"medicoId\": 1,\n    \"medicoNombre\": \"Luis García\",\n    \"especialidad\": \"Cardiología\",\n    \"consultorio\": \"Consultorio 101\",\n    \"pacienteId\": 1,\n    \"pacienteNombre\": \"Juan Pérez\",\n    \"pacienteDni\": \"45678912\",\n    \"createdAt\": \"2026-10-12T10:15:30\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Paciente intenta confirmar (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(403);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}/confirmar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{citaId}}", "confirmar"]
+            },
+            "description": "Un paciente no puede confirmar citas: 403.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirmar cita",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Estado CONFIRMADA', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(String(j.id)).to.eql(String(pm.variables.get('citaId')));",
+                  "    pm.expect(j.estado).to.eql('CONFIRMADA');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}/confirmar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{citaId}}", "confirmar"]
+            },
+            "description": "El médico confirma la cita PENDIENTE: pasa a CONFIRMADA."
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}/confirmar",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "citas", "{{citaId}}", "confirmar"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 15,\n  \"fechaHora\": \"2026-10-13T08:00:00\",\n  \"motivo\": \"Control cardiológico de rutina\",\n  \"estado\": \"CONFIRMADA\",\n  \"monto\": 150,\n  \"medicoId\": 1,\n  \"medicoNombre\": \"Luis García\",\n  \"especialidad\": \"Cardiología\",\n  \"consultorio\": \"Consultorio 101\",\n  \"pacienteId\": 1,\n  \"pacienteNombre\": \"Juan Pérez\",\n  \"pacienteDni\": \"45678912\",\n  \"createdAt\": \"2026-10-12T10:15:30\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Confirmar cita ya confirmada (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(409);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}/confirmar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{citaId}}", "confirmar"]
+            },
+            "description": "Solo se puede confirmar desde PENDIENTE: 409."
+          },
+          "response": []
+        },
+        {
+          "name": "Atender cita",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Estado ATENDIDA', () => pm.expect(pm.response.json().estado).to.eql('ATENDIDA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}/atender",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{citaId}}", "atender"]
+            },
+            "description": "El médico marca la cita como ATENDIDA."
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}/atender",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "citas", "{{citaId}}", "atender"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 15,\n  \"fechaHora\": \"2026-10-13T08:00:00\",\n  \"motivo\": \"Control cardiológico de rutina\",\n  \"estado\": \"ATENDIDA\",\n  \"monto\": 150,\n  \"medicoId\": 1,\n  \"medicoNombre\": \"Luis García\",\n  \"especialidad\": \"Cardiología\",\n  \"consultorio\": \"Consultorio 101\",\n  \"pacienteId\": 1,\n  \"pacienteNombre\": \"Juan Pérez\",\n  \"pacienteDni\": \"45678912\",\n  \"createdAt\": \"2026-10-12T10:15:30\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Atender cita ya atendida (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(409);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}/atender",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{citaId}}", "atender"]
+            },
+            "description": "Transición inválida ATENDIDA -> ATENDIDA: 409."
+          },
+          "response": [
+            {
+              "name": "Ejemplo 409 Conflict",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}/atender",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "citas", "{{citaId}}", "atender"]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-10-12T10:15:30\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Transición de estado no permitida\",\n  \"path\": \"/api/v1/citas/15/atender\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Paciente intenta cancelar cita atendida (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(409);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}/cancelar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{citaId}}", "cancelar"]
+            },
+            "description": "Una cita ATENDIDA no se puede cancelar: 409.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 - Cancelación",
+      "description": "El paciente reserva una segunda cita en el siguiente horario libre y la cancela; se validan las transiciones posteriores.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{pacienteToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "Consultar siguiente disponibilidad",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "const baseUrl = pm.variables.get('baseUrl');",
+                  "const token = pm.variables.get('pacienteToken');",
+                  "const medicoId = pm.variables.get('medicoGarciaId');",
+                  "let d = (() => { const p = String(pm.variables.get('fechaCita')).split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); })();",
+                  "let intentos = 0;",
+                  "const siguienteHabil = x => { const n = new Date(x.getFullYear(), x.getMonth(), x.getDate() + 1); while (n.getDay() === 0 || n.getDay() === 6) { n.setDate(n.getDate() + 1); } return n; };",
+                  "while (d.getDay() === 0 || d.getDay() === 6) { d.setDate(d.getDate() + 1); }",
+                  "const buscar = () => {",
+                  "    const fecha = fmt(d);",
+                  "    pm.sendRequest({",
+                  "        url: baseUrl + '/api/v1/medicos/' + medicoId + '/disponibilidad?fecha=' + fecha,",
+                  "        method: 'GET',",
+                  "        header: { Authorization: 'Bearer ' + token }",
+                  "    }, (err, res) => {",
+                  "        const slots = (!err && res.code === 200) ? (res.json().horariosDisponibles || []) : [];",
+                  "        if (slots.length > 0 || intentos >= 60) {",
+                  "            setVar('fechaCita2', fecha);",
+                  "            console.log('Fecha con disponibilidad: ' + fecha + ' (' + slots.length + ' horarios libres)');",
+                  "        } else {",
+                  "            intentos++;",
+                  "            d = siguienteHabil(d);",
+                  "            buscar();",
+                  "        }",
+                  "    });",
+                  "};",
+                  "buscar();"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Hay horarios disponibles', () => pm.expect(j.horariosDisponibles).to.be.an('array').that.is.not.empty);",
+                  "if (j.horariosDisponibles && j.horariosDisponibles.length) {",
+                  "    setVar('fechaHoraCita2', pm.variables.get('fechaCita2') + 'T' + hhmm(j.horariosDisponibles[0]) + ':00');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/{{medicoGarciaId}}/disponibilidad?fecha={{fechaCita2}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "medicos",
+                "{{medicoGarciaId}}",
+                "disponibilidad"
+              ],
+              "query": [
+                {
+                  "key": "fecha",
+                  "value": "{{fechaCita2}}"
+                }
+              ]
+            },
+            "description": "Busca (desde `fechaCita`) el siguiente día hábil con horarios libres y guarda el primero en `fechaHoraCita2`."
+          },
+          "response": []
+        },
+        {
+          "name": "Crear segunda cita",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Cita creada en estado PENDIENTE', () => {",
+                  "    pm.expect(j.estado).to.eql('PENDIENTE');",
+                  "    pm.expect(String(j.fechaHora).substring(0, 16)).to.eql(pm.variables.get('fechaHoraCita2').substring(0, 16));",
+                  "});",
+                  "setVar('cita2Id', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas"]
+            },
+            "description": "Reserva la segunda cita y guarda su id en `cita2Id`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"fechaHora\": \"{{fechaHoraCita2}}\",\n  \"motivo\": \"Consulta de seguimiento\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar cita",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Estado CANCELADA', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(String(j.id)).to.eql(String(pm.variables.get('cita2Id')));",
+                  "    pm.expect(j.estado).to.eql('CANCELADA');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cita2Id}}/cancelar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cita2Id}}", "cancelar"]
+            },
+            "description": "El paciente dueño cancela su cita: CANCELADA."
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/citas/{{cita2Id}}/cancelar",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "citas", "{{cita2Id}}", "cancelar"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 15,\n  \"fechaHora\": \"2026-10-13T08:00:00\",\n  \"motivo\": \"Control cardiológico de rutina\",\n  \"estado\": \"CANCELADA\",\n  \"monto\": 150,\n  \"medicoId\": 1,\n  \"medicoNombre\": \"Luis García\",\n  \"especialidad\": \"Cardiología\",\n  \"consultorio\": \"Consultorio 101\",\n  \"pacienteId\": 1,\n  \"pacienteNombre\": \"Juan Pérez\",\n  \"pacienteDni\": \"45678912\",\n  \"createdAt\": \"2026-10-12T10:15:30\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cancelar cita ya cancelada (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(409);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cita2Id}}/cancelar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cita2Id}}", "cancelar"]
+            },
+            "description": "Una cita CANCELADA no puede volver a cancelarse: 409."
+          },
+          "response": []
+        },
+        {
+          "name": "Médico intenta confirmar cita cancelada (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(409);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cita2Id}}/confirmar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cita2Id}}", "confirmar"]
+            },
+            "description": "Solo se confirma desde PENDIENTE: 409.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 - Auditoría (Admin)",
+      "description": "Reportes de auditoría, solo para ADMIN (`adminToken`).",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{adminToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "Citas por estado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = asList(pm.response.json());",
+                  "pm.test('Formato [{estado, cantidad}]', () => {",
+                  "    pm.expect(lista.length).to.be.above(0);",
+                  "    lista.forEach(e => { pm.expect(e).to.have.property('estado'); pm.expect(e.cantidad).to.be.a('number'); });",
+                  "});",
+                  "pm.test('Hay citas ATENDIDA y CANCELADA', () => {",
+                  "    const m = {}; lista.forEach(e => m[e.estado] = e.cantidad);",
+                  "    pm.expect(m.ATENDIDA).to.be.at.least(1);",
+                  "    pm.expect(m.CANCELADA).to.be.at.least(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/auditoria/citas-por-estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "auditoria", "citas-por-estado"]
+            },
+            "description": "Cantidad de citas agrupadas por estado. Tras la ejecución deben existir citas ATENDIDA y CANCELADA."
+          },
+          "response": [
+            {
+              "name": "Ejemplo 200 OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/auditoria/citas-por-estado",
+                  "host": ["{{baseUrl}}"],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "auditoria",
+                    "citas-por-estado"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"estado\": \"PENDIENTE\",\n    \"cantidad\": 3\n  },\n  {\n    \"estado\": \"CONFIRMADA\",\n    \"cantidad\": 1\n  },\n  {\n    \"estado\": \"CANCELADA\",\n    \"cantidad\": 1\n  },\n  {\n    \"estado\": \"ATENDIDA\",\n    \"cantidad\": 1\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Citas por rango de fechas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const setVar = (k, v) => pm.collectionVariables.set(k, v);",
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const asList = j => Array.isArray(j) ? j : (j && Array.isArray(j.content) ? j.content : []);",
+                  "const hhmm = t => String(t).substring(0, 5);",
+                  "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = asList(pm.response.json());",
+                  "const ids = lista.map(c => String(c.id));",
+                  "pm.test('Incluye las citas creadas en la ejecución', () => {",
+                  "    pm.expect(ids).to.include(String(pm.variables.get('citaId')));",
+                  "    pm.expect(ids).to.include(String(pm.variables.get('cita2Id')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/auditoria/citas?inicio={{hoy}}&fin={{fechaCita2}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "auditoria", "citas"],
+              "query": [
+                {
+                  "key": "inicio",
+                  "value": "{{hoy}}"
+                },
+                {
+                  "key": "fin",
+                  "value": "{{fechaCita2}}"
+                }
+              ]
+            },
+            "description": "Todas las citas en el rango [hoy, fechaCita2]: incluye las dos citas creadas."
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente intenta ver auditoría (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(403);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/auditoria/citas-por-estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "auditoria", "citas-por-estado"]
+            },
+            "description": "Un paciente no accede a auditoría: 403.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médico intenta ver auditoría (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(403);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/auditoria/citas-por-estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "auditoria", "citas-por-estado"]
+            },
+            "description": "Un médico no accede a auditoría: 403.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "07 - Seguridad",
+      "description": "Acceso sin token o con token inválido a endpoints protegidos: 401.",
+      "auth": {
+        "type": "noauth"
+      },
+      "item": [
+        {
+          "name": "Sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(401);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/mis-citas?inicio={{hoy}}&fin={{fechaCita}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "mis-citas"],
+              "query": [
+                {
+                  "key": "inicio",
+                  "value": "{{hoy}}"
+                },
+                {
+                  "key": "fin",
+                  "value": "{{fechaCita}}"
+                }
+              ]
+            },
+            "description": "Petición sin cabecera Authorization: 401."
+          },
+          "response": [
+            {
+              "name": "Ejemplo 401 Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/citas/mis-citas?inicio={{hoy}}&fin={{fechaCita}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "v1", "citas", "mis-citas"],
+                  "query": [
+                    {
+                      "key": "inicio",
+                      "value": "{{hoy}}"
+                    },
+                    {
+                      "key": "fin",
+                      "value": "{{fechaCita}}"
+                    }
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-10-12T10:15:30\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Se requiere autenticación\",\n  \"path\": \"/api/v1/citas/mis-citas\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Especialidades sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(401);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/especialidades",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "especialidades"]
+            },
+            "description": "Incluso la lectura de especialidades requiere autenticación: 401."
+          },
+          "response": []
+        },
+        {
+          "name": "Token inválido (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.status).to.eql(401);",
+                  "    pm.expect(j).to.have.property('message');",
+                  "    pm.expect(j).to.have.property('path');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/especialidades",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "especialidades"]
+            },
+            "description": "JWT mal formado / con firma inválida: 401.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.token-invalido.firma-invalida",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "medicoToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "medico2Token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pacienteToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "paciente2Token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "nuevoPacienteToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "nuevoPacienteEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "nuevoPacienteDni",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "especialidadCardiologiaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "especialidadNombre",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "especialidadId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "medicoGarciaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "medicoLopezId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "especialidadMedicoNombre",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "especialidadMedicoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "medicoEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "medicoColegiatura",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "medicoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "horarioId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fechaLunes",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "hoy",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fechaCita",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fechaHoraCita",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fechaHoraDomingo",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fechaHoraFueraBloque",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "citaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fechaCita2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fechaHoraCita2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cita2Id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
