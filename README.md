@@ -1120,13 +1120,12 @@ Para enviar trazas a Jaeger desde el IDE, levanta también `otel-collector` y `j
 | `jaeger`         | `jaegertracing/jaeger:2.22.0`                  | 16686                               |
 | `pgadmin`        | `dpage/pgadmin4`, solo con el perfil `tools`   | 5050                                |
 
-El `Dockerfile` de la API está optimizado en tamaño, arranque y seguridad:
+El `Dockerfile` de la API está optimizado en tamaño, arranque y seguridad. La imagen final pesa unos 330 MB:
 
 - Compila con el Maven Wrapper sobre `eclipse-temurin:25-jdk-alpine-3.24` usando una cache de BuildKit para el repositorio de Maven, de modo que las reconstrucciones no vuelven a descargar dependencias.
 - Separa el jar de Spring Boot en capas, para que un cambio en el código solo invalide la capa de la aplicación y no la de las dependencias.
 - Genera un JRE a medida con `jdeps` y `jlink`. Incluye solo los módulos que usan la aplicación y el agente de OpenTelemetry, y los datos de locale en inglés y español, que la API necesita para nombrar los días. El JRE ocupa unos 95 MB y corre sobre `alpine:3.24`.
 - Descarga el agente de OpenTelemetry verificando su SHA-256, de modo que el build falla si el archivo publicado cambia.
-- Ejecuta una corrida de entrenamiento durante el build que arranca Spring hasta el refresh del contexto sin conectarse a la base de datos y genera una cache AOT de Java 25. Con esa cache, Spring arranca en unos 2.2 segundos en lugar de 5.8. Las clases del agente no entran en la cache, porque la JVM falla al volcar una cache con el agente cargado, por eso el entrenamiento corre sin él.
 - Activa las cabeceras de objetos compactas de Java 25, que reducen el tamaño de cada objeto en memoria.
 - Corre con un usuario sin privilegios sobre archivos de solo lectura, y arranca la JVM directamente, sin un shell intermedio, para que reciba las señales de apagado.
 

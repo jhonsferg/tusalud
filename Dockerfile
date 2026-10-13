@@ -50,31 +50,12 @@ COPY --from=build /layers/spring-boot-loader/ ./
 COPY --from=build /layers/snapshot-dependencies/ ./
 COPY --from=build /layers/application/ ./
 
-FROM base AS training
-ARG MAVEN_PROFILE=prod
-RUN SPRING_PROFILES_ACTIVE=${MAVEN_PROFILE} \
-    DB_URL=jdbc:postgresql://localhost:5432/tusalud \
-    DB_USERNAME=training \
-    DB_PASSWORD=training \
-    JWT_SECRET=dHJhaW5pbmctb25seS1zZWNyZXQtZm9yLWFvdC1jYWNoZS1nZW5lcmF0aW9uLTI1Ni1iaXRz \
-    java --add-modules java.instrument \
-        -XX:+UseCompactObjectHeaders \
-        -XX:AOTCacheOutput=/app/app.aot \
-        -Dspring.context.exit=onRefresh \
-        -Dspring.jpa.hibernate.ddl-auto=none \
-        -Dspring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect \
-        -Dspring.jpa.properties.hibernate.boot.allow_jdbc_metadata_access=false \
-        -Dspring.sql.init.mode=never \
-        -Dapp.data-initializer.enabled=false \
-        -jar app.jar
-
 FROM base AS runtime
 ARG MAVEN_PROFILE=prod
 LABEL org.opencontainers.image.title="tusalud-api" \
       org.opencontainers.image.description="API REST de TuSalud" \
       org.opencontainers.image.source="https://github.com/jhonsferg/tusalud" \
       org.opencontainers.image.vendor="CodeSoftLabs"
-COPY --from=training /app/app.aot /app/app.aot
 USER spring:spring
 ENV SERVER_PORT=8080 \
     SPRING_PROFILES_ACTIVE=${MAVEN_PROFILE} \
@@ -90,4 +71,4 @@ ENV SERVER_PORT=8080 \
 EXPOSE 8080
 HEALTHCHECK --interval=15s --timeout=5s --start-period=60s --retries=5 \
     CMD wget -q -O /dev/null "http://127.0.0.1:${SERVER_PORT}/v3/api-docs" || exit 1
-ENTRYPOINT ["java", "-javaagent:/otel/opentelemetry-javaagent.jar", "-XX:+UseCompactObjectHeaders", "-XX:AOTCache=/app/app.aot", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-javaagent:/otel/opentelemetry-javaagent.jar", "-XX:+UseCompactObjectHeaders", "-jar", "/app/app.jar"]
