@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      args:
+        MAVEN_PROFILE: dev
+    image: tusalud-api:dev
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DATA_INITIALIZER_ENABLED: ${DATA_INITIALIZER_ENABLED:-true}
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=tusalud,deployment.environment.name=dev
+
+  web:
+    build:
+      args:
+        BUILD_CONFIGURATION: dev
+    image: tusalud-web:dev
