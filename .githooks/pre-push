@@ -1,0 +1,23 @@
+#!/bin/sh
+set -eu
+
+ROOT=$(git rev-parse --show-toplevel)
+cd "$ROOT"
+
+echo "pre-push: verificando formato de Java con Spotless"
+if ! ./mvnw -B -q spotless:check; then
+    echo "pre-push: hay código Java sin formatear. Ejecuta ./mvnw spotless:apply y crea un commit con los cambios." >&2
+    exit 1
+fi
+
+PRETTIER="$ROOT/web/node_modules/.bin/prettier"
+if [ ! -f "$PRETTIER" ]; then
+    echo "pre-push: no se encontró Prettier. Ejecuta: npm --prefix web ci" >&2
+    exit 1
+fi
+
+echo "pre-push: verificando formato con Prettier"
+if ! git ls-files -z | xargs -0 "$PRETTIER" --check --ignore-unknown --log-level warn; then
+    echo "pre-push: hay archivos sin formatear. Ejecuta el formateo y crea un commit con los cambios." >&2
+    exit 1
+fi

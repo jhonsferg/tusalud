@@ -1,0 +1,28 @@
+#!/bin/sh
+set -eu
+
+ROOT=$(git rev-parse --show-toplevel)
+cd "$ROOT"
+
+STAGED=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$STAGED" ] && exit 0
+
+JAVA=$(printf '%s\n' "$STAGED" | grep -E '\.java$' || true)
+OTHER=$(printf '%s\n' "$STAGED" | grep -vE '\.java$' || true)
+
+if [ -n "$JAVA" ]; then
+    echo "pre-commit: formateando Java con Spotless"
+    ./mvnw -B -q spotless:apply
+    printf '%s\n' "$JAVA" | xargs -d '\n' git add --
+fi
+
+if [ -n "$OTHER" ]; then
+    PRETTIER="$ROOT/web/node_modules/.bin/prettier"
+    if [ ! -f "$PRETTIER" ]; then
+        echo "pre-commit: no se encontró Prettier. Ejecuta: npm --prefix web ci" >&2
+        exit 1
+    fi
+    echo "pre-commit: formateando con Prettier"
+    printf '%s\n' "$OTHER" | xargs -d '\n' "$PRETTIER" --write --ignore-unknown --log-level warn
+    printf '%s\n' "$OTHER" | xargs -d '\n' git add --
+fi

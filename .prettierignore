@@ -1,0 +1,11 @@
+target/
+.mvn/
+.idea/
+.angular/
+mvnw
+mvnw.cmd
+web/node_modules/
+web/dist/
+web/.angular/
+web/coverage/
+web/package-lock.json
