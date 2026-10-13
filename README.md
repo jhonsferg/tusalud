@@ -53,28 +53,30 @@ El backend y el frontend se construyen por separado. El `.dockerignore` de la ra
 
 ## Stack tecnológico
 
-| Componente                        | Versión |
-| --------------------------------- | ------- |
-| Java                              | 21      |
-| Spring Boot                       | 3.5.16  |
-| Spring Security                   | 6.5.11  |
-| Hibernate ORM                     | 6.6.53  |
-| JJWT                              | 0.12.7  |
-| springdoc-openapi                 | 2.8.17  |
-| PostgreSQL                        | 18      |
-| H2                                | 2.3.232 |
-| Lombok                            | 1.18.46 |
-| Maven Wrapper con Maven           | 3.9.16  |
-| OpenTelemetry Java Agent          | 2.32.0  |
-| OpenTelemetry Collector Contrib   | 0.162.0 |
-| Jaeger                            | 2.22.0  |
-| Angular                           | 21.2.25 |
-| Angular CLI                       | 21.2.26 |
-| Node.js para compilar el frontend | 24      |
-| nginx                             | 1.30    |
-| Spotless Maven Plugin             | 3.10.4  |
-| palantir-java-format              | 2.102.0 |
-| Prettier                          | 3.9.10  |
+| Componente                        | Versión                      |
+| --------------------------------- | ---------------------------- |
+| Java                              | 25                           |
+| Spring Boot                       | 4.1.1                        |
+| Spring Framework                  | 7.0.9                        |
+| Jackson                           | 3.1.5                        |
+| Spring Security                   | 7.1.1                        |
+| Hibernate ORM                     | 7.4.5                        |
+| JJWT                              | 0.13.0                       |
+| springdoc-openapi                 | 3.1.1                        |
+| PostgreSQL                        | 18                           |
+| H2                                | 2.4.240                      |
+| Lombok                            | 1.18.46                      |
+| Maven Wrapper con Maven           | 3.9.16                       |
+| OpenTelemetry Java Agent          | 2.32.0                       |
+| OpenTelemetry Collector Contrib   | 0.162.0                      |
+| Jaeger                            | 2.22.0                       |
+| Angular                           | 21.2.25                      |
+| Angular CLI                       | 21.2.26                      |
+| Node.js para compilar el frontend | 24                           |
+| nginx                             | 1.30, imagen sin privilegios |
+| Spotless Maven Plugin             | 3.10.4                       |
+| palantir-java-format              | 2.102.0                      |
+| Prettier                          | 3.9.10                       |
 
 ## Arquitectura
 
@@ -95,6 +97,12 @@ src/main/java/com/codesoftlabs/tusalud/app/
     ├── interfaces/     Contratos de servicio
     └── impl/           Implementaciones transaccionales
 ```
+
+### Concurrencia con virtual threads
+
+La API corre sobre Java 25 con virtual threads activados mediante `spring.threads.virtual.enabled: true`. Tomcat atiende cada petición en un virtual thread en lugar de tomar uno de un pool limitado de hilos del sistema operativo. Mientras una petición espera a PostgreSQL, su hilo virtual se desmonta y el hilo del sistema queda libre para atender otra, de modo que la API sostiene muchas más peticiones concurrentes con la misma memoria. Las tareas asíncronas y programadas de Spring usan el mismo modelo.
+
+Desde Java 24 un bloque `synchronized` ya no fija el hilo virtual a su hilo del sistema, por lo que las librerías que todavía usan `synchronized` no anulan la ventaja. El límite real de concurrencia contra la base de datos lo marca el pool de conexiones de Hikari: cuando todas las conexiones están ocupadas, las peticiones adicionales esperan su turno sin consumir hilos del sistema.
 
 Las entidades nunca se serializan directamente. Cada respuesta se construye con un DTO, lo que evita ciclos en la serialización y problemas con relaciones perezosas. La propiedad `open-in-view` está desactivada, de modo que toda carga de datos ocurre dentro de la transacción del servicio.
 
@@ -148,7 +156,7 @@ Un paciente no puede cancelar una cita cuya fecha ya pasó, mientras que un admi
 
 ## Seguridad
 
-La API es completamente sin estado. Spring Security 6 trabaja con `SessionCreationPolicy.STATELESS`, CSRF desactivado y un filtro `JwtAuthenticationFilter` que valida el header `Authorization: Bearer <token>` en cada petición.
+La API es completamente sin estado. Spring Security 7 trabaja con `SessionCreationPolicy.STATELESS`, CSRF desactivado y un filtro `JwtAuthenticationFilter` que valida el header `Authorization: Bearer <token>` en cada petición.
 
 - Los tokens se firman con HMAC-SHA usando la clave `JWT_SECRET`, que debe estar codificada en Base64 y tener al menos 256 bits. Cada token incluye el email como sujeto, el emisor, la expiración, el id del usuario, su nombre y sus roles.
 - Un usuario inactivo no puede iniciar sesión y su token deja de ser válido aunque no haya expirado.
@@ -1077,7 +1085,7 @@ Al cambiar de perfil de Maven conviene ejecutar `./mvnw clean` antes, para que n
 
 ## Ejecución local
 
-Para trabajar desde el IDE solo hace falta Java 21 y Docker para la base de datos. El Maven Wrapper descarga Maven la primera vez que se ejecuta.
+Para trabajar desde el IDE solo hace falta Java 25 y Docker para la base de datos. El Maven Wrapper descarga Maven la primera vez que se ejecuta.
 
 1. Levanta PostgreSQL:
 
@@ -1112,7 +1120,17 @@ Para enviar trazas a Jaeger desde el IDE, levanta también `otel-collector` y `j
 | `jaeger`         | `jaegertracing/jaeger:2.22.0`                  | 16686                               |
 | `pgadmin`        | `dpage/pgadmin4`, solo con el perfil `tools`   | 5050                                |
 
-El `Dockerfile` compila la aplicación con el Maven Wrapper en una etapa de build, separa el jar en capas y genera una imagen final sobre `eclipse-temurin:21-jre-alpine` que se ejecuta con un usuario sin privilegios. El argumento de build `MAVEN_PROFILE` elige el perfil de Maven, `prod` por defecto, y la compilación falla si el `application.yaml` resultante no contiene ese perfil. La imagen define `SPRING_PROFILES_ACTIVE` con el mismo valor.
+El `Dockerfile` de la API está optimizado en tamaño, arranque y seguridad:
+
+- Compila con el Maven Wrapper sobre `eclipse-temurin:25-jdk-alpine-3.24` usando una cache de BuildKit para el repositorio de Maven, de modo que las reconstrucciones no vuelven a descargar dependencias.
+- Separa el jar de Spring Boot en capas, para que un cambio en el código solo invalide la capa de la aplicación y no la de las dependencias.
+- Genera un JRE a medida con `jdeps` y `jlink`. Incluye solo los módulos que usan la aplicación y el agente de OpenTelemetry, y los datos de locale en inglés y español, que la API necesita para nombrar los días. El JRE ocupa unos 95 MB y corre sobre `alpine:3.24`.
+- Descarga el agente de OpenTelemetry verificando su SHA-256, de modo que el build falla si el archivo publicado cambia.
+- Ejecuta una corrida de entrenamiento durante el build que arranca Spring hasta el refresh del contexto sin conectarse a la base de datos y genera una cache AOT de Java 25. Con esa cache, Spring arranca en unos 2.2 segundos en lugar de 5.8. Las clases del agente no entran en la cache, porque la JVM falla al volcar una cache con el agente cargado, por eso el entrenamiento corre sin él.
+- Activa las cabeceras de objetos compactas de Java 25, que reducen el tamaño de cada objeto en memoria.
+- Corre con un usuario sin privilegios sobre archivos de solo lectura, y arranca la JVM directamente, sin un shell intermedio, para que reciba las señales de apagado.
+
+El argumento de build `MAVEN_PROFILE` elige el perfil de Maven, `prod` por defecto, y la compilación falla si el `application.yaml` resultante no contiene ese perfil. La imagen define `SPRING_PROFILES_ACTIVE` con el mismo valor. Las opciones adicionales de la JVM se pasan con la variable `JDK_JAVA_OPTIONS`.
 
 ### Archivos de Compose
 
@@ -1249,7 +1267,7 @@ Todos los comandos se ejecutan dentro de la carpeta `web`. El build genera el si
 
 ### Imagen Docker y Compose
 
-El `Dockerfile` de `web` compila la aplicación con `node:24-alpine` y sirve el resultado con `nginx:1.30-alpine`, la rama estable de nginx. El argumento de build `BUILD_CONFIGURATION` elige la configuración de Angular y vale `production` por defecto.
+El `Dockerfile` de `web` compila la aplicación con `node:24-alpine`, con una cache de npm entre builds, y sirve el resultado con `nginxinc/nginx-unprivileged:1.30-alpine-slim`, la rama estable de nginx en su variante mínima. El contenedor corre con el usuario `nginx`, sin privilegios de root, escucha en el puerto 8080 y la imagen final pesa unos 30 MB. El argumento de build `BUILD_CONFIGURATION` elige la configuración de Angular y vale `production` por defecto.
 
 La aplicación web forma parte del stack de Compose como servicio `web` y queda disponible en `http://localhost:4200` al levantar cualquier entorno:
 
@@ -1267,12 +1285,15 @@ Para reconstruir solo el frontend después de cambiar su código, sin recrear la
 docker compose up -d --build --no-deps web
 ```
 
-nginx cumple cuatro funciones:
+nginx cumple estas funciones:
 
 - Devuelve `index.html` para cualquier ruta que no sea un archivo, de modo que las rutas de Angular funcionan al recargar la página.
 - Reenvía `/api/` al backend definido en `API_UPSTREAM`, que en Compose es `http://app:8080`. Conserva el header `Host` original con su puerto y agrega `X-Forwarded-Host`, `X-Forwarded-For`, `X-Forwarded-Proto` y `X-Real-IP`, de modo que el header `Location` de las respuestas 201 apunta a `http://localhost:4200`. El nombre del backend se resuelve con el DNS indicado en `NGINX_RESOLVER`, que por defecto es el DNS interno de Docker, `127.0.0.11`, por lo que nginx arranca aunque la API todavía no esté disponible.
 - Marca los archivos JavaScript y CSS con hash en el nombre como inmutables durante un año y obliga a revalidar `index.html` en cada visita.
-- Comprime con gzip las respuestas de texto.
+- Sirve los archivos de texto ya comprimidos. El build genera una versión gzip de cada archivo JavaScript, CSS, HTML y SVG, y nginx la entrega directamente con `gzip_static`, sin comprimir en cada petición. Las respuestas de la API se comprimen al vuelo.
+- Agrega las cabeceras de seguridad `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` y `Cross-Origin-Opener-Policy`, y oculta la versión de nginx.
+- Responde `ok` en `/healthz` sin registrar la petición, y el healthcheck de la imagen usa esa ruta.
+- Bloquea la descarga de los archivos `.map`, de modo que los sourcemaps ocultos del build de `qa` no queden expuestos.
 
 Como el navegador solo habla con nginx, la API se consume desde el mismo origen que la aplicación y no depende de CORS. La colección de Postman también puede ejecutarse a través del frontend:
 
@@ -1337,6 +1358,7 @@ Las pruebas usan el perfil `test` con H2 en memoria y no necesitan PostgreSQL ni
 
 | Clase                               | Qué verifica                                                                                            |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `VirtualThreadsTest`                | Que Tomcat atiende las peticiones con virtual threads                                                   |
 | `TusaludApplicationTests`           | Que el contexto de Spring arranca                                                                       |
 | `CitaRepositoryTest`                | Las consultas JPQL de citas, médicos, horarios y auditoría contra datos reales                          |
 | `SecurityIntegrationTest`           | Respuestas 401 y 403, rutas públicas, CORS, contenido del token y login con BCrypt                      |
@@ -1426,26 +1448,26 @@ El archivo `.env.example` documenta todas las variables con valores para desarro
 cp .env.example .env
 ```
 
-| Variable                   | Uso                                                              | Valor por defecto         |
-| -------------------------- | ---------------------------------------------------------------- | ------------------------- |
-| `SPRING_PROFILES_ACTIVE`   | Perfil de Spring en tiempo de ejecución                          | El perfil de Maven        |
-| `DB_URL`                   | URL JDBC de PostgreSQL, obligatoria en `prod`                    | Según el perfil           |
-| `DB_USERNAME`              | Usuario de PostgreSQL, obligatorio en `prod`                     | `postgres`                |
-| `DB_PASSWORD`              | Clave de PostgreSQL, obligatoria en `prod`                       | `postgres`                |
-| `JWT_SECRET`               | Clave HMAC en Base64 de al menos 256 bits, obligatoria en `prod` | Solo fuera de `prod`      |
-| `JWT_EXPIRATION_MS`        | Vigencia del token en milisegundos                               | `86400000`                |
-| `CORS_ALLOWED_ORIGINS`     | Orígenes permitidos, separados por comas                         | `http://localhost:4200`   |
-| `DATA_INITIALIZER_ENABLED` | Carga de datos de prueba. Vacío usa el valor del perfil          | Según el perfil           |
-| `SERVER_PORT`              | Puerto HTTP de la API dentro del contenedor                      | `8080`                    |
-| `JAVA_OPTS`                | Opciones de la JVM                                               | `-XX:MaxRAMPercentage=75` |
-| `OTEL_SERVICE_NAME`        | Nombre del servicio en las trazas                                | `tusalud-api`             |
-| `APP_PORT`                 | Puerto de la API en el host                                      | `8080`                    |
-| `WEB_PORT`                 | Puerto de la aplicación web en el host                           | `4200`                    |
-| `POSTGRES_PORT`            | Puerto de PostgreSQL en el host                                  | `5432`                    |
-| `JAEGER_UI_PORT`           | Puerto de la interfaz de Jaeger en el host                       | `16686`                   |
-| `OTEL_GRPC_PORT`           | Puerto OTLP gRPC del Collector en el host                        | `4317`                    |
-| `OTEL_HTTP_PORT`           | Puerto OTLP HTTP del Collector en el host                        | `4318`                    |
-| `OTEL_HEALTH_PORT`         | Puerto del healthcheck del Collector en el host                  | `13133`                   |
-| `PGADMIN_PORT`             | Puerto de pgAdmin en el host                                     | `5050`                    |
-| `PGADMIN_EMAIL`            | Usuario de pgAdmin                                               | `admin@tusalud.com`       |
-| `PGADMIN_PASSWORD`         | Clave de pgAdmin                                                 | `admin`                   |
+| Variable                   | Uso                                                              | Valor por defecto                                     |
+| -------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------- |
+| `SPRING_PROFILES_ACTIVE`   | Perfil de Spring en tiempo de ejecución                          | El perfil de Maven                                    |
+| `DB_URL`                   | URL JDBC de PostgreSQL, obligatoria en `prod`                    | Según el perfil                                       |
+| `DB_USERNAME`              | Usuario de PostgreSQL, obligatorio en `prod`                     | `postgres`                                            |
+| `DB_PASSWORD`              | Clave de PostgreSQL, obligatoria en `prod`                       | `postgres`                                            |
+| `JWT_SECRET`               | Clave HMAC en Base64 de al menos 256 bits, obligatoria en `prod` | Solo fuera de `prod`                                  |
+| `JWT_EXPIRATION_MS`        | Vigencia del token en milisegundos                               | `86400000`                                            |
+| `CORS_ALLOWED_ORIGINS`     | Orígenes permitidos, separados por comas                         | `http://localhost:4200`                               |
+| `DATA_INITIALIZER_ENABLED` | Carga de datos de prueba. Vacío usa el valor del perfil          | Según el perfil                                       |
+| `SERVER_PORT`              | Puerto HTTP de la API dentro del contenedor                      | `8080`                                                |
+| `JDK_JAVA_OPTIONS`         | Opciones adicionales de la JVM de la API                         | `-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError` |
+| `OTEL_SERVICE_NAME`        | Nombre del servicio en las trazas                                | `tusalud-api`                                         |
+| `APP_PORT`                 | Puerto de la API en el host                                      | `8080`                                                |
+| `WEB_PORT`                 | Puerto de la aplicación web en el host                           | `4200`                                                |
+| `POSTGRES_PORT`            | Puerto de PostgreSQL en el host                                  | `5432`                                                |
+| `JAEGER_UI_PORT`           | Puerto de la interfaz de Jaeger en el host                       | `16686`                                               |
+| `OTEL_GRPC_PORT`           | Puerto OTLP gRPC del Collector en el host                        | `4317`                                                |
+| `OTEL_HTTP_PORT`           | Puerto OTLP HTTP del Collector en el host                        | `4318`                                                |
+| `OTEL_HEALTH_PORT`         | Puerto del healthcheck del Collector en el host                  | `13133`                                               |
+| `PGADMIN_PORT`             | Puerto de pgAdmin en el host                                     | `5050`                                                |
+| `PGADMIN_EMAIL`            | Usuario de pgAdmin                                               | `admin@tusalud.com`                                   |
+| `PGADMIN_PASSWORD`         | Clave de pgAdmin                                                 | `admin`                                               |
