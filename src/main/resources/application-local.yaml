@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/tusalud}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      pool-name: TusaludHikariPool
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:7M+c4b4GZSekiWHhQKtFdWMk3BbcEwa1YQ0PqmCFie75dy5ko50rildSWFTsI18NTxineFm3/IIKY1lyrZn89g==}
+  data-initializer:
+    enabled: ${DATA_INITIALIZER_ENABLED:true}
+
+logging:
+  level:
+    com.codesoftlabs.tusalud.app: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE

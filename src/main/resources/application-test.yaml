@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:tusalud;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:7M+c4b4GZSekiWHhQKtFdWMk3BbcEwa1YQ0PqmCFie75dy5ko50rildSWFTsI18NTxineFm3/IIKY1lyrZn89g==}
+  data-initializer:
+    enabled: ${DATA_INITIALIZER_ENABLED:true}
+
+logging:
+  level:
+    com.codesoftlabs.tusalud.app: DEBUG
+    org.hibernate.SQL: WARN
