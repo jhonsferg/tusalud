@@ -1,45 +1,84 @@
-FROM eclipse-temurin:21-jdk-alpine AS build
+ARG JDK_IMAGE=eclipse-temurin:25-jdk-alpine-3.24
+ARG RUNTIME_IMAGE=alpine:3.24
+
+FROM ${JDK_IMAGE} AS build
 ARG MAVEN_PROFILE=prod
 WORKDIR /workspace
 
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
 RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
-RUN ./mvnw -B -q -P${MAVEN_PROFILE} dependency:go-offline
+RUN --mount=type=cache,target=/root/.m2 ./mvnw -B -q -P${MAVEN_PROFILE} dependency:go-offline
 
 COPY src/ src/
-RUN ./mvnw -B -DskipTests -P${MAVEN_PROFILE} package \
+RUN --mount=type=cache,target=/root/.m2 ./mvnw -B -q -DskipTests -P${MAVEN_PROFILE} package \
     && grep -q "active: \"${MAVEN_PROFILE}\"" target/classes/application.yaml \
-    && cp target/tusalud-api-0.0.1-SNAPSHOT.jar /workspace/app.jar
+    && cp target/tusalud-api-0.0.1-SNAPSHOT.jar app.jar \
+    && java -Djarmode=tools -jar app.jar extract --layers --destination /layers
 
-FROM eclipse-temurin:21-jre-alpine AS extract
-WORKDIR /extract
-COPY --from=build /workspace/app.jar app.jar
-RUN java -Djarmode=tools -jar app.jar extract --layers --launcher --destination layers
+FROM ${JDK_IMAGE} AS jre
+COPY --from=build /layers /layers
+RUN jdeps --ignore-missing-deps -q --recursive --multi-release 25 --print-module-deps \
+        --class-path "$(find /layers -path '*/lib/*.jar' | tr '\n' ':')" \
+        "$(find /layers -maxdepth 2 -name '*.jar' | head -1)" > /tmp/modules \
+    && jlink \
+        --add-modules "$(cat /tmp/modules),java.instrument,java.management,java.net.http,java.security.jgss,java.security.sasl,jdk.jfr,jdk.localedata,jdk.management,jdk.naming.dns,jdk.unsupported,jdk.zipfs" \
+        --include-locales=en,es \
+        --strip-debug \
+        --no-man-pages \
+        --no-header-files \
+        --compress=zip-9 \
+        --generate-cds-archive \
+        --output /jre
 
-FROM eclipse-temurin:21-jre-alpine AS runtime
+FROM ${RUNTIME_IMAGE} AS base
 ARG OTEL_JAVA_AGENT_VERSION=2.32.0
-ARG MAVEN_PROFILE=prod
+ARG OTEL_JAVA_AGENT_SHA256=f787eb6c7f3d18e69a431e108a15278d25ee37f83d68b678f621e063f3988f82
+ENV JAVA_HOME=/opt/java \
+    PATH=/opt/java/bin:$PATH \
+    TZ=America/Lima \
+    LANG=C.UTF-8
+RUN addgroup -S -g 10001 spring && adduser -S -u 10001 -G spring -h /app spring && mkdir -m 755 /otel
 WORKDIR /app
-
-RUN addgroup -S spring && adduser -S spring -G spring
-
-ADD --chown=spring:spring \
+COPY --from=jre /jre /opt/java
+ADD --checksum=sha256:${OTEL_JAVA_AGENT_SHA256} --chmod=644 \
     https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v${OTEL_JAVA_AGENT_VERSION}/opentelemetry-javaagent.jar \
     /otel/opentelemetry-javaagent.jar
-COPY --chown=spring:spring docker/otel-agent/agent.properties /otel/agent.properties
+COPY docker/otel-agent/agent.properties /otel/agent.properties
+COPY --from=build /layers/dependencies/ ./
+COPY --from=build /layers/spring-boot-loader/ ./
+COPY --from=build /layers/snapshot-dependencies/ ./
+COPY --from=build /layers/application/ ./
 
-COPY --from=extract --chown=spring:spring /extract/layers/dependencies/ ./
-COPY --from=extract --chown=spring:spring /extract/layers/spring-boot-loader/ ./
-COPY --from=extract --chown=spring:spring /extract/layers/snapshot-dependencies/ ./
-COPY --from=extract --chown=spring:spring /extract/layers/application/ ./
+FROM base AS training
+ARG MAVEN_PROFILE=prod
+RUN SPRING_PROFILES_ACTIVE=${MAVEN_PROFILE} \
+    DB_URL=jdbc:postgresql://localhost:5432/tusalud \
+    DB_USERNAME=training \
+    DB_PASSWORD=training \
+    JWT_SECRET=dHJhaW5pbmctb25seS1zZWNyZXQtZm9yLWFvdC1jYWNoZS1nZW5lcmF0aW9uLTI1Ni1iaXRz \
+    java --add-modules java.instrument \
+        -XX:+UseCompactObjectHeaders \
+        -XX:AOTCacheOutput=/app/app.aot \
+        -Dspring.context.exit=onRefresh \
+        -Dspring.jpa.hibernate.ddl-auto=none \
+        -Dspring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect \
+        -Dspring.jpa.properties.hibernate.boot.allow_jdbc_metadata_access=false \
+        -Dspring.sql.init.mode=never \
+        -Dapp.data-initializer.enabled=false \
+        -jar app.jar
 
-USER spring
-
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:+UseContainerSupport -Djava.security.egd=file:/dev/./urandom" \
-    SERVER_PORT=8080 \
+FROM base AS runtime
+ARG MAVEN_PROFILE=prod
+LABEL org.opencontainers.image.title="tusalud-api" \
+      org.opencontainers.image.description="API REST de TuSalud" \
+      org.opencontainers.image.source="https://github.com/jhonsferg/tusalud" \
+      org.opencontainers.image.vendor="CodeSoftLabs"
+COPY --from=training /app/app.aot /app/app.aot
+USER spring:spring
+ENV SERVER_PORT=8080 \
     SPRING_PROFILES_ACTIVE=${MAVEN_PROFILE} \
-    TZ=America/Lima \
+    JDK_JAVA_OPTIONS="-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError" \
     OTEL_JAVAAGENT_CONFIGURATION_FILE=/otel/agent.properties \
     OTEL_SERVICE_NAME=tusalud-api \
     OTEL_RESOURCE_ATTRIBUTES=service.namespace=tusalud,deployment.environment.name=${MAVEN_PROFILE} \
@@ -48,10 +87,7 @@ ENV JAVA_OPTS="-XX:MaxRAMPercentage=75 -XX:+UseContainerSupport -Djava.security.
     OTEL_TRACES_EXPORTER=otlp \
     OTEL_METRICS_EXPORTER=otlp \
     OTEL_LOGS_EXPORTER=otlp
-
 EXPOSE 8080
-
-HEALTHCHECK --interval=15s --timeout=5s --start-period=90s --retries=5 \
-    CMD wget -q -O /dev/null "http://localhost:${SERVER_PORT}/v3/api-docs" || exit 1
-
-ENTRYPOINT ["sh", "-c", "exec java -javaagent:/otel/opentelemetry-javaagent.jar $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]
+HEALTHCHECK --interval=15s --timeout=5s --start-period=60s --retries=5 \
+    CMD wget -q -O /dev/null "http://127.0.0.1:${SERVER_PORT}/v3/api-docs" || exit 1
+ENTRYPOINT ["java", "-javaagent:/otel/opentelemetry-javaagent.jar", "-XX:+UseCompactObjectHeaders", "-XX:AOTCache=/app/app.aot", "-jar", "/app/app.jar"]
