@@ -3,13 +3,13 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 
-import { routes } from '../../app.routes';
-import { createSession } from '../../../testing/auth-fixtures';
-import { Rol } from '../models';
-import { SESSION_STORAGE_KEY } from '../services/auth.service';
-import { authGuard } from './auth.guard';
-import { guestGuard } from './guest.guard';
-import { roleGuard } from './role.guard';
+import { routes } from '@tusalud/app/app.routes';
+import { createSession } from '@tusalud/testing/auth-fixtures';
+import { Rol } from '@tusalud/app/core/models';
+import { SESSION_STORAGE_KEY } from '@tusalud/app/core/services/auth.service';
+import { authGuard } from '@tusalud/app/core/guards/auth.guard';
+import { guestGuard } from '@tusalud/app/core/guards/guest.guard';
+import { roleGuard } from '@tusalud/app/core/guards/role.guard';
 
 @Component({ template: '' })
 class Empty {}

@@ -10,11 +10,11 @@ import {
   Rol,
   Session,
   SessionUser,
-} from '../models';
-import { jwtExpirationMs } from '../utils/jwt';
-import { AuthApiService } from './api/auth-api.service';
-import { NotificationService } from './notification.service';
-import { StorageService } from './storage.service';
+} from '@tusalud/app/core/models';
+import { jwtExpirationMs } from '@tusalud/app/core/utils/jwt';
+import { AuthApiService } from '@tusalud/app/core/services/api/auth-api.service';
+import { NotificationService } from '@tusalud/app/core/services/notification.service';
+import { StorageService } from '@tusalud/app/core/services/storage.service';
 
 export const SESSION_STORAGE_KEY = 'tusalud.session';
 export const LOGIN_URL = '/auth/login';

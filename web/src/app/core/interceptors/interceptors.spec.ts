@@ -3,15 +3,19 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
-import { createSession } from '../../../testing/auth-fixtures';
-import { SKIP_AUTH, SKIP_ERROR_NOTIFICATION, SKIP_LOADING } from '../config/http-context';
-import { ApiError } from '../models';
-import { AuthService, SESSION_STORAGE_KEY } from '../services/auth.service';
-import { LoadingService } from '../services/loading.service';
-import { NotificationService } from '../services/notification.service';
-import { authInterceptor } from './auth.interceptor';
-import { errorInterceptor } from './error.interceptor';
-import { loadingInterceptor } from './loading.interceptor';
+import { createSession } from '@tusalud/testing/auth-fixtures';
+import {
+  SKIP_AUTH,
+  SKIP_ERROR_NOTIFICATION,
+  SKIP_LOADING,
+} from '@tusalud/app/core/config/http-context';
+import { ApiError } from '@tusalud/app/core/models';
+import { AuthService, SESSION_STORAGE_KEY } from '@tusalud/app/core/services/auth.service';
+import { LoadingService } from '@tusalud/app/core/services/loading.service';
+import { NotificationService } from '@tusalud/app/core/services/notification.service';
+import { authInterceptor } from '@tusalud/app/core/interceptors/auth.interceptor';
+import { errorInterceptor } from '@tusalud/app/core/interceptors/error.interceptor';
+import { loadingInterceptor } from '@tusalud/app/core/interceptors/loading.interceptor';
 
 describe('interceptores', () => {
   let http: HttpClient;

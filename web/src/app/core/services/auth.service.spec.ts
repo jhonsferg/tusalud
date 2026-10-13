@@ -3,10 +3,14 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
-import { createAuthResponse, createSession } from '../../../testing/auth-fixtures';
-import { SKIP_AUTH, SKIP_ERROR_NOTIFICATION } from '../config/http-context';
-import { AuthService, SESSION_STORAGE_KEY, toSession } from './auth.service';
-import { NotificationService } from './notification.service';
+import { createAuthResponse, createSession } from '@tusalud/testing/auth-fixtures';
+import { SKIP_AUTH, SKIP_ERROR_NOTIFICATION } from '@tusalud/app/core/config/http-context';
+import {
+  AuthService,
+  SESSION_STORAGE_KEY,
+  toSession,
+} from '@tusalud/app/core/services/auth.service';
+import { NotificationService } from '@tusalud/app/core/services/notification.service';
 
 describe('AuthService', () => {
   let http: HttpTestingController;

@@ -1,6 +1,6 @@
 import { AbstractControl, FormGroup } from '@angular/forms';
 
-import { ApiError } from '../models';
+import { ApiError } from '@tusalud/app/core/models';
 
 export function applyServerErrors(form: FormGroup, error: ApiError): string[] {
   const unmatched: string[] = [];

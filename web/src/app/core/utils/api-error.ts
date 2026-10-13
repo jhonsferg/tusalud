@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { ApiError, ErrorResponse } from '../models';
+import { ApiError, ErrorResponse } from '@tusalud/app/core/models';
 
 const MENSAJES_POR_ESTADO: Readonly<Record<number, string>> = {
   0: 'No se pudo conectar con el servidor. Verifica tu conexión e inténtalo nuevamente.',

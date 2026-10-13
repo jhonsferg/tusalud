@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { API_URL } from '../../config/api.config';
+import { API_URL } from '@tusalud/app/core/config/api.config';
 import {
   CitaResponse,
   DisponibilidadResponse,
@@ -10,8 +10,8 @@ import {
   HorarioResponse,
   MedicoCreateRequest,
   MedicoResponse,
-} from '../../models';
-import { toHttpParams } from '../../utils/http-params';
+} from '@tusalud/app/core/models';
+import { toHttpParams } from '@tusalud/app/core/utils/http-params';
 
 @Injectable({ providedIn: 'root' })
 export class MedicosApiService {

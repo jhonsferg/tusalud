@@ -1,9 +1,12 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { toIsoDate, toIsoDateTime } from '../utils/date';
-import { AppValidators } from './app.validators';
-import { applyServerErrors } from './server-errors';
-import { firstErrorMessage, validationMessage } from './validation-messages';
+import { toIsoDate, toIsoDateTime } from '@tusalud/app/core/utils/date';
+import { AppValidators } from '@tusalud/app/core/validators/app.validators';
+import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
+import {
+  firstErrorMessage,
+  validationMessage,
+} from '@tusalud/app/core/validators/validation-messages';
 
 function check(validator: (control: FormControl) => unknown, value: unknown): unknown {
   return validator(new FormControl(value));

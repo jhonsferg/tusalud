@@ -4,14 +4,14 @@ import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { Subject } from 'rxjs';
 
-import { createSession } from '../../../testing/auth-fixtures';
-import { CitaResponse, HorarioResponse, MedicoResponse } from '../models';
-import { AuthService, SESSION_STORAGE_KEY } from '../services/auth.service';
-import { AsyncState } from './async-state';
-import { AuditoriaStore } from './auditoria.store';
-import { CitasStore } from './citas.store';
-import { EspecialidadesStore } from './especialidades.store';
-import { MedicosStore, ordenarHorarios } from './medicos.store';
+import { createSession } from '@tusalud/testing/auth-fixtures';
+import { CitaResponse, HorarioResponse, MedicoResponse } from '@tusalud/app/core/models';
+import { AuthService, SESSION_STORAGE_KEY } from '@tusalud/app/core/services/auth.service';
+import { AsyncState } from '@tusalud/app/core/state/async-state';
+import { AuditoriaStore } from '@tusalud/app/core/state/auditoria.store';
+import { CitasStore } from '@tusalud/app/core/state/citas.store';
+import { EspecialidadesStore } from '@tusalud/app/core/state/especialidades.store';
+import { MedicosStore, ordenarHorarios } from '@tusalud/app/core/state/medicos.store';
 
 function cita(id: number, fechaHora: string, estado: CitaResponse['estado']): CitaResponse {
   return {

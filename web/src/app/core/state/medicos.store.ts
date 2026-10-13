@@ -9,10 +9,10 @@ import {
   HorarioResponse,
   MedicoCreateRequest,
   MedicoResponse,
-} from '../models';
-import { MedicosApiService } from '../services/api/medicos-api.service';
-import { AsyncState } from './async-state';
-import { resetOnLogout } from './session-scoped';
+} from '@tusalud/app/core/models';
+import { MedicosApiService } from '@tusalud/app/core/services/api/medicos-api.service';
+import { AsyncState } from '@tusalud/app/core/state/async-state';
+import { resetOnLogout } from '@tusalud/app/core/state/session-scoped';
 
 export interface HorariosDelDia {
   readonly dia: DiaSemana;

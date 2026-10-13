@@ -1,6 +1,6 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
-import { parseIsoDate, parseIsoDateTime } from '../utils/date';
+import { parseIsoDate, parseIsoDateTime } from '@tusalud/app/core/utils/date';
 
 const DNI = /^\d{8}$/;
 const TELEFONO = /^\d{9}$/;

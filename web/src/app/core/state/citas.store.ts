@@ -8,11 +8,11 @@ import {
   ESTADOS_CITA_ACTIVOS,
   EstadoCita,
   RangoFechas,
-} from '../models';
-import { CitasApiService } from '../services/api/citas-api.service';
-import { MedicosApiService } from '../services/api/medicos-api.service';
-import { AsyncState } from './async-state';
-import { resetOnLogout } from './session-scoped';
+} from '@tusalud/app/core/models';
+import { CitasApiService } from '@tusalud/app/core/services/api/citas-api.service';
+import { MedicosApiService } from '@tusalud/app/core/services/api/medicos-api.service';
+import { AsyncState } from '@tusalud/app/core/state/async-state';
+import { resetOnLogout } from '@tusalud/app/core/state/session-scoped';
 
 function porFecha(a: CitaResponse, b: CitaResponse): number {
   return a.fechaHora.localeCompare(b.fechaHora);

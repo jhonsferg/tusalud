@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
-import { optionalNumberAttribute } from '../../../core/utils/route-input';
+import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
 
 @Component({
   selector: 'app-cita-form',

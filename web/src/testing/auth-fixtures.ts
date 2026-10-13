@@ -1,4 +1,4 @@
-import { AuthResponse, JwtPayload, Rol, Session } from '../app/core/models';
+import { AuthResponse, JwtPayload, Rol, Session } from '@tusalud/app/core/models';
 
 function base64Url(value: string): string {
   const bytes = new TextEncoder().encode(value);

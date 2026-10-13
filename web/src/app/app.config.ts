@@ -9,10 +9,10 @@ import {
 } from '@angular/router';
 
 import { routes } from './app.routes';
-import { AppTitleStrategy } from './core/config/app-title.strategy';
-import { authInterceptor } from './core/interceptors/auth.interceptor';
-import { errorInterceptor } from './core/interceptors/error.interceptor';
-import { loadingInterceptor } from './core/interceptors/loading.interceptor';
+import { AppTitleStrategy } from '@tusalud/app/core/config/app-title.strategy';
+import { authInterceptor } from '@tusalud/app/core/interceptors/auth.interceptor';
+import { errorInterceptor } from '@tusalud/app/core/interceptors/error.interceptor';
+import { loadingInterceptor } from '@tusalud/app/core/interceptors/loading.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [

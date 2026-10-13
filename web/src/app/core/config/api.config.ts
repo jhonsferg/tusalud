@@ -1,6 +1,6 @@
 import { InjectionToken } from '@angular/core';
 
-import { environment } from '../../../environments/environment';
+import { environment } from '@tusalud/environments/environment';
 
 export const API_URL = new InjectionToken<string>('API_URL', {
   providedIn: 'root',

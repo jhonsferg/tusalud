@@ -2,8 +2,8 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { finalize } from 'rxjs';
 
-import { SKIP_LOADING } from '../config/http-context';
-import { LoadingService } from '../services/loading.service';
+import { SKIP_LOADING } from '@tusalud/app/core/config/http-context';
+import { LoadingService } from '@tusalud/app/core/services/loading.service';
 
 export const loadingInterceptor: HttpInterceptorFn = (request, next) => {
   if (request.context.get(SKIP_LOADING)) {

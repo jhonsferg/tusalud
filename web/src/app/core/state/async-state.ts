@@ -1,8 +1,8 @@
 import { computed, signal } from '@angular/core';
 import { Observable, Subscription, catchError, defer, finalize, tap, throwError } from 'rxjs';
 
-import { ApiError } from '../models';
-import { asApiError } from '../utils/api-error';
+import { ApiError } from '@tusalud/app/core/models';
+import { asApiError } from '@tusalud/app/core/utils/api-error';
 
 export class AsyncState<T> {
   private readonly valueState = signal<T | undefined>(undefined);

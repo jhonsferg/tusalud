@@ -1,28 +1,30 @@
 import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 
-import { authGuard } from './core/guards/auth.guard';
-import { guestGuard } from './core/guards/guest.guard';
-import { roleGuard } from './core/guards/role.guard';
-import { AuthService, LOGIN_URL } from './core/services/auth.service';
+import { authGuard } from '@tusalud/app/core/guards/auth.guard';
+import { guestGuard } from '@tusalud/app/core/guards/guest.guard';
+import { roleGuard } from '@tusalud/app/core/guards/role.guard';
+import { AuthService, LOGIN_URL } from '@tusalud/app/core/services/auth.service';
 
 export const routes: Routes = [
   {
     path: 'auth',
     canActivate: [guestGuard],
-    loadComponent: () => import('./layout/auth-layout/auth-layout').then((m) => m.AuthLayout),
-    loadChildren: () => import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
+    loadComponent: () =>
+      import('@tusalud/app/layout/auth-layout/auth-layout').then((m) => m.AuthLayout),
+    loadChildren: () => import('@tusalud/app/features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
   {
     path: 'acceso-denegado',
     title: 'Acceso denegado',
-    loadComponent: () => import('./shared/components/forbidden/forbidden').then((m) => m.Forbidden),
+    loadComponent: () =>
+      import('@tusalud/app/shared/components/forbidden/forbidden').then((m) => m.Forbidden),
   },
   {
     path: '',
     canActivate: [authGuard],
     canActivateChild: [authGuard],
-    loadComponent: () => import('./layout/shell/shell').then((m) => m.Shell),
+    loadComponent: () => import('@tusalud/app/layout/shell/shell').then((m) => m.Shell),
     children: [
       {
         path: '',
@@ -35,35 +37,39 @@ export const routes: Routes = [
       {
         path: 'especialidades',
         loadChildren: () =>
-          import('./features/especialidades/especialidades.routes').then(
+          import('@tusalud/app/features/especialidades/especialidades.routes').then(
             (m) => m.ESPECIALIDADES_ROUTES,
           ),
       },
       {
         path: 'medicos',
         loadChildren: () =>
-          import('./features/medicos/medicos.routes').then((m) => m.MEDICOS_ROUTES),
+          import('@tusalud/app/features/medicos/medicos.routes').then((m) => m.MEDICOS_ROUTES),
       },
       {
         path: 'citas',
-        loadChildren: () => import('./features/citas/citas.routes').then((m) => m.CITAS_ROUTES),
+        loadChildren: () =>
+          import('@tusalud/app/features/citas/citas.routes').then((m) => m.CITAS_ROUTES),
       },
       {
         path: 'agenda',
         title: 'Mi agenda',
         canMatch: [roleGuard('ROLE_MEDICO')],
-        loadComponent: () => import('./features/agenda/agenda/agenda').then((m) => m.Agenda),
+        loadComponent: () =>
+          import('@tusalud/app/features/agenda/agenda/agenda').then((m) => m.Agenda),
       },
       {
         path: 'admin',
         canMatch: [roleGuard('ROLE_ADMIN')],
-        loadChildren: () => import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
+        loadChildren: () =>
+          import('@tusalud/app/features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
       },
     ],
   },
   {
     path: '**',
     title: 'Página no encontrada',
-    loadComponent: () => import('./shared/components/not-found/not-found').then((m) => m.NotFound),
+    loadComponent: () =>
+      import('@tusalud/app/shared/components/not-found/not-found').then((m) => m.NotFound),
   },
 ];

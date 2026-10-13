@@ -1,10 +1,10 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 
-import { EspecialidadRequest, EspecialidadResponse } from '../models';
-import { EspecialidadesApiService } from '../services/api/especialidades-api.service';
-import { AsyncState } from './async-state';
-import { resetOnLogout } from './session-scoped';
+import { EspecialidadRequest, EspecialidadResponse } from '@tusalud/app/core/models';
+import { EspecialidadesApiService } from '@tusalud/app/core/services/api/especialidades-api.service';
+import { AsyncState } from '@tusalud/app/core/state/async-state';
+import { resetOnLogout } from '@tusalud/app/core/state/session-scoped';
 
 function porNombre(a: EspecialidadResponse, b: EspecialidadResponse): number {
   return a.nombre.localeCompare(b.nombre, 'es');

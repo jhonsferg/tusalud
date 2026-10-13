@@ -1,9 +1,14 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 
-import { CitaResponse, CitasPorEstadoResponse, ESTADOS_CITA, RangoFechas } from '../models';
-import { AuditoriaApiService } from '../services/api/auditoria-api.service';
-import { AsyncState } from './async-state';
-import { resetOnLogout } from './session-scoped';
+import {
+  CitaResponse,
+  CitasPorEstadoResponse,
+  ESTADOS_CITA,
+  RangoFechas,
+} from '@tusalud/app/core/models';
+import { AuditoriaApiService } from '@tusalud/app/core/services/api/auditoria-api.service';
+import { AsyncState } from '@tusalud/app/core/state/async-state';
+import { resetOnLogout } from '@tusalud/app/core/state/session-scoped';
 
 @Injectable({ providedIn: 'root' })
 export class AuditoriaStore {

@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { createJwt } from '../../../testing/auth-fixtures';
+import { createJwt } from '@tusalud/testing/auth-fixtures';
 import { asApiError, isApiError, toApiError } from './api-error';
 import {
   addDays,
@@ -9,10 +9,10 @@ import {
   parseIsoDateTime,
   toIsoDate,
   toIsoDateTime,
-} from './date';
-import { toHttpParams } from './http-params';
-import { decodeJwt, jwtExpirationMs } from './jwt';
-import { optionalNumberAttribute } from './route-input';
+} from '@tusalud/app/core/utils/date';
+import { toHttpParams } from '@tusalud/app/core/utils/http-params';
+import { decodeJwt, jwtExpirationMs } from '@tusalud/app/core/utils/jwt';
+import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
 
 describe('jwt', () => {
   it('decodifica el payload con caracteres UTF-8', () => {

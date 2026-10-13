@@ -2,10 +2,10 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 
-import { SKIP_AUTH, SKIP_ERROR_NOTIFICATION } from '../config/http-context';
-import { AuthService } from '../services/auth.service';
-import { NotificationService } from '../services/notification.service';
-import { toApiError } from '../utils/api-error';
+import { SKIP_AUTH, SKIP_ERROR_NOTIFICATION } from '@tusalud/app/core/config/http-context';
+import { AuthService } from '@tusalud/app/core/services/auth.service';
+import { NotificationService } from '@tusalud/app/core/services/notification.service';
+import { toApiError } from '@tusalud/app/core/utils/api-error';
 
 export const errorInterceptor: HttpInterceptorFn = (request, next) => {
   const auth = inject(AuthService);

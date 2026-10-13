@@ -1,4 +1,4 @@
-import { JwtPayload } from '../models';
+import { JwtPayload } from '@tusalud/app/core/models';
 
 export function decodeJwt(token: string): JwtPayload | null {
   const parts = token.split('.');
