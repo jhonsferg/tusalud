@@ -1214,17 +1214,26 @@ La carpeta `web` contiene el frontend, creado con Angular CLI 21.2.26, que es la
 
 ```text
 web/
-├── nginx/default.conf.template   Configuración de nginx para la imagen Docker
+├── nginx/                        Configuración de nginx y cabeceras de seguridad para la imagen Docker
 ├── public/                       Archivos estáticos copiados tal cual al build
 ├── src/
 │   ├── app/
-│   │   ├── core/                 Guards, interceptores, servicios y modelos de uso global
-│   │   ├── features/             Funcionalidades: auth, especialidades, medicos, citas y admin
-│   │   ├── layout/               Estructura visual compartida de la aplicación
-│   │   ├── shared/               Componentes, directivas y pipes reutilizables
-│   │   ├── app.config.ts         Proveedores de router y HttpClient
-│   │   └── app.routes.ts         Rutas de la aplicación
+│   │   ├── core/
+│   │   │   ├── config/           URL base de la API, contextos HTTP y estrategia de títulos
+│   │   │   ├── guards/           authGuard, guestGuard y roleGuard
+│   │   │   ├── interceptors/     Carga, token JWT y manejo de errores
+│   │   │   ├── models/           Interfaces y tipos que reflejan los DTOs del backend
+│   │   │   ├── services/         Sesión, notificaciones, carga, almacenamiento y clientes de la API
+│   │   │   ├── state/            Stores con signals por dominio
+│   │   │   ├── utils/            JWT, fechas, parámetros HTTP y normalización de errores
+│   │   │   └── validators/       Validadores de formularios y mensajes de error
+│   │   ├── features/             Pantallas de auth, especialidades, medicos, citas, agenda y admin
+│   │   ├── layout/               Shell de la aplicación y layout de autenticación
+│   │   ├── shared/               Componentes compartidos, directivas y pipes
+│   │   ├── app.config.ts         Proveedores de router, HttpClient, interceptores y títulos
+│   │   └── app.routes.ts         Rutas raíz con lazy loading y guards
 │   ├── environments/             Configuración de cada entorno
+│   ├── testing/                  Utilidades compartidas por las pruebas
 │   ├── index.html
 │   ├── main.ts
 │   └── styles.scss
@@ -1234,6 +1243,71 @@ web/
 ```
 
 Las carpetas que todavía no tienen código conservan un archivo `.gitkeep` para que Git las registre.
+
+### Arquitectura del frontend
+
+La capa `core` concentra la lógica de la aplicación y está completamente implementada y probada. Los componentes de `features`, `layout` y `shared` ya existen y están conectados al router, pero todavía no tienen interfaz: cada uno muestra un texto provisional hasta que se implemente su pantalla.
+
+El estado se maneja exclusivamente con signals de Angular. No se usa `zone.js`: la detección de cambios reacciona a los signals y todos los componentes usan `ChangeDetectionStrategy.OnPush`.
+
+| Pieza                 | Responsabilidad                                                                                                                                                                                                                                                   |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AuthService`         | Guarda la sesión en un signal y expone `isAuthenticated`, `user`, `token`, `roles`, `isAdmin`, `isMedico`, `isPaciente` y `homeUrl` como signals derivados. Persiste la sesión en `localStorage`, la valida al restaurarla y la cierra sola cuando el JWT expira. |
+| Clientes de la API    | `AuthApiService`, `EspecialidadesApiService`, `MedicosApiService`, `CitasApiService` y `AuditoriaApiService` cubren los 23 endpoints del backend con tipos estrictos.                                                                                             |
+| Stores                | `EspecialidadesStore`, `MedicosStore`, `CitasStore` y `AuditoriaStore` exponen los datos, el estado de carga y los errores como signals, y mantienen las listas sincronizadas después de cada alta, edición, eliminación o cambio de estado.                      |
+| `AsyncState`          | Base de los stores: agrupa los signals `value`, `loading`, `error` y `hasValue`, y cancela la carga anterior cuando empieza una nueva.                                                                                                                            |
+| `NotificationService` | Lista de notificaciones en un signal, con cierre automático.                                                                                                                                                                                                      |
+| `LoadingService`      | Cuenta las peticiones en curso y expone `isLoading` como signal.                                                                                                                                                                                                  |
+
+Los stores se vacían automáticamente al cerrar sesión, de modo que los datos de un usuario nunca quedan visibles para el siguiente.
+
+### Interceptores HTTP
+
+Las peticiones atraviesan tres interceptores funcionales, en este orden:
+
+1. `loadingInterceptor` registra la petición en `LoadingService` mientras está en curso.
+2. `authInterceptor` agrega el header `Authorization: Bearer` a las peticiones dirigidas a la API cuando hay sesión.
+3. `errorInterceptor` convierte cualquier error en un `ApiError` con el mismo formato que el `ErrorResponse` del backend, muestra una notificación y cierra la sesión si el backend rechaza el token.
+
+Una petición puede excluirse de cada interceptor con los contextos `SKIP_LOADING`, `SKIP_AUTH` y `SKIP_ERROR_NOTIFICATION`. El login y el registro usan `SKIP_AUTH` y `SKIP_ERROR_NOTIFICATION`, porque sus errores se muestran en el propio formulario.
+
+### Rutas
+
+Todas las pantallas se cargan de forma diferida. Los parámetros de ruta llegan a los componentes como inputs con signals gracias a `withComponentInputBinding`, y cada ruta define su título.
+
+| Ruta                          | Acceso                  | Pantalla                        |
+| ----------------------------- | ----------------------- | ------------------------------- |
+| `/auth/login`                 | Sin sesión              | Inicio de sesión                |
+| `/auth/registro`              | Sin sesión              | Registro de pacientes           |
+| `/`                           | Con sesión              | Redirige a la página del rol    |
+| `/especialidades`             | Con sesión              | Lista de especialidades         |
+| `/especialidades/nueva`       | Admin                   | Alta de especialidad            |
+| `/especialidades/:id/editar`  | Admin                   | Edición de especialidad         |
+| `/medicos`                    | Con sesión              | Lista de médicos                |
+| `/medicos/nuevo`              | Admin                   | Alta de médico                  |
+| `/medicos/:id`                | Con sesión              | Detalle del médico              |
+| `/medicos/:id/horarios`       | Admin                   | Bloques de atención             |
+| `/medicos/:id/disponibilidad` | Con sesión              | Horas libres del médico         |
+| `/citas`                      | Paciente                | Mis citas                       |
+| `/citas/nueva`                | Paciente                | Reserva de cita                 |
+| `/citas/:id`                  | Paciente, médico, admin | Detalle de la cita              |
+| `/agenda`                     | Médico                  | Agenda del día                  |
+| `/admin/auditoria`            | Admin                   | Reportes de auditoría           |
+| `/acceso-denegado`            | Todos                   | Aviso de permisos insuficientes |
+
+Al entrar a la raíz, el administrador va a la auditoría, el médico a su agenda y el paciente a sus citas. Quien no inició sesión va al login, y si intentaba abrir una ruta protegida, la URL viaja como `returnUrl`. Un usuario autenticado sin el rol necesario termina en `/acceso-denegado`.
+
+### Validaciones
+
+`AppValidators` replica en el cliente las reglas del backend: DNI de 8 dígitos, teléfono de 9 dígitos, contraseña de 8 a 72 caracteres, hora en formato `HH:mm`, precio mayor a cero con hasta dos decimales, duración de cita de 10 a 240 minutos, fecha de nacimiento pasada, fecha y hora de cita futura, rango de fechas y bloque de horario válido. `firstErrorMessage` traduce cada error a un mensaje en español y `applyServerErrors` coloca los `validationErrors` que devuelve el backend en los campos del formulario correspondiente.
+
+### Pruebas del frontend
+
+Las 61 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores y cada uno de los 23 endpoints de los clientes de la API.
+
+```bash
+npm test
+```
 
 ### Entornos
 
