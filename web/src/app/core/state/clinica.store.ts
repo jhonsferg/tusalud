@@ -41,9 +41,12 @@ export class ClinicaStore {
     this.historia.load(this.api.historiaDePaciente(pacienteId));
   }
 
-  guardarDatosMedicos(request: DatosMedicosRequest): Observable<PacienteClinicoResponse> {
+  guardarDatosMedicos(
+    pacienteId: string,
+    request: DatosMedicosRequest,
+  ): Observable<PacienteClinicoResponse> {
     return this.api
-      .actualizarDatosMedicos(request)
+      .actualizarDatosMedicos(pacienteId, request)
       .pipe(
         tap((paciente) =>
           this.historia.update((historia) => (historia ? { ...historia, paciente } : historia)),

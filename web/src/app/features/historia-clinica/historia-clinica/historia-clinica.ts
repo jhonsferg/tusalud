@@ -57,9 +57,8 @@ export class HistoriaClinica {
   protected readonly guardando = signal(false);
   protected readonly grupos = GRUPOS.map((grupo) => ({ label: grupo, value: grupo }));
   protected readonly esPropia = computed(() => this.id() === undefined);
-  protected readonly volver = computed(() =>
-    this.auth.isMedico() ? '/pacientes' : '/admin/usuarios',
-  );
+  protected readonly puedeEditar = computed(() => this.auth.isMedico() && !this.esPropia());
+  protected readonly volver = '/pacientes';
 
   protected readonly form = inject(FormBuilder).group({
     grupoSanguineo: [null as string | null],
@@ -82,6 +81,9 @@ export class HistoriaClinica {
   }
 
   protected editar(): void {
+    if (!this.puedeEditar()) {
+      return;
+    }
     const paciente = this.store.historia.value()?.paciente;
     this.form.reset({
       grupoSanguineo: paciente?.grupoSanguineo ?? null,
@@ -96,10 +98,14 @@ export class HistoriaClinica {
       this.form.markAllAsTouched();
       return;
     }
+    const pacienteId = this.id();
+    if (!this.puedeEditar() || pacienteId === undefined) {
+      return;
+    }
     const valor = this.form.getRawValue();
     this.guardando.set(true);
     this.store
-      .guardarDatosMedicos({
+      .guardarDatosMedicos(pacienteId, {
         grupoSanguineo: valor.grupoSanguineo,
         alergias: valor.alergias?.trim() || null,
         antecedentes: valor.antecedentes?.trim() || null,
@@ -108,7 +114,7 @@ export class HistoriaClinica {
         next: () => {
           this.guardando.set(false);
           this.editando.set(false);
-          this.notifications.success('Tus datos médicos fueron actualizados.');
+          this.notifications.success('Los datos médicos del paciente fueron actualizados.');
         },
         error: () => this.guardando.set(false),
       });

@@ -93,7 +93,9 @@
         </td>
         <td>
           {{ orden.pacienteNombre }}
-          <small class="text-muted block">DNI {{ orden.dni }}</small>
+          @if (orden.dni) {
+            <small class="text-muted block">DNI {{ orden.dni }}</small>
+          }
         </td>
         <td>{{ orden.medicoNombre }}</td>
         <td>{{ orden.items.length }}</td>
@@ -105,12 +107,14 @@
           />
         </td>
         <td class="text-right">
-          <p-button
-            label="Abrir"
-            size="small"
-            [outlined]="true"
-            [routerLink]="['/laboratorio/ordenes', orden.id]"
-          />
+          @if (puedeAbrir()) {
+            <p-button
+              label="Abrir"
+              size="small"
+              [outlined]="true"
+              [routerLink]="['/laboratorio/ordenes', orden.id]"
+            />
+          }
         </td>
       </tr>
     </ng-template>

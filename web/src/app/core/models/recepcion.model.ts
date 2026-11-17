@@ -54,7 +54,6 @@ export interface CitaHoyResponse {
   pacienteDni: string;
   medicoNombre: string;
   especialidadNombre?: string | null;
-  motivo?: string | null;
   llego: boolean;
   turnoNumero?: string | null;
 }

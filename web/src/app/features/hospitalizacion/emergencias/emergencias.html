@@ -5,7 +5,9 @@
   backLink="/hospitalizacion"
   backLabel="Volver a hospitalización"
 >
-  <p-button label="Registrar triaje" icon="pi pi-plus" severity="danger" (onClick)="abrir()" />
+  @if (puedeRegistrar()) {
+    <p-button label="Registrar triaje" icon="pi pi-plus" severity="danger" (onClick)="abrir()" />
+  }
 </app-page-header>
 
 <div class="cola">
@@ -23,7 +25,9 @@
         <small class="text-muted"
           >DNI {{ ingreso.dni }} · espera {{ ingreso.esperaMinutos }} min</small
         >
-        <span>{{ ingreso.triaje?.motivoConsulta }}</span>
+        @if (ingreso.triaje?.motivoConsulta) {
+          <span>{{ ingreso.triaje?.motivoConsulta }}</span>
+        }
         <small class="vitales">
           @if (ingreso.triaje?.presionArterial) {
             PA {{ ingreso.triaje?.presionArterial }} ·

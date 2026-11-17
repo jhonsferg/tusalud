@@ -28,7 +28,7 @@ export const PACIENTES_ROUTES: Routes = [
   {
     path: ':id/historia-clinica',
     title: 'Historia clínica del paciente',
-    canMatch: [roleGuard('ROLE_MEDICO', 'ROLE_ADMIN')],
+    canMatch: [roleGuard('ROLE_MEDICO')],
     loadComponent: () =>
       import('@tusalud/app/features/historia-clinica/historia-clinica/historia-clinica').then(
         (m) => m.HistoriaClinica,

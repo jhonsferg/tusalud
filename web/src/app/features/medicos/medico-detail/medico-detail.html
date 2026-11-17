@@ -43,14 +43,18 @@
           <dt>Consultorio</dt>
           <dd>{{ medico.consultorio || 'Por asignar' }}</dd>
         </div>
-        <div>
-          <dt>Email</dt>
-          <dd>{{ medico.email }}</dd>
-        </div>
-        <div>
-          <dt>Teléfono</dt>
-          <dd>{{ medico.telefono || 'No registrado' }}</dd>
-        </div>
+        @if (medico.email) {
+          <div>
+            <dt>Email</dt>
+            <dd>{{ medico.email }}</dd>
+          </div>
+        }
+        @if (medico.email) {
+          <div>
+            <dt>Teléfono</dt>
+            <dd>{{ medico.telefono || 'No registrado' }}</dd>
+          </div>
+        }
       </dl>
 
       <h3 class="subtitulo">Especialidades y tarifas</h3>

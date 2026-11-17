@@ -236,14 +236,14 @@ const NAV_GROUPS: readonly NavGroup[] = [
         label: 'Farmacia',
         icon: 'pi-plus-circle',
         link: '/farmacia',
-        roles: ['ROLE_ADMIN', 'ROLE_FARMACIA'],
+        roles: ['ROLE_FARMACIA'],
         exact: true,
       },
       {
         label: 'Dispensar',
         icon: 'pi-shopping-cart',
         link: '/farmacia/dispensar',
-        roles: ['ROLE_ADMIN', 'ROLE_FARMACIA'],
+        roles: ['ROLE_FARMACIA'],
       },
       {
         label: 'Historial',

@@ -61,7 +61,7 @@ export class HospPanel implements OnInit {
   protected readonly etiquetaArea = ETIQUETA_AREA;
   protected readonly etiquetaEstado = ETIQUETA_ESTADO_CAMA;
   protected readonly color = colorCama;
-  protected readonly puedeIngresar = computed(() => this.auth.isMedico() || this.auth.isAdmin());
+  protected readonly puedeIngresar = computed(() => this.auth.isMedico());
 
   protected readonly cama = signal<CamaResponse | null>(null);
   protected readonly paciente = signal<PacienteMostradorResponse | null>(null);

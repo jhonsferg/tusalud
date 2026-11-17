@@ -54,6 +54,7 @@ export class Ordenes implements OnInit {
 
   protected readonly esPersonal = computed(() => this.auth.isLaboratorio() || this.auth.isAdmin());
   protected readonly esMedico = computed(() => this.auth.isMedico());
+  protected readonly puedeAbrir = computed(() => this.auth.isLaboratorio() || this.auth.isMedico());
   protected readonly busqueda = signal('');
   protected readonly estado = signal<EstadoOrden | null>(null);
   private readonly cambio = new Subject<void>();

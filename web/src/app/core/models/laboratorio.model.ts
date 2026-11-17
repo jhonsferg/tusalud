@@ -109,7 +109,7 @@ export interface OrdenResponse {
   prioridad: PrioridadOrden;
   pacienteId: string;
   pacienteNombre: string;
-  dni: string;
+  dni?: string | null;
   medicoId: string;
   medicoNombre: string;
   atencionId?: string | null;

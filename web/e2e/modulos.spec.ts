@@ -91,17 +91,15 @@ test.describe('billeteras digitales', () => {
 });
 
 test.describe('historia clínica', () => {
-  test('el paciente ve su historia y edita sus datos médicos', async ({ page }) => {
+  test('el paciente ve su historia sin poder editarla y con el aviso para actualizarla', async ({
+    page,
+  }) => {
     await iniciarSesion(page, 'paciente');
     await page.getByRole('link', { name: 'Historia clínica' }).click();
     await expect(page.getByRole('heading', { name: 'Juan Pérez' })).toBeVisible();
     await expect(page.getByText('Penicilina')).toBeVisible();
-
-    await page.getByRole('button', { name: 'Editar datos médicos' }).click();
-    await page.locator('#hc-alergias').fill('Penicilina y polvo');
-    await page.locator('form button[type=submit]').click();
-    await expect(page.getByText('Tus datos médicos fueron actualizados.')).toBeVisible();
-    await expect(page.getByText('Penicilina y polvo')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Editar datos médicos' })).toHaveCount(0);
+    await expect(page.getByText(/acércate al centro de salud/)).toBeVisible();
   });
 
   test('el médico ve sus pacientes y abre una historia', async ({ page }) => {

@@ -128,6 +128,30 @@ describe('rutas de la aplicación', () => {
     expect(await navigateAs(['ROLE_PACIENTE'], '/mis-ingresos', true)).toBe('/mis-ingresos');
   });
 
+  it('retira al administrador de los datos clínicos y a recepción de lo que no le corresponde', async () => {
+    const id = '11111111-1111-4111-8111-111111111111';
+    expect(await navigateAs(['ROLE_ADMIN'], `/pacientes/${id}/historia-clinica`, true)).toBe(
+      '/admin/panel',
+    );
+    expect(await navigateAs(['ROLE_ADMIN'], '/pacientes', true)).toBe('/admin/panel');
+    expect(await navigateAs(['ROLE_ADMIN'], `/laboratorio/ordenes/${id}`, true)).toBe(
+      '/admin/panel',
+    );
+    expect(await navigateAs(['ROLE_ADMIN'], '/farmacia', true)).toBe('/admin/panel');
+    expect(await navigateAs(['ROLE_ADMIN'], '/farmacia/dispensar', true)).toBe('/admin/panel');
+    expect(await navigateAs(['ROLE_ADMIN'], '/farmacia/historial', true)).toBe(
+      '/farmacia/historial',
+    );
+    expect(await navigateAs(['ROLE_MEDICO'], `/pacientes/${id}/historia-clinica`, true)).toBe(
+      `/pacientes/${id}/historia-clinica`,
+    );
+    expect(await navigateAs(['ROLE_PACIENTE'], '/pacientes', true)).toBe('/citas');
+    expect(await navigateAs(['ROLE_RECEPCION'], `/hospitalizacion/ingresos/${id}`, true)).toBe(
+      `/hospitalizacion/ingresos/${id}`,
+    );
+    expect(await navigateAs(['ROLE_RECEPCION'], '/hospitalizacion/camas', true)).toBe('/recepcion');
+  });
+
   it('muestra la página no encontrada para rutas desconocidas', async () => {
     expect(await navigateAs(['ROLE_PACIENTE'], '/no-existe', true)).toBe('/no-existe');
   });

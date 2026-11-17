@@ -38,7 +38,7 @@ export const HOSPITALIZACION_ROUTES: Routes = [
   {
     path: 'ingresos/:id',
     title: 'Ingreso hospitalario',
-    canMatch: [OPERA],
+    canMatch: [CLINICO],
     loadComponent: () =>
       import('@tusalud/app/features/hospitalizacion/ingreso-detalle/ingreso-detalle').then(
         (m) => m.IngresoDetalle,

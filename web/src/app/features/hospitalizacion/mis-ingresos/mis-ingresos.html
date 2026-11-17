@@ -34,7 +34,9 @@
               [severity]="i.estado === 'ACTIVO' ? 'info' : 'success'"
             />
           </header>
-          <p><strong>Motivo:</strong> {{ i.motivo }}</p>
+          @if (i.motivo) {
+            <p><strong>Motivo:</strong> {{ i.motivo }}</p>
+          }
           @if (i.diagnosticoAlta) {
             <p><strong>Diagnóstico de alta:</strong> {{ i.diagnosticoAlta }}</p>
           }

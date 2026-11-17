@@ -48,6 +48,8 @@ export interface PacienteClinicoResponse {
   grupoSanguineo?: string | null;
   alergias?: string | null;
   antecedentes?: string | null;
+  datosMedicosActualizadoPor?: string | null;
+  datosMedicosActualizadoEn?: string | null;
 }
 
 export interface HistoriaClinicaResponse {

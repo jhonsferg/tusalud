@@ -136,6 +136,6 @@ export async function idDeGarcia(page: Page): Promise<string> {
   const respuesta = await page.request.get('/api/v1/medicos', {
     headers: { Authorization: `Bearer ${token}` },
   });
-  const medicos = (await respuesta.json()) as { id: string; email: string }[];
-  return medicos.find((m) => m.email === 'dr.garcia@tusalud.com')!.id;
+  const medicos = (await respuesta.json()) as { id: string; apellido: string }[];
+  return medicos.find((m) => m.apellido === 'García')!.id;
 }

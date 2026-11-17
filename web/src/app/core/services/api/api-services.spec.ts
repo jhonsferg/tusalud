@@ -280,10 +280,10 @@ describe('servicios de la API', () => {
     expectRequest({ method: 'PUT', url: `/api/v1/citas/${u(7)}/atencion`, body: atencion });
     api.miHistoria().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/historia-clinica' });
-    api.actualizarDatosMedicos({ grupoSanguineo: 'O+' }).subscribe();
+    api.actualizarDatosMedicos(u(3), { grupoSanguineo: 'O+' }).subscribe();
     expectRequest({
       method: 'PUT',
-      url: '/api/v1/historia-clinica/datos-medicos',
+      url: `/api/v1/pacientes/${u(3)}/datos-medicos`,
       body: { grupoSanguineo: 'O+' },
     });
     api.historiaDePaciente(u(3)).subscribe();

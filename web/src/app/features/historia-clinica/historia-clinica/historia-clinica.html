@@ -2,7 +2,7 @@
   [title]="esPropia() ? 'Mi historia clínica' : 'Historia clínica del paciente'"
   subtitle="Datos médicos y registro de todas las atenciones"
   icon="pi-folder-open"
-  [backLink]="esPropia() ? undefined : volver()"
+  [backLink]="esPropia() ? undefined : volver"
   backLabel="Volver"
 />
 
@@ -27,7 +27,7 @@
           {{ historia.paciente.historialClinicoNumero }}</span
         >
       </div>
-      @if (esPropia() && !editando()) {
+      @if (puedeEditar() && !editando()) {
         <p-button
           label="Editar datos médicos"
           icon="pi pi-pencil"
@@ -37,7 +37,7 @@
       }
     </div>
 
-    @if (editando()) {
+    @if (editando() && puedeEditar()) {
       <form [formGroup]="form" (ngSubmit)="guardar()" novalidate class="edicion">
         <app-form-field
           label="Grupo sanguíneo"
@@ -94,6 +94,15 @@
         </div>
       </form>
     } @else {
+      @if (esPropia()) {
+        <p class="aviso-datos" role="note">
+          <i class="pi pi-info-circle"></i>
+          <span
+            >Estos datos los registra el personal de salud que te atiende. ¿Algo no es correcto?
+            Comunícate con nosotros o acércate al centro de salud para que lo actualicen.</span
+          >
+        </p>
+      }
       <div class="datos">
         <div>
           <span>Edad</span>
@@ -122,6 +131,14 @@
           <strong>{{ historia.paciente.antecedentes || 'Sin antecedentes registrados' }}</strong>
         </div>
       </div>
+      @if (historia.paciente.datosMedicosActualizadoPor) {
+        <p class="actualizado text-muted" id="hc-actualizado">
+          Actualizado por {{ historia.paciente.datosMedicosActualizadoPor }}
+          @if (historia.paciente.datosMedicosActualizadoEn) {
+            el {{ historia.paciente.datosMedicosActualizadoEn | date: 'dd/MM/yyyy' }}
+          }
+        </p>
+      }
     }
   </section>
 

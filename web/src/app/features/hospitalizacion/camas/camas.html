@@ -44,6 +44,8 @@
         <td>
           @if (c.estado === 'OCUPADA') {
             <p-tag value="Ocupada" severity="danger" />
+          } @else if (!cambiaEstado()) {
+            <p-tag [value]="etiquetaEstado[c.estado]" severity="secondary" />
           } @else {
             <p-select
               [options]="estados"

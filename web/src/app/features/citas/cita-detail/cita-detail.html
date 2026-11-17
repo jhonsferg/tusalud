@@ -86,7 +86,7 @@
         </div>
       </section>
 
-      @if (cita.estado === 'ATENDIDA') {
+      @if (cita.estado === 'ATENDIDA' && puedeVerClinica()) {
         <section class="panel">
           <h3><i class="pi pi-file"></i> Atención médica</h3>
           @if (clinica.atencion.loading() && !clinica.atencion.hasValue()) {
@@ -201,13 +201,15 @@
             <dd>{{ cita.pacienteDni }}</dd>
           </div>
         </dl>
-        <p-button
-          label="Ver historia clínica"
-          icon="pi pi-folder-open"
-          [outlined]="true"
-          size="small"
-          [routerLink]="['/pacientes', cita.pacienteId, 'historia-clinica']"
-        />
+        @if (auth.isMedico()) {
+          <p-button
+            label="Ver historia clínica"
+            icon="pi pi-folder-open"
+            [outlined]="true"
+            size="small"
+            [routerLink]="['/pacientes', cita.pacienteId, 'historia-clinica']"
+          />
+        }
       }
 
       <h3 class="mt-4">Pago</h3>

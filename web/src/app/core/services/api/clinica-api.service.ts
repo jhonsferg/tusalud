@@ -41,9 +41,12 @@ export class ClinicaApiService {
     return this.http.get<HistoriaClinicaResponse>(`${this.apiUrl}/historia-clinica`);
   }
 
-  actualizarDatosMedicos(request: DatosMedicosRequest): Observable<PacienteClinicoResponse> {
+  actualizarDatosMedicos(
+    pacienteId: string,
+    request: DatosMedicosRequest,
+  ): Observable<PacienteClinicoResponse> {
     return this.http.put<PacienteClinicoResponse>(
-      `${this.apiUrl}/historia-clinica/datos-medicos`,
+      `${this.apiUrl}/pacientes/${pacienteId}/datos-medicos`,
       request,
     );
   }

@@ -61,8 +61,9 @@ export class Emergencias implements OnInit {
   protected readonly colores = COLOR_TRIAJE;
   protected readonly etiquetaTriaje = ETIQUETA_TRIAJE;
   protected readonly puedeAsignar = computed(
-    () => this.auth.isMedico() || this.auth.isEnfermeria() || this.auth.isAdmin(),
+    () => this.auth.isMedico() || this.auth.isEnfermeria(),
   );
+  protected readonly puedeRegistrar = computed(() => this.auth.isEnfermeria());
 
   protected readonly visible = signal(false);
   protected readonly paciente = signal<PacienteMostradorResponse | null>(null);

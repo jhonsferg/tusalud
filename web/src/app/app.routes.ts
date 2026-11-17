@@ -69,7 +69,7 @@ export const routes: Routes = [
       },
       {
         path: 'pacientes',
-        canMatch: [roleGuard('ROLE_MEDICO', 'ROLE_ADMIN')],
+        canMatch: [roleGuard('ROLE_MEDICO')],
         loadChildren: () =>
           import('@tusalud/app/features/historia-clinica/historia-clinica.routes').then(
             (m) => m.PACIENTES_ROUTES,

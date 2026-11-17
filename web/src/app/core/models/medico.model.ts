@@ -31,7 +31,7 @@ export interface MedicoResponse {
   nombre: string;
   apellido: string;
   nombreCompleto: string;
-  email: string;
+  email?: string | null;
   telefono?: string | null;
   colegiatura: string;
   consultorio?: string | null;

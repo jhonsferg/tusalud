@@ -14,7 +14,7 @@ export const LABORATORIO_ROUTES: Routes = [
   {
     path: 'ordenes/:id',
     title: 'Orden de laboratorio',
-    canMatch: [roleGuard('ROLE_LABORATORIO', 'ROLE_ADMIN', 'ROLE_MEDICO')],
+    canMatch: [roleGuard('ROLE_LABORATORIO', 'ROLE_MEDICO')],
     loadComponent: () =>
       import('@tusalud/app/features/laboratorio/orden-detalle/orden-detalle').then(
         (m) => m.OrdenDetalle,

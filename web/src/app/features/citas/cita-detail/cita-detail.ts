@@ -60,6 +60,9 @@ export class CitaDetail {
   protected readonly pagoVisible = signal(false);
   protected readonly valoracionVisible = signal(false);
 
+  protected readonly puedeVerClinica = computed(
+    () => this.auth.isPaciente() || this.auth.isMedico(),
+  );
   protected readonly volver = computed(() =>
     this.auth.isPaciente() ? '/citas' : this.auth.isMedico() ? '/agenda' : '/admin/auditoria',
   );
@@ -80,7 +83,9 @@ export class CitaDetail {
       const cita = this.store.selected.value();
       if (cita?.estado === 'ATENDIDA') {
         untracked(() => {
-          this.clinica.cargarAtencion(cita.id);
+          if (this.puedeVerClinica()) {
+            this.clinica.cargarAtencion(cita.id);
+          }
           if (this.auth.isPaciente()) {
             this.clinica.cargarValoracion(cita.id);
           }

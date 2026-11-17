@@ -60,6 +60,7 @@ export class Camas implements OnInit {
   private readonly fb = inject(FormBuilder).nonNullable;
 
   protected readonly gestiona = computed(() => this.auth.isAdmin());
+  protected readonly cambiaEstado = computed(() => this.auth.isEnfermeria() || this.auth.isAdmin());
   protected readonly areas = AREAS_CAMA.map((valor) => ({
     label: ETIQUETA_AREA[valor],
     value: valor,

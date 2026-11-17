@@ -67,9 +67,13 @@ export class HospitalizacionStore {
     this.ingresos.load(this.api.ingresos(estado, q));
   }
 
-  cargarIngreso(id: string): void {
+  cargarIngreso(id: string, conEvoluciones = true): void {
     this.ingreso.load(this.api.ingreso(id));
-    this.evoluciones.load(this.api.evoluciones(id));
+    if (conEvoluciones) {
+      this.evoluciones.load(this.api.evoluciones(id));
+    } else {
+      this.evoluciones.reset();
+    }
   }
 
   crearIngreso(request: IngresoHospRequest): Observable<IngresoHospResponse> {

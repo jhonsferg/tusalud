@@ -61,12 +61,12 @@ export class IngresoDetalle {
   protected readonly tipoEvolucion = computed<'MEDICA' | 'ENFERMERIA' | null>(() =>
     this.auth.isMedico() ? 'MEDICA' : this.auth.isEnfermeria() ? 'ENFERMERIA' : null,
   );
-  protected readonly puedeAlta = computed(
-    () => this.activo() && (this.auth.isMedico() || this.auth.isAdmin()),
+  protected readonly puedeAlta = computed(() => this.activo() && this.auth.isMedico());
+  protected readonly veEvoluciones = computed(
+    () => this.auth.isMedico() || this.auth.isEnfermeria(),
   );
   protected readonly puedeTrasladar = computed(
-    () =>
-      this.activo() && (this.auth.isMedico() || this.auth.isEnfermeria() || this.auth.isAdmin()),
+    () => this.activo() && (this.auth.isMedico() || this.auth.isEnfermeria()),
   );
 
   protected readonly nota = signal('');
@@ -96,7 +96,7 @@ export class IngresoDetalle {
       if (id !== undefined) {
         untracked(() => {
           this.store.ingreso.reset();
-          this.store.cargarIngreso(id);
+          this.store.cargarIngreso(id, this.veEvoluciones());
         });
       }
     });

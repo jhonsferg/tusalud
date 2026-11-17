@@ -66,9 +66,10 @@ export interface TriajeRequest {
   motivoConsulta: string;
 }
 
-export interface TriajeResponse extends TriajeRequest {
+export interface TriajeResponse extends Partial<Omit<TriajeRequest, 'nivel'>> {
+  nivel: number;
   clasificacion: ClasificacionTriaje;
-  registradoPor: string;
+  registradoPor?: string | null;
   fecha: string;
 }
 
@@ -84,7 +85,7 @@ export interface IngresoHospResponse {
   camaCodigo?: string | null;
   medicoId?: string | null;
   medicoNombre?: string | null;
-  motivo: string;
+  motivo?: string | null;
   diagnosticoIngreso?: string | null;
   fechaIngreso: string;
   fechaAlta?: string | null;
