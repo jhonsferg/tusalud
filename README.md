@@ -1242,11 +1242,11 @@ web/
 └── Dockerfile
 ```
 
-Las carpetas que todavía no tienen código conservan un archivo `.gitkeep` para que Git las registre.
+Las carpetas sin código conservan un archivo `.gitkeep` para que Git las registre.
 
 ### Arquitectura del frontend
 
-La capa `core` concentra la lógica de la aplicación y está completamente implementada y probada. Los componentes de `features`, `layout` y `shared` ya existen y están conectados al router, pero todavía no tienen interfaz: cada uno muestra un texto provisional hasta que se implemente su pantalla.
+La capa `core` concentra la lógica de la aplicación y está completamente implementada y probada. Las 14 pantallas de `features`, el shell y el layout de autenticación están implementados y conectados a la API, con estados de carga, error y vacío, mensajes en español y diseño adaptable a móvil.
 
 El estado se maneja exclusivamente con signals de Angular. No se usa `zone.js`: la detección de cambios reacciona a los signals y todos los componentes usan `ChangeDetectionStrategy.OnPush`.
 
@@ -1301,12 +1301,34 @@ Al entrar a la raíz, el administrador va a la auditoría, el médico a su agend
 
 `AppValidators` replica en el cliente las reglas del backend: DNI de 8 dígitos, teléfono de 9 dígitos, contraseña de 8 a 72 caracteres, hora en formato `HH:mm`, precio mayor a cero con hasta dos decimales, duración de cita de 10 a 240 minutos, fecha de nacimiento pasada, fecha y hora de cita futura, rango de fechas y bloque de horario válido. `firstErrorMessage` traduce cada error a un mensaje en español y `applyServerErrors` coloca los `validationErrors` que devuelve el backend en los campos del formulario correspondiente.
 
+### Interfaz y componentes
+
+La interfaz usa PrimeNG 21 con el tema Aura personalizado con una paleta verde azulado propia del sector salud, PrimeIcons y PrimeFlex para las utilidades de maquetación. El preset y las traducciones al español de PrimeNG viven en `core/config/theme.ts` y se registran en `app.config.ts`, junto con el locale `es-PE` y la moneda PEN.
+
+Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrece:
+
+| Componente      | Función                                                            |
+| --------------- | ------------------------------------------------------------------ |
+| `PageHeader`    | Título, icono, enlace de retorno y acciones de cada pantalla       |
+| `EmptyState`    | Estado vacío o de error con acción opcional                        |
+| `FormField`     | Etiqueta, mensaje de error de validación y ayuda de un campo       |
+| `EstadoCitaTag` | Etiqueta con color e icono por estado de cita                      |
+| `CitaActions`   | Confirmación y ejecución de cancelar, confirmar y atender una cita |
+
+`NotificationOutlet` muestra las notificaciones de `NotificationService` como toasts de PrimeNG y `LoadingBar` muestra una barra de progreso global mientras hay peticiones en curso.
+
 ### Pruebas del frontend
 
 Las 61 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores y cada uno de los 23 endpoints de los clientes de la API.
 
 ```bash
 npm test
+```
+
+Las pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades y los permisos por rol. Requieren el stack levantado con datos de prueba.
+
+```bash
+npm run e2e
 ```
 
 ### Entornos
@@ -1334,9 +1356,20 @@ Todos los entornos llaman a la API con la ruta relativa `/api/v1`. En local, el 
 | `npm run build:qa`    | Build con el entorno `qa`                                                |
 | `npm run build:prod`  | Build de producción                                                      |
 | `npm test`            | Pruebas unitarias con Vitest                                             |
+| `npm run e2e`         | Pruebas de extremo a extremo con Playwright                              |
 | `npm run format`      | Formatea el código con Prettier                                          |
 
 Todos los comandos se ejecutan dentro de la carpeta `web`. El build genera el sitio en `web/dist/tusalud/browser`, que contiene `index.html`, los archivos JavaScript y CSS y el contenido de `public`.
+
+### Desarrollo con recarga en caliente
+
+`compose.hot.yaml` reemplaza la imagen de nginx por un contenedor con `ng serve` que monta la carpeta `web` como volumen, de modo que cada cambio en el código se refleja de inmediato en el navegador. Las dependencias viven en un volumen propio y el servidor de desarrollo reenvía `/api` al servicio `app` mediante `proxy.conf.docker.json`.
+
+```bash
+docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml up -d --build
+```
+
+La aplicación queda en `http://localhost:4200` junto con la API, PostgreSQL y los datos de prueba. Si cambia `package.json`, hay que reconstruir con `--build` y recrear el volumen de dependencias con `docker compose down -v`.
 
 ### Imagen Docker y Compose
 
