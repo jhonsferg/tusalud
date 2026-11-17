@@ -1,1 +1,127 @@
-<p>medico-horarios works!</p>
+<app-page-header
+  title="Horarios de atención"
+  [subtitle]="store.selected.value()?.nombreCompleto ?? 'Cargando médico'"
+  icon="pi-clock"
+  [backLink]="id() ? '/medicos/' + id() : '/medicos'"
+  backLabel="Volver al perfil"
+/>
+
+<div class="layout">
+  <section class="panel">
+    <h3>Nuevo bloque</h3>
+    <form [formGroup]="form" (ngSubmit)="agregar()" class="flex flex-column gap-3" novalidate>
+      <app-form-field
+        label="Día de la semana"
+        [control]="form.controls.diaSemana"
+        inputId="hor-dia"
+        [required]="true"
+      >
+        <p-select
+          inputId="hor-dia"
+          formControlName="diaSemana"
+          [options]="dias"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Selecciona un día"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </app-form-field>
+
+      <div class="grid-2">
+        <app-form-field
+          label="Hora de inicio"
+          [control]="form.controls.horaInicio"
+          inputId="hor-inicio"
+          [required]="true"
+        >
+          <input
+            id="hor-inicio"
+            type="time"
+            formControlName="horaInicio"
+            class="p-inputtext w-full"
+          />
+        </app-form-field>
+        <app-form-field
+          label="Hora de fin"
+          [control]="form.controls.horaFin"
+          inputId="hor-fin"
+          [required]="true"
+        >
+          <input id="hor-fin" type="time" formControlName="horaFin" class="p-inputtext w-full" />
+        </app-form-field>
+      </div>
+
+      <app-form-field
+        label="Duración de cada cita"
+        [control]="form.controls.duracionCitaMinutos"
+        inputId="hor-duracion"
+        [hint]="'Entre ' + duracionMin + ' y ' + duracionMax + ' minutos'"
+        [required]="true"
+      >
+        <p-inputnumber
+          inputId="hor-duracion"
+          formControlName="duracionCitaMinutos"
+          suffix=" min"
+          [step]="5"
+          [showButtons]="true"
+          [min]="duracionMin"
+          [max]="duracionMax"
+          [fluid]="true"
+        />
+      </app-form-field>
+
+      @if (errorDeGrupo(); as mensaje) {
+        <small class="text-red-600" role="alert">{{ mensaje }}</small>
+      }
+
+      <p-button type="submit" label="Agregar bloque" icon="pi pi-plus" [loading]="submitting()" />
+    </form>
+  </section>
+
+  <section class="panel">
+    <h3>Bloques configurados</h3>
+    @if (store.horarios.loading() && !store.horarios.hasValue()) {
+      <p-skeleton height="10rem" />
+    } @else {
+      <p-table [value]="store.horariosOrdenados()" responsiveLayout="scroll">
+        <ng-template #header>
+          <tr>
+            <th>Día</th>
+            <th>Horario</th>
+            <th>Cita</th>
+            <th style="width: 4rem"></th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-horario>
+          <tr>
+            <td class="font-semibold">{{ nombreDia[horario.diaSemana] }}</td>
+            <td>{{ horario.horaInicio.slice(0, 5) }} a {{ horario.horaFin.slice(0, 5) }}</td>
+            <td>{{ horario.duracionCitaMinutos }} min</td>
+            <td class="text-right">
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                [rounded]="true"
+                severity="danger"
+                ariaLabel="Eliminar bloque"
+                (onClick)="eliminar(horario)"
+              />
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="4">
+              <app-empty-state
+                icon="pi-calendar-times"
+                title="Sin bloques de atención"
+                message="Agrega el primer bloque para que los pacientes puedan reservar."
+              />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  </section>
+</div>

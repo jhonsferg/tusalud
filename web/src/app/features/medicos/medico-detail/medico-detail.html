@@ -1,1 +1,120 @@
-<p>medico-detail works!</p>
+<app-page-header
+  title="Perfil del médico"
+  icon="pi-user"
+  backLink="/medicos"
+  backLabel="Volver a médicos"
+/>
+
+@if (store.selected.error(); as error) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar al médico"
+      [message]="error.message"
+    >
+      <p-button label="Volver al listado" routerLink="/medicos" />
+    </app-empty-state>
+  </div>
+} @else if (store.selected.value(); as medico) {
+  <div class="layout">
+    <section class="panel">
+      <div class="identity">
+        <span class="monogram">{{ medico.nombre[0] }}{{ medico.apellido[0] }}</span>
+        <div>
+          <h2>{{ medico.nombreCompleto }}</h2>
+          <p-tag [value]="medico.especialidadNombre" severity="info" [rounded]="true" />
+          @if (medico.estado === 'INACTIVO') {
+            <p-tag value="Inactivo" severity="secondary" [rounded]="true" styleClass="ml-2" />
+          }
+        </div>
+      </div>
+
+      <dl>
+        <div>
+          <dt>Colegiatura</dt>
+          <dd>{{ medico.colegiatura }}</dd>
+        </div>
+        <div>
+          <dt>Consultorio</dt>
+          <dd>{{ medico.consultorio || 'Por asignar' }}</dd>
+        </div>
+        <div>
+          <dt>Email</dt>
+          <dd>{{ medico.email }}</dd>
+        </div>
+        <div>
+          <dt>Teléfono</dt>
+          <dd>{{ medico.telefono || 'No registrado' }}</dd>
+        </div>
+        <div>
+          <dt>Precio de consulta</dt>
+          <dd>{{ medico.precioConsulta | currency: 'PEN' : 'symbol-narrow' }}</dd>
+        </div>
+      </dl>
+
+      <div class="actions">
+        <p-button
+          label="Ver disponibilidad"
+          icon="pi pi-clock"
+          [outlined]="true"
+          [routerLink]="['/medicos', medico.id, 'disponibilidad']"
+        />
+        @if (auth.isPaciente() && medico.estado === 'ACTIVO') {
+          <p-button
+            label="Reservar cita"
+            icon="pi pi-calendar-plus"
+            routerLink="/citas/nueva"
+            [queryParams]="{ medicoId: medico.id }"
+          />
+        }
+        @if (auth.isAdmin()) {
+          <p-button
+            label="Gestionar horarios"
+            icon="pi pi-cog"
+            severity="secondary"
+            [routerLink]="['/medicos', medico.id, 'horarios']"
+          />
+        }
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3><i class="pi pi-calendar"></i> Horarios de atención</h3>
+      @if (store.horarios.loading() && !store.horarios.hasValue()) {
+        <p-skeleton height="8rem" />
+      } @else if (store.horariosPorDia().length === 0) {
+        <app-empty-state
+          icon="pi-calendar-times"
+          title="Sin horarios registrados"
+          message="Este médico todavía no tiene bloques de atención configurados."
+        />
+      } @else {
+        <ul class="horarios">
+          @for (grupo of store.horariosPorDia(); track grupo.dia) {
+            <li>
+              <strong>{{ nombreDia[grupo.dia] }}</strong>
+              <span>
+                @for (bloque of grupo.bloques; track bloque.id) {
+                  <p-tag
+                    [value]="bloque.horaInicio.slice(0, 5) + ' a ' + bloque.horaFin.slice(0, 5)"
+                    severity="secondary"
+                    styleClass="mr-1"
+                  />
+                }
+                <small class="text-muted"
+                  >Citas de {{ grupo.bloques[0].duracionCitaMinutos }} min</small
+                >
+              </span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+} @else {
+  <div class="layout">
+    <div class="panel"><p-skeleton height="16rem" /></div>
+    <div class="panel"><p-skeleton height="16rem" /></div>
+  </div>
+}

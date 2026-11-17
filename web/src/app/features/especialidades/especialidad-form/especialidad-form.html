@@ -1,1 +1,61 @@
-<p>especialidad-form works!</p>
+<app-page-header
+  [title]="editando() ? 'Editar especialidad' : 'Nueva especialidad'"
+  subtitle="Los pacientes verán esta información al buscar médicos"
+  icon="pi-heart"
+  backLink="/especialidades"
+  backLabel="Volver a especialidades"
+/>
+
+<div class="panel" style="max-width: 40rem">
+  @if (editando() && store.selected.error(); as error) {
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar la especialidad"
+      [message]="error.message"
+    >
+      <p-button label="Volver al listado" routerLink="/especialidades" />
+    </app-empty-state>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-column gap-4" novalidate>
+      <app-form-field
+        label="Nombre"
+        [control]="form.controls.nombre"
+        inputId="esp-nombre"
+        [required]="true"
+      >
+        <input pInputText id="esp-nombre" formControlName="nombre" class="w-full" />
+      </app-form-field>
+
+      <app-form-field
+        label="Descripción"
+        [control]="form.controls.descripcion"
+        inputId="esp-descripcion"
+        hint="Opcional, hasta 255 caracteres"
+      >
+        <textarea
+          pTextarea
+          id="esp-descripcion"
+          formControlName="descripcion"
+          rows="4"
+          class="w-full"
+        ></textarea>
+      </app-form-field>
+
+      <div class="flex gap-2 justify-content-end">
+        <p-button
+          label="Cancelar"
+          severity="secondary"
+          [outlined]="true"
+          routerLink="/especialidades"
+        />
+        <p-button
+          type="submit"
+          [label]="editando() ? 'Guardar cambios' : 'Crear especialidad'"
+          icon="pi pi-check"
+          [loading]="submitting() || store.selected.loading()"
+        />
+      </div>
+    </form>
+  }
+</div>

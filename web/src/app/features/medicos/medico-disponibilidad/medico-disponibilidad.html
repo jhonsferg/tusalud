@@ -1,1 +1,69 @@
-<p>medico-disponibilidad works!</p>
+<app-page-header
+  title="Disponibilidad"
+  [subtitle]="store.selected.value()?.nombreCompleto ?? 'Cargando médico'"
+  icon="pi-clock"
+  [backLink]="id() ? '/medicos/' + id() : '/medicos'"
+  backLabel="Volver al perfil"
+/>
+
+<div class="layout">
+  <section class="panel">
+    <h3>Elige una fecha</h3>
+    <p-datepicker
+      [ngModel]="fecha()"
+      (ngModelChange)="cambiarFecha($event)"
+      [inline]="true"
+      [minDate]="minimo"
+      dateFormat="dd/mm/yy"
+      [showOtherMonths]="true"
+    />
+  </section>
+
+  <section class="panel">
+    <h3>Horas libres para el {{ fecha() | date: 'fullDate' }}</h3>
+
+    @if (store.disponibilidad.error(); as error) {
+      <app-empty-state
+        tone="error"
+        icon="pi-exclamation-triangle"
+        title="No pudimos consultar la disponibilidad"
+        [message]="error.message"
+      >
+        <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="recargar()" />
+      </app-empty-state>
+    } @else if (store.disponibilidad.loading()) {
+      <div class="slots">
+        @for (n of [1, 2, 3, 4, 5, 6, 7, 8]; track n) {
+          <p-skeleton height="2.5rem" />
+        }
+      </div>
+    } @else if (store.horasDisponibles().length === 0) {
+      <app-empty-state
+        icon="pi-calendar-times"
+        title="Sin horas libres"
+        message="El médico no atiende ese día o todos sus turnos están ocupados. Prueba con otra fecha."
+      />
+    } @else {
+      <div class="slots">
+        @for (hora of store.horasDisponibles(); track hora) {
+          @if (auth.isPaciente()) {
+            <p-button
+              [label]="hora.slice(0, 5)"
+              [outlined]="true"
+              size="small"
+              routerLink="/citas/nueva"
+              [queryParams]="{ medicoId: id(), fecha: fechaIso(), hora: hora.slice(0, 5) }"
+            />
+          } @else {
+            <span class="slot">{{ hora.slice(0, 5) }}</span>
+          }
+        }
+      </div>
+      @if (auth.isPaciente()) {
+        <small class="text-muted block mt-3"
+          >Selecciona una hora para continuar con la reserva.</small
+        >
+      }
+    }
+  </section>
+</div>

@@ -1,1 +1,96 @@
-<p>especialidad-list works!</p>
+<app-page-header
+  title="Especialidades"
+  subtitle="Áreas de atención disponibles en la clínica"
+  icon="pi-heart"
+>
+  @if (auth.isAdmin()) {
+    <p-button label="Nueva especialidad" icon="pi pi-plus" routerLink="/especialidades/nueva" />
+  }
+</app-page-header>
+
+<div class="panel">
+  @if (store.list.error(); as error) {
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar las especialidades"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="recargar()" />
+    </app-empty-state>
+  } @else {
+    <p-table
+      [value]="filtradas()"
+      [loading]="store.list.loading()"
+      [paginator]="filtradas().length > 10"
+      [rows]="10"
+      [rowHover]="true"
+      responsiveLayout="scroll"
+    >
+      <ng-template #caption>
+        <p-iconfield class="w-full md:w-20rem">
+          <p-inputicon class="pi pi-search" />
+          <input
+            pInputText
+            type="search"
+            class="w-full"
+            placeholder="Buscar especialidad"
+            aria-label="Buscar especialidad"
+            [ngModel]="busqueda()"
+            (ngModelChange)="busqueda.set($event)"
+          />
+        </p-iconfield>
+      </ng-template>
+      <ng-template #header>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          @if (auth.isAdmin()) {
+            <th class="text-right" style="width: 9rem">Acciones</th>
+          }
+        </tr>
+      </ng-template>
+      <ng-template #body let-item>
+        <tr>
+          <td class="font-semibold">{{ item.nombre }}</td>
+          <td class="text-muted">{{ item.descripcion || 'Sin descripción' }}</td>
+          @if (auth.isAdmin()) {
+            <td class="text-right">
+              <p-button
+                icon="pi pi-pencil"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                [ariaLabel]="'Editar ' + item.nombre"
+                [routerLink]="['/especialidades', item.id, 'editar']"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                [rounded]="true"
+                severity="danger"
+                [ariaLabel]="'Eliminar ' + item.nombre"
+                (onClick)="eliminar(item)"
+              />
+            </td>
+          }
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td [attr.colspan]="auth.isAdmin() ? 3 : 2">
+            <app-empty-state
+              icon="pi-heart"
+              [title]="busqueda() ? 'Sin coincidencias' : 'Aún no hay especialidades'"
+              [message]="
+                busqueda()
+                  ? 'Prueba con otro término de búsqueda.'
+                  : 'Cuando se registren especialidades aparecerán aquí.'
+              "
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

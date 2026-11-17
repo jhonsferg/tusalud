@@ -1,1 +1,111 @@
-<p>medico-list works!</p>
+<app-page-header title="Médicos" subtitle="Encuentra al especialista que necesitas" icon="pi-users">
+  @if (auth.isAdmin()) {
+    <p-button label="Nuevo médico" icon="pi pi-plus" routerLink="/medicos/nuevo" />
+  }
+</app-page-header>
+
+<div class="filters panel">
+  <p-iconfield class="search">
+    <p-inputicon class="pi pi-search" />
+    <input
+      pInputText
+      type="search"
+      class="w-full"
+      placeholder="Buscar por nombre, especialidad o colegiatura"
+      aria-label="Buscar médico"
+      [ngModel]="busqueda()"
+      (ngModelChange)="busqueda.set($event)"
+    />
+  </p-iconfield>
+  <p-select
+    class="especialidad"
+    [options]="especialidades.opciones()"
+    optionLabel="label"
+    optionValue="value"
+    [ngModel]="store.filtroEspecialidad()"
+    (ngModelChange)="filtrarPorEspecialidad($event)"
+    placeholder="Todas las especialidades"
+    [showClear]="true"
+    [loading]="especialidades.list.loading()"
+    ariaLabel="Filtrar por especialidad"
+    appendTo="body"
+    styleClass="w-full"
+  />
+</div>
+
+@if (store.list.error(); as error) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar los médicos"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="recargar()" />
+    </app-empty-state>
+  </div>
+} @else if (store.list.loading() && !store.list.hasValue()) {
+  <div class="grid-cards">
+    @for (n of esqueleto; track n) {
+      <div class="panel"><p-skeleton height="9rem" /></div>
+    }
+  </div>
+} @else if (filtrados().length === 0) {
+  <div class="panel">
+    <app-empty-state
+      icon="pi-users"
+      title="No encontramos médicos"
+      message="Prueba con otra búsqueda o cambia la especialidad seleccionada."
+    />
+  </div>
+} @else {
+  <div class="grid-cards">
+    @for (medico of filtrados(); track medico.id) {
+      <article class="panel card">
+        <header>
+          <p-avatar
+            [label]="iniciales(medico.nombre, medico.apellido)"
+            size="large"
+            shape="circle"
+            styleClass="avatar"
+          />
+          <div class="min-w-0">
+            <h3>{{ medico.nombreCompleto }}</h3>
+            <p-tag [value]="medico.especialidadNombre" severity="info" [rounded]="true" />
+          </div>
+        </header>
+        <ul>
+          <li><i class="pi pi-id-card"></i> Colegiatura {{ medico.colegiatura }}</li>
+          <li>
+            <i class="pi pi-building"></i> {{ medico.consultorio || 'Consultorio por asignar' }}
+          </li>
+          <li>
+            <i class="pi pi-wallet"></i>
+            {{ medico.precioConsulta | currency: 'PEN' : 'symbol-narrow' }} por consulta
+          </li>
+        </ul>
+        @if (medico.estado === 'INACTIVO') {
+          <p-tag value="Inactivo" severity="secondary" />
+        }
+        <footer>
+          <p-button
+            label="Ver perfil"
+            icon="pi pi-user"
+            [outlined]="true"
+            size="small"
+            [routerLink]="['/medicos', medico.id]"
+          />
+          @if (auth.isPaciente() && medico.estado === 'ACTIVO') {
+            <p-button
+              label="Reservar"
+              icon="pi pi-calendar-plus"
+              size="small"
+              [routerLink]="['/citas/nueva']"
+              [queryParams]="{ medicoId: medico.id }"
+            />
+          }
+        </footer>
+      </article>
+    }
+  </div>
+}

@@ -1,0 +1,32 @@
+.layout {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+h3 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  text-transform: none;
+}
+
+.slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: 0.6rem;
+}
+
+.slot {
+  padding: 0.5rem;
+  border: 1px solid var(--p-primary-200);
+  border-radius: 8px;
+  background: var(--p-primary-50);
+  color: var(--p-primary-800);
+  font-weight: 600;
+  text-align: center;
+}
