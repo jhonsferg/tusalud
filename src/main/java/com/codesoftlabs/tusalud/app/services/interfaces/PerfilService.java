@@ -7,6 +7,7 @@ import com.codesoftlabs.tusalud.app.dto.request.PreferenciasRequest;
 import com.codesoftlabs.tusalud.app.dto.response.PerfilResponse;
 import com.codesoftlabs.tusalud.app.dto.response.PreferenciasResponse;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
+import java.util.UUID;
 
 public interface PerfilService {
 
@@ -15,6 +16,8 @@ public interface PerfilService {
     PerfilResponse actualizar(UsuarioPrincipal principal, PerfilUpdateRequest request);
 
     void cambiarPassword(UsuarioPrincipal principal, PasswordChangeRequest request);
+
+    void cambiarPassword(UsuarioPrincipal principal, PasswordChangeRequest request, UUID tokenActual);
 
     PreferenciasResponse obtenerPreferencias(UsuarioPrincipal principal);
 

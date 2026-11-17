@@ -11,6 +11,7 @@ import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.MedicoRepository;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
+import com.codesoftlabs.tusalud.app.repositories.RefreshTokenRepository;
 import com.codesoftlabs.tusalud.app.repositories.RolRepository;
 import com.codesoftlabs.tusalud.app.repositories.SesionUsuarioRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
@@ -39,6 +40,7 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
 
     private final UsuarioRepository usuarioRepository;
     private final SesionUsuarioRepository sesionRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final RolRepository rolRepository;
     private final MedicoRepository medicoRepository;
     private final PacienteRepository pacienteRepository;
@@ -101,6 +103,7 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
         }
         usuarioRepository.saveAndFlush(usuario);
         sesionRepository.revocarTodasDelUsuario(usuarioId);
+        refreshTokenRepository.revocarDeUsuario(usuarioId);
         notificacionService.crear(
                 usuario,
                 TipoNotificacion.ROLES_ACTUALIZADOS,
@@ -132,6 +135,7 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
         usuarioRepository.saveAndFlush(usuario);
         if (estado == EstadoUsuario.INACTIVO) {
             sesionRepository.revocarTodasDelUsuario(usuarioId);
+            refreshTokenRepository.revocarDeUsuario(usuarioId);
         }
         log.info("Usuario {} cambió a {} por {}", usuario.getEmail(), estado, actor.getEmail());
         return UsuarioAdminResponse.from(usuario, ultimosAccesos().get(usuarioId));

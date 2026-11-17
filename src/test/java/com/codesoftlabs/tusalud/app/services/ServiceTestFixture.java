@@ -95,6 +95,10 @@ public class ServiceTestFixture {
     }
 
     public Medico medicoConHorarioLunes(BigDecimal precio) {
+        return medicoConHorarioLunes(precio, 30);
+    }
+
+    public Medico medicoConHorarioLunes(BigDecimal precio, int duracionMinutos) {
         Medico medico = Medico.builder()
                 .colegiatura("SVC-" + siguiente())
                 .consultorio("Consultorio 1")
@@ -105,7 +109,7 @@ public class ServiceTestFixture {
                 .diaSemana(DayOfWeek.MONDAY)
                 .horaInicio(LocalTime.of(8, 0))
                 .horaFin(LocalTime.of(12, 0))
-                .duracionCitaMinutos(30)
+                .duracionCitaMinutos(duracionMinutos)
                 .build());
         return medicoRepository.save(medico);
     }

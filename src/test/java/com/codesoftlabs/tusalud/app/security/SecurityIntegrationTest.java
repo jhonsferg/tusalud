@@ -145,6 +145,23 @@ class SecurityIntegrationTest {
     }
 
     @Test
+    void elAdministradorActualizaLasEspecialidadesDeUnMedicoExistente() throws Exception {
+        Rol rolAdmin = rolRepository
+                .findByNombre(RolNombre.ROLE_ADMIN)
+                .orElseGet(() -> rolRepository.save(
+                        Rol.builder().nombre(RolNombre.ROLE_ADMIN).build()));
+        Usuario admin = usuarioRepository.save(usuario("admin.sec@test.com", EstadoUsuario.ACTIVO, rolAdmin));
+        String tokenAdmin = jwtUtils.generateToken(UsuarioPrincipal.from(admin));
+
+        mockMvc.perform(put("/api/v1/medicos/999999/especialidades")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenAdmin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"especialidadIds\":[1]}"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Médico")));
+    }
+
+    @Test
     void losPagosConBilleteraSonDelPacienteYLosPacientesCompartidosDelMedico() throws Exception {
         mockMvc.perform(post("/api/v1/pagos/qr")).andExpect(status().isUnauthorized());
         mockMvc.perform(post("/api/v1/pacientes/1/compartir")

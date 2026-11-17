@@ -2,13 +2,17 @@ package com.codesoftlabs.tusalud.app.services.impl;
 
 import com.codesoftlabs.tusalud.app.dto.request.LoginRequest;
 import com.codesoftlabs.tusalud.app.dto.request.MfaVerificarRequest;
+import com.codesoftlabs.tusalud.app.dto.request.RefreshTokenRequest;
 import com.codesoftlabs.tusalud.app.dto.request.RegisterRequest;
 import com.codesoftlabs.tusalud.app.dto.response.AuthResponse;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
+import com.codesoftlabs.tusalud.app.entities.RefreshToken;
 import com.codesoftlabs.tusalud.app.entities.Rol;
+import com.codesoftlabs.tusalud.app.entities.SesionUsuario;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoUsuario;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
+import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
 import com.codesoftlabs.tusalud.app.exceptions.DemasiadosIntentosException;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
@@ -19,8 +23,12 @@ import com.codesoftlabs.tusalud.app.security.JwtUtils;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.AuthService;
 import com.codesoftlabs.tusalud.app.services.interfaces.MfaService;
+import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
+import com.codesoftlabs.tusalud.app.services.interfaces.RefreshTokenService;
 import com.codesoftlabs.tusalud.app.services.interfaces.SesionService;
 import io.jsonwebtoken.JwtException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -42,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthServiceImpl implements AuthService {
 
     private static final String TOKEN_TYPE = "Bearer";
+    private static final String MENSAJE_REFRESH_INVALIDO = "El refresh token no es válido o expiró";
 
     private final AuthenticationManager authenticationManager;
     private final UsuarioRepository usuarioRepository;
@@ -51,6 +60,8 @@ public class AuthServiceImpl implements AuthService {
     private final JwtUtils jwtUtils;
     private final SesionService sesionService;
     private final MfaService mfaService;
+    private final RefreshTokenService refreshTokenService;
+    private final NotificacionService notificacionService;
 
     @Override
     @Transactional
@@ -138,6 +149,40 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional(noRollbackFor = BadCredentialsException.class)
+    public AuthResponse refrescar(RefreshTokenRequest request) {
+        RefreshToken actual = refreshTokenService.buscarPorToken(request.refreshToken());
+        if (actual == null) {
+            throw new BadCredentialsException(MENSAJE_REFRESH_INVALIDO);
+        }
+        Usuario usuario = actual.getUsuario();
+        SesionUsuario sesion = actual.getSesion();
+        if (actual.isUsado()) {
+            refreshTokenService.revocarFamilia(actual.getFamilia());
+            sesion.setRevocada(true);
+            notificacionService.crear(
+                    usuario,
+                    TipoNotificacion.SESION_SOSPECHOSA,
+                    "Sesión cerrada por seguridad",
+                    "Detectamos un intento de reutilizar una credencial de sesión ya renovada y cerramos esa sesión. Si no fuiste tú, cambia tu contraseña.",
+                    "/perfil");
+            log.warn("Reutilización de refresh token detectada para {}", usuario.getEmail());
+            throw new BadCredentialsException(MENSAJE_REFRESH_INVALIDO);
+        }
+        LocalDateTime ahora = LocalDateTime.now();
+        if (actual.isRevocado()
+                || !actual.getExpiraEn().isAfter(ahora)
+                || !usuario.isActivo()
+                || !sesion.estaActiva(ahora)) {
+            throw new BadCredentialsException(MENSAJE_REFRESH_INVALIDO);
+        }
+        String nuevo = refreshTokenService.rotar(actual);
+        sesion.setUltimoAcceso(ahora);
+        sesion.setExpiraEn(ahora.plus(Duration.ofMillis(refreshTokenService.getRefreshExpirationMs())));
+        return construirRespuesta(UsuarioPrincipal.from(usuario), sesion.getTokenId(), nuevo);
+    }
+
+    @Override
     @Transactional
     public void cerrarSesion(UUID tokenId) {
         sesionService.cerrarSesion(tokenId);
@@ -150,8 +195,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private AuthResponse construirRespuesta(UsuarioPrincipal principal, UUID tokenId) {
+        return construirRespuesta(principal, tokenId, refreshTokenService.emitirParaSesion(tokenId));
+    }
+
+    private AuthResponse construirRespuesta(UsuarioPrincipal principal, UUID tokenId, String refreshToken) {
         return AuthResponse.builder()
                 .token(jwtUtils.generateToken(principal, tokenId))
+                .refreshToken(refreshToken)
+                .refreshExpiresIn(jwtUtils.getRefreshExpirationMs())
                 .tokenType(TOKEN_TYPE)
                 .expiresIn(jwtUtils.getExpirationMs())
                 .usuarioId(principal.getId())

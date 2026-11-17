@@ -15,5 +15,6 @@ public enum TipoNotificacion {
     MFA_DESACTIVADO,
     PACIENTE_COMPARTIDO,
     ROLES_ACTUALIZADOS,
+    SESION_SOSPECHOSA,
     SISTEMA
 }

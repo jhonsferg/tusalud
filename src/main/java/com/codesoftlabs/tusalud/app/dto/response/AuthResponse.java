@@ -9,9 +9,15 @@ import lombok.Builder;
 public record AuthResponse(
         @Schema(example = "eyJhbGciOiJIUzUxMiJ9...") String token,
 
+        @Schema(description = "Token opaco para renovar el acceso sin credenciales; se rota en cada renovación")
+        String refreshToken,
+
+        @Schema(description = "Vigencia del refresh token en milisegundos", example = "604800000")
+        long refreshExpiresIn,
+
         @Schema(example = "Bearer") String tokenType,
 
-        @Schema(description = "Vigencia del token en milisegundos", example = "86400000")
+        @Schema(description = "Vigencia del token en milisegundos", example = "900000")
         long expiresIn,
 
         @Schema(example = "1") Long usuarioId,

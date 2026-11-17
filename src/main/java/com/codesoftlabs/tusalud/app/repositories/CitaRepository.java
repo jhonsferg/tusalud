@@ -122,6 +122,23 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
     @Query("""
             SELECT c FROM Cita c
             JOIN FETCH c.medico m
+            WHERE c.paciente.id = :pacienteId
+              AND c.fechaHora >= :desde
+              AND c.fechaHora < :hasta
+              AND c.id <> :excluirId
+              AND c.estado IN (
+                com.codesoftlabs.tusalud.app.entities.enums.EstadoCita.PENDIENTE,
+                com.codesoftlabs.tusalud.app.entities.enums.EstadoCita.CONFIRMADA)
+            """)
+    List<Cita> findActivasPacienteEnVentana(
+            @Param("pacienteId") Long pacienteId,
+            @Param("desde") LocalDateTime desde,
+            @Param("hasta") LocalDateTime hasta,
+            @Param("excluirId") Long excluirId);
+
+    @Query("""
+            SELECT c FROM Cita c
+            JOIN FETCH c.medico m
             JOIN FETCH m.usuario
             JOIN FETCH c.especialidad
             JOIN FETCH c.paciente p

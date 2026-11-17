@@ -12,6 +12,7 @@ import com.codesoftlabs.tusalud.app.security.DispositivoParser;
 import com.codesoftlabs.tusalud.app.security.JwtUtils;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
+import com.codesoftlabs.tusalud.app.services.interfaces.RefreshTokenService;
 import com.codesoftlabs.tusalud.app.services.interfaces.SesionService;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -34,6 +35,7 @@ public class SesionServiceImpl implements SesionService {
     private final PreferenciaUsuarioRepository preferenciaRepository;
     private final NotificacionService notificacionService;
     private final JwtUtils jwtUtils;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     @Transactional
@@ -51,7 +53,7 @@ public class SesionServiceImpl implements SesionService {
                 .dispositivo(dispositivo)
                 .creadaEn(ahora)
                 .ultimoAcceso(ahora)
-                .expiraEn(ahora.plus(Duration.ofMillis(jwtUtils.getExpirationMs())))
+                .expiraEn(ahora.plus(Duration.ofMillis(jwtUtils.getRefreshExpirationMs())))
                 .revocada(false)
                 .build());
 
@@ -101,6 +103,7 @@ public class SesionServiceImpl implements SesionService {
                 .findByIdAndUsuarioId(sesionId, actor.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Sesión", "id", sesionId));
         sesion.setRevocada(true);
+        refreshTokenService.revocarDeSesion(sesion.getId());
     }
 
     @Override
@@ -108,8 +111,10 @@ public class SesionServiceImpl implements SesionService {
     public void revocarTodasExceptoActual(UsuarioPrincipal actor, UUID tokenActual) {
         if (tokenActual == null) {
             sesionRepository.revocarTodasDelUsuario(actor.getId());
+            refreshTokenService.revocarDeUsuario(actor.getId());
         } else {
             sesionRepository.revocarTodasExcepto(actor.getId(), tokenActual);
+            refreshTokenService.revocarDeUsuarioExceptoSesion(actor.getId(), tokenActual);
         }
     }
 
@@ -117,7 +122,10 @@ public class SesionServiceImpl implements SesionService {
     @Transactional
     public void cerrarSesion(UUID tokenId) {
         if (tokenId != null) {
-            sesionRepository.findByTokenId(tokenId).ifPresent(sesion -> sesion.setRevocada(true));
+            sesionRepository.findByTokenId(tokenId).ifPresent(sesion -> {
+                sesion.setRevocada(true);
+                refreshTokenService.revocarDeSesion(sesion.getId());
+            });
         }
     }
 
@@ -125,6 +133,7 @@ public class SesionServiceImpl implements SesionService {
     @Transactional
     public void revocarTodasDelUsuario(Long usuarioId) {
         sesionRepository.revocarTodasDelUsuario(usuarioId);
+        refreshTokenService.revocarDeUsuario(usuarioId);
     }
 
     private boolean alertasActivas(Long usuarioId) {

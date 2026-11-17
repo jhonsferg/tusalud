@@ -7,6 +7,7 @@ import com.codesoftlabs.tusalud.app.dto.request.PreferenciasRequest;
 import com.codesoftlabs.tusalud.app.dto.response.ErrorResponse;
 import com.codesoftlabs.tusalud.app.dto.response.PerfilResponse;
 import com.codesoftlabs.tusalud.app.dto.response.PreferenciasResponse;
+import com.codesoftlabs.tusalud.app.security.JwtAuthenticationFilter;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.PerfilService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -100,8 +103,11 @@ public class PerfilController {
     })
     public ResponseEntity<Void> cambiarPassword(
             @Valid @RequestBody PasswordChangeRequest request,
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
-        perfilService.cambiarPassword(principal, request);
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
+            @Parameter(hidden = true)
+                    @RequestAttribute(value = JwtAuthenticationFilter.TOKEN_ID_ATTRIBUTE, required = false)
+                    UUID tokenActual) {
+        perfilService.cambiarPassword(principal, request, tokenActual);
         return ResponseEntity.noContent().build();
     }
 

@@ -1,6 +1,7 @@
 package com.codesoftlabs.tusalud.app.controllers;
 
 import com.codesoftlabs.tusalud.app.dto.request.LoginRequest;
+import com.codesoftlabs.tusalud.app.dto.request.RefreshTokenRequest;
 import com.codesoftlabs.tusalud.app.dto.request.RegisterRequest;
 import com.codesoftlabs.tusalud.app.dto.response.AuthResponse;
 import com.codesoftlabs.tusalud.app.dto.response.ErrorResponse;
@@ -81,6 +82,27 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest request, HttpServletRequest httpRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(authService.registrarPaciente(request, ContextoConexion.desde(httpRequest)));
+    }
+
+    @PostMapping("/refresh")
+    @SecurityRequirements()
+    @Operation(
+            summary = "Renovar el token de acceso",
+            description =
+                    "Intercambia un refresh token vigente por un nuevo token de acceso y un nuevo refresh token (rotación). Reutilizar un refresh token ya rotado cierra la sesión.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Token renovado"),
+        @ApiResponse(
+                responseCode = "400",
+                description = "Datos de entrada inválidos",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+                responseCode = "401",
+                description = "Refresh token inexistente, expirado, reutilizado o sesión cerrada",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authService.refrescar(request));
     }
 
     @PostMapping("/logout")

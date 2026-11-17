@@ -2,7 +2,9 @@ package com.codesoftlabs.tusalud.app.controllers;
 
 import com.codesoftlabs.tusalud.app.dto.request.HorarioRequest;
 import com.codesoftlabs.tusalud.app.dto.request.MedicoCreateRequest;
+import com.codesoftlabs.tusalud.app.dto.request.MedicoEspecialidadesRequest;
 import com.codesoftlabs.tusalud.app.dto.response.CitaResponse;
+import com.codesoftlabs.tusalud.app.dto.response.DisponibilidadRangoResponse;
 import com.codesoftlabs.tusalud.app.dto.response.DisponibilidadResponse;
 import com.codesoftlabs.tusalud.app.dto.response.ErrorResponse;
 import com.codesoftlabs.tusalud.app.dto.response.HorarioResponse;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -128,6 +131,32 @@ public class MedicoController {
                 .buildAndExpand(creado.id())
                 .toUri();
         return ResponseEntity.created(location).body(creado);
+    }
+
+    @PutMapping("/{id:\\d+}/especialidades")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+            summary = "Actualizar las especialidades de un médico",
+            description = "Reemplaza las especialidades que atiende el médico. Requiere rol ADMIN.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Especialidades actualizadas"),
+        @ApiResponse(
+                responseCode = "400",
+                description = "Datos de entrada inválidos",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+                responseCode = "403",
+                description = "Acceso denegado: se requiere rol ADMIN",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+                responseCode = "404",
+                description = "Médico o especialidad no encontrados",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<MedicoResponse> actualizarEspecialidades(
+            @Parameter(description = "Identificador del médico", example = "1") @PathVariable @Positive Long id,
+            @Valid @RequestBody MedicoEspecialidadesRequest request) {
+        return ResponseEntity.ok(medicoService.actualizarEspecialidades(id, request));
     }
 
     @GetMapping("/{id:\\d+}/horarios")
@@ -248,6 +277,41 @@ public class MedicoController {
         return ResponseEntity.ok(citaService.consultarDisponibilidad(id, fecha));
     }
 
+    @GetMapping("/{id:\\d+}/disponibilidad/rango")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(
+            summary = "Consultar disponibilidad en un rango de fechas",
+            description =
+                    "Devuelve, para cada día con atención dentro del rango (máximo 62 días), las horas libres del médico. Omite los días sin horario y los días pasados.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Disponibilidad por día"),
+        @ApiResponse(
+                responseCode = "400",
+                description = "Rango inválido, mayor a 62 días o con formato incorrecto",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+                responseCode = "401",
+                description = "No autenticado",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+                responseCode = "404",
+                description = "Médico no encontrado",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<List<DisponibilidadRangoResponse>> consultarDisponibilidadRango(
+            @Parameter(description = "ID del médico", example = "1") @PathVariable @Positive Long id,
+            @Parameter(description = "Primer día (yyyy-MM-dd)", example = "2026-10-01", required = true)
+                    @RequestParam
+                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    LocalDate inicio,
+            @Parameter(description = "Último día (yyyy-MM-dd)", example = "2026-10-31", required = true)
+                    @RequestParam
+                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    LocalDate fin,
+            @Parameter(description = "Reservado; se ignora") @RequestParam(required = false) Long especialidadId) {
+        return ResponseEntity.ok(citaService.consultarDisponibilidadRango(id, inicio, fin));
+    }
+
     @GetMapping("/me/agenda")
     @PreAuthorize("hasRole('MEDICO')")
     @Operation(
@@ -274,7 +338,15 @@ public class MedicoController {
             @Parameter(description = "Fecha de la agenda (yyyy-MM-dd); por defecto hoy", example = "2026-10-20")
                     @RequestParam(required = false)
                     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                    LocalDate fecha) {
-        return ResponseEntity.ok(citaService.agendaMedico(principal, fecha));
+                    LocalDate fecha,
+            @Parameter(description = "Inicio del rango (yyyy-MM-dd); requiere fin", example = "2026-10-01")
+                    @RequestParam(required = false)
+                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    LocalDate inicio,
+            @Parameter(description = "Fin del rango (yyyy-MM-dd); máximo 62 días", example = "2026-10-31")
+                    @RequestParam(required = false)
+                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                    LocalDate fin) {
+        return ResponseEntity.ok(citaService.agendaMedico(principal, fecha, inicio, fin));
     }
 }

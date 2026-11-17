@@ -3,6 +3,7 @@ package com.codesoftlabs.tusalud.app.services.impl;
 import com.codesoftlabs.tusalud.app.dto.request.CitaCreateRequest;
 import com.codesoftlabs.tusalud.app.dto.request.ReprogramarRequest;
 import com.codesoftlabs.tusalud.app.dto.response.CitaResponse;
+import com.codesoftlabs.tusalud.app.dto.response.DisponibilidadRangoResponse;
 import com.codesoftlabs.tusalud.app.dto.response.DisponibilidadResponse;
 import com.codesoftlabs.tusalud.app.entities.Cita;
 import com.codesoftlabs.tusalud.app.entities.Especialidad;
@@ -16,6 +17,7 @@ import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
 import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
+import com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException;
 import com.codesoftlabs.tusalud.app.exceptions.ForbiddenOperationException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.CitaRepository;
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -59,11 +62,15 @@ public class CitaServiceImpl implements CitaService {
     private static final Set<EstadoCita> ESTADOS_CANCELABLES = EnumSet.of(EstadoCita.PENDIENTE, EstadoCita.CONFIRMADA);
     private static final Set<EstadoCita> ESTADOS_ATENDIBLES = EnumSet.of(EstadoCita.PENDIENTE, EstadoCita.CONFIRMADA);
 
+    private static final int MAX_DIAS_CALENDARIO = 62;
+    private static final long VENTANA_MAXIMA_MINUTOS = 240;
+
     private final CitaRepository citaRepository;
     private final MedicoRepository medicoRepository;
     private final PacienteRepository pacienteRepository;
     private final HorarioAtencionRepository horarioRepository;
     private final NotificacionService notificacionService;
+    private final CitaResponseMapper citaMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -124,7 +131,7 @@ public class CitaServiceImpl implements CitaService {
                 paciente.getId(),
                 medico.getId(),
                 fechaHora);
-        return CitaResponse.from(cita);
+        return citaMapper.mapear(cita);
     }
 
     @Override
@@ -151,7 +158,7 @@ public class CitaServiceImpl implements CitaService {
         if (!esAdmin(actor) && !esPacienteDe(cita, actor) && !esMedicoDe(cita, actor)) {
             throw new ForbiddenOperationException("No tiene permiso para ver esta cita");
         }
-        return CitaResponse.from(cita);
+        return citaMapper.mapear(cita);
     }
 
     @Override
@@ -269,7 +276,7 @@ public class CitaServiceImpl implements CitaService {
                 TipoNotificacion.CITA_REPROGRAMADA,
                 "Cita reprogramada",
                 "La cita del " + anterior + " fue reprogramada para el " + nuevaFecha.format(FORMATO_FECHA) + ".");
-        return CitaResponse.from(guardada);
+        return citaMapper.mapear(guardada);
     }
 
     @Override
@@ -278,9 +285,20 @@ public class CitaServiceImpl implements CitaService {
                 .findByUsuarioEmail(actor.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("Médico", "email", actor.getEmail()));
         LocalDate dia = fecha != null ? fecha : LocalDate.now();
-        return citaRepository.findAgendaMedicoPorFecha(medico.getId(), dia).stream()
-                .map(CitaResponse::from)
-                .toList();
+        return citaMapper.mapear(citaRepository.findAgendaMedicoPorFecha(medico.getId(), dia));
+    }
+
+    @Override
+    public List<CitaResponse> agendaMedico(UsuarioPrincipal actor, LocalDate fecha, LocalDate inicio, LocalDate fin) {
+        if (inicio == null && fin == null) {
+            return agendaMedico(actor, fecha);
+        }
+        validarRangoCalendario(inicio, fin);
+        Medico medico = medicoRepository
+                .findByUsuarioEmail(actor.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("Médico", "email", actor.getEmail()));
+        return citaMapper.mapear(citaRepository.findAgendaMedico(
+                medico.getId(), inicio.atStartOfDay(), fin.plusDays(1).atStartOfDay()));
     }
 
     @Override
@@ -305,6 +323,54 @@ public class CitaServiceImpl implements CitaService {
                         .toList();
         LocalTime ahora = dia.equals(hoy) ? LocalTime.now() : null;
 
+        return new DisponibilidadResponse(
+                medico.getId(),
+                medico.getUsuario().getNombreCompleto(),
+                dia,
+                new ArrayList<>(calcularLibres(horarios, ocupadas, ahora)));
+    }
+
+    @Override
+    public List<DisponibilidadRangoResponse> consultarDisponibilidadRango(
+            Long medicoId, LocalDate inicio, LocalDate fin) {
+        validarRangoCalendario(inicio, fin);
+        if (!medicoRepository.existsById(medicoId)) {
+            throw new ResourceNotFoundException("Médico", "id", medicoId);
+        }
+        LocalDate hoy = LocalDate.now();
+        LocalDate primero = inicio.isBefore(hoy) ? hoy : inicio;
+        if (primero.isAfter(fin)) {
+            return List.of();
+        }
+
+        Map<DayOfWeek, List<HorarioAtencion>> horariosPorDia = horarioRepository.findByMedicoId(medicoId).stream()
+                .collect(Collectors.groupingBy(HorarioAtencion::getDiaSemana));
+        Map<LocalDate, List<LocalTime>> ocupadasPorDia =
+                citaRepository
+                        .findHorasOcupadas(
+                                medicoId,
+                                primero.atStartOfDay(),
+                                fin.plusDays(1).atStartOfDay())
+                        .stream()
+                        .collect(Collectors.groupingBy(
+                                LocalDateTime::toLocalDate,
+                                Collectors.mapping(LocalDateTime::toLocalTime, Collectors.toList())));
+
+        List<DisponibilidadRangoResponse> dias = new ArrayList<>();
+        for (LocalDate dia = primero; !dia.isAfter(fin); dia = dia.plusDays(1)) {
+            List<HorarioAtencion> bloques = horariosPorDia.get(dia.getDayOfWeek());
+            if (bloques == null) {
+                continue;
+            }
+            List<LocalTime> libres = new ArrayList<>(calcularLibres(
+                    bloques, ocupadasPorDia.getOrDefault(dia, List.of()), dia.equals(hoy) ? LocalTime.now() : null));
+            dias.add(new DisponibilidadRangoResponse(dia, libres, libres.size()));
+        }
+        return dias;
+    }
+
+    private static TreeSet<LocalTime> calcularLibres(
+            List<HorarioAtencion> horarios, List<LocalTime> ocupadas, LocalTime ahora) {
         TreeSet<LocalTime> libres = new TreeSet<>();
         for (HorarioAtencion bloque : horarios) {
             int duracion = bloque.getDuracionCitaMinutos();
@@ -320,9 +386,19 @@ public class CitaServiceImpl implements CitaService {
                 turno = siguiente;
             }
         }
+        return libres;
+    }
 
-        return new DisponibilidadResponse(
-                medico.getId(), medico.getUsuario().getNombreCompleto(), dia, new ArrayList<>(libres));
+    private static void validarRangoCalendario(LocalDate inicio, LocalDate fin) {
+        if (inicio == null || fin == null) {
+            throw new DatosInvalidosException("Debe indicar la fecha de inicio y la de fin");
+        }
+        if (fin.isBefore(inicio)) {
+            throw new DatosInvalidosException("La fecha de fin no puede ser anterior a la de inicio");
+        }
+        if (ChronoUnit.DAYS.between(inicio, fin) + 1 > MAX_DIAS_CALENDARIO) {
+            throw new DatosInvalidosException("El rango no puede superar " + MAX_DIAS_CALENDARIO + " días");
+        }
     }
 
     private void validarDisponibilidad(Medico medico, Paciente paciente, LocalDateTime fechaHora, Long citaExcluida) {
@@ -347,8 +423,17 @@ public class CitaServiceImpl implements CitaService {
                 || citaRepository.existsCitaMedicoEnFranja(medico.getId(), desde, hasta, citaExcluida)) {
             throw new ConflictException("El médico ya tiene una cita registrada en ese horario");
         }
-        if (citaRepository.existsCitaPacienteEnFranja(paciente.getId(), desde, hasta, citaExcluida)) {
-            throw new ConflictException("Ya tiene otra cita registrada que se cruza con ese horario");
+        LocalDateTime fin = fechaHora.plusMinutes(duracion);
+        boolean cruce = citaRepository
+                .findActivasPacienteEnVentana(
+                        paciente.getId(), fechaHora.minusMinutes(VENTANA_MAXIMA_MINUTOS), fin, citaExcluida)
+                .stream()
+                .anyMatch(otra -> otra.getFechaHora().isBefore(fin)
+                        && otra.getFechaHora()
+                                .plusMinutes(citaMapper.duracionDe(otra))
+                                .isAfter(fechaHora));
+        if (cruce) {
+            throw new ConflictException("Ya tienes otra cita activa que se cruza con ese horario");
         }
     }
 
@@ -363,7 +448,7 @@ public class CitaServiceImpl implements CitaService {
         cita.setEstado(nuevoEstado);
         Cita actualizada = citaRepository.saveAndFlush(cita);
         log.info("Cita {}: {} -> {} por {}", cita.getId(), anterior, nuevoEstado, actor.getEmail());
-        return CitaResponse.from(actualizada);
+        return citaMapper.mapear(actualizada);
     }
 
     private void notificarOtraParte(

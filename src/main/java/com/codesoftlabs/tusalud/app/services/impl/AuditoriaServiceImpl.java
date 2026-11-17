@@ -20,6 +20,7 @@ public class AuditoriaServiceImpl implements AuditoriaService {
     private static final int DIAS_RANGO_POR_DEFECTO = 30;
 
     private final CitaRepository citaRepository;
+    private final CitaResponseMapper citaMapper;
 
     @Override
     public List<CitasPorEstadoResponse> contarCitasPorEstado() {
@@ -34,8 +35,6 @@ public class AuditoriaServiceImpl implements AuditoriaService {
         if (desde.isAfter(hasta)) {
             throw new BusinessLogicException("La fecha de inicio no puede ser posterior a la fecha de fin");
         }
-        return citaRepository.findAllByRango(desde.atStartOfDay(), hasta.atTime(LocalTime.MAX)).stream()
-                .map(CitaResponse::from)
-                .toList();
+        return citaMapper.mapear(citaRepository.findAllByRango(desde.atStartOfDay(), hasta.atTime(LocalTime.MAX)));
     }
 }

@@ -48,9 +48,21 @@ public record CitaResponse(
         LocalDateTime createdAt,
 
         @Schema(example = "false", description = "Indica si la cita tiene un pago vigente")
-        boolean pagado) {
+        boolean pagado,
+
+        @Schema(example = "30", description = "Duración de la cita en minutos según el bloque de atención")
+        int duracionMinutos,
+
+        @Schema(example = "false", description = "Reservado para marcar cruces; el servidor siempre devuelve false")
+        boolean conflicto) {
+
+    private static final int DURACION_POR_DEFECTO = 30;
 
     public static CitaResponse from(Cita cita) {
+        return from(cita, DURACION_POR_DEFECTO);
+    }
+
+    public static CitaResponse from(Cita cita, int duracionMinutos) {
         Medico medico = cita.getMedico();
         Paciente paciente = cita.getPaciente();
         boolean pagado = cita.getPago() != null && cita.getPago().getEstado() == EstadoPago.PAGADO;
@@ -71,6 +83,8 @@ public record CitaResponse(
                 paciente.getUsuario().getNombreCompleto(),
                 paciente.getDni(),
                 cita.getCreatedAt(),
-                pagado);
+                pagado,
+                duracionMinutos,
+                false);
     }
 }

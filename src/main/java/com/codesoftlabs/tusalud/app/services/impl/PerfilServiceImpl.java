@@ -23,7 +23,9 @@ import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.PerfilService;
+import com.codesoftlabs.tusalud.app.services.interfaces.RefreshTokenService;
 import java.util.Base64;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +51,7 @@ public class PerfilServiceImpl implements PerfilService {
     private final PreferenciaUsuarioRepository preferenciaRepository;
     private final NotificacionService notificacionService;
     private final MfaUsuarioRepository mfaUsuarioRepository;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     public PerfilResponse obtener(UsuarioPrincipal principal) {
@@ -80,6 +83,12 @@ public class PerfilServiceImpl implements PerfilService {
     @Override
     @Transactional
     public void cambiarPassword(UsuarioPrincipal principal, PasswordChangeRequest request) {
+        cambiarPassword(principal, request, null);
+    }
+
+    @Override
+    @Transactional
+    public void cambiarPassword(UsuarioPrincipal principal, PasswordChangeRequest request, UUID tokenActual) {
         Usuario usuario = cargarUsuario(principal);
         if (!passwordEncoder.matches(request.passwordActual(), usuario.getPassword())) {
             throw new BusinessLogicException("La contraseña actual no es correcta");
@@ -88,6 +97,7 @@ public class PerfilServiceImpl implements PerfilService {
             throw new BusinessLogicException("La nueva contraseña debe ser distinta de la actual");
         }
         usuario.setPassword(passwordEncoder.encode(request.passwordNueva()));
+        refreshTokenService.revocarDeUsuarioExceptoSesion(usuario.getId(), tokenActual);
         notificacionService.crear(
                 usuario,
                 TipoNotificacion.CONTRASENA_CAMBIADA,

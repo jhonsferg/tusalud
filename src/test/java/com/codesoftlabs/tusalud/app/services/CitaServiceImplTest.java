@@ -175,7 +175,7 @@ class CitaServiceImplTest {
 
         assertThatThrownBy(() -> citaService.crearCita(solicitud(proximoLunes.atTime(10, 0)), pacientePrincipal))
                 .isInstanceOf(ConflictException.class)
-                .hasMessage("Ya tiene otra cita registrada que se cruza con ese horario");
+                .hasMessage("Ya tienes otra cita activa que se cruza con ese horario");
     }
 
     @Test

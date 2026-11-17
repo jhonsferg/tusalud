@@ -113,6 +113,10 @@ public class JwtUtils {
         return resolver.apply(parseClaims(token));
     }
 
+    public long getRefreshExpirationMs() {
+        return properties.refreshExpirationMs();
+    }
+
     public long getExpirationMs() {
         return properties.expirationMs();
     }

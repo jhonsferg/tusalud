@@ -3,6 +3,7 @@ package com.codesoftlabs.tusalud.app.services.interfaces;
 import com.codesoftlabs.tusalud.app.dto.request.CitaCreateRequest;
 import com.codesoftlabs.tusalud.app.dto.request.ReprogramarRequest;
 import com.codesoftlabs.tusalud.app.dto.response.CitaResponse;
+import com.codesoftlabs.tusalud.app.dto.response.DisponibilidadRangoResponse;
 import com.codesoftlabs.tusalud.app.dto.response.DisponibilidadResponse;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.time.LocalDate;
@@ -26,5 +27,9 @@ public interface CitaService {
 
     List<CitaResponse> agendaMedico(UsuarioPrincipal medico, LocalDate fecha);
 
+    List<CitaResponse> agendaMedico(UsuarioPrincipal medico, LocalDate fecha, LocalDate inicio, LocalDate fin);
+
     DisponibilidadResponse consultarDisponibilidad(Long medicoId, LocalDate fecha);
+
+    List<DisponibilidadRangoResponse> consultarDisponibilidadRango(Long medicoId, LocalDate inicio, LocalDate fin);
 }
