@@ -16,3 +16,5 @@ export * from './laboratorio.model';
 export * from './recepcion.model';
 export * from './caja.model';
 export * from './hospitalizacion.model';
+export * from './reportes.model';
+export * from './rrhh.model';

@@ -15,7 +15,7 @@ RUN case "${BUILD_CONFIGURATION}" in production) SUFIJO=prod ;; *) SUFIJO="${BUI
     && npm run "build:all:${SUFIJO}" \
     && mkdir -p /site \
     && cp -r dist/portal/browser/. /site/ \
-    && for app in paciente medico admin recepcion caja enfermeria laboratorio farmacia almacen; do \
+    && for app in paciente medico admin gerencia finanzas operaciones calidad rrhh recepcion caja enfermeria laboratorio farmacia almacen; do \
         mkdir -p "/site/${app}" && cp -r "dist/${app}/browser/." "/site/${app}/"; \
     done \
     && find /site -type f \

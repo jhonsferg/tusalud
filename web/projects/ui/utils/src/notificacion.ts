@@ -24,6 +24,8 @@ export const ICONO_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   ALTA_HOSPITALARIA: 'pi-sign-out',
   EMERGENCIA_TRIAJE: 'pi-exclamation-circle',
   CAJA_DIFERENCIA: 'pi-calculator',
+  SOLICITUD_AUSENCIA: 'pi-calendar-minus',
+  AUSENCIA_RESUELTA: 'pi-calendar-clock',
   SISTEMA: 'pi-info-circle',
 };
 
@@ -51,5 +53,7 @@ export const COLOR_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   ALTA_HOSPITALARIA: '#0ea5e9',
   EMERGENCIA_TRIAJE: '#ef4444',
   CAJA_DIFERENCIA: '#f59e0b',
+  SOLICITUD_AUSENCIA: '#8b5cf6',
+  AUSENCIA_RESUELTA: '#14b8a6',
   SISTEMA: '#64748b',
 };

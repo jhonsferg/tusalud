@@ -1,0 +1,104 @@
+<app-page-header
+  title="Reporte ejecutivo"
+  subtitle="Los indicadores clave de la institución frente al periodo anterior"
+  icon="pi-chart-line"
+/>
+
+<app-filtros-reporte (cambio)="cargar($event)" />
+
+@if (store.ejecutivo.error(); as problema) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar el reporte"
+      [message]="problema.message"
+    />
+  </div>
+} @else if (store.ejecutivo.value(); as r) {
+  <div class="kpis">
+    <app-kpi-variacion
+      etiqueta="Citas"
+      [valor]="(r.citas.actual | number: '1.0-0') ?? ''"
+      icono="pi-calendar"
+      [indicador]="r.citas"
+    />
+    <app-kpi-variacion
+      etiqueta="Atendidas"
+      [valor]="(r.atendidas.actual | number: '1.0-0') ?? ''"
+      icono="pi-check-circle"
+      [indicador]="r.atendidas"
+    />
+    <app-kpi-variacion
+      etiqueta="Canceladas"
+      [valor]="(r.canceladas.actual | number: '1.0-0') ?? ''"
+      icono="pi-times-circle"
+      [indicador]="r.canceladas"
+      [menorEsMejor]="true"
+    />
+    <app-kpi-variacion
+      etiqueta="Tasa de ausencia"
+      [valor]="(r.tasaAusenciaPct.actual | number: '1.1-1') + ' %'"
+      icono="pi-user-minus"
+      [indicador]="r.tasaAusenciaPct"
+      [menorEsMejor]="true"
+    />
+    <app-kpi-variacion
+      etiqueta="Ingresos"
+      [valor]="(r.ingresos.actual | currency: 'PEN' : 'symbol-narrow') ?? ''"
+      icono="pi-dollar"
+      [indicador]="r.ingresos"
+    />
+    <app-kpi-variacion
+      etiqueta="Ticket promedio"
+      [valor]="(r.ticketPromedio.actual | currency: 'PEN' : 'symbol-narrow') ?? ''"
+      icono="pi-receipt"
+      [indicador]="r.ticketPromedio"
+    />
+    <app-kpi-variacion
+      etiqueta="Ocupación hospitalaria"
+      [valor]="(r.ocupacionHospitalariaPct.actual | number: '1.1-1') + ' %'"
+      icono="pi-building"
+      [indicador]="r.ocupacionHospitalariaPct"
+    />
+    <app-kpi-variacion
+      etiqueta="Espera promedio"
+      [valor]="(r.esperaPromedioMin.actual | number: '1.0-0') + ' min'"
+      icono="pi-clock"
+      [indicador]="r.esperaPromedioMin"
+      [menorEsMejor]="true"
+    />
+    <app-kpi-variacion
+      etiqueta="Valoración promedio"
+      [valor]="(r.valoracionPromedio.actual | number: '1.1-1') + ' / 5'"
+      icono="pi-star"
+      [indicador]="r.valoracionPromedio"
+    />
+  </div>
+
+  <div class="graficos">
+    <section class="panel">
+      <h3>Citas por periodo</h3>
+      <div class="grafico">
+        <p-chart type="line" [data]="graficoCitas()" [options]="opcionesLinea" height="280px" />
+      </div>
+    </section>
+    <section class="panel">
+      <h3>Ingresos por periodo</h3>
+      <div class="grafico">
+        <p-chart type="bar" [data]="graficoIngresos()" [options]="opcionesBarras" height="280px" />
+      </div>
+    </section>
+  </div>
+
+  <section class="panel accesos">
+    <h3>Reportes por área</h3>
+    <div class="enlaces">
+      <a routerLink="/reportes/financiero"><i class="pi pi-money-bill"></i> Financiero</a>
+      <a routerLink="/reportes/operativo"><i class="pi pi-sitemap"></i> Operativo</a>
+      <a routerLink="/reportes/calidad"><i class="pi pi-verified"></i> Calidad</a>
+    </div>
+  </section>
+} @else if (store.ejecutivo.loading()) {
+  <div class="panel"><p>Preparando el reporte…</p></div>
+}

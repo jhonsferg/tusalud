@@ -22,6 +22,8 @@ export type TipoNotificacion =
   | 'ALTA_HOSPITALARIA'
   | 'EMERGENCIA_TRIAJE'
   | 'CAJA_DIFERENCIA'
+  | 'SOLICITUD_AUSENCIA'
+  | 'AUSENCIA_RESUELTA'
   | 'SISTEMA';
 
 export interface NotificacionResponse {

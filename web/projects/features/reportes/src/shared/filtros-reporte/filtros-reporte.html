@@ -1,0 +1,32 @@
+<div class="filtros panel">
+  <label class="campo">
+    <span>Periodo</span>
+    <p-datepicker
+      inputId="rep-rango"
+      selectionMode="range"
+      [ngModel]="rango()"
+      (ngModelChange)="cambiarRango($event)"
+      [showIcon]="true"
+      [maxDate]="maxima"
+      dateFormat="dd/mm/yy"
+      placeholder="Rango de fechas"
+      [readonlyInput]="true"
+      appendTo="body"
+    />
+  </label>
+  <div class="campo">
+    <span>Agrupación</span>
+    <p-selectbutton
+      [options]="agrupaciones"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="agrupacion()"
+      (ngModelChange)="cambiarAgrupacion($event)"
+      [allowEmpty]="false"
+      ariaLabel="Agrupación del reporte"
+    />
+  </div>
+  @if (error(); as mensaje) {
+    <small class="error" role="alert">{{ mensaje }}</small>
+  }
+</div>

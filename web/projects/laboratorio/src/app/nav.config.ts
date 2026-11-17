@@ -34,6 +34,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     title: 'Cuenta',
     items: [
       {
+        label: 'Mi espacio',
+        icon: 'pi-clock',
+        link: '/mi-espacio/turnos',
+        roles: ['ROLE_LABORATORIO'],
+      },
+      {
         label: 'Notificaciones',
         icon: 'pi-bell',
         link: '/notificaciones',

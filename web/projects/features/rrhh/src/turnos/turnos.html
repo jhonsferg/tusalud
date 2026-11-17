@@ -1,0 +1,188 @@
+<app-page-header
+  title="Turnos del personal"
+  subtitle="Programación semanal por área"
+  icon="pi-clock"
+  backLink="/rrhh"
+  backLabel="Volver al resumen"
+/>
+
+<div class="barra panel">
+  <div class="semana">
+    <p-button
+      icon="pi pi-chevron-left"
+      [text]="true"
+      [rounded]="true"
+      ariaLabel="Semana anterior"
+      (onClick)="mover(-7)"
+    />
+    <strong>{{ inicio() | date: 'd MMM' }} al {{ fin() | date: 'd MMM y' }}</strong>
+    <p-button
+      icon="pi pi-chevron-right"
+      [text]="true"
+      [rounded]="true"
+      ariaLabel="Semana siguiente"
+      (onClick)="mover(7)"
+    />
+    <p-button label="Esta semana" [outlined]="true" size="small" (onClick)="hoy()" />
+  </div>
+  <p-select
+    [options]="areas"
+    optionLabel="label"
+    optionValue="value"
+    [ngModel]="area()"
+    (ngModelChange)="cambiarArea($event)"
+    placeholder="Todas las áreas"
+    [showClear]="true"
+    ariaLabel="Filtrar por área"
+    appendTo="body"
+    styleClass="w-full md:w-14rem"
+  />
+  <ul class="leyenda" aria-label="Plantillas de turno">
+    @for (p of store.plantillas.value() ?? []; track p.id) {
+      <li>
+        <strong>{{ p.nombre }}</strong> {{ hora(p.horaInicio) }} a {{ hora(p.horaFin) }}
+      </li>
+    }
+  </ul>
+</div>
+
+@if (store.semana.error(); as problema) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar los turnos"
+      [message]="problema.message"
+    />
+  </div>
+} @else if (store.semana.value(); as semana) {
+  <div class="panel cuadricula-contenedor">
+    <table class="cuadricula">
+      <thead>
+        <tr>
+          <th class="empleado">Empleado</th>
+          @for (fecha of fechas(); track fecha.getTime(); let i = $index) {
+            <th>
+              {{ dias[i].slice(0, 3) }}
+              <small class="block text-muted">{{ fecha | date: 'd MMM' }}</small>
+            </th>
+          }
+          <th>Horas</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (fila of semana.filas; track fila.empleadoId) {
+          <tr>
+            <td class="empleado">
+              <strong>{{ fila.nombreCompleto }}</strong>
+              <small class="block text-muted">{{ fila.cargo }}</small>
+            </td>
+            @for (dia of fila.dias; track dia.fecha) {
+              <td class="dia">
+                @if (dia.ausencia; as aus) {
+                  <p-tag [value]="'Ausente · ' + etiquetaTipo[aus.tipo]" severity="warn" />
+                }
+                @for (turno of dia.turnos; track turno.id) {
+                  <span class="turno" [attr.title]="turno.notas || ''">
+                    {{ turno.plantillaNombre }}
+                    <small>{{ hora(turno.horaInicio) }} a {{ hora(turno.horaFin) }}</small>
+                    @if (gestiona()) {
+                      <button
+                        type="button"
+                        class="quitar"
+                        [attr.aria-label]="
+                          'Quitar el turno ' + turno.plantillaNombre + ' de ' + fila.nombreCompleto
+                        "
+                        (click)="quitar(turno)"
+                      >
+                        <i class="pi pi-times"></i>
+                      </button>
+                    }
+                  </span>
+                }
+                @if (gestiona() && !dia.ausencia) {
+                  <button
+                    type="button"
+                    class="agregar"
+                    [attr.aria-label]="
+                      'Asignar turno a ' + fila.nombreCompleto + ' el ' + dia.fecha
+                    "
+                    (click)="abrir(fila, dia.fecha)"
+                  >
+                    <i class="pi pi-plus"></i>
+                  </button>
+                }
+              </td>
+            }
+            <td class="horas">
+              <p-tag
+                [value]="fila.horasSemana + ' h'"
+                [severity]="
+                  fila.horasSemana > maximo ? 'danger' : fila.horasSemana > 0 ? 'info' : 'secondary'
+                "
+              />
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="9">
+              <app-empty-state
+                icon="pi-users"
+                title="Sin empleados"
+                message="No hay personal en esa área."
+              />
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+} @else if (store.semana.loading()) {
+  <div class="panel"><p>Cargando la semana…</p></div>
+}
+
+<p-dialog
+  header="Asignar turno"
+  [visible]="celda() !== null"
+  (visibleChange)="$event ? null : celda.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '28rem', maxWidth: '96vw' }"
+>
+  @if (celda(); as c) {
+    <div class="form">
+      <p class="text-muted">{{ c.fila.nombreCompleto }} · {{ c.fecha }}</p>
+      @if (error(); as mensaje) {
+        <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+      }
+      <label>
+        Plantilla de turno
+        <p-select
+          inputId="tur-plantilla"
+          [options]="plantillas()"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="plantillaId()"
+          (ngModelChange)="plantillaId.set($event)"
+          placeholder="Selecciona un turno"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </label>
+      <label>
+        Notas
+        <input
+          pInputText
+          id="tur-notas"
+          class="w-full"
+          [ngModel]="notas()"
+          (ngModelChange)="notas.set($event)"
+        />
+      </label>
+    </div>
+  }
+  <ng-template #footer>
+    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="celda.set(null)" />
+    <p-button label="Asignar" icon="pi pi-check" [loading]="asignando()" (onClick)="asignar()" />
+  </ng-template>
+</p-dialog>

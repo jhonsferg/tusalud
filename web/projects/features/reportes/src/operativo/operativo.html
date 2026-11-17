@@ -1,0 +1,202 @@
+<app-page-header
+  title="Reporte operativo"
+  subtitle="Ocupación, esperas, demanda, agenda e inventario crítico"
+  icon="pi-sitemap"
+/>
+
+<app-filtros-reporte (cambio)="cargar($event)" />
+
+@if (store.operativo.error(); as problema) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar el reporte"
+      [message]="problema.message"
+    />
+  </div>
+} @else if (store.operativo.value(); as r) {
+  <div class="kpis">
+    <app-kpi
+      etiqueta="Ocupación promedio"
+      [valor]="(r.ocupacionPromedioPct | number: '1.1-1') + ' %'"
+      icono="pi-building"
+    />
+    <app-kpi etiqueta="Altas del periodo" [valor]="r.altas" icono="pi-sign-out" />
+    <app-kpi
+      etiqueta="Estancia promedio"
+      [valor]="(r.estanciaPromedioDias | number: '1.0-1') + ' días'"
+      icono="pi-calendar"
+    />
+    <app-kpi
+      etiqueta="Espera promedio"
+      [valor]="(r.esperas.promedioMin | number: '1.0-0') + ' min'"
+      icono="pi-clock"
+    />
+    <app-kpi
+      etiqueta="Espera del 90 % de los turnos"
+      [valor]="(r.esperas.p90Min | number: '1.0-0') + ' min'"
+      icono="pi-stopwatch"
+      [tono]="r.esperas.p90Min > 45 ? 'alerta' : 'normal'"
+    />
+    <app-kpi etiqueta="Turnos atendidos" [valor]="r.esperas.turnos" icono="pi-users" />
+  </div>
+
+  <div class="graficos">
+    <section class="panel">
+      <h3>Camas por área</h3>
+      <div class="grafico">
+        <p-chart type="bar" [data]="graficoCamas()" [options]="opcionesApiladas" height="280px" />
+      </div>
+    </section>
+    <section class="panel">
+      <h3>Ocupación en el periodo</h3>
+      <div class="grafico">
+        <p-chart type="line" [data]="graficoOcupacion()" [options]="opcionesLinea" height="280px" />
+      </div>
+    </section>
+    <section class="panel">
+      <h3>Espera por hora del día</h3>
+      <div class="grafico">
+        <p-chart type="bar" [data]="graficoEsperas()" [options]="opcionesBarras" height="280px" />
+      </div>
+    </section>
+    <section class="panel">
+      <h3>Emergencias por nivel de triaje</h3>
+      <div class="grafico">
+        <p-chart
+          type="doughnut"
+          [data]="graficoEmergencias()"
+          [options]="opcionesDona"
+          height="280px"
+        />
+      </div>
+    </section>
+  </div>
+
+  <section class="panel demanda">
+    <h3>Demanda de citas por día y hora</h3>
+    <div class="mapa-calor" role="table" aria-label="Mapa de calor de la demanda de citas">
+      <div class="fila cabecera" role="row">
+        <span class="vacio" role="columnheader"></span>
+        @for (dia of dias; track dia) {
+          <span role="columnheader">{{ dia.slice(0, 3) }}</span>
+        }
+      </div>
+      @for (hora of horasCalor(); track hora) {
+        <div class="fila" role="row">
+          <span class="hora" role="rowheader">{{ horaDelDia(hora) }}</span>
+          @for (dia of dias; track dia; let i = $index) {
+            <span
+              class="celda"
+              role="cell"
+              [style.--intensidad]="celda(i + 1, hora).intensidad"
+              [attr.title]="
+                dia + ' ' + horaDelDia(hora) + ': ' + celda(i + 1, hora).citas + ' citas'
+              "
+              >{{ celda(i + 1, hora).citas || '' }}</span
+            >
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <div class="tablas">
+    <section class="panel">
+      <h3>Uso de la agenda por médico</h3>
+      <p-table [value]="r.agenda" [rowHover]="true" responsiveLayout="scroll">
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="medico">Médico <p-sortIcon field="medico" /></th>
+            <th pSortableColumn="citas" class="text-right">Citas <p-sortIcon field="citas" /></th>
+            <th pSortableColumn="capacidad" class="text-right">
+              Capacidad <p-sortIcon field="capacidad" />
+            </th>
+            <th pSortableColumn="utilizacionPct">Uso <p-sortIcon field="utilizacionPct" /></th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-a>
+          <tr>
+            <td>{{ a.medico }}</td>
+            <td class="text-right">{{ a.citas }}</td>
+            <td class="text-right">{{ a.capacidad }}</td>
+            <td>
+              <div
+                class="barra"
+                [attr.aria-label]="
+                  'Uso de la agenda ' + (a.utilizacionPct | number: '1.0-1') + ' %'
+                "
+              >
+                <span [style.width.%]="a.utilizacionPct > 100 ? 100 : a.utilizacionPct"></span>
+              </div>
+              <small>{{ a.utilizacionPct | number: '1.1-1' }} %</small>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="4">Sin agendas en el periodo.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+
+    <section class="panel">
+      <h3>Inventario crítico</h3>
+      <div class="kpis chicos">
+        <app-kpi
+          etiqueta="Lotes por vencer"
+          [valor]="r.inventario.lotesPorVencer"
+          icono="pi-exclamation-triangle"
+          tono="alerta"
+        />
+        <app-kpi
+          etiqueta="Unidades por vencer"
+          [valor]="r.inventario.unidadesPorVencer"
+          icono="pi-box"
+          tono="alerta"
+        />
+        <app-kpi
+          etiqueta="Lotes vencidos"
+          [valor]="r.inventario.lotesVencidos"
+          icono="pi-ban"
+          tono="peligro"
+        />
+        <app-kpi
+          etiqueta="Unidades vencidas"
+          [valor]="r.inventario.unidadesVencidas"
+          icono="pi-trash"
+          tono="peligro"
+        />
+      </div>
+      <p-table [value]="r.inventario.bajoMinimo" [rowHover]="true" responsiveLayout="scroll">
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="nombre">Producto bajo el mínimo <p-sortIcon field="nombre" /></th>
+            <th pSortableColumn="stock" class="text-right">Stock <p-sortIcon field="stock" /></th>
+            <th pSortableColumn="stockMinimo" class="text-right">
+              Mínimo <p-sortIcon field="stockMinimo" />
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-p>
+          <tr>
+            <td>
+              {{ p.nombre }} <small class="text-muted">{{ p.codigo }}</small>
+            </td>
+            <td class="text-right">{{ p.stock }}</td>
+            <td class="text-right">{{ p.stockMinimo }}</td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="3">Ningún producto está bajo su mínimo.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+  </div>
+} @else if (store.operativo.loading()) {
+  <div class="panel"><p>Preparando el reporte…</p></div>
+}

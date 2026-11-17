@@ -43,6 +43,8 @@ TuSalud es el sistema de gestión de citas y consultas médicas. El repositorio 
   - [Recepción y turnos](#recepción-y-turnos)
   - [Caja y facturación](#caja-y-facturación)
   - [Hospitalización y emergencias](#hospitalización-y-emergencias)
+  - [Reportes y BI](#reportes-y-bi)
+  - [Recursos humanos](#recursos-humanos)
 - [Manejo de errores](#manejo-de-errores)
 - [Perfiles y configuración](#perfiles-y-configuración)
 - [Migraciones con Flyway](#migraciones-con-flyway)
@@ -269,6 +271,15 @@ La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y
 | `/hospitalizacion/ingresos/:id` | Enfermería, médico, admin                                                                     | Ficha, evoluciones, traslado y alta                    |
 | `/hospitalizacion/camas`        | Enfermería, médico, admin                                                                     | Inventario de camas                                    |
 | `/mis-ingresos`                 | Paciente                                                                                      | Hospitalizaciones del paciente                         |
+| `/reportes/ejecutivo`           | Gerencia, admin                                                                               | Indicadores ejecutivos y series                        |
+| `/reportes/financiero`          | Finanzas, gerencia, admin                                                                     | Ingresos, anulaciones y cajas                          |
+| `/reportes/operativo`           | Operaciones, gerencia, admin                                                                  | Ocupación, esperas, demanda e inventario               |
+| `/reportes/calidad`             | Calidad, gerencia, admin                                                                      | Valoraciones, cancelaciones y entregas                 |
+| `/rrhh`                         | Recursos humanos, gerencia, admin                                                             | Resumen de la plantilla                                |
+| `/rrhh/empleados`               | Recursos humanos, gerencia, admin                                                             | Fichas laborales                                       |
+| `/rrhh/turnos`                  | Recursos humanos, admin                                                                       | Turnos semanales del personal                          |
+| `/rrhh/ausencias`               | Recursos humanos, admin                                                                       | Bandeja y calendario de ausencias                      |
+| `/mi-espacio`                   | Todo el personal                                                                              | Mis turnos, mis ausencias y mi ficha                   |
 | `GET`                           | `/api/v1/calendario/eventos?inicio=&fin=`                                                     | Autenticado, eventos propios                           | 200       |
 | `POST`                          | `/api/v1/calendario/eventos`                                                                  | Autenticado                                            | 201       |
 | `PUT`                           | `/api/v1/calendario/eventos/{id}`                                                             | Dueño del evento                                       | 200       |
@@ -327,6 +338,21 @@ La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y
 | `POST`                          | `/api/v1/hospitalizacion/ingresos/{id}/evoluciones`                                           | Médico, enfermería                                     | 201       |
 | `POST`                          | `/api/v1/hospitalizacion/emergencias`                                                         | Enfermería, médico, recepción, admin                   | 201       |
 | `GET`                           | `/api/v1/hospitalizacion/mis-ingresos`                                                        | Paciente                                               | 200       |
+| `GET`                           | `/api/v1/reportes/ejecutivo`                                                                  | Gerencia, admin                                        | 200       |
+| `GET`                           | `/api/v1/reportes/financiero`                                                                 | Finanzas, gerencia, admin                              | 200       |
+| `GET`                           | `/api/v1/reportes/operativo`                                                                  | Operaciones, gerencia, admin                           | 200       |
+| `GET`                           | `/api/v1/reportes/calidad`                                                                    | Calidad, gerencia, admin                               | 200       |
+| `GET`                           | `/api/v1/rrhh/resumen`, `/rrhh/empleados`, `/rrhh/empleados/{id}`                             | Recursos humanos, gerencia, admin                      | 200       |
+| `POST`                          | `/api/v1/rrhh/empleados`                                                                      | Recursos humanos                                       | 201       |
+| `PUT`                           | `/api/v1/rrhh/empleados/{id}`                                                                 | Recursos humanos                                       | 200       |
+| `GET`                           | `/api/v1/rrhh/usuarios-disponibles`, `/rrhh/empleados/{id}/saldo-vacaciones`                  | Recursos humanos                                       | 200       |
+| `GET`                           | `/api/v1/rrhh/plantillas-turno`, `/rrhh/turnos`, `/rrhh/turnos/semana`, `/rrhh/ausencias`     | Recursos humanos, admin                                | 200       |
+| `POST`                          | `/api/v1/rrhh/turnos`                                                                         | Recursos humanos                                       | 201       |
+| `DELETE`                        | `/api/v1/rrhh/turnos/{id}`                                                                    | Recursos humanos                                       | 204       |
+| `PUT`                           | `/api/v1/rrhh/ausencias/{id}/aprobar`, `/rechazar`, `/cancelar`                               | Recursos humanos                                       | 200       |
+| `GET`                           | `/api/v1/rrhh/mi-ficha`, `/rrhh/mis-turnos`, `/rrhh/mis-ausencias`                            | Todo el personal                                       | 200       |
+| `POST`                          | `/api/v1/rrhh/mis-ausencias`                                                                  | Todo el personal                                       | 201       |
+| `PUT`                           | `/api/v1/rrhh/mis-ausencias/{id}/cancelar`                                                    | Todo el personal                                       | 200       |
 | `GET`                           | `/api/v1/admin/roles`                                                                         | Admin                                                  | 200       |
 | `PUT`                           | `/api/v1/admin/usuarios/{id}/roles`                                                           | Admin                                                  | 200       |
 | `POST`                          | `/api/v1/pacientes/{id}/compartir`                                                            | Médico que atiende al paciente                         | 201       |
@@ -1290,7 +1316,7 @@ Un bloqueo quita de la disponibilidad del médico los turnos que se solapan con 
 
 ### Personal de la institución
 
-Además de pacientes, médicos y administradores existen seis roles de personal: `ROLE_LABORATORIO`, `ROLE_FARMACIA`, `ROLE_ALMACEN`, `ROLE_RECEPCION`, `ROLE_CAJA` y `ROLE_ENFERMERIA`. El administrador los registra con `POST /api/v1/admin/personal` indicando uno o más de esos roles o el de administrador, y los asigna o cambia después desde la gestión de roles. Ese alta no admite roles de médico ni de paciente porque cada uno tiene su propio registro. Cada rol entra a su módulo al iniciar sesión, solo ve en el menú lo que le corresponde y puede agendar reuniones, tareas, recordatorios y eventos personales en el calendario.
+Además de pacientes, médicos y administradores existen once roles de personal: `ROLE_LABORATORIO`, `ROLE_FARMACIA`, `ROLE_ALMACEN`, `ROLE_RECEPCION`, `ROLE_CAJA`, `ROLE_ENFERMERIA`, `ROLE_GERENCIA`, `ROLE_FINANZAS`, `ROLE_OPERACIONES`, `ROLE_RRHH` y `ROLE_CALIDAD`. El administrador los registra con `POST /api/v1/admin/personal` indicando uno o más de esos roles o el de administrador, y los asigna o cambia después desde la gestión de roles. Ese alta no admite roles de médico ni de paciente porque cada uno tiene su propio registro. Cada rol entra a su módulo al iniciar sesión, solo ve en el menú lo que le corresponde y puede agendar reuniones, tareas, recordatorios y eventos personales en el calendario.
 
 ### Almacén e inventario
 
@@ -1357,6 +1383,27 @@ Hospitalización administra las camas, los ingresos y la cola de emergencia.
 - El triaje de emergencia clasifica al paciente del nivel 1 rojo al nivel 5 azul con sus signos vitales. Los niveles 1 y 2 avisan a los médicos con `EMERGENCIA_TRIAJE`. La cola se ordena por nivel y por espera, y asignar cama solo vale para camas de emergencia, UCI y observación.
 - Las evoluciones son médicas o de enfermería y cada rol escribe solo las suyas. El administrador no escribe evoluciones y recibe 403.
 - El alta exige diagnóstico e indicaciones, libera la cama a limpieza y responde 409 si el ingreso ya tenía alta. El paciente ve sus ingresos en `/mis-ingresos`, con las evoluciones médicas resumidas y sin signos vitales.
+
+### Reportes y BI
+
+Los cargos gerenciales consultan reportes agregados, de solo lectura y sin datos de pacientes. Los cuatro reportes aceptan `desde`, `hasta` y `agrupacion` con los valores `DIA`, `SEMANA` o `MES`, el rango máximo es de 366 días y un rango inválido responde 400.
+
+- `GET /api/v1/reportes/ejecutivo` es para gerencia y administración. Entrega citas, atendidas, canceladas, tasa de ausencia, ingresos, ticket promedio, ocupación hospitalaria, espera promedio y valoración, cada uno con su valor del periodo anterior y la variación porcentual, más la serie por periodo.
+- `GET /api/v1/reportes/financiero` es para finanzas, gerencia y administración. Entrega lo cobrado por día, método de pago, origen, especialidad y médico, la tasa de anulación de comprobantes, las diferencias de caja por cajero y las cuentas por cobrar. La hospitalización se informa aparte como cargo devengado y no suma al total cobrado.
+- `GET /api/v1/reportes/operativo` es para operaciones, gerencia y administración. Entrega la ocupación de camas por área y su serie, la estancia promedio, las esperas de turnos con su promedio y su percentil 90, las emergencias por nivel de triaje, la demanda de citas por día y hora, el uso de la agenda por médico y el inventario crítico.
+- `GET /api/v1/reportes/calidad` es para calidad, gerencia y administración. Entrega las valoraciones por médico y especialidad con su distribución, las tasas de cancelación y de ausencia por especialidad, los tiempos de entrega de laboratorio y los motivos de anulación.
+
+Cada rol ve solo los reportes de su área y una prueba comprueba que ningún reporte contiene DNI, correo ni nombre de paciente. En la web, cada reporte tiene un selector de rango y agrupación, indicadores con su variación frente al periodo anterior, gráficos, tablas ordenables y, en el operativo, un mapa de calor de la demanda por día y hora.
+
+### Recursos humanos
+
+Recursos humanos administra la ficha laboral, los turnos y las ausencias del personal bajo `/api/v1/rrhh`.
+
+- La ficha laboral vincula un usuario del personal con su cargo, área, tipo de contrato, fechas, estado, sueldo y contacto de emergencia, y cada cambio se audita sin guardar los montos. Un contrato que no es indefinido exige fecha de fin. El sueldo y el contacto de emergencia solo los ven recursos humanos y gerencia, y la administración ve la ficha sin ellos.
+- Los turnos salen de plantillas de mañana, tarde y noche. La asignación responde 409 si se cruza con otro turno, si supera 48 horas semanales o si cae sobre una ausencia. La vista semanal muestra las horas de cada empleado y marca el exceso.
+- Un empleado solicita ausencias sobre sí mismo, es decir vacaciones, permiso, descanso médico, licencia u otro. Recursos humanos las aprueba o las rechaza con un motivo, no puede resolver la suya propia y las vacaciones no pueden superar el saldo anual. El saldo se calcula por año calendario.
+- Cualquier integrante del personal consulta sus turnos y sus ausencias y solicita nuevas desde Mi espacio, con las rutas `/mis-turnos`, `/mis-ausencias` y `/mi-ficha`. Quien no tiene ficha recibe 404 y la web muestra un estado vacío.
+- Recursos humanos recibe una notificación `SOLICITUD_AUSENCIA` por cada solicitud y el empleado recibe `AUSENCIA_RESUELTA`, ambas con el enlace `/ausencias`, que cada aplicación lleva a la bandeja o a Mis ausencias según el rol.
 
 ## Manejo de errores
 
@@ -1581,7 +1628,7 @@ La carpeta `web` es un workspace de Angular 21 con varios proyectos, al estilo d
 
 ```text
 web/
-├── angular.json              Proyectos: portal, nueve aplicaciones por rol y tres librerías
+├── angular.json              Proyectos: portal, catorce aplicaciones por rol y tres librerías
 ├── environments/             Configuración de cada entorno, compartida por todas las aplicaciones
 ├── nginx/                    nginx y cabeceras de seguridad para la imagen Docker
 ├── scripts/
@@ -1600,6 +1647,11 @@ web/
     ├── paciente/             Aplicación del paciente
     ├── medico/               Aplicación de médicos y especialistas
     ├── admin/                Aplicación del administrador
+    ├── gerencia/             Aplicación de gerencia, con todos los reportes y la plantilla
+    ├── finanzas/             Aplicación de finanzas
+    ├── operaciones/          Aplicación de operaciones
+    ├── calidad/              Aplicación de calidad
+    ├── rrhh/                 Aplicación de recursos humanos
     ├── recepcion/            Aplicación de recepción
     ├── caja/                 Aplicación de caja
     ├── enfermeria/           Aplicación de enfermería y hospitalización
@@ -1614,18 +1666,23 @@ Cada aplicación tiene solo cinco archivos propios: `app.config.ts`, `app.routes
 
 Todas las aplicaciones se sirven bajo el mismo origen, cada una en su ruta base, y el portal en la raíz. Como comparten el origen, comparten también la sesión guardada en `localStorage`.
 
-| Rol           | Aplicación    | Ruta base       | Página de inicio  |
-| ------------- | ------------- | --------------- | ----------------- |
-| Sin sesión    | `portal`      | `/`             | `/auth/login`     |
-| Paciente      | `paciente`    | `/paciente/`    | `/paciente/citas` |
-| Médico        | `medico`      | `/medico/`      | `/medico/agenda`  |
-| Administrador | `admin`       | `/admin/`       | `/admin/panel`    |
-| Recepción     | `recepcion`   | `/recepcion/`   | `/recepcion/`     |
-| Caja          | `caja`        | `/caja/`        | `/caja/`          |
-| Enfermería    | `enfermeria`  | `/enfermeria/`  | `/enfermeria/`    |
-| Laboratorio   | `laboratorio` | `/laboratorio/` | `/laboratorio/`   |
-| Farmacia      | `farmacia`    | `/farmacia/`    | `/farmacia/`      |
-| Almacén       | `almacen`     | `/almacen/`     | `/almacen/`       |
+| Rol              | Aplicación    | Ruta base       | Página de inicio                  |
+| ---------------- | ------------- | --------------- | --------------------------------- |
+| Sin sesión       | `portal`      | `/`             | `/auth/login`                     |
+| Paciente         | `paciente`    | `/paciente/`    | `/paciente/citas`                 |
+| Médico           | `medico`      | `/medico/`      | `/medico/agenda`                  |
+| Administrador    | `admin`       | `/admin/`       | `/admin/panel`                    |
+| Gerencia         | `gerencia`    | `/gerencia/`    | `/gerencia/reportes/ejecutivo`    |
+| Finanzas         | `finanzas`    | `/finanzas/`    | `/finanzas/reportes/financiero`   |
+| Operaciones      | `operaciones` | `/operaciones/` | `/operaciones/reportes/operativo` |
+| Calidad          | `calidad`     | `/calidad/`     | `/calidad/reportes/calidad`       |
+| Recursos humanos | `rrhh`        | `/rrhh/`        | `/rrhh/`                          |
+| Recepción        | `recepcion`   | `/recepcion/`   | `/recepcion/`                     |
+| Caja             | `caja`        | `/caja/`        | `/caja/`                          |
+| Enfermería       | `enfermeria`  | `/enfermeria/`  | `/enfermeria/`                    |
+| Laboratorio      | `laboratorio` | `/laboratorio/` | `/laboratorio/`                   |
+| Farmacia         | `farmacia`    | `/farmacia/`    | `/farmacia/`                      |
+| Almacén          | `almacen`     | `/almacen/`     | `/almacen/`                       |
 
 Cada aplicación incluye exactamente las pantallas y permisos de su rol y nada más, de modo que el paquete que descarga un paciente no contiene el código de administración. Esto reduce la superficie expuesta, pero no reemplaza la seguridad real: el control de acceso lo hace siempre el backend con `@PreAuthorize` y la relación asistencial. El frontend solo oculta lo que el rol no puede usar.
 
@@ -1741,13 +1798,13 @@ Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrec
 
 ### Pruebas del frontend
 
-Las 193 pruebas unitarias corren con Vitest, repartidas entre los proyectos, y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, el enrutamiento entre aplicaciones, las rutas de cada aplicación con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API. Cada aplicación tiene una prueba de humo que resuelve todos sus componentes perezosos.
+Las 238 pruebas unitarias corren con Vitest, repartidas entre los proyectos, y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, el enrutamiento entre aplicaciones, las rutas de cada aplicación con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API. Cada aplicación tiene una prueba de humo que resuelve todos sus componentes perezosos.
 
 ```bash
 npm test
 ```
 
-Las 89 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal los flujos de almacén, farmacia y laboratorio, y los de recepción, caja y hospitalización. Requieren el stack levantado con datos de prueba y atraviesan el portal y las aplicaciones por sus rutas base. El helper `ir` de `e2e/support.ts` construye la dirección real de cada pantalla a partir de la aplicación en la que está el usuario y de su prefijo oculto.
+Las 104 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal los flujos de almacén, farmacia y laboratorio, los de recepción, caja y hospitalización, y los reportes gerenciales, los turnos, las ausencias y Mi espacio. Requieren el stack levantado con datos de prueba y atraviesan el portal y las aplicaciones por sus rutas base. El helper `ir` de `e2e/support.ts` construye la dirección real de cada pantalla a partir de la aplicación en la que está el usuario y de su prefijo oculto.
 
 ```bash
 npm run e2e
@@ -1772,7 +1829,7 @@ Todos los entornos llaman a la API con la ruta relativa `/api/v1`. En local, el 
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `npm run start:paciente`  | Servidor de desarrollo de una aplicación, con el entorno `local`. Hay uno por aplicación y uno para `portal`      |
 | `npm run build:libs`      | Compila las librerías core, ui y features                                                                         |
-| `npm run build:all`       | Compila el portal y las nueve aplicaciones en producción en `dist/<aplicación>`                                   |
+| `npm run build:all`       | Compila el portal y las catorce aplicaciones en producción en `dist/<aplicación>`                                 |
 | `npm run build:all:local` | Lo mismo con el entorno `local`. También existen `:dev`, `:qa` y `:prod`                                          |
 | `npm run serve:dist`      | Sirve todo lo compilado en `dist` bajo sus rutas base en `http://localhost:4300`                                  |
 | `npm test`                | Pruebas unitarias de todos los proyectos. Cada uno tiene su `test:core`, `test:ui`, `test:features` y `test:apps` |
@@ -1783,9 +1840,9 @@ Todos los comandos se ejecutan dentro de la carpeta `web`. Cada compilación gen
 
 ### Desarrollo con recarga en caliente
 
-`compose.hot.yaml` reemplaza la imagen de nginx por un contenedor de desarrollo que monta la carpeta `web` como volumen. Al arrancar compila una vez el portal y las nueve aplicaciones con el entorno `local` y las sirve todas en `http://localhost:4200` con `scripts/serve-dist.mjs`, que reenvía `/api` al servicio `app`. Compilar todas una vez cuesta menos de dos minutos y casi no ocupa memoria.
+`compose.hot.yaml` reemplaza la imagen de nginx por un contenedor de desarrollo que monta la carpeta `web` como volumen. Al arrancar compila una vez el portal y las catorce aplicaciones con el entorno `local` y las sirve todas en `http://localhost:4200` con `scripts/serve-dist.mjs`, que reenvía `/api` al servicio `app`. Compilar todas una vez cuesta menos de dos minutos y casi no ocupa memoria.
 
-La recarga se activa solo en las aplicaciones en las que se trabaja con la variable `WEB_WATCH`, que acepta una lista separada por comas o `all`. Cada una de ellas ejecuta `ng build --watch` con sondeo y vuelve a compilar al guardar un archivo, y el navegador se actualiza al recargar la página. Vigilar las diez aplicaciones a la vez consume más de 13 GB de memoria, por eso no es el comportamiento por defecto.
+La recarga se activa solo en las aplicaciones en las que se trabaja con la variable `WEB_WATCH`, que acepta una lista separada por comas o `all`. Cada una de ellas ejecuta `ng build --watch` con sondeo y vuelve a compilar al guardar un archivo, y el navegador se actualiza al recargar la página. Vigilar todas las aplicaciones a la vez consume más de 13 GB de memoria con solo diez, y crece con cada una, por eso no es el comportamiento por defecto.
 
 ```bash
 WEB_WATCH=paciente,caja docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml up -d --build
@@ -1795,7 +1852,7 @@ La API, PostgreSQL y los datos de prueba quedan en el mismo stack. Los volúmene
 
 ### Imagen Docker y Compose
 
-El `Dockerfile` de `web` compila las librerías, el portal y las nueve aplicaciones con `node:24-alpine`, con una cache de npm entre builds, copia cada aplicación a su carpeta y sirve el resultado con `nginxinc/nginx-unprivileged:1.30-alpine-slim`, la rama estable de nginx en su variante mínima. El contenedor corre con el usuario `nginx`, sin privilegios de root, escucha en el puerto 8080 y la imagen final pesa unos 30 MB. El argumento de build `BUILD_CONFIGURATION` elige la configuración de Angular y vale `production` por defecto.
+El `Dockerfile` de `web` compila las librerías, el portal y las catorce aplicaciones con `node:24-alpine`, con una cache de npm entre builds, copia cada aplicación a su carpeta y sirve el resultado con `nginxinc/nginx-unprivileged:1.30-alpine-slim`, la rama estable de nginx en su variante mínima. El contenedor corre con el usuario `nginx`, sin privilegios de root, escucha en el puerto 8080 y la imagen final pesa unos 30 MB. El argumento de build `BUILD_CONFIGURATION` elige la configuración de Angular y vale `production` por defecto.
 
 La aplicación web forma parte del stack de Compose como servicio `web` y queda disponible en `http://localhost:4200` al levantar cualquier entorno:
 
@@ -1958,28 +2015,30 @@ El archivo `postman/Tusalud.postman_collection.json` es la única colección del
 
 Para usarla en Postman, importa el archivo y ejecuta la colección completa con Run collection. Las carpetas están numeradas y se ejecutan en orden, porque cada una reutiliza los tokens e identificadores que capturan las anteriores:
 
-| Carpeta                                                 | Contenido                                                                              |
-| ------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `00 - Autenticación`                                    | Login de los cinco usuarios de prueba, registro de un paciente y errores 400 y 401     |
-| `01 - Especialidades`                                   | Alta, consulta, actualización, duplicado, acceso sin permiso y eliminación             |
-| `02 - Médicos y Horarios`                               | Listados, alta de médico, bloques de horario, solapamiento y disponibilidad            |
-| `03 - Citas (Paciente)`                                 | Reserva en el primer turno libre, conflictos y acceso a citas ajenas                   |
-| `04 - Citas (Médico)`                                   | Agenda, confirmación, atención y transiciones inválidas                                |
-| `05 - Cancelación`                                      | Cancelación de una segunda cita y cancelación repetida                                 |
-| `06 - Auditoría (Admin)`                                | Reportes por estado y por rango, y accesos no permitidos                               |
-| `07 - Seguridad`                                        | Peticiones sin token y con token inválido                                              |
-| `08 - Perfil`                                           | Datos personales, contraseña y preferencias                                            |
-| `09 - Tarifas, roles y pacientes compartidos`           | Tarifa por especialidad, especialidades del médico, roles y pacientes compartidos      |
-| `10 - Pagos con Yape y Plin`                            | Reserva, generación del QR, consulta y confirmación simulada                           |
-| `11 - Verificación en dos pasos y renovación del token` | Configuración del autenticador y errores del refresh token                             |
-| `12 - Calendario y eventos`                             | Eventos personales, arrastre, privacidad y límites del rango                           |
-| `13 - Personal y almacén`                               | Alta de personal, productos, proveedores, ingresos, salidas y alertas                  |
-| `14 - Farmacia`                                         | Catálogo, venta libre, anulación y entregas del paciente                               |
-| `15 - Laboratorio`                                      | Orden del médico, muestra, resultados fuera de rango, validación y acceso              |
-| `16 - Recepción y turnos`                               | Registro de pacientes, turnos, cola, llamado, pantalla y permisos                      |
-| `17 - Caja y facturación`                               | Apertura, cobros con IGV, factura, anulación, reporte, cierre y permisos               |
-| `18 - Hospitalización y emergencia`                     | Ingreso, evoluciones por rol, traslado, triaje, alta y permisos                        |
-| `19 - Seguridad y permisos`                             | Accesos indebidos por relación, por rol y a datos clínicos, y campos que no se exponen |
+| Carpeta                                                 | Contenido                                                                                                                 |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `00 - Autenticación`                                    | Login de los cinco usuarios de prueba, registro de un paciente y errores 400 y 401                                        |
+| `01 - Especialidades`                                   | Alta, consulta, actualización, duplicado, acceso sin permiso y eliminación                                                |
+| `02 - Médicos y Horarios`                               | Listados, alta de médico, bloques de horario, solapamiento y disponibilidad                                               |
+| `03 - Citas (Paciente)`                                 | Reserva en el primer turno libre, conflictos y acceso a citas ajenas                                                      |
+| `04 - Citas (Médico)`                                   | Agenda, confirmación, atención y transiciones inválidas                                                                   |
+| `05 - Cancelación`                                      | Cancelación de una segunda cita y cancelación repetida                                                                    |
+| `06 - Auditoría (Admin)`                                | Reportes por estado y por rango, y accesos no permitidos                                                                  |
+| `07 - Seguridad`                                        | Peticiones sin token y con token inválido                                                                                 |
+| `08 - Perfil`                                           | Datos personales, contraseña y preferencias                                                                               |
+| `09 - Tarifas, roles y pacientes compartidos`           | Tarifa por especialidad, especialidades del médico, roles y pacientes compartidos                                         |
+| `10 - Pagos con Yape y Plin`                            | Reserva, generación del QR, consulta y confirmación simulada                                                              |
+| `11 - Verificación en dos pasos y renovación del token` | Configuración del autenticador y errores del refresh token                                                                |
+| `12 - Calendario y eventos`                             | Eventos personales, arrastre, privacidad y límites del rango                                                              |
+| `13 - Personal y almacén`                               | Alta de personal, productos, proveedores, ingresos, salidas y alertas                                                     |
+| `14 - Farmacia`                                         | Catálogo, venta libre, anulación y entregas del paciente                                                                  |
+| `15 - Laboratorio`                                      | Orden del médico, muestra, resultados fuera de rango, validación y acceso                                                 |
+| `16 - Recepción y turnos`                               | Registro de pacientes, turnos, cola, llamado, pantalla y permisos                                                         |
+| `17 - Caja y facturación`                               | Apertura, cobros con IGV, factura, anulación, reporte, cierre y permisos                                                  |
+| `18 - Hospitalización y emergencia`                     | Ingreso, evoluciones por rol, traslado, triaje, alta y permisos                                                           |
+| `19 - Seguridad y permisos`                             | Accesos indebidos por relación, por rol y a datos clínicos, y campos que no se exponen                                    |
+| `20 - Reportes y BI`                                    | Los cuatro reportes por rol, validaciones del rango, comparación con el periodo anterior y ausencia de datos de pacientes |
+| `21 - Recursos humanos`                                 | Fichas, turnos con choques y exceso de horas, ausencias con aprobación, Mi espacio y permisos                             |
 
 Desde la línea de comandos:
 

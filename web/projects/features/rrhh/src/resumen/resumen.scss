@@ -1,0 +1,59 @@
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.columnas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+
+  @media (max-width: 1000px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.derecha {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+h3 {
+  margin-bottom: 0.9rem;
+  font-size: 1rem;
+}
+
+.grafico {
+  position: relative;
+  height: 340px;
+}
+
+.ausentes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    padding: 0.55rem 0.8rem;
+    border-radius: 10px;
+    background: var(--p-content-hover-background);
+  }
+}
+
+.enlace {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+  color: var(--app-primary-text);
+  font-weight: 600;
+  text-decoration: none;
+}

@@ -1,0 +1,10 @@
+<div class="kpi">
+  <span class="icono"><i [class]="'pi ' + icono()"></i></span>
+  <div>
+    <strong>{{ valor() }}</strong>
+    <small>{{ etiqueta() }}</small>
+    <span class="variacion" [attr.data-tono]="tono()">
+      <i [class]="'pi ' + flecha()"></i>{{ texto() }}
+    </span>
+  </div>
+</div>

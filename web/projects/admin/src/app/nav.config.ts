@@ -213,8 +213,73 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Reportes',
+    items: [
+      {
+        label: 'Ejecutivo',
+        icon: 'pi-chart-line',
+        link: '/reportes/ejecutivo',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Financiero',
+        icon: 'pi-money-bill',
+        link: '/reportes/financiero',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Operativo',
+        icon: 'pi-sitemap',
+        link: '/reportes/operativo',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Calidad',
+        icon: 'pi-verified',
+        link: '/reportes/calidad',
+        roles: ['ROLE_ADMIN'],
+      },
+    ],
+  },
+  {
+    title: 'Recursos humanos',
+    items: [
+      {
+        label: 'Resumen de plantilla',
+        icon: 'pi-id-card',
+        link: '/rrhh',
+        roles: ['ROLE_ADMIN'],
+        exact: true,
+      },
+      {
+        label: 'Empleados',
+        icon: 'pi-users',
+        link: '/rrhh/empleados',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Turnos',
+        icon: 'pi-clock',
+        link: '/rrhh/turnos',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Ausencias',
+        icon: 'pi-calendar-minus',
+        link: '/rrhh/ausencias',
+        roles: ['ROLE_ADMIN'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
+      {
+        label: 'Mi espacio',
+        icon: 'pi-clock',
+        link: '/mi-espacio/turnos',
+        roles: ['ROLE_ADMIN'],
+      },
       {
         label: 'Notificaciones',
         icon: 'pi-bell',

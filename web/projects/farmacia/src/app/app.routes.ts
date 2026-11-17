@@ -34,6 +34,14 @@ export const routes: Routes = [
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },
       {
+        path: 'mi-espacio',
+        loadChildren: () => import('@tusalud/features/rrhh').then((m) => m.MI_ESPACIO_ROUTES),
+      },
+      {
+        path: 'ausencias',
+        redirectTo: 'mi-espacio/ausencias',
+      },
+      {
         path: 'notificaciones',
         loadChildren: () =>
           import('@tusalud/features/notificaciones').then((m) => m.NOTIFICACIONES_ROUTES),

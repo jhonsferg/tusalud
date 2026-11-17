@@ -1,0 +1,156 @@
+@if (sinFicha()) {
+  <div class="panel">
+    <app-empty-state
+      icon="pi-id-card"
+      title="Aún no tienes una ficha laboral"
+      message="Recursos humanos debe registrar tu ficha para que puedas solicitar ausencias."
+    />
+  </div>
+} @else if (store.misAusencias.value(); as datos) {
+  <div class="kpis">
+    <app-kpi
+      [etiqueta]="'Vacaciones disponibles ' + datos.saldo.anio"
+      [valor]="datos.saldo.saldo + ' días'"
+      icono="pi-sun"
+      tono="exito"
+    />
+    <app-kpi etiqueta="Tomadas" [valor]="datos.saldo.tomados + ' días'" icono="pi-check-circle" />
+    <app-kpi
+      etiqueta="Por aprobar"
+      [valor]="datos.saldo.pendientesAprobacion + ' días'"
+      icono="pi-clock"
+      [tono]="datos.saldo.pendientesAprobacion > 0 ? 'alerta' : 'normal'"
+    />
+    <app-kpi
+      etiqueta="Derecho anual"
+      [valor]="datos.saldo.diasAnuales + ' días'"
+      icono="pi-calendar"
+    />
+  </div>
+
+  <div class="panel">
+    <div class="cabecera">
+      <h3>Mis solicitudes</h3>
+      <p-button label="Solicitar ausencia" icon="pi pi-plus" (onClick)="abrir()" />
+    </div>
+    <p-table [value]="datos.ausencias" [rowHover]="true" responsiveLayout="scroll">
+      <ng-template #header>
+        <tr>
+          <th>Tipo</th>
+          <th>Desde</th>
+          <th>Hasta</th>
+          <th class="text-right">Días</th>
+          <th>Estado</th>
+          <th>Respuesta</th>
+          <th style="width: 6rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-a>
+        <tr>
+          <td>{{ etiquetaTipo[a.tipo] }}</td>
+          <td>{{ a.fechaInicio | date: 'd MMM y' }}</td>
+          <td>{{ a.fechaFin | date: 'd MMM y' }}</td>
+          <td class="text-right">{{ a.dias }}</td>
+          <td><p-tag [value]="etiquetaEstado[a.estado]" [severity]="severidad(a.estado)" /></td>
+          <td>
+            @if (a.resueltoPor) {
+              {{ a.resueltoPor }}
+              @if (a.motivoResolucion) {
+                <small class="text-muted block">{{ a.motivoResolucion }}</small>
+              }
+            }
+          </td>
+          <td class="text-right">
+            @if (puedeCancelar(a)) {
+              <p-button
+                label="Cancelar"
+                [text]="true"
+                severity="danger"
+                size="small"
+                [ariaLabel]="'Cancelar la ausencia del ' + a.fechaInicio"
+                (onClick)="cancelar(a)"
+              />
+            }
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="7">
+            <app-empty-state
+              icon="pi-calendar"
+              title="Sin solicitudes"
+              message="Aún no has solicitado ausencias."
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+}
+
+<p-dialog
+  header="Solicitar ausencia"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '30rem', maxWidth: '96vw' }"
+>
+  <form class="form" [formGroup]="form" (submit)="$event.preventDefault(); solicitar()" novalidate>
+    @if (error(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    <label>
+      Tipo
+      <p-select
+        inputId="aus-tipo"
+        formControlName="tipo"
+        [options]="tipos"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+      />
+    </label>
+    <label>
+      Fechas
+      <p-datepicker
+        inputId="aus-rango"
+        formControlName="rango"
+        selectionMode="range"
+        [minDate]="manana"
+        dateFormat="dd/mm/yy"
+        placeholder="Desde y hasta"
+        [showIcon]="true"
+        [readonlyInput]="true"
+        [fluid]="true"
+        appendTo="body"
+      />
+    </label>
+    <label>
+      Motivo
+      <textarea
+        pTextarea
+        id="aus-motivo"
+        formControlName="motivo"
+        rows="3"
+        class="w-full"
+      ></textarea>
+    </label>
+  </form>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="visible.set(false)"
+    />
+    <p-button
+      label="Enviar solicitud"
+      icon="pi pi-send"
+      [loading]="enviando()"
+      (onClick)="solicitar()"
+    />
+  </ng-template>
+</p-dialog>

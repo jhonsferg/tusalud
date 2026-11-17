@@ -7,7 +7,12 @@ export type Rol =
   | 'ROLE_ALMACEN'
   | 'ROLE_RECEPCION'
   | 'ROLE_CAJA'
-  | 'ROLE_ENFERMERIA';
+  | 'ROLE_ENFERMERIA'
+  | 'ROLE_GERENCIA'
+  | 'ROLE_FINANZAS'
+  | 'ROLE_OPERACIONES'
+  | 'ROLE_RRHH'
+  | 'ROLE_CALIDAD';
 
 export const ROLES: readonly Rol[] = [
   'ROLE_ADMIN',
@@ -19,6 +24,11 @@ export const ROLES: readonly Rol[] = [
   'ROLE_RECEPCION',
   'ROLE_CAJA',
   'ROLE_ENFERMERIA',
+  'ROLE_GERENCIA',
+  'ROLE_FINANZAS',
+  'ROLE_OPERACIONES',
+  'ROLE_RRHH',
+  'ROLE_CALIDAD',
 ];
 
 export const ROLES_PERSONAL: readonly Rol[] = [
@@ -29,6 +39,11 @@ export const ROLES_PERSONAL: readonly Rol[] = [
   'ROLE_RECEPCION',
   'ROLE_CAJA',
   'ROLE_ENFERMERIA',
+  'ROLE_GERENCIA',
+  'ROLE_FINANZAS',
+  'ROLE_OPERACIONES',
+  'ROLE_RRHH',
+  'ROLE_CALIDAD',
 ];
 
 export const ETIQUETA_ROL: Readonly<Record<string, string>> = {
@@ -41,6 +56,11 @@ export const ETIQUETA_ROL: Readonly<Record<string, string>> = {
   ROLE_RECEPCION: 'Recepción',
   ROLE_CAJA: 'Caja',
   ROLE_ENFERMERIA: 'Enfermería',
+  ROLE_GERENCIA: 'Gerencia',
+  ROLE_FINANZAS: 'Finanzas',
+  ROLE_OPERACIONES: 'Operaciones',
+  ROLE_RRHH: 'Recursos humanos',
+  ROLE_CALIDAD: 'Calidad',
 };
 
 export const DESCRIPCION_ROL: Readonly<Record<string, string>> = {
@@ -54,6 +74,11 @@ export const DESCRIPCION_ROL: Readonly<Record<string, string>> = {
     'Registra la llegada de pacientes, administra la cola y reserva citas en mostrador.',
   ROLE_CAJA: 'Abre y cierra la caja, cobra y emite comprobantes.',
   ROLE_ENFERMERIA: 'Atiende el triaje, las camas y las evoluciones de enfermería.',
+  ROLE_GERENCIA: 'Consulta los reportes ejecutivos de toda la institución.',
+  ROLE_FINANZAS: 'Consulta los reportes financieros, cajas y cuentas por cobrar.',
+  ROLE_OPERACIONES: 'Consulta la ocupación, las esperas, la demanda y el inventario crítico.',
+  ROLE_RRHH: 'Administra las fichas laborales, los turnos y las ausencias del personal.',
+  ROLE_CALIDAD: 'Consulta las valoraciones, las cancelaciones y los tiempos de entrega.',
 };
 
 export interface LoginRequest {

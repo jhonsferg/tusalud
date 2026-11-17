@@ -1,0 +1,228 @@
+<app-page-header
+  title="Reporte de calidad"
+  subtitle="Valoraciones, cancelaciones, ausencias y tiempos de entrega"
+  icon="pi-verified"
+/>
+
+<app-filtros-reporte (cambio)="cargar($event)" />
+
+@if (store.calidad.error(); as problema) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar el reporte"
+      [message]="problema.message"
+    />
+  </div>
+} @else if (store.calidad.value(); as r) {
+  <div class="kpis">
+    <app-kpi
+      etiqueta="Valoración promedio"
+      [valor]="(r.valoraciones.promedio | number: '1.1-1') + ' / 5'"
+      icono="pi-star"
+      tono="exito"
+    />
+    <app-kpi etiqueta="Valoraciones recibidas" [valor]="r.valoraciones.total" icono="pi-comments" />
+    <app-kpi etiqueta="Exámenes entregados" [valor]="r.laboratorio.completadas" icono="pi-filter" />
+    <app-kpi
+      etiqueta="Entrega promedio"
+      [valor]="(r.laboratorio.entregaPromedioHoras | number: '1.0-1') + ' h'"
+      icono="pi-clock"
+    />
+    <app-kpi
+      etiqueta="Comprobantes anulados"
+      [valor]="r.anulaciones.comprobantes"
+      icono="pi-undo"
+      [tono]="r.anulaciones.comprobantes > 0 ? 'alerta' : 'normal'"
+    />
+    <app-kpi
+      etiqueta="Dispensaciones anuladas"
+      [valor]="r.anulaciones.dispensaciones"
+      icono="pi-times-circle"
+      [tono]="r.anulaciones.dispensaciones > 0 ? 'alerta' : 'normal'"
+    />
+  </div>
+
+  <section class="panel distribucion">
+    <h3>Distribución de las valoraciones</h3>
+    <div class="grafico">
+      <p-chart
+        type="bar"
+        [data]="graficoDistribucion()"
+        [options]="opcionesBarras"
+        height="240px"
+      />
+    </div>
+  </section>
+
+  <div class="tablas">
+    <section class="panel">
+      <h3>Valoraciones por médico</h3>
+      <p-table [value]="r.porMedico" [rowHover]="true" responsiveLayout="scroll">
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="nombre">Médico <p-sortIcon field="nombre" /></th>
+            <th pSortableColumn="total" class="text-right">
+              Valoraciones <p-sortIcon field="total" />
+            </th>
+            <th pSortableColumn="promedio" class="text-right">
+              Promedio <p-sortIcon field="promedio" />
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-m>
+          <tr>
+            <td>{{ m.nombre }}</td>
+            <td class="text-right">{{ m.total }}</td>
+            <td class="text-right">
+              <strong>{{ m.promedio | number: '1.1-1' }}</strong> ★
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="3">Sin valoraciones en el periodo.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+
+    <section class="panel">
+      <h3>Valoraciones por especialidad</h3>
+      <p-table [value]="r.porEspecialidad" [rowHover]="true" responsiveLayout="scroll">
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="nombre">Especialidad <p-sortIcon field="nombre" /></th>
+            <th pSortableColumn="total" class="text-right">
+              Valoraciones <p-sortIcon field="total" />
+            </th>
+            <th pSortableColumn="promedio" class="text-right">
+              Promedio <p-sortIcon field="promedio" />
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-e>
+          <tr>
+            <td>{{ e.nombre }}</td>
+            <td class="text-right">{{ e.total }}</td>
+            <td class="text-right">
+              <strong>{{ e.promedio | number: '1.1-1' }}</strong> ★
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="3">Sin valoraciones en el periodo.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+
+    <section class="panel ancho">
+      <h3>Cancelaciones y ausencias por especialidad</h3>
+      <p-table [value]="r.citasPorEspecialidad" [rowHover]="true" responsiveLayout="scroll">
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="especialidad">Especialidad <p-sortIcon field="especialidad" /></th>
+            <th pSortableColumn="total" class="text-right">Citas <p-sortIcon field="total" /></th>
+            <th pSortableColumn="canceladas" class="text-right">
+              Canceladas <p-sortIcon field="canceladas" />
+            </th>
+            <th pSortableColumn="tasaCancelacionPct">
+              Tasa de cancelación <p-sortIcon field="tasaCancelacionPct" />
+            </th>
+            <th pSortableColumn="noAsistieron" class="text-right">
+              No asistieron <p-sortIcon field="noAsistieron" />
+            </th>
+            <th pSortableColumn="tasaAusenciaPct">
+              Tasa de ausencia <p-sortIcon field="tasaAusenciaPct" />
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-c>
+          <tr>
+            <td>{{ c.especialidad }}</td>
+            <td class="text-right">{{ c.total }}</td>
+            <td class="text-right">{{ c.canceladas }}</td>
+            <td>
+              <p-tag
+                [value]="(c.tasaCancelacionPct | number: '1.1-1') + ' %'"
+                [severity]="severidad(c.tasaCancelacionPct)"
+              />
+            </td>
+            <td class="text-right">{{ c.noAsistieron }}</td>
+            <td>
+              <p-tag
+                [value]="(c.tasaAusenciaPct | number: '1.1-1') + ' %'"
+                [severity]="severidad(c.tasaAusenciaPct)"
+              />
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="6">Sin citas en el periodo.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+
+    <section class="panel">
+      <h3>Entrega de resultados por prioridad</h3>
+      <p-table [value]="r.laboratorio.porPrioridad" [rowHover]="true" responsiveLayout="scroll">
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="prioridad">Prioridad <p-sortIcon field="prioridad" /></th>
+            <th pSortableColumn="cantidad" class="text-right">
+              Órdenes <p-sortIcon field="cantidad" />
+            </th>
+            <th pSortableColumn="promedioHoras" class="text-right">
+              Horas promedio <p-sortIcon field="promedioHoras" />
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-p>
+          <tr>
+            <td>{{ p.prioridad }}</td>
+            <td class="text-right">{{ p.cantidad }}</td>
+            <td class="text-right">{{ p.promedioHoras | number: '1.0-1' }}</td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="3">Sin órdenes completadas en el periodo.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <p class="nota text-muted">
+        El 90 % de los resultados se entrega en
+        {{ r.laboratorio.entregaP90Horas | number: '1.0-1' }} horas.
+      </p>
+    </section>
+
+    <section class="panel">
+      <h3>Motivos de anulación</h3>
+      <ul class="motivos">
+        @for (m of r.anulaciones.motivosComprobantes; track m.motivo) {
+          <li>
+            <span>Comprobante: {{ m.motivo }}</span
+            ><strong>{{ m.cantidad }}</strong>
+          </li>
+        }
+        @for (m of r.anulaciones.motivosDispensaciones; track m.motivo) {
+          <li>
+            <span>Dispensación: {{ m.motivo }}</span
+            ><strong>{{ m.cantidad }}</strong>
+          </li>
+        } @empty {
+          @if (r.anulaciones.motivosComprobantes.length === 0) {
+            <li class="vacio text-muted">Sin anulaciones en el periodo.</li>
+          }
+        }
+      </ul>
+    </section>
+  </div>
+} @else if (store.calidad.loading()) {
+  <div class="panel"><p>Preparando el reporte…</p></div>
+}

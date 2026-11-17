@@ -1,0 +1,120 @@
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.semana {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin: 0 0 0 auto;
+  padding: 0;
+  color: var(--p-text-muted-color);
+  font-size: 0.85rem;
+  list-style: none;
+}
+
+.cuadricula-contenedor {
+  overflow-x: auto;
+}
+
+.cuadricula {
+  width: 100%;
+  min-width: 56rem;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--p-content-border-color);
+    vertical-align: top;
+  }
+
+  th {
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  .empleado {
+    min-width: 11rem;
+    text-align: left;
+  }
+
+  .dia {
+    min-width: 6.5rem;
+  }
+
+  .horas {
+    text-align: center;
+  }
+}
+
+.turno {
+  position: relative;
+  display: block;
+  margin-bottom: 0.3rem;
+  padding: 0.3rem 1.4rem 0.3rem 0.5rem;
+  border-radius: 8px;
+  background: var(--app-primary-soft);
+  color: var(--app-primary-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  small {
+    display: block;
+    font-weight: 400;
+  }
+}
+
+.quitar {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.3rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.agregar {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding: 0.2rem;
+  border: 1px dashed var(--p-content-border-color);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--p-text-muted-color);
+  font-size: 0.75rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--p-primary-color);
+    color: var(--p-primary-color);
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+}

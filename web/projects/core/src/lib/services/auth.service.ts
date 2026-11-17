@@ -28,6 +28,7 @@ const ANTICIPO_RENOVACION_MS = 60_000;
 
 const HOME_BY_ROLE: readonly (readonly [Rol, string])[] = [
   ['ROLE_ADMIN', '/admin/panel'],
+  ['ROLE_GERENCIA', '/reportes/ejecutivo'],
   ['ROLE_MEDICO', '/agenda'],
   ['ROLE_PACIENTE', '/citas'],
   ['ROLE_LABORATORIO', '/laboratorio'],
@@ -36,6 +37,10 @@ const HOME_BY_ROLE: readonly (readonly [Rol, string])[] = [
   ['ROLE_RECEPCION', '/recepcion'],
   ['ROLE_CAJA', '/caja'],
   ['ROLE_ENFERMERIA', '/hospitalizacion'],
+  ['ROLE_FINANZAS', '/reportes/financiero'],
+  ['ROLE_OPERACIONES', '/reportes/operativo'],
+  ['ROLE_CALIDAD', '/reportes/calidad'],
+  ['ROLE_RRHH', '/rrhh'],
 ];
 
 const DEFAULT_HOME = '/perfil';
@@ -110,6 +115,11 @@ export class AuthService {
   readonly isRecepcion = computed(() => this.roles().includes('ROLE_RECEPCION'));
   readonly isCaja = computed(() => this.roles().includes('ROLE_CAJA'));
   readonly isEnfermeria = computed(() => this.roles().includes('ROLE_ENFERMERIA'));
+  readonly isGerencia = computed(() => this.roles().includes('ROLE_GERENCIA'));
+  readonly isFinanzas = computed(() => this.roles().includes('ROLE_FINANZAS'));
+  readonly isOperaciones = computed(() => this.roles().includes('ROLE_OPERACIONES'));
+  readonly isRrhh = computed(() => this.roles().includes('ROLE_RRHH'));
+  readonly isCalidad = computed(() => this.roles().includes('ROLE_CALIDAD'));
   readonly homeUrl = computed(() => {
     const roles = this.roles();
     const delApp = this.app ? rolesDeApp(this.app) : null;

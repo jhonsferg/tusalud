@@ -1,0 +1,223 @@
+<app-page-header
+  title="Reporte financiero"
+  subtitle="Lo cobrado por día, método, origen, especialidad y médico"
+  icon="pi-money-bill"
+/>
+
+<app-filtros-reporte (cambio)="cargar($event)" />
+
+@if (store.financiero.error(); as problema) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar el reporte"
+      [message]="problema.message"
+    />
+  </div>
+} @else if (store.financiero.value(); as r) {
+  <div class="kpis">
+    <app-kpi
+      etiqueta="Total cobrado"
+      [valor]="(r.totalCobrado | currency: 'PEN' : 'symbol-narrow') ?? ''"
+      icono="pi-dollar"
+      tono="exito"
+    />
+    <app-kpi etiqueta="Transacciones" [valor]="r.transacciones" icono="pi-receipt" />
+    <app-kpi
+      etiqueta="Ticket promedio"
+      [valor]="(r.ticketPromedio | currency: 'PEN' : 'symbol-narrow') ?? ''"
+      icono="pi-tag"
+    />
+    <app-kpi
+      etiqueta="Anulación de comprobantes"
+      [valor]="(r.comprobantes.tasaAnulacionPct | number: '1.1-1') + ' %'"
+      icono="pi-undo"
+      [tono]="r.comprobantes.tasaAnulacionPct > 10 ? 'alerta' : 'normal'"
+    />
+    <app-kpi
+      etiqueta="Diferencia neta de cajas"
+      [valor]="(r.cajas.neto | currency: 'PEN' : 'symbol-narrow') ?? ''"
+      icono="pi-calculator"
+      [tono]="r.cajas.neto < 0 ? 'peligro' : 'normal'"
+    />
+    <app-kpi
+      etiqueta="Por cobrar"
+      [valor]="(r.porCobrar.total | currency: 'PEN' : 'symbol-narrow') ?? ''"
+      icono="pi-clock"
+      tono="alerta"
+    />
+  </div>
+
+  <div class="graficos">
+    <section class="panel ancho">
+      <h3>Cobrado por periodo</h3>
+      <div class="grafico">
+        <p-chart type="bar" [data]="graficoDias()" [options]="opcionesBarras" height="280px" />
+      </div>
+    </section>
+    <section class="panel">
+      <h3>Por método de pago</h3>
+      <div class="grafico">
+        <p-chart
+          type="doughnut"
+          [data]="graficoMetodos()"
+          [options]="opcionesDona"
+          height="280px"
+        />
+      </div>
+    </section>
+    <section class="panel">
+      <h3>Por origen</h3>
+      <div class="grafico">
+        <p-chart type="doughnut" [data]="graficoOrigen()" [options]="opcionesDona" height="280px" />
+      </div>
+    </section>
+  </div>
+
+  <div class="tablas">
+    <section class="panel">
+      <h3>Origen del ingreso</h3>
+      <p-table [value]="r.porOrigen" [rowHover]="true" responsiveLayout="scroll">
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="origen">Origen <p-sortIcon field="origen" /></th>
+            <th pSortableColumn="total" class="text-right">Monto <p-sortIcon field="total" /></th>
+            <th>Tipo</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-o>
+          <tr>
+            <td>{{ etiquetaOrigen[o.origen] }}</td>
+            <td class="text-right">{{ o.total | currency: 'PEN' : 'symbol-narrow' }}</td>
+            <td>
+              <p-tag
+                [value]="o.devengado ? 'Devengado' : 'Cobrado'"
+                [severity]="o.devengado ? 'info' : 'success'"
+              />
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+
+    <section class="panel">
+      <h3>Por especialidad</h3>
+      <p-table [value]="r.porEspecialidad" [rowHover]="true" responsiveLayout="scroll">
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="nombre">Especialidad <p-sortIcon field="nombre" /></th>
+            <th pSortableColumn="cantidad" class="text-right">
+              Cobros <p-sortIcon field="cantidad" />
+            </th>
+            <th pSortableColumn="total" class="text-right">Monto <p-sortIcon field="total" /></th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-e>
+          <tr>
+            <td>{{ e.nombre }}</td>
+            <td class="text-right">{{ e.cantidad }}</td>
+            <td class="text-right">{{ e.total | currency: 'PEN' : 'symbol-narrow' }}</td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="3">Sin cobros de consulta en el periodo.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+
+    <section class="panel">
+      <h3>Por médico</h3>
+      <p-table [value]="r.porMedico" [rowHover]="true" responsiveLayout="scroll">
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="nombre">Médico <p-sortIcon field="nombre" /></th>
+            <th pSortableColumn="cantidad" class="text-right">
+              Cobros <p-sortIcon field="cantidad" />
+            </th>
+            <th pSortableColumn="total" class="text-right">Monto <p-sortIcon field="total" /></th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-m>
+          <tr>
+            <td>{{ m.nombre }}</td>
+            <td class="text-right">{{ m.cantidad }}</td>
+            <td class="text-right">{{ m.total | currency: 'PEN' : 'symbol-narrow' }}</td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="3">Sin cobros de consulta en el periodo.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+
+    <section class="panel">
+      <h3>Cajas por cajero</h3>
+      <p-table [value]="r.cajas.porCajero" [rowHover]="true" responsiveLayout="scroll">
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="nombre">Cajero <p-sortIcon field="nombre" /></th>
+            <th pSortableColumn="sesiones" class="text-right">
+              Cierres <p-sortIcon field="sesiones" />
+            </th>
+            <th pSortableColumn="faltante" class="text-right">
+              Faltante <p-sortIcon field="faltante" />
+            </th>
+            <th pSortableColumn="sobrante" class="text-right">
+              Sobrante <p-sortIcon field="sobrante" />
+            </th>
+            <th pSortableColumn="neto" class="text-right">Neto <p-sortIcon field="neto" /></th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-c>
+          <tr>
+            <td>{{ c.nombre }}</td>
+            <td class="text-right">{{ c.sesiones }}</td>
+            <td class="text-right">{{ c.faltante | currency: 'PEN' : 'symbol-narrow' }}</td>
+            <td class="text-right">{{ c.sobrante | currency: 'PEN' : 'symbol-narrow' }}</td>
+            <td class="text-right">{{ c.neto | currency: 'PEN' : 'symbol-narrow' }}</td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="5">Sin cierres de caja en el periodo.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+
+    <section class="panel">
+      <h3>Comprobantes y cuentas por cobrar</h3>
+      <dl class="resumen">
+        <div>
+          <dt>Comprobantes emitidos</dt>
+          <dd>{{ r.comprobantes.emitidos }}</dd>
+        </div>
+        <div>
+          <dt>Comprobantes anulados</dt>
+          <dd>{{ r.comprobantes.anulados }}</dd>
+        </div>
+        <div>
+          <dt>Citas por cobrar</dt>
+          <dd>
+            {{ r.porCobrar.citas.cantidad }} ·
+            {{ r.porCobrar.citas.monto | currency: 'PEN' : 'symbol-narrow' }}
+          </dd>
+        </div>
+        <div>
+          <dt>Laboratorio por cobrar</dt>
+          <dd>
+            {{ r.porCobrar.laboratorio.cantidad }} ·
+            {{ r.porCobrar.laboratorio.monto | currency: 'PEN' : 'symbol-narrow' }}
+          </dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+} @else if (store.financiero.loading()) {
+  <div class="panel"><p>Preparando el reporte…</p></div>
+}

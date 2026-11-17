@@ -1,0 +1,99 @@
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+
+  &.chicos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.graficos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+
+  @media (max-width: 1000px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+h3 {
+  margin-bottom: 0.9rem;
+  font-size: 1rem;
+}
+
+.grafico {
+  position: relative;
+  height: 280px;
+}
+
+.demanda {
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+}
+
+.mapa-calor {
+  display: grid;
+  gap: 3px;
+  min-width: 32rem;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: 4rem repeat(7, minmax(0, 1fr));
+  gap: 3px;
+}
+
+.cabecera span {
+  color: var(--p-text-muted-color);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.hora {
+  color: var(--p-text-muted-color);
+  font-size: 0.78rem;
+  line-height: 1.9rem;
+}
+
+.celda {
+  height: 1.9rem;
+  border-radius: 6px;
+  background: color-mix(
+    in srgb,
+    var(--p-primary-500) calc(var(--intensidad, 0) * 100%),
+    var(--p-content-hover-background)
+  );
+  color: var(--p-text-color);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.9rem;
+  text-align: center;
+}
+
+.tablas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+
+  @media (max-width: 1000px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.barra {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--p-content-hover-background);
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    background: var(--p-primary-500);
+  }
+}

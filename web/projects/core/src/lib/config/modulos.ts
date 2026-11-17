@@ -19,6 +19,13 @@ export const MODULOS: readonly Modulo[] = [
     icono: 'pi-cog',
   },
   {
+    app: 'gerencia',
+    rol: 'ROLE_GERENCIA',
+    base: '/gerencia/',
+    etiqueta: 'Gerencia',
+    icono: 'pi-briefcase',
+  },
+  {
     app: 'medico',
     rol: 'ROLE_MEDICO',
     base: '/medico/',
@@ -31,6 +38,34 @@ export const MODULOS: readonly Modulo[] = [
     base: '/enfermeria/',
     etiqueta: 'Enfermería y hospitalización',
     icono: 'pi-building',
+  },
+  {
+    app: 'finanzas',
+    rol: 'ROLE_FINANZAS',
+    base: '/finanzas/',
+    etiqueta: 'Finanzas',
+    icono: 'pi-money-bill',
+  },
+  {
+    app: 'operaciones',
+    rol: 'ROLE_OPERACIONES',
+    base: '/operaciones/',
+    etiqueta: 'Operaciones',
+    icono: 'pi-sitemap',
+  },
+  {
+    app: 'calidad',
+    rol: 'ROLE_CALIDAD',
+    base: '/calidad/',
+    etiqueta: 'Calidad',
+    icono: 'pi-verified',
+  },
+  {
+    app: 'rrhh',
+    rol: 'ROLE_RRHH',
+    base: '/rrhh/',
+    etiqueta: 'Recursos humanos',
+    icono: 'pi-id-card',
   },
   {
     app: 'laboratorio',

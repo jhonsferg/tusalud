@@ -15,6 +15,27 @@ export const CUENTAS = {
   almacen: { email: 'almacen@tusalud.com', password: 'Personal123!', home: /\/almacen\/$/ },
   recepcion: { email: 'recepcion@tusalud.com', password: 'Personal123!', home: /\/recepcion\/$/ },
   caja: { email: 'caja@tusalud.com', password: 'Personal123!', home: /\/caja\/$/ },
+  gerencia: {
+    email: 'gerencia@tusalud.com',
+    password: 'Personal123!',
+    home: /\/gerencia\/reportes\/ejecutivo$/,
+  },
+  finanzas: {
+    email: 'finanzas@tusalud.com',
+    password: 'Personal123!',
+    home: /\/finanzas\/reportes\/financiero$/,
+  },
+  operaciones: {
+    email: 'operaciones@tusalud.com',
+    password: 'Personal123!',
+    home: /\/operaciones\/reportes\/operativo$/,
+  },
+  calidad: {
+    email: 'calidad@tusalud.com',
+    password: 'Personal123!',
+    home: /\/calidad\/reportes\/calidad$/,
+  },
+  rrhh: { email: 'rrhh@tusalud.com', password: 'Personal123!', home: /\/rrhh\/$/ },
   enfermeria: {
     email: 'enfermeria@tusalud.com',
     password: 'Personal123!',
@@ -26,6 +47,7 @@ const PREFIJO_OCULTO: Readonly<Record<string, string>> = {
   admin: 'admin',
   recepcion: 'recepcion',
   caja: 'caja',
+  rrhh: 'rrhh',
   enfermeria: 'hospitalizacion',
   laboratorio: 'laboratorio',
   farmacia: 'farmacia',
@@ -36,6 +58,11 @@ const APPS = [
   'paciente',
   'medico',
   'admin',
+  'gerencia',
+  'finanzas',
+  'operaciones',
+  'calidad',
+  'rrhh',
   'recepcion',
   'caja',
   'enfermeria',
@@ -188,4 +215,13 @@ export async function idDeGarcia(page: Page): Promise<string> {
   });
   const medicos = (await respuesta.json()) as { id: string; apellido: string }[];
   return medicos.find((m) => m.apellido === 'García')!.id;
+}
+
+export async function tokenDe(page: Page, rol: keyof typeof CUENTAS): Promise<string> {
+  const cuenta = CUENTAS[rol];
+  const respuesta = await page.request.post('/api/v1/auth/login', {
+    data: { email: cuenta.email, password: cuenta.password },
+  });
+  const { token } = (await respuesta.json()) as { token: string };
+  return token;
 }

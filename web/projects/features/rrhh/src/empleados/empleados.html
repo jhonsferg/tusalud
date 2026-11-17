@@ -1,0 +1,343 @@
+<app-page-header
+  title="Empleados"
+  subtitle="Fichas laborales del personal"
+  icon="pi-users"
+  backLink="/rrhh"
+  backLabel="Volver al resumen"
+>
+  @if (gestiona()) {
+    <p-button label="Nuevo empleado" icon="pi pi-plus" (onClick)="abrir(null)" />
+  }
+</app-page-header>
+
+<div class="panel">
+  <div class="filtros">
+    <p-iconfield class="w-full md:w-20rem">
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        type="search"
+        class="w-full"
+        placeholder="Buscar por nombre, correo o cargo"
+        aria-label="Buscar empleado"
+        [ngModel]="busqueda()"
+        (ngModelChange)="buscar($event)"
+      />
+    </p-iconfield>
+    <p-select
+      [options]="areas"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="filtroArea()"
+      (ngModelChange)="filtroArea.set($event); cargar()"
+      placeholder="Todas las áreas"
+      [showClear]="true"
+      ariaLabel="Filtrar por área"
+      appendTo="body"
+      styleClass="w-full md:w-14rem"
+    />
+    <p-select
+      [options]="estados"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="filtroEstado()"
+      (ngModelChange)="filtroEstado.set($event); cargar()"
+      placeholder="Todos los estados"
+      [showClear]="true"
+      ariaLabel="Filtrar por estado"
+      appendTo="body"
+      styleClass="w-full md:w-12rem"
+    />
+  </div>
+
+  <p-table
+    [value]="store.empleados.value() ?? []"
+    [loading]="store.empleados.loading()"
+    [paginator]="(store.empleados.value() ?? []).length > 12"
+    [rows]="12"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+  >
+    <ng-template #header>
+      <tr>
+        <th pSortableColumn="nombreCompleto">Empleado <p-sortIcon field="nombreCompleto" /></th>
+        <th pSortableColumn="cargo">Cargo <p-sortIcon field="cargo" /></th>
+        <th pSortableColumn="area">Área <p-sortIcon field="area" /></th>
+        <th>Contrato</th>
+        <th pSortableColumn="fechaIngreso">Ingreso <p-sortIcon field="fechaIngreso" /></th>
+        @if (muestraSueldo()) {
+          <th pSortableColumn="sueldo" class="text-right">Sueldo <p-sortIcon field="sueldo" /></th>
+        }
+        <th>Estado</th>
+        <th style="width: 7rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-e>
+      <tr>
+        <td>
+          <div class="font-semibold">{{ e.nombreCompleto }}</div>
+          <small class="text-muted">{{ e.email }}</small>
+        </td>
+        <td>{{ e.cargo }}</td>
+        <td>{{ etiquetaArea[e.area] }}</td>
+        <td>{{ etiquetaContrato[e.tipoContrato] }}</td>
+        <td>{{ e.fechaIngreso | date: 'd MMM y' }}</td>
+        @if (muestraSueldo()) {
+          <td class="text-right">
+            {{ e.sueldo != null ? (e.sueldo | currency: 'PEN' : 'symbol-narrow') : '' }}
+          </td>
+        }
+        <td><p-tag [value]="etiquetaEstado[e.estado]" [severity]="severidad(e.estado)" /></td>
+        <td class="text-right acciones">
+          <p-button
+            icon="pi pi-eye"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            [ariaLabel]="'Ver ficha de ' + e.nombreCompleto"
+            (onClick)="verFicha(e)"
+          />
+          @if (gestiona()) {
+            <p-button
+              icon="pi pi-pencil"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              [ariaLabel]="'Editar a ' + e.nombreCompleto"
+              (onClick)="abrir(e)"
+            />
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td [attr.colspan]="muestraSueldo() ? 8 : 7">
+          <app-empty-state
+            icon="pi-users"
+            title="Sin empleados"
+            message="No hay fichas con esos filtros."
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  header="Ficha laboral"
+  [visible]="ficha() !== null"
+  (visibleChange)="$event ? null : ficha.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '34rem', maxWidth: '96vw' }"
+>
+  @if (ficha(); as f) {
+    <h4 class="nombre">{{ f.nombreCompleto }}</h4>
+    <p class="text-muted">{{ f.cargo }} · {{ etiquetaArea[f.area] }}</p>
+    <dl class="datos">
+      <div>
+        <dt>Correo</dt>
+        <dd>{{ f.email }}</dd>
+      </div>
+      <div>
+        <dt>Contrato</dt>
+        <dd>{{ etiquetaContrato[f.tipoContrato] }}</dd>
+      </div>
+      <div>
+        <dt>Ingreso</dt>
+        <dd>{{ f.fechaIngreso | date: 'd MMM y' }}</dd>
+      </div>
+      @if (f.fechaFinContrato) {
+        <div>
+          <dt>Fin de contrato</dt>
+          <dd>{{ f.fechaFinContrato | date: 'd MMM y' }}</dd>
+        </div>
+      }
+      <div>
+        <dt>Estado</dt>
+        <dd>{{ etiquetaEstado[f.estado] }}</dd>
+      </div>
+      <div>
+        <dt>Vacaciones anuales</dt>
+        <dd>{{ f.diasVacacionesAnuales }} días</dd>
+      </div>
+      @if (f.sueldo != null) {
+        <div>
+          <dt>Sueldo</dt>
+          <dd>{{ f.sueldo | currency: 'PEN' : 'symbol-narrow' }}</dd>
+        </div>
+      }
+      @if (f.contactoEmergenciaNombre) {
+        <div>
+          <dt>Contacto de emergencia</dt>
+          <dd>{{ f.contactoEmergenciaNombre }} {{ f.contactoEmergenciaTelefono }}</dd>
+        </div>
+      }
+      @if (saldo(); as s) {
+        <div class="saldo">
+          <dt>Vacaciones {{ s.anio }}</dt>
+          <dd>
+            {{ s.saldo }} días disponibles · {{ s.tomados }} tomados ·
+            {{ s.pendientesAprobacion }} por aprobar
+          </dd>
+        </div>
+      }
+    </dl>
+  }
+  <ng-template #footer>
+    <p-button label="Cerrar" (onClick)="ficha.set(null)" />
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  [header]="editando() ? 'Editar ficha laboral' : 'Nuevo empleado'"
+  [visible]="formVisible()"
+  (visibleChange)="formVisible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '40rem', maxWidth: '96vw' }"
+>
+  <form class="form" [formGroup]="form" (submit)="$event.preventDefault(); guardar()" novalidate>
+    @if (error(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    @if (!editando()) {
+      <label>
+        Usuario del personal
+        <p-select
+          inputId="emp-usuario"
+          formControlName="usuarioId"
+          [options]="usuarios()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Selecciona a quién registras"
+          [filter]="true"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </label>
+    }
+    <div class="dos">
+      <label
+        >Cargo <input pInputText id="emp-cargo" formControlName="cargo" class="w-full"
+      /></label>
+      <label>
+        Área
+        <p-select
+          inputId="emp-area"
+          formControlName="area"
+          [options]="areas"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </label>
+    </div>
+    <div class="dos">
+      <label>
+        Tipo de contrato
+        <p-select
+          inputId="emp-contrato"
+          formControlName="tipoContrato"
+          [options]="contratos"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </label>
+      <label>
+        Estado
+        <p-select
+          inputId="emp-estado"
+          formControlName="estado"
+          [options]="estados"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </label>
+    </div>
+    <div class="dos">
+      <label>
+        Fecha de ingreso
+        <p-datepicker
+          inputId="emp-ingreso"
+          formControlName="fechaIngreso"
+          [maxDate]="hoy"
+          dateFormat="dd/mm/yy"
+          [showIcon]="true"
+          [fluid]="true"
+          appendTo="body"
+        />
+      </label>
+      <label>
+        Fin de contrato
+        <p-datepicker
+          inputId="emp-fin"
+          formControlName="fechaFinContrato"
+          dateFormat="dd/mm/yy"
+          [showIcon]="true"
+          [showClear]="true"
+          [fluid]="true"
+          appendTo="body"
+        />
+      </label>
+    </div>
+    <div class="dos">
+      <label>
+        Sueldo mensual
+        <p-inputnumber
+          inputId="emp-sueldo"
+          formControlName="sueldo"
+          mode="currency"
+          currency="PEN"
+          locale="es-PE"
+          [min]="0"
+          [fluid]="true"
+        />
+      </label>
+      <label>
+        Días de vacaciones al año
+        <p-inputnumber
+          inputId="emp-vacaciones"
+          formControlName="diasVacacionesAnuales"
+          [min]="0"
+          [max]="60"
+          [fluid]="true"
+        />
+      </label>
+    </div>
+    <div class="dos">
+      <label
+        >Contacto de emergencia
+        <input
+          pInputText
+          id="emp-contacto"
+          formControlName="contactoEmergenciaNombre"
+          class="w-full"
+      /></label>
+      <label
+        >Teléfono del contacto
+        <input
+          pInputText
+          id="emp-telefono"
+          formControlName="contactoEmergenciaTelefono"
+          maxlength="9"
+          class="w-full"
+      /></label>
+    </div>
+  </form>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="formVisible.set(false)"
+    />
+    <p-button label="Guardar" icon="pi pi-check" [loading]="guardando()" (onClick)="guardar()" />
+  </ng-template>
+</p-dialog>

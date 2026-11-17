@@ -1,0 +1,61 @@
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+h3 {
+  margin-bottom: 0.9rem;
+  font-size: 1rem;
+}
+
+.distribucion {
+  margin-bottom: 1.25rem;
+}
+
+.grafico {
+  position: relative;
+  height: 240px;
+}
+
+.tablas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+
+  .ancho {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 1000px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nota {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+}
+
+.motivos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 10px;
+    background: var(--p-content-hover-background);
+
+    &.vacio {
+      background: transparent;
+    }
+  }
+}

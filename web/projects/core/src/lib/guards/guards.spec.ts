@@ -183,4 +183,18 @@ describe('ruta oculta', () => {
   it('acepta también la URL con el prefijo repetido', () => {
     expect(serializador.parse('/caja/cobrar').toString()).toBe('/caja/cobrar');
   });
+
+  it('asigna a cada rol gerencial su módulo con la prioridad esperada', () => {
+    expect(moduloPrincipal(['ROLE_GERENCIA'])?.app).toBe('gerencia');
+    expect(moduloPrincipal(['ROLE_FINANZAS'])?.app).toBe('finanzas');
+    expect(moduloPrincipal(['ROLE_OPERACIONES'])?.app).toBe('operaciones');
+    expect(moduloPrincipal(['ROLE_CALIDAD'])?.app).toBe('calidad');
+    expect(moduloPrincipal(['ROLE_RRHH'])?.app).toBe('rrhh');
+    expect(moduloPrincipal(['ROLE_FINANZAS', 'ROLE_GERENCIA'])?.app).toBe('gerencia');
+    expect(modulosDe(['ROLE_PACIENTE', 'ROLE_RRHH', 'ROLE_ADMIN']).map((m) => m.app)).toEqual([
+      'admin',
+      'rrhh',
+      'paciente',
+    ]);
+  });
 });

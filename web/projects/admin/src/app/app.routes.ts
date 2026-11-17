@@ -72,6 +72,24 @@ export const routes: Routes = [
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },
       {
+        path: 'reportes',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () => import('@tusalud/features/reportes').then((m) => m.REPORTES_ROUTES),
+      },
+      {
+        path: 'rrhh',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () => import('@tusalud/features/rrhh').then((m) => m.RRHH_ROUTES),
+      },
+      {
+        path: 'mi-espacio',
+        loadChildren: () => import('@tusalud/features/rrhh').then((m) => m.MI_ESPACIO_ROUTES),
+      },
+      {
+        path: 'ausencias',
+        redirectTo: 'mi-espacio/ausencias',
+      },
+      {
         path: 'notificaciones',
         loadChildren: () =>
           import('@tusalud/features/notificaciones').then((m) => m.NOTIFICACIONES_ROUTES),

@@ -12,6 +12,8 @@ import { AuditoriaStore } from './auditoria.store';
 import { CitasStore } from './citas.store';
 import { EspecialidadesStore } from './especialidades.store';
 import { MedicosStore, ordenarHorarios } from './medicos.store';
+import { ReportesStore } from './reportes.store';
+import { RrhhStore } from './rrhh.store';
 
 function u(n: number): string {
   return `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
@@ -250,6 +252,93 @@ describe('stores', () => {
     TestBed.tick();
     controller.expectOne('/api/v1/auth/logout').flush(null);
     expect(store.especialidades()).toEqual([]);
+  });
+});
+
+describe('ReportesStore', () => {
+  let controller: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+    });
+    controller = TestBed.inject(HttpTestingController);
+  });
+
+  it('carga cada reporte con su filtro y guarda el valor', () => {
+    const store = TestBed.inject(ReportesStore);
+    store.cargarFinanciero({ desde: '2026-11-01', hasta: '2026-11-30', agrupacion: 'DIA' });
+    const peticion = controller.expectOne((req) => req.url === '/api/v1/reportes/financiero');
+    expect(peticion.request.params.get('agrupacion')).toBe('DIA');
+    peticion.flush({ totalCobrado: 150 });
+    expect(store.financiero.value()?.totalCobrado).toBe(150);
+    expect(store.ejecutivo.value()).toBeUndefined();
+  });
+
+  it('expone el error del servidor sin perder el reporte anterior', () => {
+    const store = TestBed.inject(ReportesStore);
+    store.cargarCalidad({ desde: '2026-11-01', hasta: '2026-11-30', agrupacion: 'MES' });
+    controller
+      .expectOne((req) => req.url === '/api/v1/reportes/calidad')
+      .flush({ status: 403, message: 'Acceso denegado' }, { status: 403, statusText: 'Forbidden' });
+    expect(store.calidad.error()?.status).toBe(403);
+    expect(store.calidad.value()).toBeUndefined();
+  });
+});
+
+describe('RrhhStore', () => {
+  let controller: HttpTestingController;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+    });
+    controller = TestBed.inject(HttpTestingController);
+  });
+
+  it('actualiza la solicitud resuelta dentro de la lista', () => {
+    const store = TestBed.inject(RrhhStore);
+    store.cargarAusencias({ estado: 'SOLICITADA' });
+    controller
+      .expectOne((req) => req.url === '/api/v1/rrhh/ausencias')
+      .flush([
+        { id: u(1), estado: 'SOLICITADA', empleadoNombre: 'Carla Núñez' },
+        { id: u(2), estado: 'SOLICITADA', empleadoNombre: 'Pedro Ramos' },
+      ]);
+    store.resolverAusencia(u(1), 'aprobar', 'Aprobada').subscribe();
+    controller
+      .expectOne(`/api/v1/rrhh/ausencias/${u(1)}/aprobar`)
+      .flush({ id: u(1), estado: 'APROBADA', empleadoNombre: 'Carla Núñez' });
+    expect(store.ausencias.value()?.map((a) => a.estado)).toEqual(['APROBADA', 'SOLICITADA']);
+  });
+
+  it('recarga mis ausencias después de solicitar una', () => {
+    const store = TestBed.inject(RrhhStore);
+    store
+      .solicitarAusencia({ tipo: 'PERMISO', fechaInicio: '2026-12-02', fechaFin: '2026-12-02' })
+      .subscribe();
+    controller.expectOne('/api/v1/rrhh/mis-ausencias').flush({ id: u(3) });
+    controller.expectOne('/api/v1/rrhh/mis-ausencias').flush({
+      saldo: {
+        empleadoId: u(4),
+        anio: 2026,
+        diasAnuales: 30,
+        tomados: 0,
+        pendientesAprobacion: 1,
+        saldo: 29,
+      },
+      ausencias: [],
+    });
+    expect(store.misAusencias.value()?.saldo.saldo).toBe(29);
+  });
+
+  it('marca la ausencia de ficha con el estado 404 de mi ficha', () => {
+    const store = TestBed.inject(RrhhStore);
+    store.cargarMiFicha();
+    controller
+      .expectOne('/api/v1/rrhh/mi-ficha')
+      .flush({ status: 404, message: 'Sin ficha' }, { status: 404, statusText: 'Not Found' });
+    expect(store.miFicha.error()?.status).toBe(404);
   });
 });
 

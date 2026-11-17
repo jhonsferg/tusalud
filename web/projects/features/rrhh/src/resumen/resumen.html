@@ -1,0 +1,115 @@
+<app-page-header
+  title="Recursos humanos"
+  subtitle="Plantilla, contratos y ausencias de hoy"
+  icon="pi-id-card"
+/>
+
+@if (store.resumen.error(); as problema) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar el resumen"
+      [message]="problema.message"
+    />
+  </div>
+} @else if (store.resumen.value(); as r) {
+  <div class="kpis">
+    <app-kpi etiqueta="Empleados" [valor]="r.totalEmpleados" icono="pi-users" />
+    <app-kpi etiqueta="Activos" [valor]="r.activos" icono="pi-check-circle" tono="exito" />
+    <app-kpi
+      etiqueta="En licencia"
+      [valor]="r.enLicencia"
+      icono="pi-pause-circle"
+      [tono]="r.enLicencia > 0 ? 'alerta' : 'normal'"
+    />
+    <app-kpi
+      etiqueta="Ausentes hoy"
+      [valor]="r.ausentesHoy"
+      icono="pi-calendar-minus"
+      [tono]="r.ausentesHoy > 0 ? 'alerta' : 'normal'"
+    />
+    <app-kpi
+      etiqueta="Solicitudes pendientes"
+      [valor]="r.solicitudesPendientes"
+      icono="pi-inbox"
+      [tono]="r.solicitudesPendientes > 0 ? 'alerta' : 'normal'"
+    />
+    @if (r.masaSalarial != null) {
+      <app-kpi
+        etiqueta="Masa salarial mensual"
+        [valor]="(r.masaSalarial | currency: 'PEN' : 'symbol-narrow') ?? ''"
+        icono="pi-wallet"
+      />
+    }
+  </div>
+
+  <div class="columnas">
+    <section class="panel">
+      <h3>Empleados por área</h3>
+      <div class="grafico">
+        <p-chart type="bar" [data]="grafico()" [options]="opciones" height="340px" />
+      </div>
+    </section>
+
+    <div class="derecha">
+      <section class="panel">
+        <h3>Contratos por vencer</h3>
+        <p-table [value]="r.contratosPorVencer" [rowHover]="true" responsiveLayout="scroll">
+          <ng-template #header>
+            <tr>
+              <th>Empleado</th>
+              <th>Vence</th>
+              <th class="text-right">Días</th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-c>
+            <tr>
+              <td>
+                {{ c.nombreCompleto }}
+                <small class="text-muted block">{{ c.cargo }}</small>
+              </td>
+              <td>{{ c.fechaFin | date: 'd MMM y' }}</td>
+              <td class="text-right">{{ c.diasRestantes }}</td>
+            </tr>
+          </ng-template>
+          <ng-template #emptymessage>
+            <tr>
+              <td colspan="3">No hay contratos por vencer.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </section>
+
+      <section class="panel">
+        <h3>Ausentes hoy</h3>
+        @if (r.ausentesHoyDetalle; as detalle) {
+          <ul class="ausentes">
+            @for (a of detalle; track a.empleadoId) {
+              <li>
+                <strong>{{ a.nombreCompleto }}</strong>
+                <span class="text-muted"
+                  >{{ etiquetaTipo[a.tipo] }} hasta el {{ a.hasta | date: 'd MMM' }}</span
+                >
+              </li>
+            } @empty {
+              <li class="text-muted">Nadie está ausente hoy.</li>
+            }
+          </ul>
+        } @else {
+          <p class="text-muted">
+            {{ r.ausentesHoy }}
+            {{ r.ausentesHoy === 1 ? 'persona está ausente' : 'personas están ausentes' }} hoy.
+          </p>
+        }
+        @if (puedeGestionar() && r.solicitudesPendientes > 0) {
+          <a class="enlace" routerLink="/rrhh/ausencias">
+            <i class="pi pi-inbox"></i> Resolver {{ r.solicitudesPendientes }} solicitudes
+          </a>
+        }
+      </section>
+    </div>
+  </div>
+} @else if (store.resumen.loading()) {
+  <div class="panel"><p>Consultando la plantilla…</p></div>
+}

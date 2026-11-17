@@ -19,6 +19,8 @@ import { CajaApiService } from './caja-api.service';
 import { HospitalizacionApiService } from './hospitalizacion-api.service';
 import { PagosApiService } from './pagos-api.service';
 import { RecepcionApiService } from './recepcion-api.service';
+import { ReportesApiService } from './reportes-api.service';
+import { RrhhApiService } from './rrhh-api.service';
 
 function u(n: number): string {
   return `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
@@ -663,5 +665,96 @@ describe('servicios de la API', () => {
     });
     api.misIngresos().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/hospitalizacion/mis-ingresos' });
+  });
+
+  it('ReportesApiService consulta cada reporte con su rango y agrupación', () => {
+    const api = TestBed.inject(ReportesApiService);
+    const filtro = { desde: '2026-11-01', hasta: '2026-11-30', agrupacion: 'SEMANA' as const };
+    const params = { desde: '2026-11-01', hasta: '2026-11-30', agrupacion: 'SEMANA' };
+    api.ejecutivo(filtro).subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/reportes/ejecutivo', params });
+    api.financiero(filtro).subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/reportes/financiero', params });
+    api.operativo(filtro).subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/reportes/operativo', params });
+    api.calidad(filtro).subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/reportes/calidad', params });
+  });
+
+  it('RrhhApiService cubre fichas, turnos y ausencias', () => {
+    const api = TestBed.inject(RrhhApiService);
+    api.resumen().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/rrhh/resumen' });
+    api.empleados({ q: 'ana', area: 'CAJA' }).subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/rrhh/empleados',
+      params: { q: 'ana', area: 'CAJA' },
+    });
+    api.empleado(u(4)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/rrhh/empleados/${u(4)}` });
+    const ficha = {
+      usuarioId: u(5),
+      cargo: 'Cajero',
+      area: 'CAJA' as const,
+      tipoContrato: 'INDEFINIDO' as const,
+      fechaIngreso: '2026-01-05',
+      estado: 'ACTIVO' as const,
+      sueldo: 2500,
+    };
+    api.crearEmpleado(ficha).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/rrhh/empleados', body: ficha });
+    api.actualizarEmpleado(u(4), ficha).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/rrhh/empleados/${u(4)}`, body: ficha });
+    api.usuariosDisponibles().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/rrhh/usuarios-disponibles' });
+    api.saldoVacaciones(u(4)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/rrhh/empleados/${u(4)}/saldo-vacaciones` });
+    api.plantillasTurno().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/rrhh/plantillas-turno' });
+    api.semana('2026-11-16', 'MEDICA').subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/rrhh/turnos/semana',
+      params: { fecha: '2026-11-16', area: 'MEDICA' },
+    });
+    const turno = { empleadoId: u(4), plantillaId: u(6), fecha: '2026-11-24' };
+    api.asignarTurno(turno).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/rrhh/turnos', body: turno });
+    api.eliminarTurno(u(7)).subscribe();
+    expectRequest({ method: 'DELETE', url: `/api/v1/rrhh/turnos/${u(7)}` });
+    api.ausencias({ estado: 'SOLICITADA' }).subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/rrhh/ausencias',
+      params: { estado: 'SOLICITADA' },
+    });
+    api.resolverAusencia(u(8), 'aprobar', null).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/rrhh/ausencias/${u(8)}/aprobar`, body: {} });
+    api.resolverAusencia(u(8), 'rechazar', 'Cobertura insuficiente').subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: `/api/v1/rrhh/ausencias/${u(8)}/rechazar`,
+      body: { motivo: 'Cobertura insuficiente' },
+    });
+    api.miFicha().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/rrhh/mi-ficha' });
+    api.misTurnos('2026-11-16', '2026-11-22').subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/rrhh/mis-turnos',
+      params: { desde: '2026-11-16', hasta: '2026-11-22' },
+    });
+    api.misAusencias().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/rrhh/mis-ausencias' });
+    const solicitud = {
+      tipo: 'VACACIONES' as const,
+      fechaInicio: '2026-12-01',
+      fechaFin: '2026-12-05',
+    };
+    api.solicitarAusencia(solicitud).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/rrhh/mis-ausencias', body: solicitud });
+    api.cancelarMiAusencia(u(9)).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/rrhh/mis-ausencias/${u(9)}/cancelar`, body: {} });
   });
 });

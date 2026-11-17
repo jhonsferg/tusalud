@@ -1,0 +1,234 @@
+<app-page-header
+  title="Ausencias"
+  subtitle="Solicitudes, permisos y vacaciones del personal"
+  icon="pi-calendar-minus"
+  backLink="/rrhh"
+  backLabel="Volver al resumen"
+/>
+
+<div class="panel">
+  <div class="filtros">
+    <p-selectbutton
+      [options]="vistas"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="vista()"
+      (ngModelChange)="cambiarVista($event)"
+      [allowEmpty]="false"
+      ariaLabel="Vista de ausencias"
+    />
+    @if (vista() === 'lista') {
+      <p-select
+        [options]="estados"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="estado()"
+        (ngModelChange)="estado.set($event); cargar()"
+        placeholder="Todos los estados"
+        [showClear]="true"
+        ariaLabel="Filtrar por estado"
+        appendTo="body"
+        styleClass="w-full md:w-13rem"
+      />
+    } @else {
+      <div class="mes">
+        <p-button
+          icon="pi pi-chevron-left"
+          [text]="true"
+          [rounded]="true"
+          ariaLabel="Mes anterior"
+          (onClick)="moverMes(-1)"
+        />
+        <strong class="capitalizar">{{ mes() | date: 'MMMM y' }}</strong>
+        <p-button
+          icon="pi pi-chevron-right"
+          [text]="true"
+          [rounded]="true"
+          ariaLabel="Mes siguiente"
+          (onClick)="moverMes(1)"
+        />
+      </div>
+    }
+    <p-select
+      [options]="areas"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="area()"
+      (ngModelChange)="area.set($event); cargar()"
+      placeholder="Todas las áreas"
+      [showClear]="true"
+      ariaLabel="Filtrar por área"
+      appendTo="body"
+      styleClass="w-full md:w-14rem"
+    />
+  </div>
+
+  @if (vista() === 'lista') {
+    <p-table
+      [value]="store.ausencias.value() ?? []"
+      [loading]="store.ausencias.loading()"
+      [paginator]="(store.ausencias.value() ?? []).length > 12"
+      [rows]="12"
+      [rowHover]="true"
+      responsiveLayout="scroll"
+    >
+      <ng-template #header>
+        <tr>
+          <th pSortableColumn="empleadoNombre">Empleado <p-sortIcon field="empleadoNombre" /></th>
+          <th>Tipo</th>
+          <th pSortableColumn="fechaInicio">Desde <p-sortIcon field="fechaInicio" /></th>
+          <th>Hasta</th>
+          <th class="text-right">Días</th>
+          <th>Motivo</th>
+          <th>Estado</th>
+          <th style="width: 12rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-a>
+        <tr>
+          <td>
+            <div class="font-semibold">{{ a.empleadoNombre }}</div>
+            <small class="text-muted">{{ etiquetaArea[a.area] }}</small>
+          </td>
+          <td>{{ etiquetaTipo[a.tipo] }}</td>
+          <td>{{ a.fechaInicio | date: 'd MMM y' }}</td>
+          <td>{{ a.fechaFin | date: 'd MMM y' }}</td>
+          <td class="text-right">{{ a.dias }}</td>
+          <td>{{ a.motivo || '' }}</td>
+          <td>
+            <p-tag [value]="etiquetaEstado[a.estado]" [severity]="severidad(a.estado)" />
+            @if (a.resueltoPor) {
+              <small class="text-muted block">{{ a.resueltoPor }}</small>
+            }
+            @if (a.motivoResolucion) {
+              <small class="text-muted block">{{ a.motivoResolucion }}</small>
+            }
+          </td>
+          <td class="text-right acciones">
+            @if (gestiona() && a.estado === 'SOLICITADA') {
+              <p-button
+                label="Aprobar"
+                icon="pi pi-check"
+                size="small"
+                severity="success"
+                [ariaLabel]="'Aprobar la ausencia de ' + a.empleadoNombre"
+                (onClick)="abrir(a, 'aprobar')"
+              />
+              <p-button
+                label="Rechazar"
+                icon="pi pi-times"
+                size="small"
+                severity="danger"
+                [outlined]="true"
+                [ariaLabel]="'Rechazar la ausencia de ' + a.empleadoNombre"
+                (onClick)="abrir(a, 'rechazar')"
+              />
+            }
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="8">
+            <app-empty-state
+              icon="pi-inbox"
+              title="Sin solicitudes"
+              message="No hay ausencias con esos filtros."
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  } @else {
+    <div class="calendario-contenedor">
+      <table class="calendario" aria-label="Calendario de ausencias">
+        <thead>
+          <tr>
+            <th class="empleado">Empleado</th>
+            @for (dia of diasMes(); track dia.getTime()) {
+              <th>{{ dia.getDate() }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (fila of filasCalendario(); track fila.empleado) {
+            <tr>
+              <td class="empleado">
+                <strong>{{ fila.empleado }}</strong>
+                <small class="block text-muted">{{ fila.area }}</small>
+              </td>
+              @for (celda of fila.dias; track $index) {
+                <td
+                  class="celda"
+                  [class.aprobada]="celda?.estado === 'APROBADA'"
+                  [class.solicitada]="celda?.estado === 'SOLICITADA'"
+                  [attr.title]="
+                    celda ? etiquetaTipo[celda.tipo] + ' · ' + etiquetaEstado[celda.estado] : ''
+                  "
+                ></td>
+              }
+            </tr>
+          } @empty {
+            <tr>
+              <td [attr.colspan]="diasMes().length + 1">
+                <app-empty-state
+                  icon="pi-calendar"
+                  title="Sin ausencias"
+                  message="Nadie tiene ausencias en este mes."
+                />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <p class="leyenda text-muted">
+        <span class="muestra aprobada"></span> Aprobada
+        <span class="muestra solicitada"></span> Solicitada
+      </p>
+    </div>
+  }
+</div>
+
+<p-dialog
+  [header]="resolviendo()?.accion === 'aprobar' ? 'Aprobar solicitud' : 'Rechazar solicitud'"
+  [visible]="resolviendo() !== null"
+  (visibleChange)="$event ? null : resolviendo.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '28rem', maxWidth: '96vw' }"
+>
+  @if (resolviendo(); as r) {
+    <p class="text-muted">
+      {{ r.ausencia.empleadoNombre }} · {{ etiquetaTipo[r.ausencia.tipo] }} del
+      {{ r.ausencia.fechaInicio | date: 'd MMM' }} al {{ r.ausencia.fechaFin | date: 'd MMM y' }}
+    </p>
+    @if (error(); as mensaje) {
+      <p-message severity="error" styleClass="w-full mb-3">{{ mensaje }}</p-message>
+    }
+    <label class="motivo">
+      {{ r.accion === 'aprobar' ? 'Comentario' : 'Motivo del rechazo' }}
+      <textarea
+        pTextarea
+        id="aus-resolucion"
+        rows="3"
+        class="w-full"
+        [ngModel]="motivo()"
+        (ngModelChange)="motivo.set($event)"
+      ></textarea>
+    </label>
+  }
+  <ng-template #footer>
+    <p-button
+      label="Volver"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="resolviendo.set(null)"
+    />
+    <p-button
+      [label]="resolviendo()?.accion === 'aprobar' ? 'Aprobar' : 'Rechazar'"
+      [severity]="resolviendo()?.accion === 'aprobar' ? 'success' : 'danger'"
+      [loading]="procesando()"
+      (onClick)="confirmar()"
+    />
+  </ng-template>
+</p-dialog>

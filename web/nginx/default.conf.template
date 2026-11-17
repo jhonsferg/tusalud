@@ -63,11 +63,11 @@ server {
         return 404;
     }
 
-    location ~ ^/(paciente|medico|admin|recepcion|caja|enfermeria|laboratorio|farmacia|almacen)$ {
+    location ~ ^/(paciente|medico|admin|gerencia|finanzas|operaciones|calidad|rrhh|recepcion|caja|enfermeria|laboratorio|farmacia|almacen)$ {
         return 301 /$1/$is_args$args;
     }
 
-    location ~ ^/(?:paciente|medico|admin|recepcion|caja|enfermeria|laboratorio|farmacia|almacen)/index\.html$ {
+    location ~ ^/(?:paciente|medico|admin|gerencia|finanzas|operaciones|calidad|rrhh|recepcion|caja|enfermeria|laboratorio|farmacia|almacen)/index\.html$ {
         include /etc/nginx/snippets/security-headers.conf;
         add_header Cache-Control "no-cache";
         try_files $uri =404;
@@ -90,7 +90,7 @@ server {
         try_files $uri =404;
     }
 
-    location ~ ^/(paciente|medico|admin|recepcion|caja|enfermeria|laboratorio|farmacia|almacen)/ {
+    location ~ ^/(paciente|medico|admin|gerencia|finanzas|operaciones|calidad|rrhh|recepcion|caja|enfermeria|laboratorio|farmacia|almacen)/ {
         include /etc/nginx/snippets/security-headers.conf;
         add_header Cache-Control "no-cache";
         try_files $uri /$1/index.html;

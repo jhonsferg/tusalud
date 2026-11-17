@@ -115,3 +115,15 @@ ROLE_CAJA          Jorge Paredes   caja@tusalud.com          Personal123!   /caj
 ROLE_ENFERMERIA    Lucía Campos    enfermeria@tusalud.com    Personal123!   /hospitalizacion
 
 Datos de ejemplo: seis citas de hoy con turnos en espera, llamado, atendido y ausente, una caja cerrada ayer con un faltante de S/ 5.00 y seis comprobantes entre boletas, una factura y una anulada, catorce camas con dos ingresos activos y emergencias de nivel 2 y 4 sin cama, y un alta histórica.
+
+GERENCIA, FINANZAS, OPERACIONES, RRHH Y CALIDAD
+-----------------------------------------------
+Rol                Nombre            Correo                     Contraseña     Entra a
+ROLE_GERENCIA      Mariana Ríos      gerencia@tusalud.com       Personal123!   /gerencia/
+ROLE_FINANZAS      Esteban Mora      finanzas@tusalud.com       Personal123!   /finanzas/
+ROLE_OPERACIONES   Valentina Cruz    operaciones@tusalud.com    Personal123!   /operaciones/
+ROLE_RRHH          Ximena Solís      rrhh@tusalud.com           Personal123!   /rrhh/
+ROLE_CALIDAD       Hugo Benavides    calidad@tusalud.com        Personal123!   /calidad/
+
+Cada uno ve solo los reportes de su área, gerencia ve todos, y recursos humanos administra las fichas, los turnos y las ausencias. Todo el personal consulta sus turnos y solicita ausencias en Mi espacio.
+Datos de ejemplo: 19 fichas laborales con sueldos y contratos, turnos de la semana y 5 ausencias entre aprobadas, solicitadas y rechazadas, que sirven de base a los reportes.
