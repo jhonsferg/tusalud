@@ -85,6 +85,7 @@
                 [class.fuera]="!celda.delMes"
                 [class.hoy]="celda.esHoy"
                 [class.editable]="puedeEditar()"
+                (click)="clickCelda($event, celda.fecha)"
                 (dblclick)="crearEnDia(celda.fecha)"
               >
                 <button
@@ -132,9 +133,10 @@
           <div class="agenda">
             @for (grupo of agenda(); track grupo.fecha.getTime()) {
               <section class="agenda-grupo">
-                <h3 [class.hoy]="esHoy(grupo.fecha)">
-                  <b>{{ grupo.fecha | date: 'd' }}</b>
-                  <span>{{ grupo.fecha | date: 'EEEE, MMMM y' }}</span>
+                <h3 class="agenda-fecha" [class.es-hoy]="esHoy(grupo.fecha)">
+                  <span class="dia-num">{{ grupo.fecha | date: 'd' }}</span>
+                  <span class="dia-semana">{{ grupo.fecha | date: 'EEEE' }}</span>
+                  <span class="dia-mes">{{ grupo.fecha | date: 'MMMM y' }}</span>
                 </h3>
                 <ul>
                   @for (evento of grupo.eventos; track evento.id) {
@@ -172,42 +174,44 @@
         }
         @default {
           <div class="tiempo" [class.dia]="vista() === 'dia'" #desplazable>
-            <div class="tiempo-cabecera">
-              <span></span>
-              @for (columna of columnas(); track columna.fecha.getTime()) {
-                <button
-                  type="button"
-                  class="cabecera-dia"
-                  [class.hoy]="columna.esHoy"
-                  [attr.aria-label]="'Abrir ' + (columna.fecha | date: 'EEEE d MMMM')"
-                  (click)="abrirDia(columna.fecha)"
-                >
-                  <small>{{ columna.fecha | date: 'EEE' }}</small>
-                  <strong>{{ columna.fecha.getDate() }}</strong>
-                </button>
-              }
-            </div>
-
-            @if (hayTodoElDia() || puedeEditar()) {
-              <div class="todo-el-dia">
-                <span class="etiqueta-todo">Todo el día</span>
+            <div class="tiempo-fijo">
+              <div class="tiempo-cabecera">
+                <span></span>
                 @for (columna of columnas(); track columna.fecha.getTime()) {
-                  <div class="todo-celda" (dblclick)="crearTodoElDia(columna.fecha)">
-                    @for (evento of columna.todoElDia; track evento.id) {
-                      <button
-                        type="button"
-                        class="chip todo"
-                        [class.hecho]="evento.completado"
-                        [attr.data-color]="evento.color"
-                        (click)="eventoElegido.emit(evento)"
-                      >
-                        {{ evento.titulo }}
-                      </button>
-                    }
-                  </div>
+                  <button
+                    type="button"
+                    class="cabecera-dia"
+                    [class.hoy]="columna.esHoy"
+                    [attr.aria-label]="'Abrir ' + (columna.fecha | date: 'EEEE d MMMM')"
+                    (click)="abrirDia(columna.fecha)"
+                  >
+                    <small>{{ columna.fecha | date: 'EEE' }}</small>
+                    <strong>{{ columna.fecha.getDate() }}</strong>
+                  </button>
                 }
               </div>
-            }
+
+              @if (hayTodoElDia() || puedeEditar()) {
+                <div class="todo-el-dia">
+                  <span class="etiqueta-todo">Todo el día</span>
+                  @for (columna of columnas(); track columna.fecha.getTime()) {
+                    <div class="todo-celda" (dblclick)="crearTodoElDia(columna.fecha)">
+                      @for (evento of columna.todoElDia; track evento.id) {
+                        <button
+                          type="button"
+                          class="chip todo"
+                          [class.hecho]="evento.completado"
+                          [attr.data-color]="evento.color"
+                          (click)="eventoElegido.emit(evento)"
+                        >
+                          {{ evento.titulo }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
 
             <div
               class="tiempo-cuerpo"
@@ -216,21 +220,23 @@
               [class.arrastrando]="arrastre() !== null"
               [style.height.px]="horasVisibles().horas.length * altoHora"
               (pointerdown)="iniciarArrastre($event)"
-              (pointermove)="moverArrastre($event)"
+              (pointermove)="moverArrastre($event); moverPuntero($event)"
+              (pointerleave)="salirPuntero()"
               (pointerup)="terminarArrastre($event)"
               (pointercancel)="cancelarArrastre()"
             >
+              <div class="rejilla" aria-hidden="true">
+                @for (hora of horasVisibles().horas; track hora) {
+                  <div class="linea-hora" [style.height.px]="altoHora"></div>
+                }
+              </div>
               <div class="horas">
                 @for (hora of horasVisibles().horas; track hora) {
                   <span [style.height.px]="altoHora">{{ claveHora(hora) }}</span>
                 }
               </div>
               @for (columna of columnas(); track columna.fecha.getTime(); let indice = $index) {
-                <div
-                  class="columna"
-                  [class.hoy]="columna.esHoy"
-                  [style.background-size]="'100% ' + altoHora + 'px'"
-                >
+                <div class="columna" [class.hoy]="columna.esHoy">
                   @for (bloque of columna.noLaboral; track $index) {
                     <div
                       class="no-laboral"
@@ -288,6 +294,22 @@
                         <span class="resize" aria-hidden="true"></span>
                       }
                     </button>
+                  }
+                  @if (marcador(); as marcador) {
+                    @if (marcador.columna === indice) {
+                      <div
+                        class="marcador"
+                        [class.editable]="puedeEditar()"
+                        [style.top.px]="marcador.top"
+                        [style.height.px]="marcador.alto"
+                        aria-hidden="true"
+                      >
+                        <b>{{ horaDe(marcador.desde) }}</b>
+                        @if (puedeEditar()) {
+                          <i class="pi pi-plus"></i>
+                        }
+                      </div>
+                    }
                   }
                   @if (fantasma(); as fantasma) {
                     @if (fantasma.columna === indice) {

@@ -106,6 +106,7 @@ interface Arrastre {
 const ALTO_HORA = 56;
 const MAX_EVENTOS_MES = 3;
 const UMBRAL_ARRASTRE_PX = 5;
+const PASO_MARCADOR = 30;
 const DIAS_CORTOS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
 @Component({
@@ -198,30 +199,10 @@ export class Calendario {
   protected readonly semana = computed(() => numeroDeSemana(this.rango().inicio));
 
   protected readonly horasVisibles = computed(() => {
-    let minimo = this.horaInicio();
-    let maximo = this.horaFin();
-    const { inicio, fin } = this.rango();
-    const limiteFin = sumarDias(fin, 1);
-    const ahora = this.ahora();
-    if (ahora >= inicio && ahora < limiteFin) {
-      minimo = Math.min(minimo, ahora.getHours());
-      maximo = Math.max(maximo, ahora.getHours() + 1);
-    }
-    const considerar = (desde: Date, hasta: Date) => {
-      if (desde >= inicio && desde < limiteFin) {
-        minimo = Math.min(minimo, desde.getHours());
-        maximo = Math.max(maximo, hasta.getMinutes() > 0 ? hasta.getHours() + 1 : hasta.getHours());
-      }
-    };
-    this.eventosVisibles()
-      .filter((evento) => !evento.todoElDia)
-      .forEach((evento) => considerar(evento.inicio, evento.fin));
-    this.huecosLibres().forEach((hueco) => considerar(hueco.inicio, hueco.fin));
-    maximo = Math.min(24, Math.max(maximo, minimo + 1));
     return {
-      minimo,
-      maximo,
-      horas: Array.from({ length: maximo - minimo }, (_, i) => minimo + i),
+      minimo: 0,
+      maximo: 24,
+      horas: Array.from({ length: 24 }, (_, i) => i),
     };
   });
 
@@ -323,6 +304,22 @@ export class Calendario {
     return (minutos * ALTO_HORA) / 60;
   });
 
+  protected readonly puntero = signal<{ columna: number; desde: number } | null>(null);
+
+  protected readonly marcador = computed(() => {
+    const puntero = this.puntero();
+    if (!puntero || this.arrastre()) {
+      return null;
+    }
+    return {
+      columna: puntero.columna,
+      top: (puntero.desde * ALTO_HORA) / 60,
+      alto: (PASO_MARCADOR * ALTO_HORA) / 60,
+      desde: puntero.desde,
+      hasta: puntero.desde + PASO_MARCADOR,
+    };
+  });
+
   protected readonly fantasma = computed(() => {
     const arrastre = this.arrastre();
     if (!arrastre || !arrastre.movido) {
@@ -391,6 +388,42 @@ export class Calendario {
       return;
     }
     this.eventoElegido.emit(evento);
+  }
+
+  protected clickCelda(evento: MouseEvent, fecha: Date): void {
+    const objetivo = evento.target as HTMLElement;
+    if (objetivo.closest('button')) {
+      return;
+    }
+    this.abrirDia(fecha);
+  }
+
+  protected moverPuntero(evento: PointerEvent): void {
+    if (this.arrastre() || evento.pointerType === 'touch') {
+      return;
+    }
+    const objetivo = evento.target as HTMLElement;
+    if (objetivo.closest('.evento, .hueco, .ahora')) {
+      this.puntero.set(null);
+      return;
+    }
+    const lugar = this.posicion(evento);
+    if (!lugar) {
+      this.puntero.set(null);
+      return;
+    }
+    const desde = Math.min(
+      Math.floor(lugar.minutos / PASO_MARCADOR) * PASO_MARCADOR,
+      24 * 60 - PASO_MARCADOR,
+    );
+    const actual = this.puntero();
+    if (!actual || actual.columna !== lugar.columna || actual.desde !== desde) {
+      this.puntero.set({ columna: lugar.columna, desde });
+    }
+  }
+
+  protected salirPuntero(): void {
+    this.puntero.set(null);
   }
 
   protected crearEnDia(fecha: Date): void {
@@ -616,10 +649,10 @@ export class Calendario {
   private irAHoraActual(): void {
     queueMicrotask(() => {
       const contenedor = this.desplazable()?.nativeElement;
-      const linea = this.lineaAhora();
       if (contenedor) {
-        const objetivo = linea !== null ? linea - 140 : 0;
-        contenedor.scrollTop = Math.max(0, objetivo);
+        const linea = this.lineaAhora();
+        const y = linea !== null ? linea - 3 * ALTO_HORA : this.horaInicio() * ALTO_HORA;
+        contenedor.scrollTop = Math.max(0, y - 16);
       }
     });
   }

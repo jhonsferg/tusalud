@@ -22,6 +22,83 @@ test.describe('calendario', () => {
     await expect(page.locator('.ahora')).toHaveCount(0);
   });
 
+  test('semana y día muestran las 24 horas con separadores y un marcador al pasar el cursor', async ({
+    page,
+  }) => {
+    await iniciarSesion(page, 'medico');
+    await ir(page, '/calendario');
+    const vistas = page.getByRole('group', { name: 'Vista del calendario' });
+    for (const vista of ['Semana', 'Día']) {
+      await vistas.getByRole('button', { name: vista }).click();
+      await expect(page.locator('.horas span')).toHaveCount(24);
+      await expect(page.locator('.linea-hora')).toHaveCount(24);
+      await expect(page.locator('.horas span').first()).toHaveText('00:00');
+      await expect(page.locator('.horas span').last()).toHaveText('23:00');
+      const cuerpo = page.locator('.tiempo-cuerpo');
+      await cuerpo.scrollIntoViewIfNeeded();
+      const columna = (await page.locator('.columna').first().boundingBox())!;
+      const visible = (await page.locator('.tiempo').boundingBox())!;
+      await page.mouse.move(columna.x + columna.width / 2, visible.y + visible.height / 2);
+      await expect(page.locator('.marcador')).toHaveCount(1);
+      await page.mouse.move(visible.x - 20, visible.y - 20);
+      await expect(page.locator('.marcador')).toHaveCount(0);
+    }
+  });
+
+  test('la fila de todo el día no tapa las primeras horas visibles', async ({ page }) => {
+    await iniciarSesion(page, 'medico');
+    await ir(page, '/calendario');
+    await page
+      .getByRole('group', { name: 'Vista del calendario' })
+      .getByRole('button', { name: 'Semana' })
+      .click();
+    await page.evaluate(() => {
+      const el = document.querySelector('.tiempo') as HTMLElement;
+      el.scrollTop = 7 * 56;
+    });
+    const fijo = (await page.locator('.tiempo-fijo').boundingBox())!;
+    const hora7 = (await page.locator('.horas span').nth(7).boundingBox())!;
+    expect(hora7.y).toBeGreaterThanOrEqual(fijo.y + fijo.height - 2);
+  });
+
+  test('en la vista mensual todo el cuadro del día abre el día y muestra un marcador', async ({
+    page,
+  }) => {
+    await iniciarSesion(page, 'medico');
+    await ir(page, '/calendario');
+    await page
+      .getByRole('group', { name: 'Vista del calendario' })
+      .getByRole('button', { name: 'Mes' })
+      .click();
+    const celda = page.locator('.mes-celda').nth(10);
+    await celda.hover();
+    await expect(celda).toHaveCSS('cursor', 'pointer');
+    const caja = (await celda.boundingBox())!;
+    await page.mouse.click(caja.x + caja.width - 8, caja.y + caja.height - 8);
+    await expect(page.locator('.tiempo.dia')).toBeVisible();
+  });
+
+  test('la agenda agrupa por día con el número en un círculo y sin cajas superpuestas', async ({
+    page,
+  }) => {
+    await iniciarSesion(page, 'medico');
+    await ir(page, '/calendario');
+    await page
+      .getByRole('group', { name: 'Vista del calendario' })
+      .getByRole('button', { name: 'Agenda' })
+      .click();
+    const grupo = page.locator('.agenda-grupo').first();
+    await expect(grupo).toBeVisible();
+    const numero = grupo.locator('.dia-num');
+    const caja = (await numero.boundingBox())!;
+    expect(Math.round(caja.width)).toBe(Math.round(caja.height));
+    await expect(numero).toHaveCSS('border-radius', '50%');
+    const fecha = (await grupo.locator('.agenda-fecha').boundingBox())!;
+    const lista = (await grupo.locator('ul').boundingBox())!;
+    expect(lista.x).toBeGreaterThanOrEqual(fecha.x + fecha.width);
+    await expect(grupo.locator('.agenda-fecha')).toHaveCSS('border-top-width', '0px');
+  });
+
   test('el paciente elige un hueco libre en el calendario para reservar', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
     await ir(page, `/citas/nueva?medicoId=${await idDeGarcia(page)}`);
