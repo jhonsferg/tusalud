@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "6b0d7c1e-3f5a-4e1b-9a7c-2d4e8f9a1c01",
     "name": "TuSalud API",
-    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 11, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
+    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 12, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -5114,6 +5114,372 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "12 - Calendario y eventos",
+      "description": "Eventos personales del calendario, bloqueos de agenda y su efecto en la disponibilidad.",
+      "item": [
+        {
+          "name": "Crear una reunión",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date(Date.now() + (3 + Math.floor(Math.random() * 60)) * 86400000);",
+                  "const p = n => String(n).padStart(2, '0');",
+                  "const dia = d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());",
+                  "pm.collectionVariables.set('fechaDiaEvento', dia);",
+                  "pm.collectionVariables.set('fechaInicioEvento', dia + 'T10:00:00');",
+                  "pm.collectionVariables.set('fechaFinEvento', dia + 'T11:00:00');",
+                  "pm.collectionVariables.set('fechaInicioMovido', dia + 'T11:00:00');",
+                  "pm.collectionVariables.set('fechaFinMovido', dia + 'T12:00:00');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve el evento creado', () => {",
+                  "    pm.expect(j.id).to.be.a(\"number\");",
+                  "    pm.expect(j.tipo).to.eql(\"REUNION\");",
+                  "    pm.expect(j.completado).to.eql(false);",
+                  "});",
+                  "pm.collectionVariables.set('eventoId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calendario/eventos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calendario", "eventos"]
+            },
+            "description": "Cualquier usuario autenticado crea eventos propios.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Reunión de seguimiento\",\n  \"tipo\": \"REUNION\",\n  \"inicio\": \"{{fechaInicioEvento}}\",\n  \"fin\": \"{{fechaFinEvento}}\",\n  \"ubicacion\": \"Consultorio virtual\",\n  \"recordatorioMinutos\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar los eventos del rango",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye el evento creado', () => pm.expect(pm.response.json().map(e => e.id)).to.include(Number(pm.collectionVariables.get('eventoId'))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calendario/eventos?inicio={{fechaDiaEvento}}&fin={{fechaDiaEvento}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calendario", "eventos"],
+              "query": [
+                {
+                  "key": "inicio",
+                  "value": "{{fechaDiaEvento}}"
+                },
+                {
+                  "key": "fin",
+                  "value": "{{fechaDiaEvento}}"
+                }
+              ]
+            },
+            "description": "Devuelve los eventos que se solapan con el rango.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mover el evento una hora",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Actualiza el horario', () => pm.expect(pm.response.json().inicio).to.eql(pm.collectionVariables.get('fechaInicioMovido')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calendario/eventos/{{eventoId}}/mover",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "calendario",
+                "eventos",
+                "{{eventoId}}",
+                "mover"
+              ]
+            },
+            "description": "Es lo que usa el arrastre del calendario.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inicio\": \"{{fechaInicioMovido}}\",\n  \"fin\": \"{{fechaFinMovido}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro usuario no ve el evento (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calendario/eventos/{{eventoId}}/completado",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "calendario",
+                "eventos",
+                "{{eventoId}}",
+                "completado"
+              ]
+            },
+            "description": "Los eventos son privados de su dueño.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"completado\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente intenta crear un bloqueo (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calendario/eventos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calendario", "eventos"]
+            },
+            "description": "Solo los médicos crean bloqueos.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Bloqueo\",\n  \"tipo\": \"BLOQUEO\",\n  \"inicio\": \"{{fechaInicioEvento}}\",\n  \"fin\": \"{{fechaFinEvento}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rango mayor a 100 días (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calendario/eventos?inicio=2026-01-01&fin=2026-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calendario", "eventos"],
+              "query": [
+                {
+                  "key": "inicio",
+                  "value": "2026-01-01"
+                },
+                {
+                  "key": "fin",
+                  "value": "2026-12-31"
+                }
+              ]
+            },
+            "description": "El rango máximo es de 100 días.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar el evento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/calendario/eventos/{{eventoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "calendario", "eventos", "{{eventoId}}"]
+            },
+            "description": "El dueño elimina su evento.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -5289,6 +5655,36 @@
     },
     {
       "key": "citaPagoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "eventoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fechaDiaEvento",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fechaInicioEvento",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fechaFinEvento",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fechaInicioMovido",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fechaFinMovido",
       "value": "",
       "type": "string"
     }

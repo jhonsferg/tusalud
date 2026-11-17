@@ -91,3 +91,8 @@ Yape y Plin: el pago genera un QR que vence a los 5 minutos y el botón Simular 
 Cupones de ejemplo: SALUD20 y BIENVENIDA10.
 Verificación en dos pasos: ningún usuario la tiene activa. Cada usuario puede activarla en Mi perfil, pestaña Seguridad, con cualquier aplicación autenticadora.
 El token de acceso dura 15 minutos y se renueva solo con el refresh token, sin volver a pedir la contraseña.
+
+CALENDARIO
+----------
+Juan Pérez tiene una tarea y una reunión de ejemplo, el administrador un recordatorio y Luis García una reunión y un bloqueo de una hora en su primer día hábil libre de los próximos 14.
+Cada usuario crea sus propios eventos en Calendario, y los bloqueos de agenda solo los crean los médicos.

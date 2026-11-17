@@ -34,6 +34,7 @@ TuSalud es el sistema de gestión de citas y consultas médicas. El repositorio 
   - [Verificación en dos pasos](#verificación-en-dos-pasos)
   - [Renovación del token](#renovación-del-token)
   - [Calendario de citas](#calendario-de-citas)
+  - [Planificador de eventos](#planificador-de-eventos)
 - [Manejo de errores](#manejo-de-errores)
 - [Perfiles y configuración](#perfiles-y-configuración)
 - [Migraciones con Flyway](#migraciones-con-flyway)
@@ -224,6 +225,12 @@ La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y
 | `POST`   | `/api/v1/auth/mfa/verificar`                             | Público con token de verificación     | 200       |
 | `PUT`    | `/api/v1/medicos/{id}/especialidades`                    | Admin                                 | 200       |
 | `GET`    | `/api/v1/medicos/{id}/disponibilidad/rango?inicio=&fin=` | Autenticado                           | 200       |
+| `GET`    | `/api/v1/calendario/eventos?inicio=&fin=`                | Autenticado, eventos propios          | 200       |
+| `POST`   | `/api/v1/calendario/eventos`                             | Autenticado                           | 201       |
+| `PUT`    | `/api/v1/calendario/eventos/{id}`                        | Dueño del evento                      | 200       |
+| `PUT`    | `/api/v1/calendario/eventos/{id}/mover`                  | Dueño del evento                      | 200       |
+| `PUT`    | `/api/v1/calendario/eventos/{id}/completado`             | Dueño del evento                      | 200       |
+| `DELETE` | `/api/v1/calendario/eventos/{id}`                        | Dueño del evento                      | 204       |
 | `GET`    | `/api/v1/admin/roles`                                    | Admin                                 | 200       |
 | `PUT`    | `/api/v1/admin/usuarios/{id}/roles`                      | Admin                                 | 200       |
 | `POST`   | `/api/v1/pacientes/{id}/compartir`                       | Médico que atiende al paciente        | 201       |
@@ -1170,6 +1177,21 @@ El frontend renueva el token un minuto antes de que venza y, si una petición re
 
 `GET /api/v1/medicos/{id}/disponibilidad/rango` devuelve las horas libres de hasta 62 días en una sola petición y `GET /api/v1/medicos/me/agenda` acepta un rango de fechas. Cada cita informa su `duracionMinutos`. Reservar o reprogramar rechaza con 409 una cita que se cruce con otra cita activa del paciente, aunque sea con otro médico.
 
+### Planificador de eventos
+
+Cada usuario tiene su propia agenda de eventos personales en la tabla `eventos_calendario`. Un evento puede ser una reunión, una tarea, un recordatorio, un evento personal o, solo para médicos, un bloqueo de agenda. Tiene título, notas, lugar, color opcional, duración de hasta 31 días, la marca de todo el día y un aviso previo opcional en minutos. Nadie ve ni modifica los eventos de otra persona.
+
+| Endpoint                                         | Comportamiento                                                        |
+| ------------------------------------------------ | --------------------------------------------------------------------- |
+| `GET /api/v1/calendario/eventos?inicio=&fin=`    | Eventos que se solapan con el rango, de hasta 100 días                |
+| `POST /api/v1/calendario/eventos`                | Crea el evento y responde 201 con `Location`                          |
+| `PUT /api/v1/calendario/eventos/{id}`            | Reemplaza los datos del evento                                        |
+| `PUT /api/v1/calendario/eventos/{id}/mover`      | Cambia el inicio y el fin, y es lo que usa el arrastre del calendario |
+| `PUT /api/v1/calendario/eventos/{id}/completado` | Marca una tarea como completada o pendiente                           |
+| `DELETE /api/v1/calendario/eventos/{id}`         | Elimina el evento                                                     |
+
+Un bloqueo quita de la disponibilidad del médico los turnos que se solapan con él. Reservar o reprogramar sobre un bloqueo responde 409, y crear o mover un bloqueo sobre una cita pendiente o confirmada también responde 409. La tarea programada de recordatorios crea una notificación `RECORDATORIO_EVENTO` cuando faltan los minutos elegidos para el inicio, una sola vez, y mover el evento reinicia el aviso.
+
 ## Manejo de errores
 
 `GlobalExceptionHandler` traduce cada excepción a una respuesta con el mismo formato. Los errores 401 y 403 que produce Spring Security antes de llegar a un controlador usan ese mismo formato.
@@ -1475,6 +1497,7 @@ Todas las pantallas se cargan de forma diferida. Los parámetros de ruta llegan 
 | `/citas/nueva`                    | Paciente                | Reserva de cita                 |
 | `/citas/:id`                      | Paciente, médico, admin | Detalle de la cita              |
 | `/agenda`                         | Médico                  | Agenda del día                  |
+| `/calendario`                     | Con sesión              | Calendario y planificador       |
 | `/admin/auditoria`                | Admin                   | Reportes de auditoría           |
 | `/perfil`                         | Con sesión              | Datos, seguridad, avisos y tema |
 | `/notificaciones`                 | Con sesión              | Bandeja de notificaciones       |
@@ -1494,7 +1517,7 @@ Al entrar a la raíz, el administrador va al panel de control, el médico a su a
 
 La primera vez que un usuario entra, una guía paso a paso resalta las partes de la interfaz que le corresponden según su rol. Se puede volver a abrir desde el menú del avatar o desde la tarjeta al pie del menú lateral, y el avance se guarda en las preferencias con `tourCompletado`.
 
-Las citas se ven en lista o en un calendario propio con vistas de mes, semana y día. La vista de día y la de semana muestran una línea con la hora actual y las citas que se cruzan se resaltan y se cuentan en la cabecera. Al reservar, el paciente elige el hueco libre directamente en el calendario: los huecos que chocan con sus propias citas no aparecen, así que no puede elegir una fecha al azar.
+Las citas se ven en lista o en un calendario propio con vistas de mes, semana, día y agenda. La vista de día y la de semana muestran una línea con la hora actual y las citas que se cruzan se resaltan y se cuentan en la cabecera. El calendario es un componente propio que se parece a Google Calendar: tiene un mini calendario lateral, filtros por tipo de calendario, una fila para los eventos de todo el día, el número de semana y el sombreado del horario en que el médico no atiende. Con la edición activa se arrastra sobre la cuadrícula para crear un evento, se mueve o se estira un evento para reprogramarlo con pasos de 15 minutos, y los atajos T, M, S, D y A llevan a hoy y a cada vista. La página `/calendario` está disponible para todos los roles y junta las citas con las reuniones, tareas y recordatorios personales, y los médicos añaden además sus bloqueos de agenda. La disponibilidad de un médico y la reserva usan el mismo componente en modo de selección. Al reservar, el paciente elige el hueco libre directamente en el calendario: los huecos que chocan con sus propias citas no aparecen, así que no puede elegir una fecha al azar.
 
 ### Validaciones
 
@@ -1518,13 +1541,13 @@ Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrec
 
 ### Pruebas del frontend
 
-Las 94 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API.
+Las 105 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API.
 
 ```bash
 npm test
 ```
 
-Las 56 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario y la renovación de sesión. Requieren el stack levantado con datos de prueba.
+Las 64 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre y la renovación de sesión. Requieren el stack levantado con datos de prueba.
 
 ```bash
 npm run e2e
@@ -1747,6 +1770,7 @@ Para usarla en Postman, importa el archivo y ejecuta la colección completa con 
 | `09 - Tarifas, roles y pacientes compartidos`           | Tarifa por especialidad, especialidades del médico, roles y pacientes compartidos  |
 | `10 - Pagos con Yape y Plin`                            | Reserva, generación del QR, consulta y confirmación simulada                       |
 | `11 - Verificación en dos pasos y renovación del token` | Configuración del autenticador y errores del refresh token                         |
+| `12 - Calendario y eventos`                             | Eventos personales, arrastre, privacidad y límites del rango                       |
 
 Desde la línea de comandos:
 
