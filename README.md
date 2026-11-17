@@ -29,6 +29,7 @@ TuSalud es el sistema de gestión de citas y consultas médicas. El repositorio 
 - [Aplicación web](#aplicación-web)
 - [Observabilidad](#observabilidad)
 - [Datos de prueba](#datos-de-prueba)
+  - [Datos de demostración](#datos-de-demostración)
 - [Pruebas automatizadas](#pruebas-automatizadas)
 - [Flujo de trabajo con Git](#flujo-de-trabajo-con-git)
 - [Colección Postman](#colección-postman)
@@ -1468,6 +1469,21 @@ Tomcat agrega los headers `Connection`, `Keep-Alive` y `Transfer-Encoding` al en
 - Luis García atiende Cardiología de lunes a viernes de 08:00 a 13:00 con citas de 30 minutos, en el Consultorio 101, por 150.00.
 - Carmen López atiende Pediatría de lunes a viernes de 14:00 a 19:00 y los sábados de 08:00 a 12:00 con citas de 30 minutos, en el Consultorio 205, por 120.00.
 - Se crean dos citas de ejemplo para el siguiente día hábil: Juan Pérez con Luis García a las 09:00 en estado `PENDIENTE` y María Rodríguez con Carmen López a las 15:00 en estado `CONFIRMADA`.
+
+### Datos de demostración
+
+`DemoDataInitializer` amplía esos datos cuando `app.demo-data.enabled` está activo, algo que ocurre por defecto en los perfiles `dev` y `local` y se controla con la variable `DEMO_DATA_ENABLED`. Corre después de `DataInitializer`, es idempotente y nunca se ejecuta en producción ni en las pruebas, salvo en su propia prueba.
+
+- Cinco médicos más, de Medicina General, Dermatología, Traumatología, Ginecología y Oftalmología, cada uno con sus horarios.
+- Ocho pacientes más con nombres, DNI y fechas de nacimiento ficticios.
+- Veintiuna citas en los cuatro estados, repartidas desde tres semanas atrás hasta nueve días adelante. Cada cita cae en un día y una hora de atención del médico, y las fechas se calculan a partir del día en que arranca la API.
+
+El archivo `users.txt` de la raíz lista todos los usuarios con su correo, contraseña y rol, junto con las citas de ejemplo. Para volver a un estado limpio basta con recrear el volumen de la base de datos:
+
+```bash
+docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml down -v
+docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml up -d --build
+```
 
 ## Pruebas automatizadas
 

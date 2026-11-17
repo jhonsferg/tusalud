@@ -1,0 +1,76 @@
+USUARIOS DE PRUEBA DE TUSALUD
+=============================
+
+Los datos son ficticios y se cargan solo en los perfiles dev y local, o en qa si se habilita.
+Para cargarlos: docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml up -d --build
+Para reiniciarlos desde cero: docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml down -v
+
+ADMINISTRADOR
+-------------
+Rol: ROLE_ADMIN
+Nombre            Correo                      Contraseña
+Administrador G.  admin@tusalud.com           Admin123!
+
+MEDICOS
+-------
+Rol: ROLE_MEDICO
+Nombre              Correo                      Contraseña    Especialidad      Colegiatura  Consultorio      Precio   Horario
+Luis García         dr.garcia@tusalud.com       Medico123!    Cardiología       CMP-12345    Consultorio 101  S/150    Lun a Vie 08:00-13:00
+Carmen López        dra.lopez@tusalud.com       Medico123!    Pediatría         CMP-67890    Consultorio 205  S/120    Lun a Vie 14:00-19:00, Sáb 08:00-12:00
+Ricardo Salazar     dr.salazar@tusalud.com      Medico123!    Medicina General  CMP-23456    Consultorio 102  S/90     Lun a Vie 08:00-12:00 y 15:00-18:00
+Patricia Vega       dra.vega@tusalud.com        Medico123!    Dermatología      CMP-34567    Consultorio 310  S/130    Mar y Jue 09:00-14:00
+Andrés Quispe       dr.quispe@tusalud.com       Medico123!    Traumatología     CMP-45678    Consultorio 215  S/160    Lun, Mié y Vie 10:00-16:00
+Lucía Fernández     dra.fernandez@tusalud.com   Medico123!    Ginecología       CMP-56789    Consultorio 402  S/140    Lun a Vie 14:00-19:00
+Marcos Delgado      dr.delgado@tusalud.com      Medico123!    Oftalmología      CMP-67801    Consultorio 118  S/110    Mié a Sáb 08:00-13:00
+
+Todas las citas duran 30 minutos.
+
+PACIENTES
+---------
+Rol: ROLE_PACIENTE
+Nombre                 Correo                       Contraseña     DNI       Teléfono   Nacimiento
+Juan Pérez             juan.perez@correo.com        Paciente123!   12345678  987654321  1990-05-15
+María Rodríguez        maria.rodriguez@correo.com   Paciente123!   87654321  976543210  1985-11-20
+Sofía Ramírez          sofia.ramirez@correo.com     Paciente123!   45123678  911223344  1994-03-08
+Carlos Mendoza         carlos.mendoza@correo.com    Paciente123!   40213456  922334455  1978-09-21
+Valeria Castillo       valeria.castillo@correo.com  Paciente123!   71234509  933445566  1998-12-02
+Diego Herrera          diego.herrera@correo.com     Paciente123!   46789012  944556677  1989-06-17
+Camila Torres          camila.torres@correo.com     Paciente123!   72345611  955667788  2001-01-30
+Luis Alberto Vargas    luis.vargas@correo.com       Paciente123!   43219876  966778899  1972-11-05
+Ana Lucía Paredes      ana.paredes@correo.com       Paciente123!   70123987  977889900  1992-07-14
+Jorge Medina           jorge.medina@correo.com      Paciente123!   41567890  988990011  1965-04-25
+
+ESPECIALIDADES
+--------------
+Cardiología, Pediatría, Medicina General, Dermatología, Traumatología, Ginecología y Oftalmología.
+
+CITAS DE EJEMPLO
+----------------
+Las fechas son relativas al día en que arranca la API y siempre caen en un día y una hora de atención del médico.
+
+Estado       Cuándo           Paciente              Médico           Motivo
+ATENDIDA     hace 3 semanas   Sofía Ramírez         R. Salazar       Chequeo general anual
+ATENDIDA     hace 2 semanas   Carlos Mendoza        L. García        Seguimiento de hipertensión
+ATENDIDA     hace 10 días     Valeria Castillo      P. Vega          Control de acné
+ATENDIDA     hace 9 días      Diego Herrera         A. Quispe        Dolor de rodilla tras una lesión deportiva
+ATENDIDA     hace 7 días      Camila Torres         L. Fernández     Control ginecológico anual
+ATENDIDA     hace 6 días      Luis Alberto Vargas   M. Delgado       Revisión de la vista por fatiga visual
+ATENDIDA     hace 3 días      Sofía Ramírez         P. Vega          Revisión de manchas en la piel
+CANCELADA    hace 5 días      Ana Lucía Paredes     C. López         Control de crecimiento de mi hija
+CANCELADA    hace 4 días      Jorge Medina          R. Salazar       Certificado médico laboral
+PENDIENTE    siguiente día    Juan Pérez            L. García        Control de presión arterial
+CONFIRMADA   siguiente día    María Rodríguez       C. López         Control pediátrico de su hijo
+CONFIRMADA   en 2 días        Sofía Ramírez         L. García        Palpitaciones ocasionales
+PENDIENTE    en 2 días        Camila Torres         L. García        Dolor en el pecho al caminar rápido
+CONFIRMADA   en 2 días        Diego Herrera         L. García        Chequeo cardiológico preventivo
+PENDIENTE    en 2 días        Carlos Mendoza        R. Salazar       Resfriado persistente
+CONFIRMADA   en 3 días        Valeria Castillo      L. Fernández     Control prenatal
+PENDIENTE    en 4 días        Diego Herrera         M. Delgado       Cambio de lentes
+CONFIRMADA   en 5 días        Camila Torres         P. Vega          Revisión de lunares
+PENDIENTE    en 5 días        Luis Alberto Vargas   A. Quispe        Dolor lumbar persistente
+CONFIRMADA   en 6 días        Ana Lucía Paredes     C. López         Vacunación de refuerzo
+PENDIENTE    en 7 días        Jorge Medina          L. García        Control de colesterol
+PENDIENTE    en 8 días        Juan Pérez            R. Salazar       Dolor de garganta
+CONFIRMADA   en 9 días        María Rodríguez       P. Vega          Dermatitis en las manos
+
+Cuando el día indicado no es de atención del médico, la cita se mueve al día de atención más cercano.
