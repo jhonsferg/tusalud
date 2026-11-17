@@ -106,3 +106,12 @@ ROLE_ALMACEN       Pedro Ramos    almacen@tusalud.com       Personal123!
 
 Cada uno entra a su módulo al iniciar sesión. El administrador registra más personal en Usuarios con el botón Nuevo personal.
 Datos de ejemplo: 19 productos con lotes vigentes, por vencer y vencidos, 5 recetas pendientes en farmacia y 5 órdenes de laboratorio en distintos estados.
+
+RECEPCION, CAJA Y ENFERMERIA
+----------------------------
+Rol                Nombre          Correo                    Contraseña     Entra a
+ROLE_RECEPCION     Carla Núñez     recepcion@tusalud.com     Personal123!   /recepcion
+ROLE_CAJA          Jorge Paredes   caja@tusalud.com          Personal123!   /caja
+ROLE_ENFERMERIA    Lucía Campos    enfermeria@tusalud.com    Personal123!   /hospitalizacion
+
+Datos de ejemplo: seis citas de hoy con turnos en espera, llamado, atendido y ausente, una caja cerrada ayer con un faltante de S/ 5.00 y seis comprobantes entre boletas, una factura y una anulada, catorce camas con dos ingresos activos y emergencias de nivel 2 y 4 sin cama, y un alta histórica.
