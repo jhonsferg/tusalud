@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "6b0d7c1e-3f5a-4e1b-9a7c-2d4e8f9a1c01",
     "name": "TuSalud API",
-    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 07, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
+    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 08, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -4012,6 +4012,231 @@
                 }
               ]
             }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "08 - Perfil",
+      "description": "Datos personales y contraseña del usuario autenticado, con `pacienteToken`.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{pacienteToken}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "Obtener mi perfil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Incluye los datos del paciente', () => {",
+                  "    pm.expect(j.email).to.eql('juan.perez@correo.com');",
+                  "    pm.expect(j.dni).to.match(/^\\d{8}$/);",
+                  "    pm.expect(j.historialClinicoNumero).to.match(/^HC-\\d{6}$/);",
+                  "    pm.expect(j.roles).to.include(\"ROLE_PACIENTE\");",
+                  "    pm.expect(j.medicoId).to.not.exist;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil"]
+            },
+            "description": "Devuelve los datos personales y la ficha de paciente del usuario autenticado."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar mi perfil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Refleja los cambios', () => {",
+                  "    pm.expect(j.nombre).to.eql('Juan');",
+                  "    pm.expect(j.telefono).to.eql('987654321');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Pérez\",\n  \"telefono\": \"987654321\",\n  \"fechaNacimiento\": \"1990-05-20\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil"]
+            },
+            "description": "Actualiza nombre, apellido, teléfono y fecha de nacimiento. El email y el DNI no cambian."
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar perfil con datos inválidos (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Detalla los campos inválidos', () => {",
+                  "    const e = pm.response.json().validationErrors;",
+                  "    pm.expect(e).to.have.property('nombre');",
+                  "    pm.expect(e).to.have.property('telefono');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"\",\n  \"apellido\": \"Pérez\",\n  \"telefono\": \"123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil"]
+            },
+            "description": "El nombre vacío y el teléfono de 3 dígitos son rechazados."
+          },
+          "response": []
+        },
+        {
+          "name": "Cambiar contraseña con la actual incorrecta (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Informa que la contraseña actual no es correcta', () => pm.expect(pm.response.json().message).to.include('contraseña actual'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passwordActual\": \"Incorrecta123!\",\n  \"passwordNueva\": \"NuevaClave456!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil", "password"]
+            },
+            "description": "No se cambia la contraseña si la actual no coincide."
+          },
+          "response": []
+        },
+        {
+          "name": "Cambiar contraseña demasiado corta (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Detalla la nueva contraseña', () => pm.expect(pm.response.json().validationErrors).to.have.property('passwordNueva'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passwordActual\": \"Paciente123!\",\n  \"passwordNueva\": \"corta\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil", "password"]
+            },
+            "description": "La nueva contraseña debe tener entre 8 y 72 caracteres."
+          },
+          "response": []
+        },
+        {
+          "name": "Perfil sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil"]
+            },
+            "description": "El perfil exige autenticación."
           },
           "response": []
         }
