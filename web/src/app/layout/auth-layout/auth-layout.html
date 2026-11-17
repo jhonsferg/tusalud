@@ -1,1 +1,18 @@
-<router-outlet />
+<div class="auth">
+  <aside class="brand">
+    <div class="logo"><i class="pi pi-heart-fill"></i> TuSalud</div>
+    <h2>Tu salud, a un clic de distancia</h2>
+    <p>
+      Reserva citas con especialistas, revisa tu historial y gestiona tu atención médica desde un
+      solo lugar.
+    </p>
+    <ul>
+      <li><i class="pi pi-check-circle"></i> Reserva en segundos, sin llamadas</li>
+      <li><i class="pi pi-check-circle"></i> Horarios en tiempo real de cada médico</li>
+      <li><i class="pi pi-check-circle"></i> Confirmaciones y seguimiento de tus citas</li>
+    </ul>
+  </aside>
+  <main class="content">
+    <div class="card"><router-outlet /></div>
+  </main>
+</div>

@@ -1,0 +1,14 @@
+<div class="field">
+  <label [for]="inputId()">
+    {{ label() }}
+    @if (required()) {
+      <span class="req" aria-hidden="true">*</span>
+    }
+  </label>
+  <ng-content />
+  @if (error(); as message) {
+    <small class="error" role="alert" [id]="inputId() + '-error'">{{ message }}</small>
+  } @else if (hint(); as text) {
+    <small class="hint">{{ text }}</small>
+  }
+</div>

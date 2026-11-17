@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--p-surface-700);
+}
+
+.req {
+  color: var(--p-red-500);
+}
+
+.error {
+  color: var(--p-red-600);
+}
+
+.hint {
+  color: var(--p-surface-500);
+}

@@ -1,0 +1,17 @@
+@if (backLink(); as link) {
+  <a class="back" [routerLink]="link"><i class="pi pi-arrow-left"></i> {{ backLabel() }}</a>
+}
+<div class="header">
+  <div class="heading">
+    @if (icon(); as iconClass) {
+      <span class="icon"><i [class]="'pi ' + iconClass"></i></span>
+    }
+    <div>
+      <h1>{{ title() }}</h1>
+      @if (subtitle(); as text) {
+        <p>{{ text }}</p>
+      }
+    </div>
+  </div>
+  <div class="actions"><ng-content /></div>
+</div>

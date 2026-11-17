@@ -1,0 +1,53 @@
+:host {
+  display: block;
+  margin-bottom: 1.5rem;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 12px;
+  background: var(--p-primary-100);
+  color: var(--p-primary-700);
+  font-size: 1.25rem;
+}
+
+h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+p {
+  margin: 0.2rem 0 0;
+  color: var(--p-surface-500);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

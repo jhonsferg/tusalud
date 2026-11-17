@@ -1,1 +1,67 @@
-<router-outlet />
+<ng-template #nav>
+  <div class="logo"><i class="pi pi-heart-fill"></i> TuSalud</div>
+  <nav aria-label="Navegación principal">
+    @for (item of items(); track item.link) {
+      <a
+        class="nav-link"
+        [routerLink]="item.link"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+        (click)="menuOpen.set(false)"
+      >
+        <i [class]="'pi ' + item.icon"></i>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+  <div class="user">
+    <p-avatar [label]="iniciales()" shape="circle" styleClass="avatar" />
+    <div class="user-info">
+      <strong>{{ user()?.nombreCompleto }}</strong>
+      <small>{{ rol() }}</small>
+    </div>
+    <p-button
+      icon="pi pi-sign-out"
+      [text]="true"
+      severity="secondary"
+      ariaLabel="Cerrar sesión"
+      pTooltip="Cerrar sesión"
+      tooltipPosition="top"
+      (onClick)="salir()"
+    />
+  </div>
+</ng-template>
+
+<div class="shell">
+  <aside class="sidebar">
+    <ng-container [ngTemplateOutlet]="nav" />
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <p-button
+        icon="pi pi-bars"
+        [text]="true"
+        severity="secondary"
+        ariaLabel="Abrir menú"
+        (onClick)="menuOpen.set(true)"
+      />
+      <span class="topbar-logo"><i class="pi pi-heart-fill"></i> TuSalud</span>
+    </header>
+    <div class="content">
+      <div class="page"><router-outlet /></div>
+    </div>
+  </div>
+</div>
+
+<p-drawer
+  [visible]="menuOpen()"
+  (visibleChange)="menuOpen.set($event)"
+  position="left"
+  [showCloseIcon]="true"
+  [style]="{ width: '18rem' }"
+>
+  <div class="drawer-body">
+    <ng-container [ngTemplateOutlet]="nav" />
+  </div>
+</p-drawer>

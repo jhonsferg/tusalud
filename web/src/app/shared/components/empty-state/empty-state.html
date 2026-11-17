@@ -1,0 +1,8 @@
+<div class="empty" [class.error]="tone() === 'error'">
+  <span class="icon"><i [class]="'pi ' + icon()"></i></span>
+  <h3>{{ title() }}</h3>
+  @if (message(); as text) {
+    <p>{{ text }}</p>
+  }
+  <div class="actions"><ng-content /></div>
+</div>
