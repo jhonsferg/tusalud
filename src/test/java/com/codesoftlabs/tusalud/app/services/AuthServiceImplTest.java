@@ -11,9 +11,12 @@ import com.codesoftlabs.tusalud.app.entities.Usuario;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
+import com.codesoftlabs.tusalud.app.repositories.SesionUsuarioRepository;
+import com.codesoftlabs.tusalud.app.security.ContextoConexion;
 import com.codesoftlabs.tusalud.app.security.JwtUtils;
 import com.codesoftlabs.tusalud.app.services.interfaces.AuthService;
 import java.time.LocalDate;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,11 +31,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Import(ServiceTestFixture.class)
 class AuthServiceImplTest {
 
+    private static final ContextoConexion CONTEXTO =
+            new ContextoConexion("10.0.0.5", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0 Safari/537.36");
+
     @Autowired
     private AuthService authService;
 
     @Autowired
     private PacienteRepository pacienteRepository;
+
+    @Autowired
+    private SesionUsuarioRepository sesionRepository;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -51,7 +60,7 @@ class AuthServiceImplTest {
         String email = "svc.test.registro" + n + "@test.com";
 
         AuthResponse respuesta = authService.registrarPaciente(
-                registro("  " + email.toUpperCase() + " ", "7" + String.format("%07d", n)));
+                registro("  " + email.toUpperCase() + " ", "7" + String.format("%07d", n)), CONTEXTO);
 
         assertThat(respuesta.email()).isEqualTo(email);
         assertThat(respuesta.tokenType()).isEqualTo("Bearer");
@@ -66,9 +75,11 @@ class AuthServiceImplTest {
     void registrarPacienteConEmailDuplicadoLanzaConflict() {
         Usuario existente = fixture.usuario("dup", RolNombre.ROLE_PACIENTE);
 
-        assertThatThrownBy(() -> authService.registrarPaciente(registro(
-                        existente.getEmail().toUpperCase(),
-                        "6" + String.format("%07d", ServiceTestFixture.siguiente()))))
+        assertThatThrownBy(() -> authService.registrarPaciente(
+                        registro(
+                                existente.getEmail().toUpperCase(),
+                                "6" + String.format("%07d", ServiceTestFixture.siguiente())),
+                        CONTEXTO))
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("Ya existe un usuario registrado con el email");
     }
@@ -78,7 +89,8 @@ class AuthServiceImplTest {
         Paciente existente = fixture.paciente();
 
         assertThatThrownBy(() -> authService.registrarPaciente(
-                        registro("svc.test.dni" + ServiceTestFixture.siguiente() + "@test.com", existente.getDni())))
+                        registro("svc.test.dni" + ServiceTestFixture.siguiente() + "@test.com", existente.getDni()),
+                        CONTEXTO))
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("DNI");
     }
@@ -87,7 +99,8 @@ class AuthServiceImplTest {
     void loginConCredencialesCorrectasDevuelveToken() {
         Usuario usuario = fixture.usuario("login", RolNombre.ROLE_MEDICO);
 
-        AuthResponse respuesta = authService.login(new LoginRequest(usuario.getEmail(), ServiceTestFixture.PASSWORD));
+        AuthResponse respuesta =
+                authService.login(new LoginRequest(usuario.getEmail(), ServiceTestFixture.PASSWORD), CONTEXTO);
 
         assertThat(respuesta.usuarioId()).isEqualTo(usuario.getId());
         assertThat(respuesta.roles()).containsExactly(RolNombre.ROLE_MEDICO.name());
@@ -96,12 +109,31 @@ class AuthServiceImplTest {
     }
 
     @Test
+    void loginCreaUnaSesionCuyoTokenIdVaEnElClaimJti() {
+        Usuario usuario = fixture.usuario("jti", RolNombre.ROLE_PACIENTE);
+
+        AuthResponse respuesta =
+                authService.login(new LoginRequest(usuario.getEmail(), ServiceTestFixture.PASSWORD), CONTEXTO);
+
+        String jti = jwtUtils.parseClaims(respuesta.token()).getId();
+        assertThat(jti).isNotBlank();
+        assertThat(sesionRepository.findByTokenId(UUID.fromString(jti)))
+                .isPresent()
+                .get()
+                .satisfies(sesion -> {
+                    assertThat(sesion.getIp()).isEqualTo("10.0.0.5");
+                    assertThat(sesion.getDispositivo()).isEqualTo("Chrome en Windows");
+                    assertThat(sesion.isRevocada()).isFalse();
+                });
+    }
+
+    @Test
     void loginConCredencialesIncorrectasLanzaBadCredentials() {
         Usuario usuario = fixture.usuario("login", RolNombre.ROLE_PACIENTE);
 
-        assertThatThrownBy(() -> authService.login(new LoginRequest(usuario.getEmail(), "incorrecta")))
+        assertThatThrownBy(() -> authService.login(new LoginRequest(usuario.getEmail(), "incorrecta"), CONTEXTO))
                 .isInstanceOf(BadCredentialsException.class);
-        assertThatThrownBy(() -> authService.login(new LoginRequest("svc.test.noexiste@test.com", "x")))
+        assertThatThrownBy(() -> authService.login(new LoginRequest("svc.test.noexiste@test.com", "x"), CONTEXTO))
                 .isInstanceOf(BadCredentialsException.class);
     }
 }

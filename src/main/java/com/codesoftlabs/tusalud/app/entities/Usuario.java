@@ -56,6 +56,9 @@ public class Usuario {
     @Column(length = 20)
     private String telefono;
 
+    @Column(length = 450000)
+    private String avatar;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 15)
     @Builder.Default

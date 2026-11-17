@@ -1,6 +1,7 @@
 package com.codesoftlabs.tusalud.app.controllers;
 
 import com.codesoftlabs.tusalud.app.dto.request.CitaCreateRequest;
+import com.codesoftlabs.tusalud.app.dto.request.ReprogramarRequest;
 import com.codesoftlabs.tusalud.app.dto.response.CitaResponse;
 import com.codesoftlabs.tusalud.app.dto.response.ErrorResponse;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
@@ -172,6 +173,38 @@ public class CitaController {
             @Parameter(description = "ID de la cita", example = "1") @PathVariable @Positive Long id,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(citaService.cancelarCita(id, principal));
+    }
+
+    @PutMapping("/{id:\\d+}/reprogramar")
+    @PreAuthorize("hasAnyRole('PACIENTE', 'ADMIN')")
+    @Operation(
+            summary = "Reprogramar cita",
+            description =
+                    "Mueve una cita PENDIENTE o CONFIRMADA a otra fecha y hora con las mismas validaciones de horario y solapamiento que la reserva. La cita vuelve a PENDIENTE. Permitido al paciente dueño o a un ADMIN.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Cita reprogramada"),
+        @ApiResponse(
+                responseCode = "400",
+                description = "Datos de entrada inválidos",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+                responseCode = "403",
+                description = "Sin permiso para reprogramar esta cita",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+                responseCode = "404",
+                description = "Cita no encontrada",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+                responseCode = "409",
+                description = "Horario no válido, ocupado o cita en un estado que no admite cambios",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<CitaResponse> reprogramar(
+            @Parameter(description = "ID de la cita", example = "1") @PathVariable @Positive Long id,
+            @Valid @RequestBody ReprogramarRequest request,
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
+        return ResponseEntity.ok(citaService.reprogramarCita(id, request, principal));
     }
 
     @PutMapping("/{id:\\d+}/confirmar")

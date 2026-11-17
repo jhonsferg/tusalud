@@ -1,14 +1,18 @@
 package com.codesoftlabs.tusalud.app.services.impl;
 
 import com.codesoftlabs.tusalud.app.dto.request.CitaCreateRequest;
+import com.codesoftlabs.tusalud.app.dto.request.ReprogramarRequest;
 import com.codesoftlabs.tusalud.app.dto.response.CitaResponse;
 import com.codesoftlabs.tusalud.app.dto.response.DisponibilidadResponse;
 import com.codesoftlabs.tusalud.app.entities.Cita;
 import com.codesoftlabs.tusalud.app.entities.HorarioAtencion;
 import com.codesoftlabs.tusalud.app.entities.Medico;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
+import com.codesoftlabs.tusalud.app.entities.Pago;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoCita;
+import com.codesoftlabs.tusalud.app.entities.enums.EstadoPago;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
+import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
 import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
 import com.codesoftlabs.tusalud.app.exceptions.ForbiddenOperationException;
@@ -19,6 +23,7 @@ import com.codesoftlabs.tusalud.app.repositories.MedicoRepository;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.CitaService;
+import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,7 +51,9 @@ public class CitaServiceImpl implements CitaService {
 
     private static final Locale LOCALE_ES = Locale.of("es", "PE");
     private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final int DIAS_RANGO_POR_DEFECTO = 30;
+    private static final Long NINGUNA_CITA = 0L;
 
     private static final Set<EstadoCita> ESTADOS_CANCELABLES = EnumSet.of(EstadoCita.PENDIENTE, EstadoCita.CONFIRMADA);
     private static final Set<EstadoCita> ESTADOS_ATENDIBLES = EnumSet.of(EstadoCita.PENDIENTE, EstadoCita.CONFIRMADA);
@@ -55,6 +62,7 @@ public class CitaServiceImpl implements CitaService {
     private final MedicoRepository medicoRepository;
     private final PacienteRepository pacienteRepository;
     private final HorarioAtencionRepository horarioRepository;
+    private final NotificacionService notificacionService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -75,30 +83,7 @@ public class CitaServiceImpl implements CitaService {
             throw new BusinessLogicException("La fecha y hora de la cita debe ser futura");
         }
 
-        DayOfWeek dia = fechaHora.getDayOfWeek();
-        List<HorarioAtencion> horarios = horarioRepository.findByMedicoAndDia(medico.getId(), dia);
-        if (horarios.isEmpty()) {
-            throw new BusinessLogicException("El médico no tiene horario de atención el día " + nombreDia(dia));
-        }
-        LocalTime hora = fechaHora.toLocalTime();
-        HorarioAtencion bloque = horarios.stream()
-                .filter(h -> h.admiteCitaEn(hora))
-                .findFirst()
-                .orElseThrow(() -> new BusinessLogicException(String.format(
-                        "La hora %s no corresponde a un turno válido del médico el día %s. Bloques de atención: %s",
-                        hora.format(FORMATO_HORA), nombreDia(dia), describirBloques(horarios))));
-
-        int duracion = bloque.getDuracionCitaMinutos();
-        LocalDateTime desde = fechaHora.minusMinutes(duracion);
-        LocalDateTime hasta = fechaHora.plusMinutes(duracion);
-
-        if (citaRepository.existsSolapamiento(medico.getId(), fechaHora)
-                || citaRepository.existsCitaMedicoEnFranja(medico.getId(), desde, hasta)) {
-            throw new ConflictException("El médico ya tiene una cita registrada en ese horario");
-        }
-        if (citaRepository.existsCitaPacienteEnFranja(paciente.getId(), desde, hasta)) {
-            throw new ConflictException("Ya tiene otra cita registrada que se cruza con ese horario");
-        }
+        validarDisponibilidad(medico, paciente, fechaHora, NINGUNA_CITA);
 
         Cita cita = Cita.builder()
                 .fechaHora(fechaHora)
@@ -109,6 +94,21 @@ public class CitaServiceImpl implements CitaService {
                 .paciente(paciente)
                 .build();
         cita = citaRepository.save(cita);
+
+        String fecha = fechaHora.format(FORMATO_FECHA);
+        notificacionService.crear(
+                medico.getUsuario(),
+                TipoNotificacion.CITA_CREADA,
+                "Nueva cita registrada",
+                paciente.getUsuario().getNombreCompleto() + " registró una cita para el " + fecha + ".",
+                enlace(cita));
+        notificacionService.crear(
+                paciente.getUsuario(),
+                TipoNotificacion.CITA_CREADA,
+                "Cita registrada",
+                "Su cita con " + medico.getUsuario().getNombreCompleto() + " para el " + fecha
+                        + " está pendiente de confirmación.",
+                enlace(cita));
 
         log.info(
                 "Cita {} registrada: paciente {} con médico {} el {}",
@@ -160,7 +160,25 @@ public class CitaServiceImpl implements CitaService {
         if (!admin && !cita.getFechaHora().isAfter(LocalDateTime.now())) {
             throw new BusinessLogicException("No se puede cancelar una cita cuya fecha y hora ya pasó");
         }
-        return cambiarEstado(cita, EstadoCita.CANCELADA, actor);
+        Pago pago = cita.getPago();
+        if (pago != null && pago.getEstado() == EstadoPago.PAGADO) {
+            pago.setEstado(EstadoPago.REEMBOLSADO);
+            notificacionService.crear(
+                    cita.getPaciente().getUsuario(),
+                    TipoNotificacion.PAGO_REEMBOLSADO,
+                    "Pago reembolsado",
+                    "Se reembolsó el pago " + pago.getComprobante() + " de su cita cancelada del "
+                            + cita.getFechaHora().format(FORMATO_FECHA) + ".",
+                    enlace(cita));
+        }
+        CitaResponse cancelada = cambiarEstado(cita, EstadoCita.CANCELADA, actor);
+        notificarOtraParte(
+                cita,
+                actor,
+                TipoNotificacion.CITA_CANCELADA,
+                "Cita cancelada",
+                "La cita del " + cita.getFechaHora().format(FORMATO_FECHA) + " fue cancelada.");
+        return cancelada;
     }
 
     @Override
@@ -173,7 +191,15 @@ public class CitaServiceImpl implements CitaService {
         if (cita.getEstado() != EstadoCita.PENDIENTE) {
             throw new BusinessLogicException("No se puede confirmar una cita en estado " + cita.getEstado());
         }
-        return cambiarEstado(cita, EstadoCita.CONFIRMADA, actor);
+        CitaResponse confirmada = cambiarEstado(cita, EstadoCita.CONFIRMADA, actor);
+        notificacionService.crear(
+                cita.getPaciente().getUsuario(),
+                TipoNotificacion.CITA_CONFIRMADA,
+                "Cita confirmada",
+                cita.getMedico().getUsuario().getNombreCompleto() + " confirmó su cita del "
+                        + cita.getFechaHora().format(FORMATO_FECHA) + ".",
+                enlace(cita));
+        return confirmada;
     }
 
     @Override
@@ -186,7 +212,56 @@ public class CitaServiceImpl implements CitaService {
         if (!ESTADOS_ATENDIBLES.contains(cita.getEstado())) {
             throw new BusinessLogicException("No se puede atender una cita en estado " + cita.getEstado());
         }
-        return cambiarEstado(cita, EstadoCita.ATENDIDA, actor);
+        CitaResponse atendida = cambiarEstado(cita, EstadoCita.ATENDIDA, actor);
+        notificacionService.crear(
+                cita.getPaciente().getUsuario(),
+                TipoNotificacion.CITA_ATENDIDA,
+                "Cita atendida",
+                "Su cita del " + cita.getFechaHora().format(FORMATO_FECHA) + " con "
+                        + cita.getMedico().getUsuario().getNombreCompleto() + " fue marcada como atendida.",
+                enlace(cita));
+        return atendida;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public CitaResponse reprogramarCita(Long citaId, ReprogramarRequest request, UsuarioPrincipal actor) {
+        Cita cita = buscarCita(citaId);
+        if (!esAdmin(actor) && !esPacienteDe(cita, actor)) {
+            throw new ForbiddenOperationException(
+                    "Solo el paciente de la cita o un administrador pueden reprogramarla");
+        }
+        if (!ESTADOS_CANCELABLES.contains(cita.getEstado())) {
+            throw new BusinessLogicException("No se puede reprogramar una cita en estado " + cita.getEstado());
+        }
+        LocalDateTime nuevaFecha = request.fechaHora().truncatedTo(ChronoUnit.MINUTES);
+        if (!nuevaFecha.isAfter(LocalDateTime.now())) {
+            throw new BusinessLogicException("La fecha y hora de la cita debe ser futura");
+        }
+        if (nuevaFecha.equals(cita.getFechaHora())) {
+            throw new BusinessLogicException("La nueva fecha y hora debe ser distinta de la actual");
+        }
+
+        Medico medico = medicoRepository
+                .findByIdForUpdate(cita.getMedico().getId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Médico", "id", cita.getMedico().getId()));
+        validarDisponibilidad(medico, cita.getPaciente(), nuevaFecha, cita.getId());
+
+        String anterior = cita.getFechaHora().format(FORMATO_FECHA);
+        cita.setFechaHora(nuevaFecha);
+        cita.setEstado(EstadoCita.PENDIENTE);
+        cita.setRecordatorioEnviado(false);
+        Cita guardada = citaRepository.saveAndFlush(cita);
+        log.info("Cita {} reprogramada de {} a {} por {}", cita.getId(), anterior, nuevaFecha, actor.getEmail());
+
+        notificarOtraParte(
+                guardada,
+                actor,
+                TipoNotificacion.CITA_REPROGRAMADA,
+                "Cita reprogramada",
+                "La cita del " + anterior + " fue reprogramada para el " + nuevaFecha.format(FORMATO_FECHA) + ".");
+        return CitaResponse.from(guardada);
     }
 
     @Override
@@ -242,6 +317,33 @@ public class CitaServiceImpl implements CitaService {
                 medico.getId(), medico.getUsuario().getNombreCompleto(), dia, new ArrayList<>(libres));
     }
 
+    private void validarDisponibilidad(Medico medico, Paciente paciente, LocalDateTime fechaHora, Long citaExcluida) {
+        DayOfWeek dia = fechaHora.getDayOfWeek();
+        List<HorarioAtencion> horarios = horarioRepository.findByMedicoAndDia(medico.getId(), dia);
+        if (horarios.isEmpty()) {
+            throw new BusinessLogicException("El médico no tiene horario de atención el día " + nombreDia(dia));
+        }
+        LocalTime hora = fechaHora.toLocalTime();
+        HorarioAtencion bloque = horarios.stream()
+                .filter(h -> h.admiteCitaEn(hora))
+                .findFirst()
+                .orElseThrow(() -> new BusinessLogicException(String.format(
+                        "La hora %s no corresponde a un turno válido del médico el día %s. Bloques de atención: %s",
+                        hora.format(FORMATO_HORA), nombreDia(dia), describirBloques(horarios))));
+
+        int duracion = bloque.getDuracionCitaMinutos();
+        LocalDateTime desde = fechaHora.minusMinutes(duracion);
+        LocalDateTime hasta = fechaHora.plusMinutes(duracion);
+
+        if (citaRepository.existsSolapamiento(medico.getId(), fechaHora, citaExcluida)
+                || citaRepository.existsCitaMedicoEnFranja(medico.getId(), desde, hasta, citaExcluida)) {
+            throw new ConflictException("El médico ya tiene una cita registrada en ese horario");
+        }
+        if (citaRepository.existsCitaPacienteEnFranja(paciente.getId(), desde, hasta, citaExcluida)) {
+            throw new ConflictException("Ya tiene otra cita registrada que se cruza con ese horario");
+        }
+    }
+
     private Cita buscarCita(Long citaId) {
         return citaRepository
                 .findByIdWithDetails(citaId)
@@ -254,6 +356,20 @@ public class CitaServiceImpl implements CitaService {
         Cita actualizada = citaRepository.saveAndFlush(cita);
         log.info("Cita {}: {} -> {} por {}", cita.getId(), anterior, nuevoEstado, actor.getEmail());
         return CitaResponse.from(actualizada);
+    }
+
+    private void notificarOtraParte(
+            Cita cita, UsuarioPrincipal actor, TipoNotificacion tipo, String titulo, String mensaje) {
+        if (!esMedicoDe(cita, actor)) {
+            notificacionService.crear(cita.getMedico().getUsuario(), tipo, titulo, mensaje, enlace(cita));
+        }
+        if (!esPacienteDe(cita, actor)) {
+            notificacionService.crear(cita.getPaciente().getUsuario(), tipo, titulo, mensaje, enlace(cita));
+        }
+    }
+
+    private static String enlace(Cita cita) {
+        return "/citas/" + cita.getId();
     }
 
     private static boolean seSuperpone(LocalTime turno, int duracion, List<LocalTime> ocupadas) {

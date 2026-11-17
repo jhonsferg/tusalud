@@ -46,6 +46,15 @@ public class Paciente {
     @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
 
+    @Column(name = "grupo_sanguineo", length = 3)
+    private String grupoSanguineo;
+
+    @Column(length = 1000)
+    private String alergias;
+
+    @Column(length = 2000)
+    private String antecedentes;
+
     @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;

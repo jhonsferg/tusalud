@@ -29,7 +29,10 @@ public record PerfilResponse(
         @Schema(example = "CMP-12345") String colegiatura,
         @Schema(example = "Consultorio 101") String consultorio,
         @Schema(example = "Cardiología") String especialidad,
-        @Schema(example = "150.00") BigDecimal precioConsulta) {
+        @Schema(example = "150.00") BigDecimal precioConsulta,
+
+        @Schema(description = "Imagen de perfil como data URL o null", example = "data:image/png;base64,iVBORw0KGgo=")
+        String avatar) {
 
     public static PerfilResponse from(Usuario usuario, List<String> roles, Paciente paciente, Medico medico) {
         return new PerfilResponse(
@@ -48,6 +51,7 @@ public record PerfilResponse(
                 medico == null ? null : medico.getColegiatura(),
                 medico == null ? null : medico.getConsultorio(),
                 medico == null ? null : medico.getEspecialidad().getNombre(),
-                medico == null ? null : medico.getPrecioConsulta());
+                medico == null ? null : medico.getPrecioConsulta(),
+                usuario.getAvatar());
     }
 }

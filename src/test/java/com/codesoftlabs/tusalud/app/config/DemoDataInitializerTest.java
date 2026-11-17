@@ -4,10 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.codesoftlabs.tusalud.app.entities.Cita;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoCita;
+import com.codesoftlabs.tusalud.app.repositories.AtencionRepository;
 import com.codesoftlabs.tusalud.app.repositories.CitaRepository;
+import com.codesoftlabs.tusalud.app.repositories.CuponRepository;
 import com.codesoftlabs.tusalud.app.repositories.MedicoRepository;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
+import com.codesoftlabs.tusalud.app.repositories.PagoRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
+import com.codesoftlabs.tusalud.app.repositories.ValoracionRepository;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,6 +45,21 @@ class DemoDataInitializerTest {
     @Autowired
     private CitaRepository citaRepository;
 
+    @Autowired
+    private CuponRepository cuponRepository;
+
+    @Autowired
+    private AtencionRepository atencionRepository;
+
+    @Autowired
+    private PagoRepository pagoRepository;
+
+    @Autowired
+    private ValoracionRepository valoracionRepository;
+
+    @Autowired
+    private DemoClinicalDataInitializer clinicalInitializer;
+
     @Test
     void cargaMedicosPacientesYCitasDeDemostracion() {
         assertThat(medicoRepository.count()).isEqualTo(7);
@@ -71,12 +90,28 @@ class DemoDataInitializerTest {
     }
 
     @Test
+    void cargaCuponesAtencionesPagosYValoraciones() {
+        assertThat(cuponRepository.count()).isEqualTo(3);
+        assertThat(cuponRepository.findByCodigo("VERANO50").orElseThrow().getFechaFin())
+                .isBefore(java.time.LocalDate.now());
+        long atendidas = citaRepository.findAll().stream()
+                .filter(c -> c.getEstado() == EstadoCita.ATENDIDA)
+                .count();
+        assertThat(atencionRepository.count()).isEqualTo(atendidas);
+        assertThat(pagoRepository.count()).isGreaterThanOrEqualTo(atendidas);
+        assertThat(valoracionRepository.count()).isPositive();
+    }
+
+    @Test
     void esIdempotente() {
         long citas = citaRepository.count();
+        long pagos = pagoRepository.count();
 
         demoDataInitializer.run();
+        clinicalInitializer.run();
 
         assertThat(citaRepository.count()).isEqualTo(citas);
+        assertThat(pagoRepository.count()).isEqualTo(pagos);
         assertThat(medicoRepository.count()).isEqualTo(7);
     }
 }

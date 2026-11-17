@@ -12,12 +12,15 @@ import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
 import com.codesoftlabs.tusalud.app.repositories.RolRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
+import com.codesoftlabs.tusalud.app.security.ContextoConexion;
 import com.codesoftlabs.tusalud.app.security.JwtUtils;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.AuthService;
+import com.codesoftlabs.tusalud.app.services.interfaces.SesionService;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,19 +44,25 @@ public class AuthServiceImpl implements AuthService {
     private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final SesionService sesionService;
 
     @Override
-    public AuthResponse login(LoginRequest request) {
+    @Transactional
+    public AuthResponse login(LoginRequest request, ContextoConexion contexto) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(normalizarEmail(request.email()), request.password()));
         UsuarioPrincipal principal = (UsuarioPrincipal) authentication.getPrincipal();
+        Usuario usuario = usuarioRepository
+                .findById(principal.getId())
+                .orElseThrow(() -> new IllegalStateException("Usuario autenticado inexistente: " + principal.getId()));
+        UUID tokenId = sesionService.iniciarSesion(usuario, contexto);
         log.info("Inicio de sesión exitoso para {}", principal.getEmail());
-        return construirRespuesta(principal);
+        return construirRespuesta(principal, tokenId);
     }
 
     @Override
     @Transactional
-    public AuthResponse registrarPaciente(RegisterRequest request) {
+    public AuthResponse registrarPaciente(RegisterRequest request, ContextoConexion contexto) {
         String email = normalizarEmail(request.email());
         String dni = request.dni().trim();
 
@@ -86,8 +95,15 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         pacienteRepository.save(paciente);
 
+        UUID tokenId = sesionService.iniciarSesion(usuario, contexto);
         log.info("Paciente registrado: {} (historia clínica {})", email, paciente.getHistorialClinicoNumero());
-        return construirRespuesta(UsuarioPrincipal.from(usuario));
+        return construirRespuesta(UsuarioPrincipal.from(usuario), tokenId);
+    }
+
+    @Override
+    @Transactional
+    public void cerrarSesion(UUID tokenId) {
+        sesionService.cerrarSesion(tokenId);
     }
 
     private Rol obtenerOCrearRol(RolNombre nombre) {
@@ -96,9 +112,9 @@ public class AuthServiceImpl implements AuthService {
                 .orElseGet(() -> rolRepository.save(Rol.builder().nombre(nombre).build()));
     }
 
-    private AuthResponse construirRespuesta(UsuarioPrincipal principal) {
+    private AuthResponse construirRespuesta(UsuarioPrincipal principal, UUID tokenId) {
         return AuthResponse.builder()
-                .token(jwtUtils.generateToken(principal))
+                .token(jwtUtils.generateToken(principal, tokenId))
                 .tokenType(TOKEN_TYPE)
                 .expiresIn(jwtUtils.getExpirationMs())
                 .usuarioId(principal.getId())

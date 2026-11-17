@@ -2,6 +2,7 @@ package com.codesoftlabs.tusalud.app.security;
 
 import com.codesoftlabs.tusalud.app.config.JwtProperties;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -9,6 +10,7 @@ import io.jsonwebtoken.security.Keys;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
@@ -31,17 +33,23 @@ public class JwtUtils {
     }
 
     public String generateToken(UsuarioPrincipal principal) {
+        return generateToken(principal, null);
+    }
+
+    public String generateToken(UsuarioPrincipal principal, UUID tokenId) {
         Instant now = Instant.now();
-        return Jwts.builder()
+        JwtBuilder builder = Jwts.builder()
                 .subject(principal.getEmail())
                 .issuer(properties.issuer())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusMillis(properties.expirationMs())))
                 .claim(CLAIM_USER_ID, principal.getId())
                 .claim(CLAIM_NOMBRE, principal.getNombreCompleto())
-                .claim(CLAIM_ROLES, principal.getRoles())
-                .signWith(signingKey)
-                .compact();
+                .claim(CLAIM_ROLES, principal.getRoles());
+        if (tokenId != null) {
+            builder.id(tokenId.toString());
+        }
+        return builder.signWith(signingKey).compact();
     }
 
     public Claims parseClaims(String token) {

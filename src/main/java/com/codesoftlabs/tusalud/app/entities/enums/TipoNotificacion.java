@@ -1,0 +1,15 @@
+package com.codesoftlabs.tusalud.app.entities.enums;
+
+public enum TipoNotificacion {
+    CITA_CREADA,
+    CITA_CONFIRMADA,
+    CITA_CANCELADA,
+    CITA_ATENDIDA,
+    CITA_REPROGRAMADA,
+    RECORDATORIO_CITA,
+    INICIO_SESION,
+    CONTRASENA_CAMBIADA,
+    PAGO_REGISTRADO,
+    PAGO_REEMBOLSADO,
+    SISTEMA
+}

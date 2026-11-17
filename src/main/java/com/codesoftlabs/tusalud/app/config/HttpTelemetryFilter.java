@@ -38,7 +38,8 @@ public class HttpTelemetryFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
-        return !request.getRequestURI().startsWith("/api/");
+        String uri = request.getRequestURI();
+        return !uri.startsWith("/api/") || uri.endsWith("/notificaciones/stream");
     }
 
     @Override

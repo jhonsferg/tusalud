@@ -81,14 +81,15 @@ class CitaRepositoryTest {
 
     @Test
     void detectaSolapamientoIgnorandoCanceladas() {
-        assertThat(citaRepository.existsSolapamiento(medico.getId(), lunes10)).isTrue();
-        assertThat(citaRepository.existsSolapamiento(medico.getId(), lunes10.plusHours(1)))
+        assertThat(citaRepository.existsSolapamiento(medico.getId(), lunes10, 0L))
+                .isTrue();
+        assertThat(citaRepository.existsSolapamiento(medico.getId(), lunes10.plusHours(1), 0L))
                 .isFalse();
         assertThat(citaRepository.existsCitaMedicoEnFranja(
-                        medico.getId(), lunes10.minusMinutes(30), lunes10.plusMinutes(30)))
+                        medico.getId(), lunes10.minusMinutes(30), lunes10.plusMinutes(30), 0L))
                 .isTrue();
         assertThat(citaRepository.existsCitaPacienteEnFranja(
-                        paciente.getId(), lunes10.plusMinutes(30), lunes10.plusMinutes(90)))
+                        paciente.getId(), lunes10.plusMinutes(30), lunes10.plusMinutes(90), 0L))
                 .isFalse();
     }
 

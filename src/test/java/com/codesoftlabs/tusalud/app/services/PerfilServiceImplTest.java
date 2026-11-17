@@ -3,18 +3,25 @@ package com.codesoftlabs.tusalud.app.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.codesoftlabs.tusalud.app.dto.request.AvatarRequest;
 import com.codesoftlabs.tusalud.app.dto.request.PasswordChangeRequest;
 import com.codesoftlabs.tusalud.app.dto.request.PerfilUpdateRequest;
+import com.codesoftlabs.tusalud.app.dto.request.PreferenciasRequest;
 import com.codesoftlabs.tusalud.app.dto.response.PerfilResponse;
+import com.codesoftlabs.tusalud.app.dto.response.PreferenciasResponse;
 import com.codesoftlabs.tusalud.app.entities.Medico;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
+import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
+import com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
+import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.PerfilService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Base64;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +47,9 @@ class PerfilServiceImplTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private NotificacionService notificacionService;
 
     @Test
     void obtenerDevuelveLosDatosDelPaciente() {
@@ -123,5 +133,83 @@ class PerfilServiceImplTest {
                         new PasswordChangeRequest(ServiceTestFixture.PASSWORD, ServiceTestFixture.PASSWORD)))
                 .isInstanceOf(BusinessLogicException.class)
                 .hasMessageContaining("distinta");
+    }
+
+    @Test
+    void cambiarPasswordNotificaContrasenaCambiada() {
+        Usuario usuario = fixture.usuario("pwd4", RolNombre.ROLE_PACIENTE);
+
+        perfilService.cambiarPassword(
+                fixture.principal(usuario), new PasswordChangeRequest(ServiceTestFixture.PASSWORD, "NuevaClave789!"));
+
+        assertThat(notificacionService.listar(fixture.principal(usuario), false, 10))
+                .singleElement()
+                .satisfies(n -> assertThat(n.tipo()).isEqualTo(TipoNotificacion.CONTRASENA_CAMBIADA));
+    }
+
+    @Test
+    void actualizarAvatarGuardaLaImagenEnElPerfil() {
+        Usuario usuario = fixture.usuario("avatar", RolNombre.ROLE_PACIENTE);
+        String imagen = "data:image/png;base64,iVBORw0KGgo=";
+
+        PerfilResponse perfil = perfilService.actualizarAvatar(fixture.principal(usuario), new AvatarRequest(imagen));
+
+        assertThat(perfil.avatar()).isEqualTo(imagen);
+        assertThat(perfilService.obtener(fixture.principal(usuario)).avatar()).isEqualTo(imagen);
+    }
+
+    @Test
+    void actualizarAvatarRechazaTiposNoPermitidos() {
+        Usuario usuario = fixture.usuario("avatar2", RolNombre.ROLE_PACIENTE);
+
+        assertThatThrownBy(() -> perfilService.actualizarAvatar(
+                        fixture.principal(usuario), new AvatarRequest("data:image/gif;base64,R0lGOD")))
+                .isInstanceOf(DatosInvalidosException.class)
+                .hasMessageContaining("PNG, JPEG o WEBP");
+        assertThatThrownBy(() -> perfilService.actualizarAvatar(
+                        fixture.principal(usuario), new AvatarRequest("https://correo.com/foto.png")))
+                .isInstanceOf(DatosInvalidosException.class);
+    }
+
+    @Test
+    void actualizarAvatarRechazaImagenMayorA300Kb() {
+        Usuario usuario = fixture.usuario("avatar3", RolNombre.ROLE_PACIENTE);
+        String grande = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(new byte[300 * 1024 + 1]);
+
+        assertThatThrownBy(() -> perfilService.actualizarAvatar(fixture.principal(usuario), new AvatarRequest(grande)))
+                .isInstanceOf(DatosInvalidosException.class)
+                .hasMessageContaining("300 KB");
+    }
+
+    @Test
+    void eliminarAvatarQuitaLaImagen() {
+        Usuario usuario = fixture.usuario("avatar4", RolNombre.ROLE_PACIENTE);
+        perfilService.actualizarAvatar(
+                fixture.principal(usuario), new AvatarRequest("data:image/webp;base64,UklGRg=="));
+
+        perfilService.eliminarAvatar(fixture.principal(usuario));
+
+        assertThat(perfilService.obtener(fixture.principal(usuario)).avatar()).isNull();
+    }
+
+    @Test
+    void preferenciasSinGuardarDevuelvenValoresPorDefecto() {
+        Usuario usuario = fixture.usuario("pref", RolNombre.ROLE_PACIENTE);
+
+        PreferenciasResponse preferencias = perfilService.obtenerPreferencias(fixture.principal(usuario));
+
+        assertThat(preferencias.recordatoriosActivos()).isTrue();
+        assertThat(preferencias.horasAntelacionRecordatorio()).isEqualTo(24);
+        assertThat(preferencias.alertasInicioSesion()).isTrue();
+    }
+
+    @Test
+    void actualizarPreferenciasGuardaLosValores() {
+        Usuario usuario = fixture.usuario("pref2", RolNombre.ROLE_MEDICO);
+
+        perfilService.actualizarPreferencias(fixture.principal(usuario), new PreferenciasRequest(false, 48, false));
+        PreferenciasResponse guardadas = perfilService.obtenerPreferencias(fixture.principal(usuario));
+
+        assertThat(guardadas).isEqualTo(new PreferenciasResponse(false, 48, false));
     }
 }

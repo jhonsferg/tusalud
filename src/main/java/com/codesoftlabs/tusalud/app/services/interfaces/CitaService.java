@@ -1,6 +1,7 @@
 package com.codesoftlabs.tusalud.app.services.interfaces;
 
 import com.codesoftlabs.tusalud.app.dto.request.CitaCreateRequest;
+import com.codesoftlabs.tusalud.app.dto.request.ReprogramarRequest;
 import com.codesoftlabs.tusalud.app.dto.response.CitaResponse;
 import com.codesoftlabs.tusalud.app.dto.response.DisponibilidadResponse;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
@@ -20,6 +21,8 @@ public interface CitaService {
     CitaResponse confirmarCita(Long citaId, UsuarioPrincipal actor);
 
     CitaResponse atenderCita(Long citaId, UsuarioPrincipal medico);
+
+    CitaResponse reprogramarCita(Long citaId, ReprogramarRequest request, UsuarioPrincipal actor);
 
     List<CitaResponse> agendaMedico(UsuarioPrincipal medico, LocalDate fecha);
 

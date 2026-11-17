@@ -4,6 +4,7 @@ import com.codesoftlabs.tusalud.app.security.JwtAccessDeniedHandler;
 import com.codesoftlabs.tusalud.app.security.JwtAuthenticationEntryPoint;
 import com.codesoftlabs.tusalud.app.security.JwtAuthenticationFilter;
 import com.codesoftlabs.tusalud.app.security.JwtUtils;
+import com.codesoftlabs.tusalud.app.services.interfaces.SesionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
@@ -40,6 +41,7 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private final JwtAccessDeniedHandler accessDeniedHandler;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final SesionService sesionService;
 
     @Bean
     @Order(2)
@@ -53,6 +55,8 @@ public class SecurityConfig {
                         ex.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**")
                         .permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/auth/logout")
+                        .authenticated()
                         .requestMatchers(PUBLIC_ENDPOINTS)
                         .permitAll()
                         .requestMatchers("/api/v1/admin/**")
@@ -78,7 +82,7 @@ public class SecurityConfig {
                         .anyRequest()
                         .authenticated())
                 .addFilterBefore(
-                        new JwtAuthenticationFilter(jwtUtils, userDetailsService),
+                        new JwtAuthenticationFilter(jwtUtils, userDetailsService, sesionService),
                         UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

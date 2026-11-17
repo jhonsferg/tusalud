@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.math.BigDecimal;
@@ -56,6 +57,10 @@ public class Cita {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal monto;
 
+    @Column(name = "recordatorio_enviado", nullable = false)
+    @Builder.Default
+    private boolean recordatorioEnviado = false;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "medico_id", nullable = false)
     private Medico medico;
@@ -74,4 +79,7 @@ public class Cita {
 
     @Version
     private Long version;
+
+    @OneToOne(mappedBy = "cita", fetch = FetchType.LAZY)
+    private Pago pago;
 }
