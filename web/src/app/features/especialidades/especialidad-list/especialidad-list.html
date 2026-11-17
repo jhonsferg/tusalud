@@ -45,6 +45,7 @@
         <tr>
           <th>Nombre</th>
           <th>Descripción</th>
+          <th style="width: 10rem">Consulta</th>
           @if (auth.isAdmin()) {
             <th class="text-right" style="width: 9rem">Acciones</th>
           }
@@ -54,6 +55,9 @@
         <tr>
           <td class="font-semibold">{{ item.nombre }}</td>
           <td class="text-muted">{{ item.descripcion || 'Sin descripción' }}</td>
+          <td class="font-semibold">
+            {{ item.precioConsulta | currency: 'PEN' : 'symbol-narrow' }}
+          </td>
           @if (auth.isAdmin()) {
             <td class="text-right">
               <p-button
@@ -78,7 +82,7 @@
       </ng-template>
       <ng-template #emptymessage>
         <tr>
-          <td [attr.colspan]="auth.isAdmin() ? 3 : 2">
+          <td [attr.colspan]="auth.isAdmin() ? 4 : 3">
             <app-empty-state
               icon="pi-heart"
               [title]="busqueda() ? 'Sin coincidencias' : 'Aún no hay especialidades'"

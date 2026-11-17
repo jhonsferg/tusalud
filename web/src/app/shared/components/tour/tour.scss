@@ -1,0 +1,118 @@
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+}
+
+.tour-veil {
+  position: absolute;
+  inset: 0;
+  background: rgb(8 14 30 / 62%);
+}
+
+.tour-spot {
+  position: absolute;
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 3px var(--p-primary-color),
+    0 0 0 100vmax rgb(8 14 30 / 62%);
+  transition:
+    top 0.25s ease,
+    left 0.25s ease,
+    width 0.25s ease,
+    height 0.25s ease;
+  pointer-events: none;
+}
+
+.tour-card {
+  position: absolute;
+  width: min(22.5rem, calc(100vw - 2rem));
+  padding: 1.25rem 1.25rem 1rem;
+  border-radius: 16px;
+  background: var(--p-content-background);
+  color: var(--p-text-color);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 35%);
+  transition:
+    top 0.25s ease,
+    left 0.25s ease;
+
+  &.centrada {
+    top: 50%;
+    left: 50%;
+    width: min(26rem, calc(100vw - 2rem));
+    transform: translate(-50%, -50%);
+  }
+
+  @media (max-width: 640px) {
+    &:not(.centrada) {
+      left: 1rem;
+    }
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  p {
+    margin: 0 0 1rem;
+    color: var(--p-text-muted-color);
+    line-height: 1.5;
+  }
+
+  footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+}
+
+.tour-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 12px;
+  background: var(--app-primary-soft);
+  color: var(--app-primary-text);
+}
+
+.tour-progress {
+  color: var(--p-text-muted-color);
+  font-size: 0.8rem;
+}
+
+.tour-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.tour-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.3rem;
+  margin-top: 0.9rem;
+
+  span {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--p-content-border-color);
+
+    &.on {
+      width: 1.1rem;
+      border-radius: 999px;
+      background: var(--p-primary-color);
+    }
+  }
+}

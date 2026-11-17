@@ -65,7 +65,7 @@ describe('guards', () => {
   });
 
   it('roleGuard deniega el acceso a roles no autorizados', async () => {
-    expect(await navigateAs(['ROLE_PACIENTE'], '/admin')).toBe('/acceso-denegado');
+    expect(await navigateAs(['ROLE_PACIENTE'], '/admin')).toBe('/citas');
     expect(await navigateAs(['ROLE_ADMIN'], '/admin')).toBe('/admin');
   });
 
@@ -83,9 +83,13 @@ describe('rutas de la aplicación', () => {
   });
 
   it('protege las secciones por rol', async () => {
-    expect(await navigateAs(['ROLE_PACIENTE'], '/admin/auditoria', true)).toBe('/acceso-denegado');
-    expect(await navigateAs(['ROLE_PACIENTE'], '/agenda', true)).toBe('/acceso-denegado');
-    expect(await navigateAs(['ROLE_MEDICO'], '/citas/nueva', true)).toBe('/acceso-denegado');
+    expect(await navigateAs(['ROLE_PACIENTE'], '/admin/auditoria', true)).toBe('/citas');
+    expect(await navigateAs(['ROLE_PACIENTE'], '/agenda', true)).toBe('/citas');
+    expect(await navigateAs(['ROLE_MEDICO'], '/citas/nueva', true)).toBe('/agenda');
+    expect(await navigateAs(['ROLE_MEDICO'], '/especialidades', true)).toBe('/agenda');
+    expect(await navigateAs(['ROLE_MEDICO'], '/medicos', true)).toBe('/agenda');
+    expect(await navigateAs(['ROLE_ADMIN'], '/pagos/metodos', true)).toBe('/admin/panel');
+    expect(await navigateAs(['ROLE_PACIENTE'], '/pacientes', true)).toBe('/citas');
     expect(await navigateAs(['ROLE_ADMIN'], '/especialidades/3/editar', true)).toBe(
       '/especialidades/3/editar',
     );

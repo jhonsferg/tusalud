@@ -74,7 +74,7 @@ describe('servicios de la API', () => {
 
   it('EspecialidadesApiService cubre el CRUD completo', () => {
     const api = TestBed.inject(EspecialidadesApiService);
-    const body = { nombre: 'Neurología', descripcion: 'Sistema nervioso' };
+    const body = { nombre: 'Neurología', descripcion: 'Sistema nervioso', precioConsulta: 170 };
     api.listar().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/especialidades' });
     api.obtener(3).subscribe();
@@ -95,8 +95,7 @@ describe('servicios de la API', () => {
       email: 'ana.torres@tusalud.com',
       password: 'Medico123!',
       colegiatura: 'CMP-54321',
-      precioConsulta: 150,
-      especialidadId: 1,
+      especialidadIds: [1, 3],
     };
     const horario = {
       diaSemana: 'MONDAY' as const,
@@ -137,7 +136,12 @@ describe('servicios de la API', () => {
 
   it('CitasApiService cubre la reserva y los cambios de estado', () => {
     const api = TestBed.inject(CitasApiService);
-    const cita = { medicoId: 1, fechaHora: '2026-10-20T10:00:00', motivo: 'Control' };
+    const cita = {
+      medicoId: 1,
+      especialidadId: 1,
+      fechaHora: '2026-10-20T10:00:00',
+      motivo: 'Control',
+    };
 
     api.crear(cita).subscribe();
     expectRequest({ method: 'POST', url: '/api/v1/citas', body: cita });
@@ -177,6 +181,7 @@ describe('servicios de la API', () => {
       recordatoriosActivos: true,
       horasAntelacionRecordatorio: 24,
       alertasInicioSesion: true,
+      tourCompletado: false,
     };
     api.actualizarAvatar('data:image/png;base64,AAAA').subscribe();
     expectRequest({
@@ -319,6 +324,80 @@ describe('servicios de la API', () => {
       method: 'PUT',
       url: '/api/v1/admin/usuarios/4/estado',
       body: { estado: 'INACTIVO' },
+    });
+  });
+
+  it('MedicosApiService actualiza las especialidades de un médico', () => {
+    const api = TestBed.inject(MedicosApiService);
+    api.actualizarEspecialidades(5, [1, 4]).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: '/api/v1/medicos/5/especialidades',
+      body: { especialidadIds: [1, 4] },
+    });
+  });
+
+  it('AdminApiService gestiona los roles de los usuarios', () => {
+    const api = TestBed.inject(AdminApiService);
+    api.listarRoles().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/admin/roles' });
+    api.actualizarRoles(4, ['ROLE_ADMIN', 'ROLE_PACIENTE']).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: '/api/v1/admin/usuarios/4/roles',
+      body: { roles: ['ROLE_ADMIN', 'ROLE_PACIENTE'] },
+    });
+  });
+
+  it('ClinicaApiService comparte pacientes entre médicos', () => {
+    const api = TestBed.inject(ClinicaApiService);
+    api.listarCompartidos(3).subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/pacientes/3/compartidos' });
+    api.compartirPaciente(3, { medicoId: 2, nota: 'Interconsulta' }).subscribe();
+    expectRequest({
+      method: 'POST',
+      url: '/api/v1/pacientes/3/compartir',
+      body: { medicoId: 2, nota: 'Interconsulta' },
+    });
+    api.dejarDeCompartir(3, 2).subscribe();
+    expectRequest({ method: 'DELETE', url: '/api/v1/pacientes/3/compartir/2' });
+  });
+
+  it('PagosApiService cubre el flujo de pago con QR de Yape y Plin', () => {
+    const api = TestBed.inject(PagosApiService);
+    api.crearPagoQr({ citaId: 8, billetera: 'YAPE', codigoCupon: 'SALUD20' }).subscribe();
+    expectRequest({
+      method: 'POST',
+      url: '/api/v1/pagos/qr',
+      body: { citaId: 8, billetera: 'YAPE', codigoCupon: 'SALUD20' },
+    });
+    api.consultarPagoQr('abc').subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/pagos/qr/abc' });
+    api.simularConfirmacionQr('abc').subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/pagos/qr/abc/simular-confirmacion' });
+    api.cancelarPagoQr('abc').subscribe();
+    expectRequest({ method: 'DELETE', url: '/api/v1/pagos/qr/abc' });
+  });
+
+  it('AuthApiService cubre la verificación en dos pasos', () => {
+    const api = TestBed.inject(AuthApiService);
+    api.estadoMfa().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/auth/mfa/estado' });
+    api.configurarMfa().subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/auth/mfa/configurar' });
+    api.activarMfa('123456').subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/auth/mfa/activar', body: { codigo: '123456' } });
+    api.desactivarMfa({ password: 'x', codigo: '123456' }).subscribe();
+    expectRequest({
+      method: 'POST',
+      url: '/api/v1/auth/mfa/desactivar',
+      body: { password: 'x', codigo: '123456' },
+    });
+    api.regenerarCodigosMfa('123456').subscribe();
+    expectRequest({
+      method: 'POST',
+      url: '/api/v1/auth/mfa/codigos-recuperacion/regenerar',
+      body: { codigo: '123456' },
     });
   });
 

@@ -36,6 +36,7 @@ export const routes: Routes = [
       },
       {
         path: 'especialidades',
+        canMatch: [roleGuard('ROLE_ADMIN', 'ROLE_PACIENTE')],
         loadChildren: () =>
           import('@tusalud/app/features/especialidades/especialidades.routes').then(
             (m) => m.ESPECIALIDADES_ROUTES,
@@ -43,6 +44,7 @@ export const routes: Routes = [
       },
       {
         path: 'medicos',
+        canMatch: [roleGuard('ROLE_ADMIN', 'ROLE_PACIENTE')],
         loadChildren: () =>
           import('@tusalud/app/features/medicos/medicos.routes').then((m) => m.MEDICOS_ROUTES),
       },
@@ -53,11 +55,13 @@ export const routes: Routes = [
       },
       {
         path: 'pagos',
+        canMatch: [roleGuard('ROLE_PACIENTE')],
         loadChildren: () =>
           import('@tusalud/app/features/pagos/pagos.routes').then((m) => m.PAGOS_ROUTES),
       },
       {
         path: 'historia-clinica',
+        canMatch: [roleGuard('ROLE_PACIENTE')],
         loadChildren: () =>
           import('@tusalud/app/features/historia-clinica/historia-clinica.routes').then(
             (m) => m.HISTORIA_CLINICA_ROUTES,
@@ -65,6 +69,7 @@ export const routes: Routes = [
       },
       {
         path: 'pacientes',
+        canMatch: [roleGuard('ROLE_MEDICO', 'ROLE_ADMIN')],
         loadChildren: () =>
           import('@tusalud/app/features/historia-clinica/historia-clinica.routes').then(
             (m) => m.PACIENTES_ROUTES,

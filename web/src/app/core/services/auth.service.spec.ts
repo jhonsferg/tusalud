@@ -33,7 +33,28 @@ describe('AuthService', () => {
     const auth = setup();
     expect(auth.isAuthenticated()).toBe(false);
     expect(auth.roles()).toEqual([]);
-    expect(auth.homeUrl()).toBe('/especialidades');
+    expect(auth.homeUrl()).toBe('/perfil');
+  });
+
+  it('devuelve el desafío MFA sin abrir sesión y la abre al verificar el código', () => {
+    const auth = setup();
+    let resultado: unknown;
+    auth.login({ email: 'a@b.com', password: 'x' }).subscribe((r) => (resultado = r));
+    http.expectOne('/api/v1/auth/login').flush({
+      ...createAuthResponse(['ROLE_PACIENTE']),
+      token: null,
+      mfaRequerido: true,
+      mfaToken: 'temporal',
+    });
+    expect(resultado).toEqual({ mfa: { mfaToken: 'temporal' } });
+    expect(auth.isAuthenticated()).toBe(false);
+
+    auth.verificarMfa('temporal', '123456').subscribe();
+    const verificacion = http.expectOne('/api/v1/auth/mfa/verificar');
+    expect(verificacion.request.body).toEqual({ mfaToken: 'temporal', codigo: '123456' });
+    verificacion.flush(createAuthResponse(['ROLE_PACIENTE']));
+    TestBed.tick();
+    expect(auth.isAuthenticated()).toBe(true);
   });
 
   it('inicia sesión, expone signals derivados y persiste la sesión', () => {
@@ -53,7 +74,9 @@ describe('AuthService', () => {
     request.flush(createAuthResponse(['ROLE_PACIENTE']));
     TestBed.tick();
 
-    expect(usuario).toEqual(expect.objectContaining({ email: 'juan.perez@correo.com', id: 4 }));
+    expect(usuario).toEqual({
+      sesion: expect.objectContaining({ email: 'juan.perez@correo.com', id: 4 }),
+    });
     expect(auth.isAuthenticated()).toBe(true);
     expect(auth.isPaciente()).toBe(true);
     expect(auth.isAdmin()).toBe(false);

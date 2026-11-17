@@ -1,0 +1,61 @@
+@if (tour.active() && tour.step(); as paso) {
+  <div class="tour" role="dialog" aria-modal="true" [attr.aria-label]="paso.title">
+    @if (spot(); as spot) {
+      <div
+        class="tour-spot"
+        [style.top.px]="spot.top"
+        [style.left.px]="spot.left"
+        [style.width.px]="spot.width"
+        [style.height.px]="spot.height"
+      ></div>
+    } @else {
+      <div class="tour-veil"></div>
+    }
+
+    <section
+      class="tour-card"
+      [class.centrada]="!tarjeta()"
+      [style.top.px]="tarjeta()?.top"
+      [style.left.px]="tarjeta()?.left"
+    >
+      <header>
+        <span class="tour-icon"><i [class]="'pi ' + paso.icon"></i></span>
+        <h2>{{ paso.title }}</h2>
+      </header>
+      <p>{{ paso.text }}</p>
+      <footer>
+        <span class="tour-progress">Paso {{ tour.index() + 1 }} de {{ tour.steps().length }}</span>
+        <span class="tour-actions">
+          @if (!tour.isLast()) {
+            <p-button
+              label="Omitir"
+              [text]="true"
+              severity="secondary"
+              size="small"
+              (onClick)="tour.close()"
+            />
+          }
+          @if (!tour.isFirst()) {
+            <p-button
+              label="Anterior"
+              [outlined]="true"
+              severity="secondary"
+              size="small"
+              (onClick)="tour.previous()"
+            />
+          }
+          <p-button
+            [label]="tour.isLast() ? 'Finalizar' : tour.isFirst() ? 'Comenzar' : 'Siguiente'"
+            size="small"
+            (onClick)="tour.next()"
+          />
+        </span>
+      </footer>
+      <div class="tour-dots" aria-hidden="true">
+        @for (p of tour.steps(); track $index) {
+          <span [class.on]="$index === tour.index()"></span>
+        }
+      </div>
+    </section>
+  </div>
+}

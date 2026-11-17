@@ -27,6 +27,10 @@ export class Login {
 
   protected readonly submitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly mfaToken = signal<string | null>(null);
+  protected readonly usarRecuperacion = signal(false);
+
+  protected readonly codigo = inject(FormBuilder).nonNullable.control('', [Validators.required]);
 
   protected readonly form = inject(FormBuilder).nonNullable.group({
     email: ['', [Validators.required, Validators.email, AppValidators.notBlank]],
@@ -41,13 +45,13 @@ export class Login {
     }
     this.submitting.set(true);
     this.auth.login(this.form.getRawValue()).subscribe({
-      next: () => {
-        const destino = this.returnUrl();
-        void this.router.navigateByUrl(
-          destino && destino.startsWith('/') && !destino.startsWith('//')
-            ? destino
-            : this.auth.homeUrl(),
-        );
+      next: (resultado) => {
+        if ('mfa' in resultado) {
+          this.submitting.set(false);
+          this.mfaToken.set(resultado.mfa.mfaToken);
+          return;
+        }
+        this.entrar();
       },
       error: (error: ApiError) => {
         this.submitting.set(false);
@@ -59,5 +63,48 @@ export class Login {
         );
       },
     });
+  }
+
+  protected verificar(): void {
+    const token = this.mfaToken();
+    this.errorMessage.set(null);
+    if (!token || this.codigo.invalid) {
+      this.codigo.markAsTouched();
+      return;
+    }
+    this.submitting.set(true);
+    this.auth.verificarMfa(token, this.codigo.value.trim()).subscribe({
+      next: () => this.entrar(),
+      error: (error: ApiError) => {
+        this.submitting.set(false);
+        this.errorMessage.set(
+          error.status === 401 || error.status === 400
+            ? 'El código no es válido o ya venció.'
+            : error.message,
+        );
+      },
+    });
+  }
+
+  protected volver(): void {
+    this.mfaToken.set(null);
+    this.codigo.reset('');
+    this.errorMessage.set(null);
+    this.usarRecuperacion.set(false);
+  }
+
+  protected alternarRecuperacion(): void {
+    this.usarRecuperacion.update((valor) => !valor);
+    this.errorMessage.set(null);
+    this.codigo.reset('');
+  }
+
+  private entrar(): void {
+    const destino = this.returnUrl();
+    void this.router.navigateByUrl(
+      destino && destino.startsWith('/') && !destino.startsWith('//')
+        ? destino
+        : this.auth.homeUrl(),
+    );
   }
 }

@@ -1,6 +1,6 @@
 <app-page-header
   title="Mis pacientes"
-  subtitle="Pacientes que has atendido o tienen citas contigo"
+  subtitle="Pacientes que atiendes y los que otros médicos comparten contigo"
   icon="pi-users"
 />
 
@@ -43,7 +43,7 @@
           <th>Historia</th>
           <th>Última cita</th>
           <th class="text-right">Citas</th>
-          <th style="width: 9rem"></th>
+          <th style="width: 13rem"></th>
         </tr>
       </ng-template>
       <ng-template #body let-paciente>
@@ -54,13 +54,32 @@
               <div>
                 <div class="font-semibold">{{ paciente.nombreCompleto }}</div>
                 <small class="text-muted">DNI {{ paciente.dni }}</small>
+                @if (paciente.compartidoPor) {
+                  <p-tag
+                    [value]="'Compartido por ' + paciente.compartidoPor"
+                    severity="info"
+                    icon="pi pi-share-alt"
+                    [rounded]="true"
+                    styleClass="ml-2"
+                  />
+                }
               </div>
             </div>
           </td>
           <td>{{ paciente.historialClinicoNumero }}</td>
           <td>{{ paciente.ultimaCita ? (paciente.ultimaCita | date: 'd MMM y') : '—' }}</td>
           <td class="text-right">{{ paciente.totalCitas }}</td>
-          <td class="text-right">
+          <td class="text-right acciones">
+            @if (!paciente.compartidoPor) {
+              <p-button
+                icon="pi pi-share-alt"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                [ariaLabel]="'Compartir a ' + paciente.nombreCompleto"
+                (onClick)="abrirCompartir(paciente)"
+              />
+            }
             <p-button
               label="Historia"
               icon="pi pi-folder-open"
@@ -85,3 +104,73 @@
     </p-table>
   }
 </div>
+
+<p-dialog
+  [header]="'Compartir a ' + (compartiendo()?.nombreCompleto ?? '')"
+  [visible]="compartiendo() !== null"
+  (visibleChange)="$event ? null : compartiendo.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '32rem', maxWidth: '94vw' }"
+>
+  <p class="text-muted">
+    El médico elegido podrá ver la historia clínica de este paciente y recibirá un aviso. Puedes
+    dejar de compartir cuando quieras.
+  </p>
+  <div class="flex flex-column gap-2 mb-3">
+    <label for="compartir-colega">Médico</label>
+    <p-select
+      inputId="compartir-colega"
+      [options]="colegas()"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="colegaId()"
+      (ngModelChange)="colegaId.set($event)"
+      placeholder="Selecciona un colega"
+      [filter]="true"
+      appendTo="body"
+      styleClass="w-full"
+    />
+    <label for="compartir-nota">Nota para el colega</label>
+    <textarea
+      pTextarea
+      id="compartir-nota"
+      rows="3"
+      class="w-full"
+      maxlength="500"
+      [ngModel]="nota()"
+      (ngModelChange)="nota.set($event)"
+    ></textarea>
+    <div class="flex justify-content-end">
+      <p-button
+        label="Compartir"
+        icon="pi pi-share-alt"
+        [loading]="enviando()"
+        [disabled]="colegaId() === null"
+        (onClick)="compartir()"
+      />
+    </div>
+  </div>
+
+  @if ((store.compartidos.value() ?? []).length > 0) {
+    <h4>Compartido con</h4>
+    <ul class="compartidos">
+      @for (item of store.compartidos.value(); track item.medicoId) {
+        <li>
+          <span>
+            <strong>{{ item.medicoNombre }}</strong>
+            <small class="text-muted">{{ item.especialidades.join(', ') }}</small>
+          </span>
+          <p-button
+            icon="pi pi-times"
+            [text]="true"
+            [rounded]="true"
+            severity="danger"
+            [ariaLabel]="'Dejar de compartir con ' + item.medicoNombre"
+            (onClick)="dejarDeCompartir(item.medicoId)"
+          />
+        </li>
+      }
+    </ul>
+  }
+</p-dialog>

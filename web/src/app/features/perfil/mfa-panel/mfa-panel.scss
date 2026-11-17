@@ -1,0 +1,120 @@
+.mfa {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  padding: 1.25rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 14px;
+  background: var(--p-content-background);
+}
+
+.mfa-head {
+  display: flex;
+  gap: 0.9rem;
+
+  h3 {
+    margin: 0 0 0.25rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--p-text-muted-color);
+    line-height: 1.5;
+  }
+}
+
+.mfa-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 12px;
+  background: var(--app-primary-soft);
+  color: var(--app-primary-text);
+  font-size: 1.2rem;
+}
+
+.mfa-estado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mfa-restantes {
+  color: var(--p-text-muted-color);
+  font-size: 0.9rem;
+}
+
+.mfa-acciones {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.pasos {
+  margin: 0 0 1rem;
+  padding-left: 1.2rem;
+  color: var(--p-text-muted-color);
+  line-height: 1.6;
+}
+
+.qr-zona {
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #ffffff;
+
+  img {
+    display: block;
+  }
+}
+
+.clave-manual {
+  margin: 0.9rem 0 0;
+  color: var(--p-text-muted-color);
+  text-align: center;
+
+  code {
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    background: var(--p-content-hover-background);
+    color: var(--p-text-color);
+    letter-spacing: 0.08em;
+    word-break: break-all;
+  }
+}
+
+.codigo {
+  font-size: 1.4rem;
+  letter-spacing: 0.4em;
+  text-align: center;
+}
+
+.codigos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 0.55rem;
+    border-radius: 8px;
+    background: var(--p-content-hover-background);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+}
+
+.dialogo-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}

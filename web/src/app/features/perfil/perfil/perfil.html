@@ -58,12 +58,8 @@
         }
         @if (esMedico()) {
           <div>
-            <dt>Especialidad</dt>
-            <dd>{{ perfil.especialidad }}</dd>
-          </div>
-          <div>
-            <dt>Precio de consulta</dt>
-            <dd>{{ perfil.precioConsulta | currency: 'PEN' : 'symbol-narrow' }}</dd>
+            <dt>Especialidades</dt>
+            <dd>{{ perfil.especialidades?.join(', ') || perfil.especialidad }}</dd>
           </div>
         }
       </dl>
@@ -191,6 +187,7 @@
           </p-tabpanel>
 
           <p-tabpanel value="seguridad">
+            <app-mfa-panel />
             <form
               [formGroup]="seguridad"
               (ngSubmit)="cambiarPassword()"

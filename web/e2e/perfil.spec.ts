@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { iniciarSesion, cerrarSesion } from './support';
+import { cerrarSesion, iniciarSesion, omitirGuia, registrarPaciente } from './support';
 
 test.describe('perfil', () => {
   test('el paciente ve y actualiza sus datos', async ({ page }) => {
@@ -50,7 +50,8 @@ test.describe('perfil', () => {
   });
 
   test('cambia la contraseña con validaciones y vuelve a la original', async ({ page }) => {
-    await iniciarSesion(page, 'paciente');
+    await omitirGuia(page);
+    const cuenta = await registrarPaciente(page, 'clave');
     await page.goto('/perfil');
     await page.getByRole('tab', { name: 'Seguridad' }).click();
 
@@ -70,7 +71,7 @@ test.describe('perfil', () => {
 
     await cerrarSesion(page);
     await page.goto('/auth/login');
-    await page.getByLabel('Email').fill('juan.perez@correo.com');
+    await page.getByLabel('Email').fill(cuenta.email);
     await page.locator('#login-password').fill('Paciente123!');
     await page.getByRole('button', { name: 'Iniciar sesión' }).click();
     await expect(page.getByText('Email o contraseña incorrectos.')).toBeVisible();

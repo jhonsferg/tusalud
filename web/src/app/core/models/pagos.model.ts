@@ -78,3 +78,25 @@ export interface PagoResponse {
   metodo: string;
   fechaPago: string;
 }
+
+export type Billetera = 'YAPE' | 'PLIN';
+export type EstadoPagoQr = 'PENDIENTE' | 'CONFIRMADO' | 'EXPIRADO' | 'CANCELADO';
+
+export interface PagoQrRequest {
+  citaId: number;
+  billetera: Billetera;
+  codigoCupon?: string | null;
+}
+
+export interface PagoQrResponse {
+  codigo: string;
+  billetera: Billetera;
+  monto: number;
+  descuento: number;
+  total: number;
+  codigoCupon?: string | null;
+  qrPayload: string;
+  estado: EstadoPagoQr;
+  expiraEn: string;
+  pagoId?: number | null;
+}

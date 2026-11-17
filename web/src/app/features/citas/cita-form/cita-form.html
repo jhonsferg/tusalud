@@ -1,6 +1,6 @@
 <app-page-header
   title="Reservar cita"
-  subtitle="Elige médico, fecha y hora en tres pasos"
+  subtitle="Elige especialidad, médico, fecha y hora"
   icon="pi-calendar-plus"
   backLink="/citas"
   backLabel="Volver a mis citas"
@@ -10,6 +10,36 @@
   <form class="panel" [formGroup]="form" (ngSubmit)="submit()" novalidate>
     <div class="step">
       <span class="num">1</span>
+      <app-form-field
+        label="Especialidad"
+        [control]="form.controls.especialidadId"
+        inputId="cita-especialidad"
+        [required]="true"
+      >
+        <p-select
+          inputId="cita-especialidad"
+          formControlName="especialidadId"
+          [options]="opcionesEspecialidad()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Selecciona una especialidad"
+          [loading]="especialidades.list.loading()"
+          appendTo="body"
+          styleClass="w-full"
+          (onChange)="cambioEspecialidad()"
+        >
+          <ng-template #item let-opcion>
+            <span class="opcion-precio">
+              <span>{{ opcion.label }}</span>
+              <small>{{ opcion.precio | currency: 'PEN' : 'symbol-narrow' }}</small>
+            </span>
+          </ng-template>
+        </p-select>
+      </app-form-field>
+    </div>
+
+    <div class="step">
+      <span class="num">2</span>
       <app-form-field
         label="Médico"
         [control]="form.controls.medicoId"
@@ -35,7 +65,7 @@
     </div>
 
     <div class="step">
-      <span class="num">2</span>
+      <span class="num">3</span>
       <app-form-field
         label="Fecha"
         [control]="form.controls.fecha"
@@ -57,7 +87,7 @@
     </div>
 
     <div class="step">
-      <span class="num">3</span>
+      <span class="num">4</span>
       <app-form-field
         label="Hora"
         [control]="form.controls.hora"
@@ -136,7 +166,7 @@
         </div>
         <div>
           <dt>Especialidad</dt>
-          <dd>{{ medico.especialidadNombre }}</dd>
+          <dd>{{ especialidadElegida()?.nombre ?? 'Por elegir' }}</dd>
         </div>
         <div>
           <dt>Consultorio</dt>
@@ -154,7 +184,9 @@
         </div>
         <div class="total">
           <dt>Total a pagar</dt>
-          <dd>{{ medico.precioConsulta | currency: 'PEN' : 'symbol-narrow' }}</dd>
+          <dd>
+            {{ especialidadElegida()?.precioConsulta ?? 0 | currency: 'PEN' : 'symbol-narrow' }}
+          </dd>
         </div>
       </dl>
     } @else {

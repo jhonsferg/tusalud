@@ -22,6 +22,7 @@ import { Textarea } from 'primeng/textarea';
 import { ApiError } from '@tusalud/app/core/models';
 import { NotificationService } from '@tusalud/app/core/services/notification.service';
 import { CitasStore } from '@tusalud/app/core/state/citas.store';
+import { EspecialidadesStore } from '@tusalud/app/core/state/especialidades.store';
 import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
 import { combineDateAndTime, parseIsoDate, toIsoDate } from '@tusalud/app/core/utils/date';
 import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
@@ -55,10 +56,12 @@ const MOTIVO_MAX = 500;
 })
 export class CitaForm {
   readonly medicoId = input(undefined, { transform: optionalNumberAttribute });
+  readonly especialidadId = input(undefined, { transform: optionalNumberAttribute });
   readonly fecha = input<string>();
   readonly hora = input<string>();
 
   protected readonly medicos = inject(MedicosStore);
+  protected readonly especialidades = inject(EspecialidadesStore);
   private readonly citas = inject(CitasStore);
   private readonly notifications = inject(NotificationService);
   private readonly router = inject(Router);
@@ -68,6 +71,7 @@ export class CitaForm {
   protected readonly motivoMax = MOTIVO_MAX;
 
   protected readonly form = inject(FormBuilder).group({
+    especialidadId: [null as number | null, [Validators.required]],
     medicoId: [null as number | null, [Validators.required]],
     fecha: [null as Date | null, [Validators.required]],
     hora: [null as string | null, [Validators.required]],
@@ -78,15 +82,35 @@ export class CitaForm {
     initialValue: this.form.value,
   });
 
-  protected readonly opcionesMedico = computed(() =>
-    this.medicos.medicosActivos().map((medico) => ({
-      value: medico.id,
-      label: `${medico.nombreCompleto} · ${medico.especialidadNombre}`,
+  protected readonly opcionesEspecialidad = computed(() =>
+    this.especialidades.especialidades().map((especialidad) => ({
+      value: especialidad.id,
+      label: especialidad.nombre,
+      precio: especialidad.precioConsulta,
     })),
   );
 
+  protected readonly opcionesMedico = computed(() => {
+    const especialidadId = this.valores().especialidadId;
+    return this.medicos
+      .medicosActivos()
+      .filter(
+        (medico) =>
+          !especialidadId ||
+          medico.especialidades.some((especialidad) => especialidad.id === especialidadId),
+      )
+      .map((medico) => ({
+        value: medico.id,
+        label: `${medico.nombreCompleto} · ${medico.especialidades.map((e) => e.nombre).join(', ')}`,
+      }));
+  });
+
   protected readonly medicoElegido = computed(() =>
     this.medicos.medicosActivos().find((medico) => medico.id === this.valores().medicoId),
+  );
+
+  protected readonly especialidadElegida = computed(() =>
+    this.especialidades.especialidades().find((item) => item.id === this.valores().especialidadId),
   );
 
   protected readonly horas = computed(() =>
@@ -100,6 +124,27 @@ export class CitaForm {
 
   constructor() {
     this.medicos.load(null);
+    this.especialidades.load();
+
+    effect(() => {
+      const especialidadParam = this.especialidadId();
+      if (especialidadParam !== undefined) {
+        untracked(() => this.form.controls.especialidadId.setValue(especialidadParam));
+      }
+    });
+
+    effect(() => {
+      const medico = this.medicoElegido();
+      if (!medico) {
+        return;
+      }
+      untracked(() => {
+        const actual = this.form.controls.especialidadId.value;
+        if (!actual || !medico.especialidades.some((especialidad) => especialidad.id === actual)) {
+          this.form.controls.especialidadId.setValue(medico.especialidades[0]?.id ?? null);
+        }
+      });
+    });
 
     effect(() => {
       const medicoId = this.medicoId();
@@ -145,6 +190,18 @@ export class CitaForm {
     this.form.controls.hora.markAsTouched();
   }
 
+  protected cambioEspecialidad(): void {
+    const medico = this.medicoElegido();
+    const especialidadId = this.form.controls.especialidadId.value;
+    if (
+      medico &&
+      !medico.especialidades.some((especialidad) => especialidad.id === especialidadId)
+    ) {
+      this.form.controls.medicoId.setValue(null);
+    }
+    this.form.controls.hora.setValue(null);
+  }
+
   protected cambioMedicoOFecha(): void {
     this.form.controls.hora.setValue(null);
   }
@@ -158,7 +215,12 @@ export class CitaForm {
     const valor = this.form.getRawValue();
     this.submitting.set(true);
     this.citas
-      .crear({ medicoId: valor.medicoId!, fechaHora, motivo: valor.motivo!.trim() })
+      .crear({
+        medicoId: valor.medicoId!,
+        especialidadId: valor.especialidadId!,
+        fechaHora,
+        motivo: valor.motivo!.trim(),
+      })
       .subscribe({
         next: (cita) => {
           this.notifications.success('Tu cita fue reservada. El médico la confirmará pronto.');

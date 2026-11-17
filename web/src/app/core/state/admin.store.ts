@@ -7,6 +7,7 @@ import {
   EstadisticasResponse,
   PagoResponse,
   RangoFechas,
+  RolResumenResponse,
   UsuarioAdminResponse,
 } from '@tusalud/app/core/models';
 import { AdminApiService } from '@tusalud/app/core/services/api/admin-api.service';
@@ -23,6 +24,7 @@ export class AdminStore {
   readonly cupones = new AsyncState<CuponResponse[]>();
   readonly pagos = new AsyncState<PagoResponse[]>();
   readonly usuarios = new AsyncState<UsuarioAdminResponse[]>();
+  readonly roles = new AsyncState<RolResumenResponse[]>();
 
   readonly filtroRol = this.rolActual.asReadonly();
   readonly filtroBusqueda = this.busquedaActual.asReadonly();
@@ -60,6 +62,19 @@ export class AdminStore {
     this.pagos.load(this.api.listarPagos(rango));
   }
 
+  cargarRoles(): void {
+    this.roles.load(this.api.listarRoles());
+  }
+
+  actualizarRoles(id: number, roles: string[]): Observable<UsuarioAdminResponse> {
+    return this.api.actualizarRoles(id, roles).pipe(
+      tap((usuario) => {
+        this.usuarios.update((items) => items?.map((item) => (item.id === id ? usuario : item)));
+        this.cargarRoles();
+      }),
+    );
+  }
+
   cargarUsuarios(rol: string | null = null, q: string | null = null): void {
     this.rolActual.set(rol);
     this.busquedaActual.set(q);
@@ -86,5 +101,6 @@ export class AdminStore {
     this.cupones.reset();
     this.pagos.reset();
     this.usuarios.reset();
+    this.roles.reset();
   }
 }

@@ -68,6 +68,20 @@ export interface PacienteResumenResponse {
   historialClinicoNumero: string;
   ultimaCita?: string | null;
   totalCitas: number;
+  compartidoPor?: string | null;
+}
+
+export interface CompartidoResponse {
+  medicoId: number;
+  medicoNombre: string;
+  especialidades: string[];
+  nota?: string | null;
+  fecha: string;
+}
+
+export interface CompartirPacienteRequest {
+  medicoId: number;
+  nota?: string | null;
 }
 
 export interface ValoracionRequest {

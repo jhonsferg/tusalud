@@ -3,12 +3,16 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 import { Button } from 'primeng/button';
+import { Checkbox } from 'primeng/checkbox';
+import { Dialog } from 'primeng/dialog';
+import { Message } from 'primeng/message';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
 import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
+import { Tooltip } from 'primeng/tooltip';
 import { Subject, debounceTime } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -32,17 +36,22 @@ const ETIQUETA_ROL: Readonly<Record<string, string>> = {
     DatePipe,
     FormsModule,
     Button,
+    Checkbox,
+    Dialog,
+    Message,
     IconField,
     InputIcon,
     InputText,
     Select,
     TableModule,
     Tag,
+    Tooltip,
     EmptyState,
     PageHeader,
     UserAvatar,
   ],
   templateUrl: './usuarios.html',
+  styleUrl: './usuarios.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Usuarios implements OnInit {
@@ -67,8 +76,51 @@ export class Usuarios implements OnInit {
       .subscribe(() => this.cargar());
   }
 
+  protected readonly editando = signal<UsuarioAdminResponse | null>(null);
+  protected readonly seleccion = signal<string[]>([]);
+  protected readonly guardando = signal(false);
+  protected readonly errorRoles = signal<string | null>(null);
+  protected readonly descripcionRol: Readonly<Record<string, string>> = {
+    ROLE_ADMIN: 'Gestiona usuarios, roles, tarifas, cupones y pagos.',
+    ROLE_MEDICO: 'Atiende pacientes y administra su agenda. Requiere perfil médico.',
+    ROLE_PACIENTE: 'Reserva citas y paga consultas. Requiere perfil de paciente.',
+  };
+
   ngOnInit(): void {
     this.cargar();
+    this.store.cargarRoles();
+  }
+
+  protected abrirRoles(usuario: UsuarioAdminResponse): void {
+    this.errorRoles.set(null);
+    this.seleccion.set([...usuario.roles]);
+    this.editando.set(usuario);
+  }
+
+  protected alternarRolSeleccionado(rol: string, marcado: boolean): void {
+    this.seleccion.update((actual) =>
+      marcado ? [...new Set([...actual, rol])] : actual.filter((item) => item !== rol),
+    );
+  }
+
+  protected guardarRoles(): void {
+    const usuario = this.editando();
+    if (!usuario || this.seleccion().length === 0) {
+      return;
+    }
+    this.errorRoles.set(null);
+    this.guardando.set(true);
+    this.store.actualizarRoles(usuario.id, this.seleccion()).subscribe({
+      next: () => {
+        this.guardando.set(false);
+        this.editando.set(null);
+        this.notifications.success('Los roles del usuario fueron actualizados.');
+      },
+      error: (error: { message: string }) => {
+        this.guardando.set(false);
+        this.errorRoles.set(error.message);
+      },
+    });
   }
 
   protected cargar(): void {

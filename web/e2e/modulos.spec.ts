@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import {
   formatoFecha,
   iniciarSesion,
+  omitirGuia,
   diaHabilAleatorio,
   reservarPrimeraHoraLibre,
 } from './support';
@@ -62,6 +63,45 @@ test.describe('pagos del paciente', () => {
   });
 });
 
+test.describe('billeteras digitales', () => {
+  for (const [billetera, nombre] of [
+    ['Yape', 'YAPE'],
+    ['Plin', 'PLIN'],
+  ] as const) {
+    test(`paga con ${billetera} escaneando un QR y confirmando desde la app`, async ({ page }) => {
+      await iniciarSesion(page, 'paciente');
+      await page.goto('/citas/nueva?medicoId=1');
+      await page.locator('#cita-fecha').pressSequentially(formatoFecha(diaHabilAleatorio()));
+      await page.keyboard.press('Escape');
+      await reservarPrimeraHoraLibre(page, `Pago con ${nombre} e2e`);
+
+      await page.getByRole('button', { name: 'Pagar cita' }).click();
+      await page.getByText(billetera, { exact: true }).click();
+      await page.getByRole('button', { name: 'Generar código QR' }).click();
+      await expect(page.getByAltText('Código QR de pago')).toBeVisible();
+      await expect(page.getByText(/Vence en/)).toBeVisible();
+      await page.getByRole('button', { name: 'Simular pago desde la app' }).click();
+      await expect(page.getByText(/Pago registrado/).first()).toBeVisible();
+      await expect(page.getByText('Pagada', { exact: true }).first()).toBeVisible();
+    });
+  }
+
+  test('cancela un QR pendiente al cambiar de billetera', async ({ page }) => {
+    await iniciarSesion(page, 'paciente');
+    await page.goto('/citas/nueva?medicoId=1');
+    await page.locator('#cita-fecha').pressSequentially(formatoFecha(diaHabilAleatorio()));
+    await page.keyboard.press('Escape');
+    await reservarPrimeraHoraLibre(page, 'Cambio de billetera e2e');
+
+    await page.getByRole('button', { name: 'Pagar cita' }).click();
+    await page.getByText('Yape', { exact: true }).click();
+    await page.getByRole('button', { name: 'Generar código QR' }).click();
+    await expect(page.getByAltText('Código QR de pago')).toBeVisible();
+    await page.getByText('Plin', { exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Generar código QR' })).toBeVisible();
+  });
+});
+
 test.describe('historia clínica', () => {
   test('el paciente ve su historia y edita sus datos médicos', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
@@ -79,7 +119,7 @@ test.describe('historia clínica', () => {
   test('el médico ve sus pacientes y abre una historia', async ({ page }) => {
     await iniciarSesion(page, 'medico');
     await page.getByRole('link', { name: 'Mis pacientes' }).click();
-    await expect(page.getByRole('cell', { name: /Carlos Mendoza/ })).toBeVisible();
+    await expect(page.getByRole('cell', { name: /Carlos Mendoza/ }).first()).toBeVisible();
     await page
       .getByRole('row', { name: /Carlos Mendoza/ })
       .getByRole('button', { name: 'Historia' })
@@ -122,6 +162,112 @@ test.describe('notificaciones y perfil', () => {
       'aria-checked',
       'true',
     );
+  });
+});
+
+test.describe('especialidades y roles', () => {
+  test('el administrador cambia la tarifa de una especialidad y el paciente la ve al reservar', async ({
+    browser,
+  }) => {
+    const admin = await (await browser.newContext()).newPage();
+    await iniciarSesion(admin, 'admin');
+    await admin.goto('/especialidades');
+    await expect(admin.getByRole('columnheader', { name: 'Consulta' })).toBeVisible();
+    await admin.getByRole('button', { name: 'Editar Oftalmología' }).click();
+    await admin.locator('#esp-precio').click();
+    await admin.keyboard.press('Control+a');
+    await admin.locator('#esp-precio').pressSequentially('115');
+    await admin.getByRole('button', { name: 'Guardar cambios' }).click();
+    await expect(
+      admin.getByRole('row', { name: /Oftalmología/ }).getByText(/115\.00/),
+    ).toBeVisible();
+
+    const paciente = await (await browser.newContext()).newPage();
+    await iniciarSesion(paciente, 'paciente');
+    await paciente.goto('/citas/nueva');
+    const opcion = paciente.getByRole('option', { name: 'Oftalmología' });
+    await expect(async () => {
+      await paciente.locator('#cita-especialidad').click();
+      await expect(opcion).toBeVisible({ timeout: 1500 });
+    }).toPass();
+    await opcion.click();
+    await paciente.locator('#cita-medico').click();
+    await paciente.getByRole('option', { name: /Marcos Delgado/ }).click();
+    await expect(paciente.locator('.summary').getByText(/115.00/)).toBeVisible();
+
+    await admin.getByRole('button', { name: 'Editar Oftalmología' }).click();
+    await admin.locator('#esp-precio').click();
+    await admin.keyboard.press('Control+a');
+    await admin.locator('#esp-precio').pressSequentially('110');
+    await admin.getByRole('button', { name: 'Guardar cambios' }).click();
+    await expect(
+      admin.getByRole('row', { name: /Oftalmología/ }).getByText(/110\.00/),
+    ).toBeVisible();
+  });
+
+  test('el administrador gestiona los roles de un usuario', async ({ page }) => {
+    await iniciarSesion(page, 'admin');
+    await page.goto('/admin/usuarios');
+    await page.getByPlaceholder('Buscar por nombre o correo').fill('valeria.castillo');
+    await page.getByRole('button', { name: /Gestionar roles de Valeria/ }).click();
+    const dialogo = page.getByRole('dialog');
+    await dialogo.getByLabel(/Administrador/).check();
+    await dialogo.getByRole('button', { name: 'Guardar roles' }).click();
+    await expect(page.getByText('Los roles del usuario fueron actualizados.')).toBeVisible();
+    await expect(
+      page.getByRole('row', { name: /Valeria/ }).getByText('Administrador'),
+    ).toBeVisible();
+
+    await page.getByRole('button', { name: /Gestionar roles de Valeria/ }).click();
+    await page
+      .getByRole('dialog')
+      .getByLabel(/Administrador/)
+      .uncheck();
+    await page.getByRole('dialog').getByRole('button', { name: 'Guardar roles' }).click();
+    await expect(page.getByText('Los roles del usuario fueron actualizados.')).toBeVisible();
+  });
+});
+
+test.describe('pacientes compartidos', () => {
+  test('un médico comparte un paciente con otro colega y deja de compartirlo', async ({
+    browser,
+  }) => {
+    test.setTimeout(90_000);
+    const garcia = await (await browser.newContext()).newPage();
+    await iniciarSesion(garcia, 'medico');
+    await garcia.goto('/pacientes');
+    await garcia.getByRole('button', { name: 'Compartir a Diego Herrera' }).click();
+    const previo = garcia.getByRole('button', { name: 'Dejar de compartir con Ricardo Salazar' });
+    if (await previo.count()) {
+      await previo.click();
+      await expect(previo).toHaveCount(0);
+    }
+    await garcia.locator('#compartir-colega').click();
+    await garcia.getByRole('option', { name: /Ricardo Salazar/ }).click();
+    await garcia.locator('#compartir-nota').fill('Revisión conjunta por cuadro respiratorio');
+    await garcia
+      .getByRole('dialog')
+      .getByRole('button', { name: /Compartir$/ })
+      .click();
+    await expect(garcia.getByText(/fue compartido con Ricardo Salazar/)).toBeVisible();
+    await expect(
+      garcia.getByRole('button', { name: 'Dejar de compartir con Ricardo Salazar' }),
+    ).toBeVisible();
+
+    const salazar = await (await browser.newContext()).newPage();
+    await omitirGuia(salazar);
+    await salazar.goto('/auth/login');
+    await salazar.getByLabel('Email').fill('dr.salazar@tusalud.com');
+    await salazar.locator('#login-password').fill('Medico123!');
+    await salazar.getByRole('button', { name: 'Iniciar sesión' }).click();
+    await expect(salazar).toHaveURL(/\/agenda$/);
+    await salazar.goto('/pacientes');
+    await expect(
+      salazar.getByRole('row', { name: /Diego Herrera/ }).getByText(/Compartido por/),
+    ).toBeVisible();
+
+    await garcia.getByRole('button', { name: 'Dejar de compartir con Ricardo Salazar' }).click();
+    await expect(garcia.getByText('Se dejó de compartir el paciente.')).toBeVisible();
   });
 });
 

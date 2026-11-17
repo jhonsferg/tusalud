@@ -12,4 +12,5 @@ export interface PreferenciasResponse {
   recordatoriosActivos: boolean;
   horasAntelacionRecordatorio: number;
   alertasInicioSesion: boolean;
+  tourCompletado: boolean;
 }

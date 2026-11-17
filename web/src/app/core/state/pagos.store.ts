@@ -71,6 +71,15 @@ export class PagosStore {
     );
   }
 
+  registrarPagoConfirmado(pagoId: number, citaId: number): Observable<PagoResponse> {
+    return this.api.obtenerPago(pagoId).pipe(
+      tap((pago) => {
+        this.pagos.update((items) => (items ? [pago, ...items] : items));
+        this.citas.marcarPagada(citaId);
+      }),
+    );
+  }
+
   reset(): void {
     this.metodos.reset();
     this.pagos.reset();

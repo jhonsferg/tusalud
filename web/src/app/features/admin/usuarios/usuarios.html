@@ -1,6 +1,6 @@
 <app-page-header
   title="Usuarios"
-  subtitle="Cuentas de pacientes, médicos y administradores"
+  subtitle="Cuentas de pacientes, médicos y administradores, y los roles de cada persona"
   icon="pi-id-card"
 />
 
@@ -56,7 +56,7 @@
           <th>Rol</th>
           <th>Último acceso</th>
           <th>Estado</th>
-          <th style="width: 9rem"></th>
+          <th style="width: 13rem"></th>
         </tr>
       </ng-template>
       <ng-template #body let-usuario>
@@ -84,7 +84,16 @@
               [severity]="usuario.estado === 'ACTIVO' ? 'success' : 'secondary'"
             />
           </td>
-          <td class="text-right">
+          <td class="text-right acciones">
+            <p-button
+              icon="pi pi-key"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              [ariaLabel]="'Gestionar roles de ' + usuario.nombreCompleto"
+              pTooltip="Gestionar roles"
+              (onClick)="abrirRoles(usuario)"
+            />
             @if (!esYo(usuario)) {
               <p-button
                 [label]="usuario.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'"
@@ -113,3 +122,48 @@
     </p-table>
   }
 </div>
+
+<p-dialog
+  [header]="'Roles de ' + (editando()?.nombreCompleto ?? '')"
+  [visible]="editando() !== null"
+  (visibleChange)="$event ? null : editando.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '30rem', maxWidth: '94vw' }"
+>
+  @if (errorRoles(); as mensaje) {
+    <p-message severity="error" styleClass="mb-3 w-full">{{ mensaje }}</p-message>
+  }
+  <ul class="roles-lista">
+    @for (rol of store.roles.value() ?? []; track rol.nombre) {
+      <li>
+        <p-checkbox
+          [inputId]="'rol-' + rol.nombre"
+          [binary]="true"
+          [ngModel]="seleccion().includes(rol.nombre)"
+          (ngModelChange)="alternarRolSeleccionado(rol.nombre, $event)"
+        />
+        <label [for]="'rol-' + rol.nombre">
+          <strong>{{ etiquetaRol[rol.nombre] }}</strong>
+          <small>{{ descripcionRol[rol.nombre] }}</small>
+          <small class="text-muted">{{ rol.usuarios }} usuarios con este rol</small>
+        </label>
+      </li>
+    }
+  </ul>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="editando.set(null)"
+    />
+    <p-button
+      label="Guardar roles"
+      icon="pi pi-check"
+      [loading]="guardando()"
+      [disabled]="seleccion().length === 0"
+      (onClick)="guardarRoles()"
+    />
+  </ng-template>
+</p-dialog>

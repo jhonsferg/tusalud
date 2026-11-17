@@ -18,8 +18,7 @@ test.describe('administrador', () => {
     await page.locator('#med-password').fill('Medico123!');
     await page.locator('#med-colegiatura').fill(`CMP-${sufijo.slice(-6)}`);
     await page.locator('#med-consultorio').fill('Consultorio 300');
-    await page.locator('#med-precio').pressSequentially('90');
-    await page.locator('#med-especialidad').click();
+    await page.locator('p-multiselect').click();
     await page.getByRole('option').first().click();
     await page.getByRole('button', { name: 'Registrar médico' }).click();
 
@@ -66,8 +65,12 @@ test.describe('administrador', () => {
   test('filtra médicos por especialidad y búsqueda', async ({ page }) => {
     await iniciarSesion(page, 'admin');
     await page.goto('/medicos');
-    await page.locator('p-select.especialidad').click();
-    await page.getByRole('option', { name: 'Pediatría' }).click();
+    const pediatria = page.getByRole('option', { name: 'Pediatría' });
+    await expect(async () => {
+      await page.locator('p-select.especialidad').click();
+      await expect(pediatria).toBeVisible({ timeout: 1500 });
+    }).toPass();
+    await pediatria.click();
     await expect(page.getByRole('heading', { name: 'Carmen López' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Luis García' })).toHaveCount(0);
     await page.getByPlaceholder('Buscar por nombre').fill('zzzz');
@@ -121,8 +124,8 @@ test.describe('ciclo de vida de una cita', () => {
     await expect(page.getByRole('row').nth(1)).toBeVisible();
   });
 
-  test('el médico revisa la disponibilidad pública de otro médico', async ({ page }) => {
-    await iniciarSesion(page, 'medico');
+  test('el paciente revisa la disponibilidad pública de un médico', async ({ page }) => {
+    await iniciarSesion(page, 'paciente');
     await page.goto('/medicos/2/disponibilidad');
     await expect(page.getByRole('heading', { name: /Horas libres/ })).toBeVisible();
     await page.goto('/especialidades');

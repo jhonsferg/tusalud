@@ -32,6 +32,12 @@ export class MedicosApiService {
     return this.http.post<MedicoResponse>(this.baseUrl, request);
   }
 
+  actualizarEspecialidades(id: number, especialidadIds: number[]): Observable<MedicoResponse> {
+    return this.http.put<MedicoResponse>(`${this.baseUrl}/${id}/especialidades`, {
+      especialidadIds,
+    });
+  }
+
   listarHorarios(medicoId: number): Observable<HorarioResponse[]> {
     return this.http.get<HorarioResponse[]>(`${this.baseUrl}/${medicoId}/horarios`);
   }

@@ -1,0 +1,172 @@
+<section class="mfa">
+  <div class="mfa-head">
+    <span class="mfa-icon"><i class="pi pi-shield"></i></span>
+    <div>
+      <h3>Verificación en dos pasos</h3>
+      <p>
+        Protege tu cuenta con un código temporal de una aplicación autenticadora como Google
+        Authenticator, Microsoft Authenticator o Authy.
+      </p>
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <p-skeleton height="2.5rem" />
+  } @else if (estado(); as estado) {
+    <div class="mfa-estado">
+      @if (estado.activo) {
+        <p-tag severity="success" value="Activada" icon="pi pi-check" />
+        <span class="mfa-restantes"
+          >{{ estado.codigosRecuperacionRestantes }} códigos de recuperación disponibles</span
+        >
+        <span class="mfa-acciones">
+          <p-button
+            label="Regenerar códigos"
+            [outlined]="true"
+            severity="secondary"
+            size="small"
+            (onClick)="abrirRegeneracion()"
+          />
+          <p-button
+            label="Desactivar"
+            [outlined]="true"
+            severity="danger"
+            size="small"
+            (onClick)="abrirDesactivacion()"
+          />
+        </span>
+      } @else {
+        <p-tag severity="warn" value="Desactivada" icon="pi pi-exclamation-triangle" />
+        <span class="mfa-acciones">
+          <p-button
+            label="Activar verificación"
+            icon="pi pi-lock"
+            size="small"
+            (onClick)="abrirActivacion()"
+          />
+        </span>
+      }
+    </div>
+  }
+</section>
+
+<p-dialog
+  [visible]="modo() !== null"
+  (visibleChange)="$event ? null : cerrar()"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '30rem', maxWidth: '94vw' }"
+  [header]="
+    modo() === 'activar'
+      ? 'Activar verificación en dos pasos'
+      : modo() === 'desactivar'
+        ? 'Desactivar verificación'
+        : 'Regenerar códigos de recuperación'
+  "
+>
+  @if (error(); as mensaje) {
+    <p-message severity="error" styleClass="mb-3 w-full">{{ mensaje }}</p-message>
+  }
+
+  @if (modo() === 'activar' && paso() === 1) {
+    <ol class="pasos">
+      <li>Abre tu aplicación autenticadora y elige «Agregar cuenta».</li>
+      <li>Escanea este código QR o ingresa la clave manualmente.</li>
+    </ol>
+    <div class="qr-zona">
+      @if (qr(); as imagen) {
+        <img [src]="imagen" width="220" height="220" alt="Código QR para tu autenticador" />
+      } @else {
+        <p-skeleton width="220px" height="220px" />
+      }
+    </div>
+    @if (configuracion(); as c) {
+      <p class="clave-manual">
+        Clave manual: <code>{{ c.secreto }}</code>
+      </p>
+    }
+    <div class="dialogo-acciones">
+      <p-button label="Cancelar" [text]="true" severity="secondary" (onClick)="cerrar()" />
+      <p-button
+        label="Ya lo escaneé"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        [disabled]="!configuracion()"
+        (onClick)="continuar()"
+      />
+    </div>
+  }
+
+  @if (paso() === 2) {
+    <form (submit)="$event.preventDefault(); confirmar()" class="flex flex-column gap-3" novalidate>
+      @if (modo() === 'desactivar') {
+        <label for="mfa-password">Contraseña</label>
+        <p-password
+          inputId="mfa-password"
+          [formControl]="password"
+          [feedback]="false"
+          [toggleMask]="true"
+          autocomplete="current-password"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+        />
+      }
+      <label for="mfa-codigo">Código de 6 dígitos de tu aplicación</label>
+      <input
+        pInputText
+        id="mfa-codigo"
+        type="text"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        maxlength="6"
+        [formControl]="codigo"
+        placeholder="000000"
+        class="w-full codigo"
+      />
+      <div class="dialogo-acciones">
+        <p-button label="Cancelar" [text]="true" severity="secondary" (onClick)="cerrar()" />
+        <p-button
+          type="submit"
+          [label]="
+            modo() === 'desactivar'
+              ? 'Desactivar'
+              : modo() === 'regenerar'
+                ? 'Regenerar'
+                : 'Verificar y activar'
+          "
+          [severity]="modo() === 'desactivar' ? 'danger' : 'primary'"
+          [loading]="trabajando()"
+        />
+      </div>
+    </form>
+  }
+
+  @if (paso() === 3) {
+    <p-message severity="warn" styleClass="mb-3 w-full"
+      >Guarda estos códigos en un lugar seguro. Cada uno sirve una sola vez si pierdes tu
+      dispositivo y no se volverán a mostrar.</p-message
+    >
+    <ul class="codigos">
+      @for (c of codigosRecuperacion(); track c) {
+        <li>{{ c }}</li>
+      }
+    </ul>
+    <div class="dialogo-acciones">
+      <p-button
+        label="Copiar"
+        icon="pi pi-copy"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="copiarCodigos()"
+      />
+      <p-button
+        label="Descargar"
+        icon="pi pi-download"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="descargarCodigos()"
+      />
+      <p-button label="Listo" (onClick)="cerrar()" />
+    </div>
+  }
+</p-dialog>

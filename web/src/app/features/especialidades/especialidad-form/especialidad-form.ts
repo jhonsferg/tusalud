@@ -10,6 +10,7 @@ import {
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
+import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 
@@ -29,6 +30,7 @@ import { PageHeader } from '@tusalud/app/shared/components/page-header/page-head
     ReactiveFormsModule,
     RouterLink,
     Button,
+    InputNumber,
     InputText,
     Textarea,
     EmptyState,
@@ -51,6 +53,7 @@ export class EspecialidadForm {
   protected readonly form = inject(FormBuilder).nonNullable.group({
     nombre: ['', [Validators.required, AppValidators.notBlank, Validators.maxLength(80)]],
     descripcion: ['', [Validators.maxLength(255)]],
+    precioConsulta: [null as number | null, [Validators.required, Validators.min(0.01)]],
   });
 
   constructor() {
@@ -63,7 +66,11 @@ export class EspecialidadForm {
     effect(() => {
       const actual = this.store.selected.value();
       if (actual && actual.id === this.id()) {
-        this.form.reset({ nombre: actual.nombre, descripcion: actual.descripcion ?? '' });
+        this.form.reset({
+          nombre: actual.nombre,
+          descripcion: actual.descripcion ?? '',
+          precioConsulta: actual.precioConsulta,
+        });
       }
     });
   }
@@ -73,8 +80,12 @@ export class EspecialidadForm {
       this.form.markAllAsTouched();
       return;
     }
-    const { nombre, descripcion } = this.form.getRawValue();
-    const request = { nombre: nombre.trim(), descripcion: descripcion.trim() || null };
+    const { nombre, descripcion, precioConsulta } = this.form.getRawValue();
+    const request = {
+      nombre: nombre.trim(),
+      descripcion: descripcion.trim() || null,
+      precioConsulta: precioConsulta!,
+    };
     const id = this.id();
     this.submitting.set(true);
     const operacion =

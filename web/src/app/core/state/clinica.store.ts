@@ -4,6 +4,8 @@ import { Observable, tap } from 'rxjs';
 import {
   AtencionRequest,
   AtencionResponse,
+  CompartidoResponse,
+  CompartirPacienteRequest,
   DatosMedicosRequest,
   HistoriaClinicaResponse,
   PacienteClinicoResponse,
@@ -23,6 +25,7 @@ export class ClinicaStore {
   readonly historia = new AsyncState<HistoriaClinicaResponse>();
   readonly pacientes = new AsyncState<PacienteResumenResponse[]>();
   readonly atencion = new AsyncState<AtencionResponse>();
+  readonly compartidos = new AsyncState<CompartidoResponse[]>();
   readonly valoracion = new AsyncState<ValoracionResponse>();
   readonly valoraciones = new AsyncState<ValoracionesMedicoResponse>();
 
@@ -44,6 +47,31 @@ export class ClinicaStore {
       .pipe(
         tap((paciente) =>
           this.historia.update((historia) => (historia ? { ...historia, paciente } : historia)),
+        ),
+      );
+  }
+
+  cargarCompartidos(pacienteId: number): void {
+    this.compartidos.load(this.api.listarCompartidos(pacienteId));
+  }
+
+  compartirPaciente(
+    pacienteId: number,
+    request: CompartirPacienteRequest,
+  ): Observable<CompartidoResponse> {
+    return this.api
+      .compartirPaciente(pacienteId, request)
+      .pipe(
+        tap((compartido) => this.compartidos.update((items) => [...(items ?? []), compartido])),
+      );
+  }
+
+  dejarDeCompartir(pacienteId: number, medicoId: number): Observable<void> {
+    return this.api
+      .dejarDeCompartir(pacienteId, medicoId)
+      .pipe(
+        tap(() =>
+          this.compartidos.update((items) => items?.filter((item) => item.medicoId !== medicoId)),
         ),
       );
   }
@@ -85,6 +113,7 @@ export class ClinicaStore {
   reset(): void {
     this.historia.reset();
     this.pacientes.reset();
+    this.compartidos.reset();
     this.atencion.reset();
     this.valoracion.reset();
     this.valoraciones.reset();

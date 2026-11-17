@@ -18,6 +18,9 @@ export interface CitaResponse {
   medicoId: number;
   medicoNombre: string;
   especialidad: string;
+  especialidadId: number;
+  especialidadNombre: string;
+  precio: number;
   consultorio?: string | null;
   pacienteId: number;
   pacienteNombre: string;
@@ -28,6 +31,7 @@ export interface CitaResponse {
 
 export interface CitaCreateRequest {
   medicoId: number;
+  especialidadId: number;
   fechaHora: string;
   motivo: string;
 }

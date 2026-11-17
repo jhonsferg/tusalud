@@ -1,4 +1,4 @@
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -39,6 +39,7 @@ import { AppValidators, PASSWORD_MAX } from '@tusalud/app/core/validators/app.va
 import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
 import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
 import { FormField } from '@tusalud/app/shared/components/form-field/form-field';
+import { MfaPanel } from '@tusalud/app/features/perfil/mfa-panel/mfa-panel';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
 import { UserAvatar } from '@tusalud/app/shared/components/user-avatar/user-avatar';
 
@@ -106,7 +107,7 @@ function reducirImagen(archivo: File): Promise<string> {
 @Component({
   selector: 'app-perfil',
   imports: [
-    CurrencyPipe,
+    MfaPanel,
     DatePipe,
     FormsModule,
     ReactiveFormsModule,

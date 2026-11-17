@@ -23,6 +23,9 @@ function cita(id: number, fechaHora: string, estado: CitaResponse['estado']): Ci
     medicoId: 1,
     medicoNombre: 'Luis García',
     especialidad: 'Cardiología',
+    especialidadId: 1,
+    especialidadNombre: 'Cardiología',
+    precio: 150,
     consultorio: 'Consultorio 101',
     pacienteId: 1,
     pacienteNombre: 'Juan Pérez',
@@ -102,7 +105,7 @@ describe('stores', () => {
       { id: 2, nombre: 'Pediatría' },
     ]);
 
-    store.crear({ nombre: 'Dermatología' }).subscribe();
+    store.crear({ nombre: 'Dermatología', precioConsulta: 130 }).subscribe();
     controller.expectOne('/api/v1/especialidades').flush({ id: 3, nombre: 'Dermatología' });
     expect(store.especialidades().map((e) => e.nombre)).toEqual([
       'Cardiología',
@@ -110,7 +113,7 @@ describe('stores', () => {
       'Pediatría',
     ]);
 
-    store.actualizar(2, { nombre: 'Alergología' }).subscribe();
+    store.actualizar(2, { nombre: 'Alergología', precioConsulta: 120 }).subscribe();
     controller.expectOne('/api/v1/especialidades/2').flush({ id: 2, nombre: 'Alergología' });
     expect(store.opciones()[0]).toEqual({ value: 2, label: 'Alergología' });
 
@@ -147,7 +150,7 @@ describe('stores', () => {
     controller.expectOne((req) => req.url === '/api/v1/medicos').flush([]);
     const medico = {
       id: 9,
-      especialidadId: 1,
+      especialidades: [{ id: 1, nombre: 'Cardiología', precioConsulta: 150 }],
       apellido: 'Torres',
       nombre: 'Ana',
     } as MedicoResponse;

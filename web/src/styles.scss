@@ -57,15 +57,16 @@ a {
 }
 
 .page {
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
 }
 
 .panel {
   background: var(--p-content-background);
   border: 1px solid var(--p-content-border-color);
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 1.25rem;
+  box-shadow: 0 1px 2px rgb(16 24 40 / 5%);
 }
 
 .text-muted {
@@ -74,6 +75,29 @@ a {
 
 .p-datatable .p-datatable-tbody > tr > td {
   vertical-align: middle;
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  background: var(--p-content-hover-background);
+  color: var(--p-text-muted-color);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.p-button {
+  font-weight: 600;
+}
+
+:focus-visible {
+  outline: 2px solid var(--p-primary-color);
+  outline-offset: 2px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--p-text-muted-color) 40%, transparent) transparent;
 }
 
 .form-grid {

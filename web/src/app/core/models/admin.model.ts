@@ -37,3 +37,9 @@ export interface UsuarioAdminResponse {
   createdAt: string;
   ultimoAcceso?: string | null;
 }
+
+export interface RolResumenResponse {
+  nombre: string;
+  descripcion: string;
+  usuarios: number;
+}

@@ -71,7 +71,11 @@
           />
           <div class="min-w-0">
             <h3>{{ medico.nombreCompleto }}</h3>
-            <p-tag [value]="medico.especialidadNombre" severity="info" [rounded]="true" />
+            <div class="chips">
+              @for (esp of medico.especialidades; track esp.id) {
+                <p-tag [value]="esp.nombre" severity="info" [rounded]="true" />
+              }
+            </div>
           </div>
         </header>
         <ul>
@@ -81,7 +85,8 @@
           </li>
           <li>
             <i class="pi pi-wallet"></i>
-            {{ medico.precioConsulta | currency: 'PEN' : 'symbol-narrow' }} por consulta
+            {{ desde(medico) | currency: 'PEN' : 'symbol-narrow' }}
+            {{ medico.especialidades.length > 1 ? 'desde, según especialidad' : 'por consulta' }}
           </li>
         </ul>
         @if (medico.estado === 'INACTIVO') {

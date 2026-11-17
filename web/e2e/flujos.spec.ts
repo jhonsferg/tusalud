@@ -48,9 +48,9 @@ test.describe('paciente', () => {
   test('no puede entrar a las secciones de administración', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
     await page.goto('/admin/auditoria');
-    await expect(page).toHaveURL(/\/acceso-denegado/);
+    await expect(page).toHaveURL(/\/citas$/);
     await page.goto('/medicos/nuevo');
-    await expect(page).toHaveURL(/\/acceso-denegado/);
+    await expect(page).toHaveURL(/\/citas$/);
   });
 });
 
@@ -83,6 +83,7 @@ test.describe('administrador', () => {
     await page.goto('/especialidades/nueva');
     await page.locator('#esp-nombre').fill(nombre);
     await page.locator('#esp-descripcion').fill('Creada por e2e');
+    await page.locator('#esp-precio').pressSequentially('100');
     await page.getByRole('button', { name: 'Crear especialidad' }).click();
     await expect(page.getByRole('cell', { name: nombre, exact: true })).toBeVisible();
 

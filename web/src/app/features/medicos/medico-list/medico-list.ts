@@ -18,6 +18,7 @@ import { Select } from 'primeng/select';
 import { Skeleton } from 'primeng/skeleton';
 import { Tag } from 'primeng/tag';
 
+import { MedicoResponse } from '@tusalud/app/core/models';
 import { AuthService } from '@tusalud/app/core/services/auth.service';
 import { EspecialidadesStore } from '@tusalud/app/core/state/especialidades.store';
 import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
@@ -60,7 +61,7 @@ export class MedicoList implements OnInit {
       (medico) =>
         !termino ||
         medico.nombreCompleto.toLowerCase().includes(termino) ||
-        medico.especialidadNombre.toLowerCase().includes(termino) ||
+        medico.especialidades.some((e) => e.nombre.toLowerCase().includes(termino)) ||
         medico.colegiatura.toLowerCase().includes(termino),
     );
   });
@@ -68,6 +69,10 @@ export class MedicoList implements OnInit {
   ngOnInit(): void {
     this.especialidades.load();
     this.store.load(this.store.filtroEspecialidad());
+  }
+
+  protected desde(medico: MedicoResponse): number {
+    return Math.min(...medico.especialidades.map((especialidad) => especialidad.precioConsulta));
   }
 
   protected filtrarPorEspecialidad(id: number | null): void {

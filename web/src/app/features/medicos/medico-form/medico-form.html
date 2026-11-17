@@ -85,21 +85,23 @@
     </app-form-field>
 
     <app-form-field
-      label="Especialidad"
-      [control]="form.controls.especialidadId"
+      label="Especialidades"
+      [control]="form.controls.especialidadIds"
+      hint="El precio de la consulta lo define cada especialidad"
       inputId="med-especialidad"
       [required]="true"
     >
-      <p-select
+      <p-multiselect
         inputId="med-especialidad"
-        formControlName="especialidadId"
+        formControlName="especialidadIds"
         [options]="especialidades.opciones()"
         optionLabel="label"
         optionValue="value"
-        placeholder="Selecciona una especialidad"
+        placeholder="Selecciona una o más especialidades"
         [loading]="especialidades.list.loading()"
         [filter]="true"
         filterPlaceholder="Buscar"
+        display="chip"
         appendTo="body"
         styleClass="w-full"
       />
@@ -112,25 +114,6 @@
       hint="Opcional"
     >
       <input pInputText id="med-consultorio" formControlName="consultorio" class="w-full" />
-    </app-form-field>
-
-    <app-form-field
-      label="Precio de consulta"
-      [control]="form.controls.precioConsulta"
-      inputId="med-precio"
-      [required]="true"
-    >
-      <p-inputnumber
-        inputId="med-precio"
-        formControlName="precioConsulta"
-        mode="currency"
-        currency="PEN"
-        locale="es-PE"
-        [min]="0"
-        [minFractionDigits]="2"
-        [maxFractionDigits]="2"
-        [fluid]="true"
-      />
     </app-form-field>
   </div>
 

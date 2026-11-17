@@ -1,6 +1,6 @@
 <app-page-header
   [title]="editando() ? 'Editar especialidad' : 'Nueva especialidad'"
-  subtitle="Los pacientes verán esta información al buscar médicos"
+  subtitle="Define el nombre y la tarifa de consulta que se cobra por esta especialidad"
   icon="pi-heart"
   backLink="/especialidades"
   backLabel="Volver a especialidades"
@@ -25,6 +25,26 @@
         [required]="true"
       >
         <input pInputText id="esp-nombre" formControlName="nombre" class="w-full" />
+      </app-form-field>
+
+      <app-form-field
+        label="Precio de consulta"
+        [control]="form.controls.precioConsulta"
+        inputId="esp-precio"
+        hint="Se aplica a las nuevas reservas. Las citas ya reservadas conservan su precio."
+        [required]="true"
+      >
+        <p-inputnumber
+          inputId="esp-precio"
+          formControlName="precioConsulta"
+          mode="currency"
+          currency="PEN"
+          locale="es-PE"
+          [min]="0"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          [fluid]="true"
+        />
       </app-form-field>
 
       <app-form-field

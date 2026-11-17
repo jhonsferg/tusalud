@@ -12,3 +12,22 @@
   text-align: center;
   color: var(--p-text-muted-color);
 }
+
+.codigo-mfa {
+  font-size: 1.5rem;
+  letter-spacing: 0.35em;
+  text-align: center;
+}
+
+.link-button {
+  border: 0;
+  background: none;
+  color: var(--app-primary-text);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

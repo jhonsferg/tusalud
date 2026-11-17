@@ -23,7 +23,11 @@
         <span class="monogram">{{ medico.nombre[0] }}{{ medico.apellido[0] }}</span>
         <div>
           <h2>{{ medico.nombreCompleto }}</h2>
-          <p-tag [value]="medico.especialidadNombre" severity="info" [rounded]="true" />
+          <div class="chips">
+            @for (esp of medico.especialidades; track esp.id) {
+              <p-tag [value]="esp.nombre" severity="info" [rounded]="true" />
+            }
+          </div>
           @if (medico.estado === 'INACTIVO') {
             <p-tag value="Inactivo" severity="secondary" [rounded]="true" styleClass="ml-2" />
           }
@@ -47,11 +51,17 @@
           <dt>Teléfono</dt>
           <dd>{{ medico.telefono || 'No registrado' }}</dd>
         </div>
-        <div>
-          <dt>Precio de consulta</dt>
-          <dd>{{ medico.precioConsulta | currency: 'PEN' : 'symbol-narrow' }}</dd>
-        </div>
       </dl>
+
+      <h3 class="subtitulo">Especialidades y tarifas</h3>
+      <ul class="tarifas">
+        @for (esp of medico.especialidades; track esp.id) {
+          <li>
+            <span>{{ esp.nombre }}</span>
+            <strong>{{ esp.precioConsulta | currency: 'PEN' : 'symbol-narrow' }}</strong>
+          </li>
+        }
+      </ul>
 
       <div class="actions">
         <p-button
@@ -60,6 +70,15 @@
           [outlined]="true"
           [routerLink]="['/medicos', medico.id, 'disponibilidad']"
         />
+        @if (auth.isAdmin()) {
+          <p-button
+            label="Editar especialidades"
+            icon="pi pi-pencil"
+            [outlined]="true"
+            severity="secondary"
+            (onClick)="abrirEspecialidades(medico)"
+          />
+        }
         @if (auth.isPaciente() && medico.estado === 'ACTIVO') {
           <p-button
             label="Reservar cita"
@@ -158,3 +177,45 @@
     <div class="panel"><p-skeleton height="16rem" /></div>
   </div>
 }
+
+<p-dialog
+  header="Especialidades del médico"
+  [visible]="editando()"
+  (visibleChange)="editando.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '28rem', maxWidth: '94vw' }"
+>
+  <p class="text-muted">
+    El precio de cada consulta se define en la especialidad, no en el médico.
+  </p>
+  <p-multiselect
+    inputId="med-esp-edicion"
+    [options]="especialidades.opciones()"
+    optionLabel="label"
+    optionValue="value"
+    [ngModel]="seleccion()"
+    (ngModelChange)="seleccion.set($event)"
+    placeholder="Selecciona especialidades"
+    display="chip"
+    appendTo="body"
+    styleClass="w-full"
+  />
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="editando.set(false)"
+    />
+    @if (store.selected.value(); as medico) {
+      <p-button
+        label="Guardar"
+        icon="pi pi-check"
+        [loading]="guardando()"
+        [disabled]="seleccion().length === 0"
+        (onClick)="guardarEspecialidades(medico)"
+      />
+    }
+  </ng-template>
+</p-dialog>

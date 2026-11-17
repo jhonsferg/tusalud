@@ -9,6 +9,7 @@ import {
   EstadisticasResponse,
   PagoResponse,
   RangoFechas,
+  RolResumenResponse,
   UsuarioAdminResponse,
 } from '@tusalud/app/core/models';
 import { toHttpParams } from '@tusalud/app/core/utils/http-params';
@@ -55,5 +56,13 @@ export class AdminApiService {
     estado: 'ACTIVO' | 'INACTIVO',
   ): Observable<UsuarioAdminResponse> {
     return this.http.put<UsuarioAdminResponse>(`${this.baseUrl}/usuarios/${id}/estado`, { estado });
+  }
+
+  listarRoles(): Observable<RolResumenResponse[]> {
+    return this.http.get<RolResumenResponse[]>(`${this.baseUrl}/roles`);
+  }
+
+  actualizarRoles(id: number, roles: string[]): Observable<UsuarioAdminResponse> {
+    return this.http.put<UsuarioAdminResponse>(`${this.baseUrl}/usuarios/${id}/roles`, { roles });
   }
 }

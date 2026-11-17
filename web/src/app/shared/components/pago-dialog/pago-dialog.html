@@ -19,28 +19,92 @@
         <p-message severity="error" icon="pi pi-exclamation-circle">{{ mensaje }}</p-message>
       }
 
-      <div class="campo">
-        <label for="pago-metodo">Método de pago</label>
-        @if (opciones().length > 0) {
-          <p-select
-            inputId="pago-metodo"
-            [options]="opciones()"
-            optionLabel="label"
-            optionValue="value"
-            [ngModel]="metodoId()"
-            (ngModelChange)="metodoId.set($event)"
-            placeholder="Selecciona una tarjeta"
-            appendTo="body"
-            styleClass="w-full"
-          />
-        } @else {
-          <p class="sin-metodos">
-            <i class="pi pi-credit-card"></i>
-            No tienes tarjetas vigentes.
-            <a routerLink="/pagos/metodos" (click)="visible.set(false)">Agregar una tarjeta</a>
+      <p-selectbutton
+        [options]="canales"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="canal()"
+        (ngModelChange)="cambiarCanal($event)"
+        [allowEmpty]="false"
+        ariaLabel="Medio de pago"
+        styleClass="canales"
+      >
+        <ng-template #item let-item>
+          <span class="canal"><i [class]="item.icon"></i> {{ item.label }}</span>
+        </ng-template>
+      </p-selectbutton>
+
+      @if (canal() === 'TARJETA') {
+        <div class="campo">
+          <label for="pago-metodo">Método de pago</label>
+          @if (opciones().length > 0) {
+            <p-select
+              inputId="pago-metodo"
+              [options]="opciones()"
+              optionLabel="label"
+              optionValue="value"
+              [ngModel]="metodoId()"
+              (ngModelChange)="metodoId.set($event)"
+              placeholder="Selecciona una tarjeta"
+              appendTo="body"
+              styleClass="w-full"
+            />
+          } @else {
+            <p class="sin-metodos">
+              <i class="pi pi-credit-card"></i>
+              No tienes tarjetas vigentes.
+              <a routerLink="/pagos/metodos" (click)="visible.set(false)">Agregar una tarjeta</a>
+            </p>
+          }
+        </div>
+      } @else if (qr(); as qr) {
+        <div class="qr-caja" [attr.data-billetera]="qr.billetera">
+          @if (qr.estado === 'PENDIENTE') {
+            <p class="qr-titulo">
+              Escanea con <strong>{{ qr.billetera === 'YAPE' ? 'Yape' : 'Plin' }}</strong> y
+              confirma el pago de
+              <strong>{{ qr.total | currency: 'PEN' : 'symbol-narrow' }}</strong>
+            </p>
+            @if (qrImagen(); as imagen) {
+              <img [src]="imagen" width="240" height="240" alt="Código QR de pago" />
+            }
+            <p class="qr-tiempo"><i class="pi pi-clock"></i> Vence en {{ tiempo() }}</p>
+            <p class="qr-espera"><i class="pi pi-spin pi-spinner"></i> Esperando confirmación…</p>
+            @if (simulacionDisponible()) {
+              <p-button
+                label="Simular pago desde la app"
+                icon="pi pi-mobile"
+                [outlined]="true"
+                size="small"
+                [loading]="simulando()"
+                (onClick)="simularPagoEnApp()"
+              />
+            }
+          } @else if (vencido()) {
+            <p class="qr-titulo"><i class="pi pi-exclamation-triangle"></i> El código QR venció.</p>
+            <p-button label="Generar un nuevo QR" icon="pi pi-refresh" (onClick)="cancelarQr()" />
+          } @else if (qr.estado === 'CONFIRMADO') {
+            <p class="qr-titulo ok"><i class="pi pi-check-circle"></i> Pago confirmado.</p>
+          } @else {
+            <p class="qr-titulo">El pago fue cancelado.</p>
+            <p-button label="Volver a intentar" (onClick)="cancelarQr()" />
+          }
+        </div>
+      } @else {
+        <div class="qr-caja" [attr.data-billetera]="billetera()">
+          <p class="qr-titulo">
+            Genera un código QR y escanéalo desde tu app de
+            <strong>{{ billetera() === 'YAPE' ? 'Yape' : 'Plin' }}</strong
+            >.
           </p>
-        }
-      </div>
+          <p-button
+            label="Generar código QR"
+            icon="pi pi-qrcode"
+            [loading]="generando()"
+            (onClick)="generarQr()"
+          />
+        </div>
+      }
 
       <div class="campo">
         <label for="pago-cupon">¿Tienes un cupón de descuento?</label>
@@ -104,12 +168,14 @@
       [outlined]="true"
       (onClick)="visible.set(false)"
     />
-    <p-button
-      label="Pagar ahora"
-      icon="pi pi-lock"
-      [loading]="pagando()"
-      [disabled]="metodoId() === null"
-      (onClick)="pagar()"
-    />
+    @if (canal() === 'TARJETA') {
+      <p-button
+        label="Pagar ahora"
+        icon="pi pi-lock"
+        [loading]="pagando()"
+        [disabled]="metodoId() === null"
+        (onClick)="pagar()"
+      />
+    }
   </ng-template>
 </p-dialog>

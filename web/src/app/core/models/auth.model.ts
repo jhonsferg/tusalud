@@ -49,3 +49,39 @@ export interface Session {
   expiresAt: number;
   user: SessionUser;
 }
+
+export interface LoginResponse extends Omit<AuthResponse, 'token'> {
+  token?: string | null;
+  mfaRequerido?: boolean;
+  mfaToken?: string | null;
+}
+
+export interface MfaChallenge {
+  mfaToken: string;
+}
+
+export type LoginResult = { sesion: SessionUser } | { mfa: MfaChallenge };
+
+export interface MfaVerifyRequest {
+  mfaToken: string;
+  codigo: string;
+}
+
+export interface MfaEstadoResponse {
+  activo: boolean;
+  codigosRecuperacionRestantes: number;
+}
+
+export interface MfaConfiguracionResponse {
+  secreto: string;
+  otpauthUri: string;
+}
+
+export interface MfaActivacionResponse {
+  codigosRecuperacion: string[];
+}
+
+export interface MfaDesactivarRequest {
+  password: string;
+  codigo: string;
+}

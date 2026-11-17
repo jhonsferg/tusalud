@@ -1,3 +1,4 @@
+import { CurrencyPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -25,6 +26,7 @@ import { PageHeader } from '@tusalud/app/shared/components/page-header/page-head
 @Component({
   selector: 'app-especialidad-list',
   imports: [
+    CurrencyPipe,
     FormsModule,
     RouterLink,
     Button,

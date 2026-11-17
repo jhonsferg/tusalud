@@ -5,6 +5,7 @@ import { Observable, map, tap } from 'rxjs';
 import {
   AuthResponse,
   LoginRequest,
+  LoginResult,
   ROLES,
   RegisterRequest,
   Rol,
@@ -29,7 +30,7 @@ const HOME_BY_ROLE: readonly (readonly [Rol, string])[] = [
   ['ROLE_PACIENTE', '/citas'],
 ];
 
-const DEFAULT_HOME = '/especialidades';
+const DEFAULT_HOME = '/perfil';
 
 function isRol(value: unknown): value is Rol {
   return typeof value === 'string' && (ROLES as readonly string[]).includes(value);
@@ -103,8 +104,20 @@ export class AuthService {
     });
   }
 
-  login(request: LoginRequest): Observable<SessionUser> {
-    return this.api.login({ ...request, email: request.email.trim().toLowerCase() }).pipe(
+  login(request: LoginRequest): Observable<LoginResult> {
+    return this.api
+      .login({ ...request, email: request.email.trim().toLowerCase() })
+      .pipe(
+        map((response) =>
+          response.mfaRequerido && response.mfaToken
+            ? ({ mfa: { mfaToken: response.mfaToken } } satisfies LoginResult)
+            : this.abrirSesion(response as AuthResponse),
+        ),
+      );
+  }
+
+  verificarMfa(mfaToken: string, codigo: string): Observable<SessionUser> {
+    return this.api.verificarMfa({ mfaToken, codigo }).pipe(
       map((response) => toSession(response)),
       tap((session) => this.state.set(session)),
       map((session) => session.user),
@@ -152,6 +165,12 @@ export class AuthService {
     void this.router.navigate([LOGIN_URL], {
       queryParams: returnUrl && !returnUrl.startsWith('/auth') ? { returnUrl } : undefined,
     });
+  }
+
+  private abrirSesion(response: AuthResponse): LoginResult {
+    const session = toSession(response);
+    this.state.set(session);
+    return { sesion: session.user };
   }
 
   private restoreSession(): Session | null {

@@ -3,25 +3,26 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
+  effect,
   computed,
   inject,
   signal,
 } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { MenuItem } from 'primeng/api';
 import { Badge } from 'primeng/badge';
 import { Button } from 'primeng/button';
 import { Drawer } from 'primeng/drawer';
-import { Menu } from 'primeng/menu';
 import { Popover } from 'primeng/popover';
 import { Tooltip } from 'primeng/tooltip';
 
 import { NotificacionResponse, Rol } from '@tusalud/app/core/models';
 import { AuthService } from '@tusalud/app/core/services/auth.service';
 import { StorageService } from '@tusalud/app/core/services/storage.service';
-import { ThemeService } from '@tusalud/app/core/services/theme.service';
+import { ThemeMode, ThemeService } from '@tusalud/app/core/services/theme.service';
+import { TourService } from '@tusalud/app/core/services/tour.service';
 import { NotificacionesStore } from '@tusalud/app/core/state/notificaciones.store';
 import { PerfilStore } from '@tusalud/app/core/state/perfil.store';
+import { Tour } from '@tusalud/app/shared/components/tour/tour';
 import { UserAvatar } from '@tusalud/app/shared/components/user-avatar/user-avatar';
 import { COLOR_NOTIFICACION, ICONO_NOTIFICACION } from '@tusalud/app/shared/utils/notificacion';
 
@@ -99,8 +100,18 @@ const NAV_GROUPS: readonly NavGroup[] = [
   {
     title: 'Directorio',
     items: [
-      { label: 'Médicos', icon: 'pi-user-plus', link: '/medicos', roles: TODOS },
-      { label: 'Especialidades', icon: 'pi-heart', link: '/especialidades', roles: TODOS },
+      {
+        label: 'Médicos',
+        icon: 'pi-user-plus',
+        link: '/medicos',
+        roles: ['ROLE_ADMIN', 'ROLE_PACIENTE'],
+      },
+      {
+        label: 'Especialidades',
+        icon: 'pi-heart',
+        link: '/especialidades',
+        roles: ['ROLE_ADMIN', 'ROLE_PACIENTE'],
+      },
     ],
   },
   {
@@ -137,10 +148,10 @@ const COLLAPSE_KEY = 'tusalud.sidebar.collapsed';
     Badge,
     Button,
     Drawer,
-    Menu,
     Popover,
     Tooltip,
     UserAvatar,
+    Tour,
   ],
   templateUrl: './shell.html',
   styleUrl: './shell.scss',
@@ -153,6 +164,8 @@ export class Shell implements OnInit {
   private readonly perfil = inject(PerfilStore);
   private readonly router = inject(Router);
   private readonly storage = inject(StorageService);
+  protected readonly tour = inject(TourService);
+  private tourOfrecido = false;
 
   protected readonly menuOpen = signal(false);
   protected readonly collapsed = signal(
@@ -163,6 +176,7 @@ export class Shell implements OnInit {
   protected readonly user = this.auth.user;
   protected readonly avatar = computed(() => this.perfil.perfil.value()?.avatar ?? null);
   protected readonly rol = computed(() => ETIQUETA_ROL[this.auth.roles()[0]] ?? '');
+  protected readonly correo = computed(() => this.auth.user()?.email ?? '');
   protected readonly grupos = computed(() =>
     NAV_GROUPS.map((grupo) => ({
       title: grupo.title,
@@ -170,30 +184,46 @@ export class Shell implements OnInit {
     })).filter((grupo) => grupo.items.length > 0),
   );
 
-  protected readonly menuUsuario = computed<MenuItem[]>(() => [
-    { label: 'Mi perfil', icon: 'pi pi-user', routerLink: '/perfil' },
-    {
-      label: 'Seguridad y sesiones',
-      icon: 'pi pi-shield',
-      routerLink: '/perfil',
-      queryParams: { tab: 'seguridad' },
-    },
-    { label: 'Notificaciones', icon: 'pi pi-bell', routerLink: '/notificaciones' },
-    { separator: true },
-    {
-      label: this.theme.isDark() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro',
-      icon: this.theme.isDark() ? 'pi pi-sun' : 'pi pi-moon',
-      command: () => this.theme.toggle(),
-    },
-    { separator: true },
-    { label: 'Cerrar sesión', icon: 'pi pi-sign-out', command: () => this.salir() },
-  ]);
+  protected readonly accesos = [
+    { label: 'Mi perfil', icon: 'pi-user', link: '/perfil', tab: null },
+    { label: 'Seguridad y verificación', icon: 'pi-shield', link: '/perfil', tab: 'seguridad' },
+    { label: 'Apariencia', icon: 'pi-palette', link: '/perfil', tab: 'apariencia' },
+    { label: 'Notificaciones', icon: 'pi-bell', link: '/notificaciones', tab: null },
+  ] as const;
+
+  protected readonly modos: readonly { valor: ThemeMode; label: string; icon: string }[] = [
+    { valor: 'light', label: 'Claro', icon: 'pi-sun' },
+    { valor: 'dark', label: 'Oscuro', icon: 'pi-moon' },
+    { valor: 'auto', label: 'Sistema', icon: 'pi-desktop' },
+  ];
 
   protected readonly icono = ICONO_NOTIFICACION;
   protected readonly color = COLOR_NOTIFICACION;
 
+  constructor() {
+    effect(() => {
+      const preferencias = this.perfil.preferencias.value();
+      if (preferencias && !preferencias.tourCompletado && !this.tourOfrecido) {
+        this.tourOfrecido = true;
+        setTimeout(() => this.iniciarTour(), 600);
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.perfil.load();
+    this.perfil.cargarPreferencias();
+  }
+
+  protected iniciarTour(panel?: Popover): void {
+    panel?.hide();
+    this.menuOpen.set(false);
+    this.tour.start(() => this.perfil.marcarTour(true).subscribe({ error: () => undefined }));
+  }
+
+  protected salirDelPanel(panel: Popover): void {
+    panel.hide();
+    this.salir();
   }
 
   protected alternarColapso(): void {
@@ -218,6 +248,10 @@ export class Shell implements OnInit {
 
   protected marcarTodas(): void {
     this.notificaciones.marcarTodasLeidas().subscribe({ error: () => undefined });
+  }
+
+  protected alternarTema(modo: ThemeMode): void {
+    this.theme.setMode(modo);
   }
 
   protected salir(): void {

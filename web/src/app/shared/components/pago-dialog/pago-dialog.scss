@@ -71,3 +71,61 @@ dl {
     }
   }
 }
+
+:host ::ng-deep .canales {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  .p-togglebutton {
+    justify-content: center;
+  }
+}
+
+.canal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.qr-caja {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.1rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 14px;
+  text-align: center;
+
+  &[data-billetera='YAPE'] {
+    border-color: #742284;
+    background: color-mix(in srgb, #742284 8%, transparent);
+  }
+
+  &[data-billetera='PLIN'] {
+    border-color: #00b3c6;
+    background: color-mix(in srgb, #00b3c6 8%, transparent);
+  }
+
+  img {
+    padding: 0.5rem;
+    border-radius: 10px;
+    background: #ffffff;
+  }
+}
+
+.qr-titulo {
+  margin: 0;
+  line-height: 1.5;
+
+  &.ok {
+    color: var(--p-green-600);
+  }
+}
+
+.qr-tiempo,
+.qr-espera {
+  margin: 0;
+  color: var(--p-text-muted-color);
+  font-size: 0.9rem;
+}

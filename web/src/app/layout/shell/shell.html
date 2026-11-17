@@ -17,6 +17,7 @@
         @for (item of grupo.items; track item.link) {
           <a
             class="nav-link"
+            [attr.data-tour]="'nav:' + item.link"
             [routerLink]="item.link"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
@@ -41,6 +42,16 @@
       </div>
     }
   </nav>
+
+  @if (!compact) {
+    <button type="button" class="ayuda" (click)="iniciarTour()">
+      <i class="pi pi-compass"></i>
+      <span>
+        <strong>¿Primera vez aquí?</strong>
+        <small>Recorre la guía paso a paso</small>
+      </span>
+    </button>
+  }
 </ng-template>
 
 <div class="shell" [class.collapsed]="collapsed()">
@@ -71,6 +82,7 @@
       <div class="spacer"></div>
 
       <p-button
+        data-tour="tema"
         [icon]="theme.isDark() ? 'pi pi-sun' : 'pi pi-moon'"
         [text]="true"
         [rounded]="true"
@@ -79,7 +91,7 @@
         (onClick)="theme.toggle()"
       />
 
-      <div class="bell">
+      <div class="bell" data-tour="bell">
         <p-button
           icon="pi pi-bell"
           [text]="true"
@@ -98,9 +110,10 @@
       <button
         type="button"
         class="user-button"
+        data-tour="usuario"
         aria-haspopup="menu"
         aria-label="Menú de usuario"
-        (click)="menuDeUsuario.toggle($event)"
+        (click)="panelUsuario.toggle($event)"
       >
         <app-user-avatar [nombre]="user()?.nombreCompleto ?? ''" [imagen]="avatar()" />
         <span class="user-text">
@@ -109,7 +122,6 @@
         </span>
         <i class="pi pi-chevron-down user-caret"></i>
       </button>
-      <p-menu #menuDeUsuario [model]="menuUsuario()" [popup]="true" appendTo="body" />
     </header>
 
     <div class="content">
@@ -117,6 +129,60 @@
     </div>
   </div>
 </div>
+
+<p-popover #panelUsuario styleClass="popover-cuenta" appendTo="body">
+  <div class="cuenta">
+    <div class="cuenta-head">
+      <app-user-avatar [nombre]="user()?.nombreCompleto ?? ''" [imagen]="avatar()" size="xlarge" />
+      <div class="cuenta-id">
+        <strong>{{ user()?.nombreCompleto }}</strong>
+        <span>{{ correo() }}</span>
+        <span class="rol-chip">{{ rol() }}</span>
+      </div>
+    </div>
+
+    <ul class="cuenta-links">
+      @for (acceso of accesos; track acceso.label) {
+        <li>
+          <a
+            [routerLink]="acceso.link"
+            [queryParams]="acceso.tab ? { tab: acceso.tab } : null"
+            (click)="panelUsuario.hide()"
+          >
+            <i [class]="'pi ' + acceso.icon"></i>
+            <span>{{ acceso.label }}</span>
+          </a>
+        </li>
+      }
+      <li>
+        <button type="button" (click)="iniciarTour(panelUsuario)">
+          <i class="pi pi-compass"></i>
+          <span>Guía de bienvenida</span>
+        </button>
+      </li>
+    </ul>
+
+    <div class="cuenta-tema" role="radiogroup" aria-label="Apariencia">
+      @for (modo of modos; track modo.valor) {
+        <button
+          type="button"
+          role="radio"
+          [attr.aria-checked]="theme.mode() === modo.valor"
+          [class.on]="theme.mode() === modo.valor"
+          (click)="alternarTema(modo.valor)"
+        >
+          <i [class]="'pi ' + modo.icon"></i>
+          {{ modo.label }}
+        </button>
+      }
+    </div>
+
+    <button type="button" class="cuenta-salir" (click)="salirDelPanel(panelUsuario)">
+      <i class="pi pi-sign-out"></i>
+      Cerrar sesión
+    </button>
+  </div>
+</p-popover>
 
 <p-popover #popover styleClass="popover-notificaciones">
   <div class="notif">
@@ -179,3 +245,5 @@
     <ng-container [ngTemplateOutlet]="nav" [ngTemplateOutletContext]="{ compact: false }" />
   </div>
 </p-drawer>
+
+<app-tour />

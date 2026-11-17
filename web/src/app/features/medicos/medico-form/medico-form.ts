@@ -2,10 +2,9 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
-import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
+import { MultiSelect } from 'primeng/multiselect';
 import { Password } from 'primeng/password';
-import { Select } from 'primeng/select';
 
 import { ApiError } from '@tusalud/app/core/models';
 import { NotificationService } from '@tusalud/app/core/services/notification.service';
@@ -22,10 +21,9 @@ import { PageHeader } from '@tusalud/app/shared/components/page-header/page-head
     ReactiveFormsModule,
     RouterLink,
     Button,
-    InputNumber,
     InputText,
+    MultiSelect,
     Password,
-    Select,
     FormField,
     PageHeader,
   ],
@@ -51,8 +49,7 @@ export class MedicoForm implements OnInit {
     telefono: ['', [AppValidators.telefono]],
     colegiatura: ['', [Validators.required, AppValidators.notBlank, Validators.maxLength(20)]],
     consultorio: ['', [Validators.maxLength(60)]],
-    precioConsulta: [null as number | null, [Validators.required, Validators.min(0.01)]],
-    especialidadId: [null as number | null, [Validators.required]],
+    especialidadIds: [[] as number[], [Validators.required, Validators.minLength(1)]],
   });
 
   ngOnInit(): void {
@@ -75,8 +72,7 @@ export class MedicoForm implements OnInit {
         telefono: valor.telefono || null,
         colegiatura: valor.colegiatura!.trim(),
         consultorio: valor.consultorio?.trim() || null,
-        precioConsulta: valor.precioConsulta!,
-        especialidadId: valor.especialidadId!,
+        especialidadIds: valor.especialidadIds ?? [],
       })
       .subscribe({
         next: (medico) => {

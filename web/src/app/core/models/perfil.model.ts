@@ -14,8 +14,9 @@ export interface PerfilResponse {
   colegiatura?: string | null;
   consultorio?: string | null;
   especialidad?: string | null;
-  precioConsulta?: number | null;
+  especialidades?: string[];
   avatar?: string | null;
+  mfaActivo?: boolean;
 }
 
 export interface PerfilUpdateRequest {

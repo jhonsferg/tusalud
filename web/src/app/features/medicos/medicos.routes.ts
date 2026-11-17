@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-// @tusalud/app/features/medicos/
 import { roleGuard } from '@tusalud/app/core/guards/role.guard';
 
 export const MEDICOS_ROUTES: Routes = [

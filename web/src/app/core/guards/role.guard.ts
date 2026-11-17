@@ -17,6 +17,11 @@ export function roleGuard(...roles: readonly Rol[]): CanMatchFn {
         `/${segments.map((segment) => segment.path).join('/')}`;
       return router.createUrlTree([LOGIN_URL], { queryParams: { returnUrl } });
     }
-    return auth.hasAnyRole(roles) ? true : router.parseUrl(FORBIDDEN_URL);
+    if (auth.hasAnyRole(roles)) {
+      return true;
+    }
+    const inicio = auth.homeUrl();
+    const destino = router.currentNavigation()?.extractedUrl.toString().split('?')[0];
+    return router.parseUrl(destino === inicio ? FORBIDDEN_URL : inicio);
   };
 }

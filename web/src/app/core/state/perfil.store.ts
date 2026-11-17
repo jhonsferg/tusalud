@@ -54,9 +54,24 @@ export class PerfilStore {
     this.preferencias.load(this.api.obtenerPreferencias());
   }
 
-  guardarPreferencias(request: PreferenciasResponse): Observable<PreferenciasResponse> {
+  guardarPreferencias(
+    request: Omit<PreferenciasResponse, 'tourCompletado'>,
+  ): Observable<PreferenciasResponse> {
+    const tourCompletado = this.preferencias.value()?.tourCompletado ?? false;
     return this.api
-      .actualizarPreferencias(request)
+      .actualizarPreferencias({ ...request, tourCompletado })
+      .pipe(tap((preferencias) => this.preferencias.set(preferencias)));
+  }
+
+  marcarTour(completado: boolean): Observable<PreferenciasResponse> {
+    const actual = this.preferencias.value();
+    return this.api
+      .actualizarPreferencias({
+        recordatoriosActivos: actual?.recordatoriosActivos ?? true,
+        horasAntelacionRecordatorio: actual?.horasAntelacionRecordatorio ?? 24,
+        alertasInicioSesion: actual?.alertasInicioSesion ?? true,
+        tourCompletado: completado,
+      })
       .pipe(tap((preferencias) => this.preferencias.set(preferencias)));
   }
 

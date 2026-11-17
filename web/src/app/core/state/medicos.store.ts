@@ -73,9 +73,18 @@ export class MedicosStore {
     return this.api.crear(request).pipe(
       tap((creado) => {
         const filtro = this.especialidadFiltro();
-        if (filtro === null || filtro === creado.especialidadId) {
+        if (filtro === null || creado.especialidades.some((e) => e.id === filtro)) {
           this.list.update((items) => [...(items ?? []), creado].sort(porApellido));
         }
+      }),
+    );
+  }
+
+  actualizarEspecialidades(id: number, especialidadIds: number[]): Observable<MedicoResponse> {
+    return this.api.actualizarEspecialidades(id, especialidadIds).pipe(
+      tap((actualizado) => {
+        this.selected.set(actualizado);
+        this.list.update((items) => items?.map((item) => (item.id === id ? actualizado : item)));
       }),
     );
   }

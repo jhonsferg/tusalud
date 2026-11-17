@@ -21,6 +21,8 @@ export const NOMBRE_DIA: Readonly<Record<DiaSemana, string>> = {
   SUNDAY: 'Domingo',
 };
 
+import { EspecialidadResponse } from './especialidad.model';
+
 export type EstadoUsuario = 'ACTIVO' | 'INACTIVO';
 
 export interface MedicoResponse {
@@ -33,9 +35,7 @@ export interface MedicoResponse {
   telefono?: string | null;
   colegiatura: string;
   consultorio?: string | null;
-  precioConsulta: number;
-  especialidadId: number;
-  especialidadNombre: string;
+  especialidades: EspecialidadResponse[];
   estado: EstadoUsuario;
 }
 
@@ -47,8 +47,7 @@ export interface MedicoCreateRequest {
   telefono?: string | null;
   colegiatura: string;
   consultorio?: string | null;
-  precioConsulta: number;
-  especialidadId: number;
+  especialidadIds: number[];
 }
 
 export interface HorarioRequest {

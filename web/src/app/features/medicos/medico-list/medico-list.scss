@@ -76,3 +76,9 @@
   color: var(--app-primary-text);
   font-weight: 700;
 }
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}

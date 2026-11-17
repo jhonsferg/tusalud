@@ -7,6 +7,8 @@ import {
   CuponValidacionResponse,
   MetodoPagoRequest,
   MetodoPagoResponse,
+  PagoQrRequest,
+  PagoQrResponse,
   PagoRequest,
   PagoResponse,
 } from '@tusalud/app/core/models';
@@ -52,5 +54,24 @@ export class PagosApiService {
 
   obtenerPago(id: number): Observable<PagoResponse> {
     return this.http.get<PagoResponse>(`${this.apiUrl}/pagos/${id}`);
+  }
+
+  crearPagoQr(request: PagoQrRequest): Observable<PagoQrResponse> {
+    return this.http.post<PagoQrResponse>(`${this.apiUrl}/pagos/qr`, request);
+  }
+
+  consultarPagoQr(codigo: string): Observable<PagoQrResponse> {
+    return this.http.get<PagoQrResponse>(`${this.apiUrl}/pagos/qr/${codigo}`);
+  }
+
+  simularConfirmacionQr(codigo: string): Observable<PagoQrResponse> {
+    return this.http.post<PagoQrResponse>(
+      `${this.apiUrl}/pagos/qr/${codigo}/simular-confirmacion`,
+      null,
+    );
+  }
+
+  cancelarPagoQr(codigo: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/pagos/qr/${codigo}`);
   }
 }

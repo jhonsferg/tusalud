@@ -7,6 +7,8 @@ import { SKIP_ERROR_NOTIFICATION } from '@tusalud/app/core/config/http-context';
 import {
   AtencionRequest,
   AtencionResponse,
+  CompartidoResponse,
+  CompartirPacienteRequest,
   DatosMedicosRequest,
   HistoriaClinicaResponse,
   PacienteClinicoResponse,
@@ -50,6 +52,26 @@ export class ClinicaApiService {
     return this.http.get<HistoriaClinicaResponse>(
       `${this.apiUrl}/pacientes/${pacienteId}/historia-clinica`,
     );
+  }
+
+  listarCompartidos(pacienteId: number): Observable<CompartidoResponse[]> {
+    return this.http.get<CompartidoResponse[]>(
+      `${this.apiUrl}/pacientes/${pacienteId}/compartidos`,
+    );
+  }
+
+  compartirPaciente(
+    pacienteId: number,
+    request: CompartirPacienteRequest,
+  ): Observable<CompartidoResponse> {
+    return this.http.post<CompartidoResponse>(
+      `${this.apiUrl}/pacientes/${pacienteId}/compartir`,
+      request,
+    );
+  }
+
+  dejarDeCompartir(pacienteId: number, medicoId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/pacientes/${pacienteId}/compartir/${medicoId}`);
   }
 
   misPacientes(): Observable<PacienteResumenResponse[]> {
