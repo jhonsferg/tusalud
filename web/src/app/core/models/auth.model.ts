@@ -25,6 +25,8 @@ export interface AuthResponse {
   email: string;
   nombreCompleto: string;
   roles: string[];
+  refreshToken?: string | null;
+  refreshExpiresIn?: number | null;
 }
 
 export interface JwtPayload {
@@ -47,6 +49,8 @@ export interface SessionUser {
 export interface Session {
   token: string;
   expiresAt: number;
+  refreshToken?: string;
+  refreshExpiresAt?: number;
   user: SessionUser;
 }
 
@@ -61,6 +65,10 @@ export interface MfaChallenge {
 }
 
 export type LoginResult = { sesion: SessionUser } | { mfa: MfaChallenge };
+
+export interface RefreshRequest {
+  refreshToken: string;
+}
 
 export interface MfaVerifyRequest {
   mfaToken: string;

@@ -34,7 +34,7 @@ export const appConfig: ApplicationConfig = {
     { provide: LOCALE_ID, useValue: 'es-PE' },
     provideHttpClient(
       withFetch(),
-      withInterceptors([loadingInterceptor, authInterceptor, errorInterceptor]),
+      withInterceptors([loadingInterceptor, errorInterceptor, authInterceptor]),
     ),
     providePrimeNG({
       ripple: true,

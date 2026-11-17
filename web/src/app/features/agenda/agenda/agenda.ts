@@ -8,14 +8,21 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
+import { SelectButton } from 'primeng/selectbutton';
 import { Skeleton } from 'primeng/skeleton';
 
 import { CitaResponse } from '@tusalud/app/core/models';
 import { CitasStore, esCitaActiva } from '@tusalud/app/core/state/citas.store';
 import { addDays, parseIsoDate, today, toIsoDate } from '@tusalud/app/core/utils/date';
+import { Calendario } from '@tusalud/app/shared/components/calendario/calendario';
+import {
+  CalEvento,
+  RangoVisible,
+} from '@tusalud/app/shared/components/calendario/calendario.utils';
+import { citaAEvento } from '@tusalud/app/shared/utils/cita-calendario';
 import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
 import { EstadoCitaTag } from '@tusalud/app/shared/components/estado-cita-tag/estado-cita-tag';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
@@ -29,7 +36,9 @@ import { CitaActions } from '@tusalud/app/shared/services/cita-actions.service';
     RouterLink,
     Button,
     DatePicker,
+    SelectButton,
     Skeleton,
+    Calendario,
     EmptyState,
     EstadoCitaTag,
     PageHeader,
@@ -41,6 +50,16 @@ import { CitaActions } from '@tusalud/app/shared/services/cita-actions.service';
 export class Agenda implements OnInit {
   protected readonly store = inject(CitasStore);
   private readonly acciones = inject(CitaActions);
+  private readonly router = inject(Router);
+
+  protected readonly modo = signal<'lista' | 'calendario'>('lista');
+  protected readonly modos = [
+    { label: 'Día', value: 'lista', icon: 'pi pi-list' },
+    { label: 'Calendario', value: 'calendario', icon: 'pi pi-calendar' },
+  ];
+  protected readonly eventos = computed(() =>
+    (this.store.agendaRango.value() ?? []).map((cita) => citaAEvento(cita, 'paciente')),
+  );
 
   protected readonly fecha = signal(today());
   protected readonly fechaDate = computed(() => parseIsoDate(this.fecha()) ?? new Date());
@@ -49,6 +68,14 @@ export class Agenda implements OnInit {
 
   ngOnInit(): void {
     this.cargar();
+  }
+
+  protected cargarRango(rango: RangoVisible): void {
+    this.store.loadAgendaRango(toIsoDate(rango.inicio), toIsoDate(rango.fin));
+  }
+
+  protected abrirEvento(evento: CalEvento): void {
+    void this.router.navigate(['/citas', evento.id]);
   }
 
   protected cargar(): void {

@@ -1,39 +1,59 @@
 <app-page-header title="Mi agenda" subtitle="Tus pacientes del día" icon="pi-calendar" />
 
 <div class="panel toolbar">
-  <div class="nav">
-    <p-button
-      icon="pi pi-chevron-left"
-      [outlined]="true"
-      severity="secondary"
-      ariaLabel="Día anterior"
-      (onClick)="mover(-1)"
-    />
-    <p-datepicker
-      [ngModel]="fechaDate()"
-      (ngModelChange)="elegir($event)"
-      dateFormat="DD, d MM yy"
-      [showIcon]="true"
-      [readonlyInput]="true"
-      appendTo="body"
-    />
-    <p-button
-      icon="pi pi-chevron-right"
-      [outlined]="true"
-      severity="secondary"
-      ariaLabel="Día siguiente"
-      (onClick)="mover(1)"
-    />
-    @if (!esHoy()) {
-      <p-button label="Hoy" [text]="true" (onClick)="irAHoy()" />
-    }
-  </div>
-  <span class="text-muted">
-    {{ store.citasAgenda().length }} citas, {{ activas() }} por atender
-  </span>
+  <p-selectbutton
+    [options]="modos"
+    optionLabel="label"
+    optionValue="value"
+    [ngModel]="modo()"
+    (ngModelChange)="modo.set($event ?? 'lista')"
+    [allowEmpty]="false"
+    ariaLabel="Modo de visualización"
+  />
+  @if (modo() === 'lista') {
+    <div class="nav">
+      <p-button
+        icon="pi pi-chevron-left"
+        [outlined]="true"
+        severity="secondary"
+        ariaLabel="Día anterior"
+        (onClick)="mover(-1)"
+      />
+      <p-datepicker
+        [ngModel]="fechaDate()"
+        (ngModelChange)="elegir($event)"
+        dateFormat="DD, d MM yy"
+        [showIcon]="true"
+        [readonlyInput]="true"
+        appendTo="body"
+      />
+      <p-button
+        icon="pi pi-chevron-right"
+        [outlined]="true"
+        severity="secondary"
+        ariaLabel="Día siguiente"
+        (onClick)="mover(1)"
+      />
+      @if (!esHoy()) {
+        <p-button label="Hoy" [text]="true" (onClick)="irAHoy()" />
+      }
+    </div>
+    <span class="text-muted">
+      {{ store.citasAgenda().length }} citas, {{ activas() }} por atender
+    </span>
+  }
 </div>
 
-@if (store.agenda.error(); as error) {
+@if (modo() === 'calendario') {
+  <div class="panel">
+    <app-calendario
+      [eventos]="eventos()"
+      [cargando]="store.agendaRango.loading()"
+      (rangoCambiado)="cargarRango($event)"
+      (eventoElegido)="abrirEvento($event)"
+    />
+  </div>
+} @else if (store.agenda.error(); as error) {
   <div class="panel">
     <app-empty-state
       tone="error"

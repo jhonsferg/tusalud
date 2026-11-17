@@ -1,6 +1,6 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, map, tap } from 'rxjs';
+import { Observable, catchError, finalize, map, shareReplay, tap, throwError } from 'rxjs';
 
 import {
   AuthResponse,
@@ -23,6 +23,7 @@ export const LOGIN_URL = '/auth/login';
 export type LogoutReason = 'manual' | 'expired' | 'unauthorized';
 
 const MAX_TIMER_MS = 2_147_483_647;
+const ANTICIPO_RENOVACION_MS = 60_000;
 
 const HOME_BY_ROLE: readonly (readonly [Rol, string])[] = [
   ['ROLE_ADMIN', '/admin/panel'],
@@ -45,6 +46,8 @@ function isSession(value: unknown): value is Session {
   return (
     typeof session.token === 'string' &&
     typeof session.expiresAt === 'number' &&
+    (session.refreshToken === undefined || typeof session.refreshToken === 'string') &&
+    (session.refreshExpiresAt === undefined || typeof session.refreshExpiresAt === 'number') &&
     typeof user === 'object' &&
     user !== null &&
     typeof user.id === 'number' &&
@@ -59,6 +62,12 @@ export function toSession(response: AuthResponse, now = Date.now()): Session {
   return {
     token: response.token,
     expiresAt: jwtExpirationMs(response.token) ?? now + response.expiresIn,
+    ...(response.refreshToken
+      ? {
+          refreshToken: response.refreshToken,
+          refreshExpiresAt: now + (response.refreshExpiresIn ?? 0),
+        }
+      : {}),
     user: {
       id: response.usuarioId,
       email: response.email,
@@ -76,6 +85,7 @@ export class AuthService {
   private readonly notifications = inject(NotificationService);
 
   private readonly state = signal<Session | null>(this.restoreSession());
+  private renovando: Observable<string> | null = null;
 
   readonly session = this.state.asReadonly();
   readonly isAuthenticated = computed(() => this.state() !== null);
@@ -98,8 +108,21 @@ export class AuthService {
         return;
       }
       this.storage.write(SESSION_STORAGE_KEY, session);
-      const remaining = Math.min(session.expiresAt - Date.now(), MAX_TIMER_MS);
-      const timer = setTimeout(() => this.logout('expired'), Math.max(remaining, 0));
+      const renovable = this.puedeRenovar(session);
+      const vence = renovable ? session.refreshExpiresAt! : session.expiresAt;
+      const espera = renovable
+        ? Math.max(session.expiresAt - Date.now() - ANTICIPO_RENOVACION_MS, 1000)
+        : vence - Date.now();
+      const timer = setTimeout(
+        () => {
+          if (renovable) {
+            this.refresh().subscribe({ error: () => undefined });
+          } else {
+            this.logout('expired');
+          }
+        },
+        Math.min(Math.max(espera, 0), MAX_TIMER_MS),
+      );
       onCleanup(() => clearTimeout(timer));
     });
   }
@@ -114,6 +137,31 @@ export class AuthService {
             : this.abrirSesion(response as AuthResponse),
         ),
       );
+  }
+
+  puedeRenovar(session: Session | null = this.state()): boolean {
+    return !!session?.refreshToken && (session.refreshExpiresAt ?? 0) > Date.now();
+  }
+
+  refresh(): Observable<string> {
+    const session = this.state();
+    if (!session?.refreshToken || !this.puedeRenovar(session)) {
+      return throwError(() => new Error('La sesión no se puede renovar'));
+    }
+    if (!this.renovando) {
+      this.renovando = this.api.refresh({ refreshToken: session.refreshToken }).pipe(
+        map((response) => toSession(response)),
+        tap((nueva) => this.state.set(nueva)),
+        map((nueva) => nueva.token),
+        catchError((error: unknown) => {
+          this.logout('expired');
+          return throwError(() => error);
+        }),
+        finalize(() => (this.renovando = null)),
+        shareReplay({ bufferSize: 1, refCount: false }),
+      );
+    }
+    return this.renovando;
   }
 
   verificarMfa(mfaToken: string, codigo: string): Observable<SessionUser> {

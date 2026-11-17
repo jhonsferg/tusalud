@@ -59,74 +59,46 @@
           emptyMessage="No hay médicos disponibles"
           appendTo="body"
           styleClass="w-full"
-          (onChange)="cambioMedicoOFecha()"
+          (onChange)="cambioMedico()"
         />
       </app-form-field>
     </div>
 
     <div class="step">
       <span class="num">3</span>
-      <app-form-field
-        label="Fecha"
-        [control]="form.controls.fecha"
-        inputId="cita-fecha"
-        [required]="true"
-      >
-        <p-datepicker
-          inputId="cita-fecha"
-          formControlName="fecha"
-          [minDate]="minimo"
-          dateFormat="dd/mm/yy"
-          [showIcon]="true"
-          [fluid]="true"
-          placeholder="dd/mm/aaaa"
-          appendTo="body"
-          (onSelect)="cambioMedicoOFecha()"
-        />
-      </app-form-field>
-    </div>
-
-    <div class="step">
-      <span class="num">4</span>
-      <app-form-field
-        label="Hora"
-        [control]="form.controls.hora"
-        inputId="cita-hora"
-        [required]="true"
-      >
-        @if (!form.controls.medicoId.value || !form.controls.fecha.value) {
-          <small class="text-muted"
-            >Elige primero un médico y una fecha para ver las horas libres.</small
-          >
-        } @else if (medicos.disponibilidad.error(); as error) {
-          <small class="text-red-600">{{ error.message }}</small>
-        } @else if (medicos.disponibilidad.loading()) {
-          <div class="slots">
-            @for (n of [1, 2, 3, 4, 5, 6]; track n) {
-              <p-skeleton height="2.4rem" />
-            }
-          </div>
-        } @else if (horas().length === 0) {
-          <app-empty-state
-            icon="pi-calendar-times"
-            title="Sin horas libres"
-            message="El médico no atiende ese día o no le quedan turnos. Prueba con otra fecha."
-          />
+      <div class="paso-calendario">
+        <label id="cita-calendario-etiqueta" class="etiqueta"
+          >Fecha y hora <span class="req">*</span></label
+        >
+        @if (!form.controls.medicoId.value) {
+          <p class="text-muted">
+            Elige primero un médico para ver sus horas libres en el calendario.
+          </p>
         } @else {
-          <div class="slots" role="radiogroup" aria-label="Horas disponibles">
-            @for (hora of horas(); track hora) {
-              <p-button
-                [label]="hora"
-                size="small"
-                [outlined]="form.controls.hora.value !== hora"
-                role="radio"
-                [attr.aria-checked]="form.controls.hora.value === hora"
-                (onClick)="elegirHora(hora)"
-              />
-            }
-          </div>
+          <small class="text-muted"
+            >Los bloques verdes son horas libres del médico. Tus citas ya reservadas aparecen en
+            gris y bloquean las horas que se cruzan con ellas.</small
+          >
+          <app-calendario
+            [eventos]="eventosPropios()"
+            [huecos]="huecos()"
+            [seleccion]="seleccionActual()"
+            [cargando]="medicos.disponibilidadRango.loading()"
+            [(vista)]="vistaCalendario"
+            [(fecha)]="fechaCalendario"
+            (rangoCambiado)="cargarRango($event)"
+            (huecoElegido)="elegirHueco($event)"
+          />
+          @if (medicos.disponibilidadRango.error(); as error) {
+            <small class="text-red-600">{{ error.message }}</small>
+          }
         }
-      </app-form-field>
+        @if (
+          form.controls.hora.touched && (!form.controls.fecha.value || !form.controls.hora.value)
+        ) {
+          <small class="text-red-600">Elige una hora libre en el calendario.</small>
+        }
+      </div>
     </div>
 
     <app-form-field

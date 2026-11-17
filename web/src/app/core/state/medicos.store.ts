@@ -4,6 +4,7 @@ import { Observable, tap } from 'rxjs';
 import {
   DIAS_SEMANA,
   DiaSemana,
+  DisponibilidadDiaResponse,
   DisponibilidadResponse,
   HorarioRequest,
   HorarioResponse,
@@ -40,6 +41,7 @@ export class MedicosStore {
   readonly selected = new AsyncState<MedicoResponse>();
   readonly horarios = new AsyncState<HorarioResponse[]>();
   readonly disponibilidad = new AsyncState<DisponibilidadResponse>();
+  readonly disponibilidadRango = new AsyncState<DisponibilidadDiaResponse[]>();
 
   readonly filtroEspecialidad = this.especialidadFiltro.asReadonly();
   readonly medicos = computed(() => this.list.value() ?? []);
@@ -113,11 +115,16 @@ export class MedicosStore {
     this.disponibilidad.load(this.api.disponibilidad(medicoId, fecha));
   }
 
+  loadDisponibilidadRango(medicoId: number, inicio: string, fin: string): void {
+    this.disponibilidadRango.load(this.api.disponibilidadRango(medicoId, inicio, fin));
+  }
+
   reset(): void {
     this.especialidadFiltro.set(null);
     this.list.reset();
     this.selected.reset();
     this.horarios.reset();
     this.disponibilidad.reset();
+    this.disponibilidadRango.reset();
   }
 }

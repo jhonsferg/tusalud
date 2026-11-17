@@ -68,3 +68,9 @@ export interface DisponibilidadResponse {
   fecha: string;
   horariosDisponibles: string[];
 }
+
+export interface DisponibilidadDiaResponse {
+  fecha: string;
+  horariosDisponibles: string[];
+  totalHoras: number;
+}

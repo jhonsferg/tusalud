@@ -38,6 +38,7 @@ export class CitasStore {
 
   readonly misCitas = new AsyncState<CitaResponse[]>();
   readonly agenda = new AsyncState<CitaResponse[]>();
+  readonly agendaRango = new AsyncState<CitaResponse[]>();
   readonly selected = new AsyncState<CitaResponse>();
 
   readonly rango = this.rangoActual.asReadonly();
@@ -67,6 +68,10 @@ export class CitasStore {
   loadAgenda(fecha: string | null = null): void {
     this.fechaAgendaActual.set(fecha);
     this.agenda.load(this.medicosApi.miAgenda(fecha));
+  }
+
+  loadAgendaRango(inicio: string, fin: string): void {
+    this.agendaRango.load(this.medicosApi.miAgendaRango(inicio, fin));
   }
 
   loadOne(id: number): void {
@@ -115,12 +120,14 @@ export class CitasStore {
     this.fechaAgendaActual.set(null);
     this.misCitas.reset();
     this.agenda.reset();
+    this.agendaRango.reset();
     this.selected.reset();
   }
 
   private sincronizar(cita: CitaResponse): void {
     this.misCitas.update((items) => reemplazar(items, cita));
     this.agenda.update((items) => reemplazar(items, cita));
+    this.agendaRango.update((items) => reemplazar(items, cita));
     if (this.selected.value()?.id === cita.id) {
       this.selected.set(cita);
     }

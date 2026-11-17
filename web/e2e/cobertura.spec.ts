@@ -1,11 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import {
-  formatoFecha,
-  iniciarSesion,
-  diaHabilAleatorio,
-  reservarPrimeraHoraLibre,
-} from './support';
+import { iniciarSesion, reservarPrimeraHoraLibre } from './support';
 
 test.describe('administrador', () => {
   test('registra un médico y configura y elimina un horario', async ({ page }) => {
@@ -84,8 +79,6 @@ test.describe('ciclo de vida de una cita', () => {
     const paciente = await (await browser.newContext()).newPage();
     await iniciarSesion(paciente, 'paciente');
     await paciente.goto('/citas/nueva?medicoId=1');
-    await paciente.locator('#cita-fecha').pressSequentially(formatoFecha(diaHabilAleatorio()));
-    await paciente.keyboard.press('Escape');
     await reservarPrimeraHoraLibre(paciente, 'Chequeo del ciclo completo');
     await expect(paciente).toHaveURL(/\/citas\/\d+$/);
     const url = paciente.url();

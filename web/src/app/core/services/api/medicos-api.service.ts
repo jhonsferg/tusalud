@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { API_URL } from '@tusalud/app/core/config/api.config';
 import {
   CitaResponse,
+  DisponibilidadDiaResponse,
   DisponibilidadResponse,
   HorarioRequest,
   HorarioResponse,
@@ -53,6 +54,23 @@ export class MedicosApiService {
   disponibilidad(medicoId: number, fecha: string): Observable<DisponibilidadResponse> {
     return this.http.get<DisponibilidadResponse>(`${this.baseUrl}/${medicoId}/disponibilidad`, {
       params: toHttpParams({ fecha }),
+    });
+  }
+
+  disponibilidadRango(
+    medicoId: number,
+    inicio: string,
+    fin: string,
+  ): Observable<DisponibilidadDiaResponse[]> {
+    return this.http.get<DisponibilidadDiaResponse[]>(
+      `${this.baseUrl}/${medicoId}/disponibilidad/rango`,
+      { params: toHttpParams({ inicio, fin }) },
+    );
+  }
+
+  miAgendaRango(inicio: string, fin: string): Observable<CitaResponse[]> {
+    return this.http.get<CitaResponse[]>(`${this.baseUrl}/me/agenda`, {
+      params: toHttpParams({ inicio, fin }),
     });
   }
 

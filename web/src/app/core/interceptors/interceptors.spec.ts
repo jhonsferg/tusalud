@@ -30,7 +30,7 @@ describe('interceptores', () => {
       providers: [
         provideRouter([]),
         provideHttpClient(
-          withInterceptors([loadingInterceptor, authInterceptor, errorInterceptor]),
+          withInterceptors([loadingInterceptor, errorInterceptor, authInterceptor]),
         ),
         provideHttpClientTesting(),
       ],

@@ -1,0 +1,438 @@
+:host {
+  display: block;
+}
+
+.cal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.cal-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+}
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.icono,
+.hoy {
+  height: 2.2rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 10px;
+  background: var(--p-content-background);
+  color: var(--p-text-color);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--p-content-hover-background);
+  }
+}
+
+.icono {
+  width: 2.2rem;
+}
+
+.hoy {
+  padding: 0 0.9rem;
+}
+
+.cal-titulo {
+  flex: 1;
+  min-width: 10rem;
+  margin: 0;
+  font-size: 1.15rem;
+  text-transform: capitalize;
+}
+
+.cal-extra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.alerta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--p-red-500) 14%, transparent);
+  color: var(--p-red-600);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.vistas {
+  display: inline-flex;
+  padding: 0.2rem;
+  border-radius: 12px;
+  background: var(--p-content-hover-background);
+
+  button {
+    padding: 0.4rem 0.9rem;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--p-text-muted-color);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+
+    &.activa {
+      background: var(--p-content-background);
+      color: var(--app-primary-text);
+      box-shadow: 0 1px 4px rgb(0 0 0 / 14%);
+    }
+  }
+}
+
+.mes {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 12px;
+}
+
+.mes-cabecera {
+  padding: 0.55rem;
+  background: var(--p-content-hover-background);
+  color: var(--p-text-muted-color);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.mes-celda {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-height: 6.6rem;
+  padding: 0.35rem;
+  border-top: 1px solid var(--p-content-border-color);
+  border-left: 1px solid var(--p-content-border-color);
+
+  &:nth-child(7n + 8) {
+    border-left: 0;
+  }
+
+  &.fuera {
+    background: color-mix(in srgb, var(--p-content-hover-background) 60%, transparent);
+    color: var(--p-text-muted-color);
+  }
+
+  &.hoy .mes-numero {
+    background: var(--p-primary-color);
+    color: #ffffff;
+  }
+
+  @media (max-width: 640px) {
+    min-height: 4.4rem;
+  }
+}
+
+.mes-numero {
+  align-self: flex-start;
+  min-width: 1.7rem;
+  height: 1.7rem;
+  padding: 0 0.3rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--p-content-hover-background);
+  }
+}
+
+.cruce-icono {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  color: var(--p-red-500);
+  font-size: 0.85rem;
+}
+
+.libres {
+  align-self: flex-start;
+  padding: 0.1rem 0.5rem;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--p-green-500) 18%, transparent);
+  color: var(--p-green-700);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chip {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  padding: 0.12rem 0.4rem;
+  border: 0;
+  border-left: 3px solid var(--color-evento);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--color-evento) 14%, transparent);
+  color: var(--p-text-color);
+  font: inherit;
+  font-size: 0.74rem;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+
+  @media (max-width: 640px) {
+    b {
+      display: none;
+    }
+  }
+}
+
+.mas {
+  align-self: flex-start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--app-primary-text);
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+[data-color='info'] {
+  --color-evento: var(--p-blue-500);
+}
+
+[data-color='success'] {
+  --color-evento: var(--p-green-500);
+}
+
+[data-color='warn'] {
+  --color-evento: var(--p-orange-500);
+}
+
+[data-color='danger'] {
+  --color-evento: var(--p-red-500);
+}
+
+[data-color='secondary'] {
+  --color-evento: var(--p-surface-500);
+}
+
+.tiempo {
+  overflow: auto;
+  max-height: 38rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 12px;
+}
+
+.tiempo-cabecera,
+.tiempo-cuerpo {
+  display: grid;
+  grid-template-columns: 3.6rem repeat(7, minmax(6.5rem, 1fr));
+}
+
+.tiempo.dia .tiempo-cabecera,
+.tiempo.dia .tiempo-cuerpo {
+  grid-template-columns: 3.6rem minmax(0, 1fr);
+}
+
+.tiempo-cabecera {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--p-content-hover-background);
+  border-bottom: 1px solid var(--p-content-border-color);
+}
+
+.cabecera-dia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.45rem 0;
+  border: 0;
+  border-left: 1px solid var(--p-content-border-color);
+  background: transparent;
+  color: var(--p-text-muted-color);
+  font: inherit;
+  text-transform: capitalize;
+  cursor: pointer;
+
+  strong {
+    color: var(--p-text-color);
+    font-size: 1.15rem;
+  }
+
+  &.hoy strong {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--p-primary-color);
+    color: #ffffff;
+  }
+}
+
+.tiempo-cuerpo {
+  position: relative;
+}
+
+.horas {
+  span {
+    display: block;
+    padding: 0 0.4rem;
+    color: var(--p-text-muted-color);
+    font-size: 0.72rem;
+    text-align: right;
+    transform: translateY(-0.45rem);
+  }
+}
+
+.columna {
+  position: relative;
+  border-left: 1px solid var(--p-content-border-color);
+  background-image: linear-gradient(to bottom, var(--p-content-border-color) 1px, transparent 1px);
+
+  &.hoy {
+    background-color: color-mix(in srgb, var(--p-primary-color) 4%, transparent);
+  }
+}
+
+.evento {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.05rem;
+  overflow: hidden;
+  padding: 0.2rem 0.4rem;
+  border: 0;
+  border-left: 4px solid var(--color-evento);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-evento) 18%, var(--p-content-background));
+  color: var(--p-text-color);
+  font: inherit;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+  z-index: 2;
+
+  span,
+  small {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  small {
+    color: var(--p-text-muted-color);
+  }
+
+  &.conflicto {
+    outline: 2px solid var(--p-red-500);
+    outline-offset: -2px;
+    background-image: repeating-linear-gradient(
+      135deg,
+      transparent 0 6px,
+      color-mix(in srgb, var(--p-red-500) 14%, transparent) 6px 12px
+    );
+
+    i {
+      color: var(--p-red-500);
+    }
+  }
+}
+
+.hueco {
+  position: absolute;
+  right: 3px;
+  left: 3px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0 0.5rem;
+  border: 1px dashed var(--p-green-500);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--p-green-500) 12%, transparent);
+  color: var(--p-green-700);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 1;
+
+  &:hover {
+    background: color-mix(in srgb, var(--p-green-500) 24%, transparent);
+  }
+
+  &.elegido {
+    border-style: solid;
+    background: var(--p-green-600);
+    color: #ffffff;
+  }
+}
+
+.ahora {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 4;
+  height: 2px;
+  background: var(--p-red-500);
+  pointer-events: none;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--p-red-500);
+  }
+
+  span {
+    position: absolute;
+    top: -0.55rem;
+    right: 0;
+    padding: 0 0.3rem;
+    border-radius: 4px;
+    background: var(--p-red-500);
+    color: #ffffff;
+    font-size: 0.66rem;
+    font-weight: 700;
+  }
+}
+
+.cal-cargando {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--p-content-background) 55%, transparent);
+  pointer-events: none;
+}

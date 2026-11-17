@@ -1,11 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import {
-  formatoFecha,
-  iniciarSesion,
-  diaHabilAleatorio,
-  reservarPrimeraHoraLibre,
-} from './support';
+import { iniciarSesion, reservarPrimeraHoraLibre } from './support';
 
 test.describe('paciente', () => {
   test('ve el catálogo de especialidades y médicos', async ({ page }) => {
@@ -30,9 +25,6 @@ test.describe('paciente', () => {
       .getByRole('button', { name: 'Reservar' })
       .click();
     await expect(page).toHaveURL(/\/citas\/nueva\?medicoId=/);
-
-    await page.locator('#cita-fecha').pressSequentially(formatoFecha(diaHabilAleatorio()));
-    await page.keyboard.press('Escape');
 
     await reservarPrimeraHoraLibre(page, 'Control de rutina e2e');
 

@@ -71,7 +71,11 @@ export class RealtimeService {
       });
       if (response.status === 401) {
         this.controller = null;
-        this.auth.logout('unauthorized');
+        if (this.auth.puedeRenovar()) {
+          this.auth.refresh().subscribe({ next: () => void this.open(), error: () => undefined });
+        } else {
+          this.auth.logout('unauthorized');
+        }
         return;
       }
       if (!response.ok || !response.body) {

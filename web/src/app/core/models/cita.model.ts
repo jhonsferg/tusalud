@@ -27,6 +27,8 @@ export interface CitaResponse {
   pacienteDni: string;
   createdAt: string;
   pagado?: boolean;
+  duracionMinutos?: number;
+  conflicto?: boolean;
 }
 
 export interface CitaCreateRequest {

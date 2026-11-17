@@ -34,44 +34,30 @@ export async function iniciarSesion(page: Page, rol: keyof typeof CUENTAS): Prom
   await expect(page).toHaveURL(cuenta.home);
 }
 
-export function proximoDiaHabil(): Date {
-  const fecha = new Date();
-  do {
-    fecha.setDate(fecha.getDate() + 1);
-  } while (fecha.getDay() === 0 || fecha.getDay() === 6);
-  return fecha;
-}
-
-export function formatoFecha(fecha: Date): string {
-  const dia = String(fecha.getDate()).padStart(2, '0');
-  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-  return [dia, mes, fecha.getFullYear()].join('/');
-}
-
 export async function reservarPrimeraHoraLibre(page: Page, motivo: string): Promise<void> {
-  const horas = page.getByRole('radio');
-  await expect(horas.first()).toBeVisible();
-  const total = await horas.count();
-  for (let intento = 0; intento < total; intento++) {
-    await horas.nth(intento).click();
+  const huecos = page.getByRole('button', { name: /^Elegir / });
+  const semanas = 1 + Math.floor(Math.random() * 12);
+  await expect(page.getByRole('button', { name: 'Siguiente' })).toBeVisible();
+  for (let i = 0; i < semanas; i++) {
+    await page.getByRole('button', { name: 'Siguiente' }).click();
+  }
+  for (let intento = 0; intento < 20; intento++) {
+    if (!(await huecos.count())) {
+      await page.getByRole('button', { name: 'Siguiente' }).click();
+      await page.waitForTimeout(400);
+      continue;
+    }
+    await huecos.nth(Math.floor(Math.random() * (await huecos.count()))).click();
     await page.locator('#cita-motivo').fill(motivo);
     await page.getByRole('button', { name: 'Confirmar reserva' }).click();
     try {
       await page.waitForURL(/\/citas\/\d+$/, { timeout: 4000 });
       return;
     } catch {
-      await expect(horas.first()).toBeVisible();
+      await page.waitForTimeout(400);
     }
   }
   throw new Error('No quedaron horas libres para reservar');
-}
-
-export function diaHabilAleatorio(): Date {
-  const fecha = new Date();
-  do {
-    fecha.setTime(Date.now() + (1 + Math.floor(Math.random() * 90)) * 86_400_000);
-  } while (fecha.getDay() === 0 || fecha.getDay() === 6);
-  return fecha;
 }
 
 export async function cerrarSesion(page: Page): Promise<void> {

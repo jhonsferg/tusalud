@@ -14,9 +14,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { startWith } from 'rxjs';
 import { Button } from 'primeng/button';
-import { DatePicker } from 'primeng/datepicker';
 import { Select } from 'primeng/select';
-import { Skeleton } from 'primeng/skeleton';
 import { Textarea } from 'primeng/textarea';
 
 import { ApiError } from '@tusalud/app/core/models';
@@ -28,7 +26,14 @@ import { combineDateAndTime, parseIsoDate, toIsoDate } from '@tusalud/app/core/u
 import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
 import { AppValidators } from '@tusalud/app/core/validators/app.validators';
 import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
+import { Calendario } from '@tusalud/app/shared/components/calendario/calendario';
+import {
+  CalEvento,
+  CalHueco,
+  RangoVisible,
+  VistaCalendario,
+} from '@tusalud/app/shared/components/calendario/calendario.utils';
+import { citaAEvento } from '@tusalud/app/shared/utils/cita-calendario';
 import { FormField } from '@tusalud/app/shared/components/form-field/form-field';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
 
@@ -42,11 +47,9 @@ const MOTIVO_MAX = 500;
     ReactiveFormsModule,
     RouterLink,
     Button,
-    DatePicker,
     Select,
-    Skeleton,
+    Calendario,
     Textarea,
-    EmptyState,
     FormField,
     PageHeader,
   ],
@@ -113,9 +116,55 @@ export class CitaForm {
     this.especialidades.especialidades().find((item) => item.id === this.valores().especialidadId),
   );
 
-  protected readonly horas = computed(() =>
-    this.medicos.horasDisponibles().map((hora) => hora.slice(0, 5)),
+  protected readonly vistaCalendario = signal<VistaCalendario>('semana');
+  protected readonly fechaCalendario = signal(new Date());
+  private readonly rangoCalendario = signal<RangoVisible | null>(null);
+
+  protected readonly eventosPropios = computed<CalEvento[]>(() =>
+    this.citas.proximas().map((cita) => ({
+      ...citaAEvento(cita, 'medico'),
+      titulo: 'Tu cita',
+      detalle: cita.medicoNombre,
+      color: 'secondary' as const,
+    })),
   );
+
+  protected readonly huecos = computed<CalHueco[] | null>(() => {
+    if (!this.valores().medicoId) {
+      return null;
+    }
+    const resultado: CalHueco[] = [];
+    for (const dia of this.medicos.disponibilidadRango.value() ?? []) {
+      const base = parseIsoDate(dia.fecha);
+      if (!base) {
+        continue;
+      }
+      const inicios = dia.horariosDisponibles.map((hora) => {
+        const [h, m] = hora.split(':').map(Number);
+        return new Date(base.getFullYear(), base.getMonth(), base.getDate(), h, m);
+      });
+      let paso = 30;
+      for (let i = 1; i < inicios.length; i++) {
+        const diferencia = (inicios[i].getTime() - inicios[i - 1].getTime()) / 60_000;
+        if (diferencia > 0) {
+          paso = Math.min(paso, diferencia);
+        }
+      }
+      inicios.forEach((inicio) =>
+        resultado.push({ inicio, fin: new Date(inicio.getTime() + paso * 60_000) }),
+      );
+    }
+    return resultado;
+  });
+
+  protected readonly seleccionActual = computed(() => {
+    const { fecha, hora } = this.valores();
+    if (!fecha || !hora) {
+      return null;
+    }
+    const [h, m] = hora.split(':').map(Number);
+    return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate(), h, m);
+  });
 
   protected readonly fechaHora = computed(() => {
     const { fecha, hora } = this.valores();
@@ -164,29 +213,42 @@ export class CitaForm {
       });
     });
 
+    this.citas.loadMisCitas();
+
     effect(() => {
-      const { medicoId, fecha } = this.valores();
-      if (medicoId && fecha) {
-        untracked(() => this.medicos.loadDisponibilidad(medicoId, toIsoDate(fecha)));
+      const medicoId = this.valores().medicoId;
+      const rango = this.rangoCalendario();
+      if (medicoId && rango) {
+        untracked(() =>
+          this.medicos.loadDisponibilidadRango(
+            medicoId,
+            toIsoDate(rango.inicio),
+            toIsoDate(rango.fin),
+          ),
+        );
       }
     });
 
     effect(() => {
-      const disponibles = this.horas();
-      const actual = untracked(() => this.form.controls.hora.value);
-      if (
-        actual &&
-        !this.medicos.disponibilidad.loading() &&
-        this.medicos.disponibilidad.hasValue() &&
-        !disponibles.includes(actual)
-      ) {
-        untracked(() => this.form.controls.hora.setValue(null));
+      const fecha = this.form.controls.fecha.value;
+      const seleccion = this.seleccionActual();
+      if (seleccion || fecha) {
+        untracked(() => this.fechaCalendario.set(seleccion ?? fecha ?? new Date()));
       }
     });
   }
 
-  protected elegirHora(hora: string): void {
+  protected cargarRango(rango: RangoVisible): void {
+    this.rangoCalendario.set(rango);
+  }
+
+  protected elegirHueco(inicio: Date): void {
+    const hora = `${String(inicio.getHours()).padStart(2, '0')}:${String(inicio.getMinutes()).padStart(2, '0')}`;
+    this.form.controls.fecha.setValue(
+      new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate()),
+    );
     this.form.controls.hora.setValue(hora);
+    this.form.controls.fecha.markAsTouched();
     this.form.controls.hora.markAsTouched();
   }
 
@@ -202,8 +264,9 @@ export class CitaForm {
     this.form.controls.hora.setValue(null);
   }
 
-  protected cambioMedicoOFecha(): void {
+  protected cambioMedico(): void {
     this.form.controls.hora.setValue(null);
+    this.form.controls.fecha.setValue(null);
   }
 
   protected submit(): void {
@@ -231,10 +294,15 @@ export class CitaForm {
           applyServerErrors(this.form, error);
           if (error.status === 409) {
             this.form.controls.hora.setValue(null);
-            const id = valor.medicoId;
-            if (id && valor.fecha) {
-              this.medicos.loadDisponibilidad(id, toIsoDate(valor.fecha));
+            const rango = this.rangoCalendario();
+            if (valor.medicoId && rango) {
+              this.medicos.loadDisponibilidadRango(
+                valor.medicoId,
+                toIsoDate(rango.inicio),
+                toIsoDate(rango.fin),
+              );
             }
+            this.citas.loadMisCitas();
           }
         },
       });

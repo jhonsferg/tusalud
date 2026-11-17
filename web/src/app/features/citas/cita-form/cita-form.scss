@@ -1,10 +1,10 @@
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
   gap: 1.25rem;
   align-items: start;
 
-  @media (max-width: 900px) {
+  @media (max-width: 1100px) {
     grid-template-columns: 1fr;
   }
 }
@@ -91,4 +91,20 @@ form {
   small {
     color: var(--p-text-muted-color);
   }
+}
+
+.paso-calendario {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.etiqueta {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.req {
+  color: var(--p-red-500);
 }

@@ -18,28 +18,45 @@
 <div class="panel">
   <div class="toolbar">
     <p-selectbutton
-      [options]="opciones"
+      [options]="modos"
       optionLabel="label"
       optionValue="value"
-      [ngModel]="vista()"
-      (ngModelChange)="vista.set($event ?? 'proximas')"
+      [ngModel]="modo()"
+      (ngModelChange)="modo.set($event ?? 'lista')"
       [allowEmpty]="false"
-      ariaLabel="Filtrar citas"
+      ariaLabel="Modo de visualización"
     />
-    <p-datepicker
-      selectionMode="range"
-      [ngModel]="rango()"
-      (ngModelChange)="cambiarRango($event)"
-      [showIcon]="true"
-      [showButtonBar]="true"
-      dateFormat="dd/mm/yy"
-      placeholder="Filtrar por fechas"
-      [readonlyInput]="true"
-      appendTo="body"
-    />
+    @if (modo() === 'lista') {
+      <p-selectbutton
+        [options]="opciones"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="vista()"
+        (ngModelChange)="vista.set($event ?? 'proximas')"
+        [allowEmpty]="false"
+        ariaLabel="Filtrar citas"
+      />
+      <p-datepicker
+        selectionMode="range"
+        [ngModel]="rango()"
+        (ngModelChange)="cambiarRango($event)"
+        [showIcon]="true"
+        [showButtonBar]="true"
+        dateFormat="dd/mm/yy"
+        placeholder="Filtrar por fechas"
+        [readonlyInput]="true"
+        appendTo="body"
+      />
+    }
   </div>
 
-  @if (store.misCitas.error(); as error) {
+  @if (modo() === 'calendario') {
+    <app-calendario
+      [eventos]="eventos()"
+      [cargando]="store.misCitas.loading()"
+      (eventoElegido)="abrirEvento($event)"
+    />
+  } @else if (store.misCitas.error(); as error) {
     <app-empty-state
       tone="error"
       icon="pi-exclamation-triangle"

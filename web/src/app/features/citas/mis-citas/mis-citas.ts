@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
 import { SelectButton } from 'primeng/selectbutton';
@@ -17,6 +17,9 @@ import { TableModule } from 'primeng/table';
 import { CitaResponse, ESTADOS_CITA } from '@tusalud/app/core/models';
 import { CitasStore, esCitaActiva } from '@tusalud/app/core/state/citas.store';
 import { toIsoDate } from '@tusalud/app/core/utils/date';
+import { Calendario } from '@tusalud/app/shared/components/calendario/calendario';
+import { CalEvento } from '@tusalud/app/shared/components/calendario/calendario.utils';
+import { citaAEvento } from '@tusalud/app/shared/utils/cita-calendario';
 import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
 import { EstadoCitaTag } from '@tusalud/app/shared/components/estado-cita-tag/estado-cita-tag';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
@@ -36,6 +39,7 @@ type Vista = 'proximas' | 'historial' | 'todas';
     DatePicker,
     SelectButton,
     TableModule,
+    Calendario,
     EmptyState,
     EstadoCitaTag,
     PageHeader,
@@ -47,6 +51,16 @@ type Vista = 'proximas' | 'historial' | 'todas';
 export class MisCitas implements OnInit {
   protected readonly store = inject(CitasStore);
   private readonly acciones = inject(CitaActions);
+  private readonly router = inject(Router);
+
+  protected readonly modo = signal<'lista' | 'calendario'>('lista');
+  protected readonly modos = [
+    { label: 'Lista', value: 'lista', icon: 'pi pi-list' },
+    { label: 'Calendario', value: 'calendario', icon: 'pi pi-calendar' },
+  ];
+  protected readonly eventos = computed(() =>
+    this.store.citas().map((cita) => citaAEvento(cita, 'medico')),
+  );
 
   protected readonly vista = signal<Vista>('proximas');
   protected readonly rango = signal<Date[] | null>(null);
@@ -91,6 +105,10 @@ export class MisCitas implements OnInit {
 
   protected puedeCancelar(cita: CitaResponse): boolean {
     return esCitaActiva(cita) && new Date(cita.fechaHora).getTime() > Date.now();
+  }
+
+  protected abrirEvento(evento: CalEvento): void {
+    void this.router.navigate(['/citas', evento.id]);
   }
 
   protected cancelar(cita: CitaResponse): void {

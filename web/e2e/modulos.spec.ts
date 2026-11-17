@@ -1,12 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import {
-  formatoFecha,
-  iniciarSesion,
-  omitirGuia,
-  diaHabilAleatorio,
-  reservarPrimeraHoraLibre,
-} from './support';
+import { iniciarSesion, omitirGuia, reservarPrimeraHoraLibre } from './support';
 
 test.describe('pagos del paciente', () => {
   test('agrega y elimina una tarjeta', async ({ page }) => {
@@ -43,8 +37,6 @@ test.describe('pagos del paciente', () => {
   test('reserva, paga con cupón y ve el comprobante', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
     await page.goto('/citas/nueva?medicoId=1');
-    await page.locator('#cita-fecha').pressSequentially(formatoFecha(diaHabilAleatorio()));
-    await page.keyboard.press('Escape');
     await reservarPrimeraHoraLibre(page, 'Pago con cupón e2e');
 
     await page.getByRole('button', { name: 'Pagar cita' }).click();
@@ -71,8 +63,6 @@ test.describe('billeteras digitales', () => {
     test(`paga con ${billetera} escaneando un QR y confirmando desde la app`, async ({ page }) => {
       await iniciarSesion(page, 'paciente');
       await page.goto('/citas/nueva?medicoId=1');
-      await page.locator('#cita-fecha').pressSequentially(formatoFecha(diaHabilAleatorio()));
-      await page.keyboard.press('Escape');
       await reservarPrimeraHoraLibre(page, `Pago con ${nombre} e2e`);
 
       await page.getByRole('button', { name: 'Pagar cita' }).click();
@@ -89,8 +79,6 @@ test.describe('billeteras digitales', () => {
   test('cancela un QR pendiente al cambiar de billetera', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
     await page.goto('/citas/nueva?medicoId=1');
-    await page.locator('#cita-fecha').pressSequentially(formatoFecha(diaHabilAleatorio()));
-    await page.keyboard.press('Escape');
     await reservarPrimeraHoraLibre(page, 'Cambio de billetera e2e');
 
     await page.getByRole('button', { name: 'Pagar cita' }).click();
@@ -202,6 +190,21 @@ test.describe('especialidades y roles', () => {
     await admin.getByRole('button', { name: 'Guardar cambios' }).click();
     await expect(
       admin.getByRole('row', { name: /Oftalmología/ }).getByText(/110\.00/),
+    ).toBeVisible();
+  });
+
+  test('el administrador edita las especialidades de un médico', async ({ page }) => {
+    await iniciarSesion(page, 'admin');
+    await page.goto('/medicos');
+    await page
+      .locator('article', { hasText: 'Luis García' })
+      .getByRole('button', { name: 'Ver perfil' })
+      .click();
+    await expect(page.getByText('Especialidades y tarifas')).toBeVisible();
+    await page.getByRole('button', { name: 'Editar especialidades' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Guardar' }).click();
+    await expect(
+      page.getByText('Las especialidades del médico fueron actualizadas.'),
     ).toBeVisible();
   });
 

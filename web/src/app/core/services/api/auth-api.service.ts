@@ -13,6 +13,7 @@ import {
   MfaDesactivarRequest,
   MfaEstadoResponse,
   MfaVerifyRequest,
+  RefreshRequest,
   RegisterRequest,
 } from '@tusalud/app/core/models';
 
@@ -23,6 +24,12 @@ export class AuthApiService {
 
   login(request: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, request, {
+      context: publicRequest(),
+    });
+  }
+
+  refresh(request: RefreshRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.baseUrl}/refresh`, request, {
       context: publicRequest(),
     });
   }

@@ -40,7 +40,11 @@ test.describe('guía de bienvenida', () => {
     await expect(guia).toBeVisible({ timeout: 10_000 });
     await guia.getByRole('button', { name: 'Comenzar' }).click();
     await expect(page.getByRole('dialog', { name: 'Reserva tu cita' })).toBeVisible();
+    const guardado = page.waitForResponse(
+      (r) => r.url().includes('/perfil/preferencias') && r.request().method() === 'PUT',
+    );
     await page.keyboard.press('Escape');
+    await guardado;
     await expect(page.getByRole('dialog', { name: 'Reserva tu cita' })).toHaveCount(0);
 
     await page.reload();
@@ -120,5 +124,40 @@ test.describe('verificación en dos pasos', () => {
     await page.locator('#mfa-codigo').fill(codigoTotp(secreto));
     await page.getByRole('dialog').getByRole('button', { name: 'Desactivar', exact: true }).click();
     await expect(page.getByText('La verificación en dos pasos fue desactivada.')).toBeVisible();
+  });
+});
+
+test.describe('renovación de sesión', () => {
+  test('renueva el token de acceso sin pedir las credenciales otra vez', async ({ page }) => {
+    await iniciarSesion(page, 'paciente');
+    const antes = await page.evaluate(() => JSON.parse(localStorage.getItem('tusalud.session')!));
+    expect(antes.refreshToken).toBeTruthy();
+
+    await page.evaluate(() => {
+      const sesion = JSON.parse(localStorage.getItem('tusalud.session')!);
+      sesion.token = 'invalido.invalido.invalido';
+      localStorage.setItem('tusalud.session', JSON.stringify(sesion));
+    });
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Menú de usuario' })).toBeVisible();
+    await expect(page).toHaveURL(/\/citas$/);
+
+    await expect
+      .poll(async () =>
+        page.evaluate(() => JSON.parse(localStorage.getItem('tusalud.session')!).refreshToken),
+      )
+      .not.toBe(antes.refreshToken);
+  });
+
+  test('cierra la sesión si el refresh token ya no es válido', async ({ page }) => {
+    await iniciarSesion(page, 'paciente');
+    await page.evaluate(() => {
+      const sesion = JSON.parse(localStorage.getItem('tusalud.session')!);
+      sesion.token = 'invalido.invalido.invalido';
+      sesion.refreshToken = 'revocado';
+      localStorage.setItem('tusalud.session', JSON.stringify(sesion));
+    });
+    await page.reload();
+    await expect(page).toHaveURL(/\/auth\/login/);
   });
 });
