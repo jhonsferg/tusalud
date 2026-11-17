@@ -10,20 +10,7 @@ import { ApiError } from '@tusalud/app/core/models';
 import { AuthService } from '@tusalud/app/core/services/auth.service';
 import { AppValidators } from '@tusalud/app/core/validators/app.validators';
 import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
-import { environment } from '@tusalud/environments/environment';
 import { FormField } from '@tusalud/app/shared/components/form-field/form-field';
-
-interface CuentaDemo {
-  readonly rol: string;
-  readonly email: string;
-  readonly password: string;
-}
-
-const CUENTAS_DEMO: readonly CuentaDemo[] = [
-  { rol: 'Paciente', email: 'juan.perez@correo.com', password: 'Paciente123!' },
-  { rol: 'Médico', email: 'dr.garcia@tusalud.com', password: 'Medico123!' },
-  { rol: 'Admin', email: 'admin@tusalud.com', password: 'Admin123!' },
-];
 
 @Component({
   selector: 'app-login',
@@ -40,16 +27,11 @@ export class Login {
 
   protected readonly submitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
-  protected readonly cuentasDemo = environment.production ? [] : CUENTAS_DEMO;
 
   protected readonly form = inject(FormBuilder).nonNullable.group({
     email: ['', [Validators.required, Validators.email, AppValidators.notBlank]],
     password: ['', [Validators.required]],
   });
-
-  protected usarCuenta(cuenta: CuentaDemo): void {
-    this.form.setValue({ email: cuenta.email, password: cuenta.password });
-  }
 
   protected submit(): void {
     this.errorMessage.set(null);

@@ -53,20 +53,3 @@
 </form>
 
 <p class="footer">¿No tienes cuenta? <a routerLink="/auth/registro">Regístrate como paciente</a></p>
-
-@if (cuentasDemo.length > 0) {
-  <div class="demo">
-    <small>Cuentas de prueba</small>
-    <div class="demo-actions">
-      @for (cuenta of cuentasDemo; track cuenta.email) {
-        <p-button
-          [label]="cuenta.rol"
-          size="small"
-          severity="secondary"
-          [outlined]="true"
-          (onClick)="usarCuenta(cuenta)"
-        />
-      }
-    </div>
-  </div>
-}
