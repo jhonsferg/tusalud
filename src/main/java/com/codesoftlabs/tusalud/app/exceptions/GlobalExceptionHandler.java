@@ -146,8 +146,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDataIntegrity(
             DataIntegrityViolationException ex, HttpServletRequest request) {
         log.warn(
-                "Violación de integridad de datos: {}",
-                ex.getMostSpecificCause().getMessage());
+                "Violación de integridad de datos en {} {}: {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                ex.getMostSpecificCause().getClass().getSimpleName());
         return build(
                 HttpStatus.CONFLICT,
                 "La operación viola una restricción de integridad de datos (registro duplicado o referenciado)",

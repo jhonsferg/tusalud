@@ -43,4 +43,9 @@ public record MetodoPagoRequest(
         @Pattern(regexp = "^\\d{3,4}$", message = "El CVV debe tener 3 o 4 dígitos")
         String cvv,
 
-        @Schema(example = "true") Boolean predeterminado) {}
+        @Schema(example = "true") Boolean predeterminado) {
+    @Override
+    public String toString() {
+        return "MetodoPagoRequest[REDACTADO]";
+    }
+}

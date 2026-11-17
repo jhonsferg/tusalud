@@ -91,7 +91,7 @@ public class JwtUtils {
             parseClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException ex) {
-            log.debug("Token JWT inválido: {}", ex.getMessage());
+            log.debug("Token JWT inválido: {}", ex.getClass().getSimpleName());
             return false;
         }
     }

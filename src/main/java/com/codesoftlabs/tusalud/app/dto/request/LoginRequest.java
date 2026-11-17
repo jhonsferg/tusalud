@@ -12,4 +12,9 @@ public record LoginRequest(
         String email,
 
         @Schema(example = "Admin123!") @NotBlank(message = "La contraseña es obligatoria")
-        String password) {}
+        String password) {
+    @Override
+    public String toString() {
+        return "LoginRequest[REDACTADO]";
+    }
+}

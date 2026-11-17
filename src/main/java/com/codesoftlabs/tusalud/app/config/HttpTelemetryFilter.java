@@ -58,14 +58,23 @@ public class HttpTelemetryFilter extends OncePerRequestFilter {
         ContentCachingResponseWrapper cachedResponse = new ContentCachingResponseWrapper(response);
 
         registrarHeadersRequest(span, cachedRequest);
-        span.setAttribute(REQUEST_BODY, new String(cachedRequest.getBody(), cachedRequest.getBodyCharset()));
+        String ruta = request.getRequestURI();
+        String cuerpoSolicitud = TelemetryRedactor.cuerpoSeguro(
+                ruta, request.getContentType(), cachedRequest.getBody(), cachedRequest.getBodyCharset());
+        if (cuerpoSolicitud != null) {
+            span.setAttribute(REQUEST_BODY, cuerpoSolicitud);
+        }
         span.setAttribute(REQUEST_BODY_SIZE, (long) cachedRequest.getBody().length);
 
         try {
             filterChain.doFilter(cachedRequest, cachedResponse);
         } finally {
             byte[] responseBody = cachedResponse.getContentAsByteArray();
-            span.setAttribute(RESPONSE_BODY, new String(responseBody, charsetDe(cachedResponse.getContentType())));
+            String cuerpoRespuesta = TelemetryRedactor.cuerpoSeguro(
+                    ruta, cachedResponse.getContentType(), responseBody, charsetDe(cachedResponse.getContentType()));
+            if (cuerpoRespuesta != null) {
+                span.setAttribute(RESPONSE_BODY, cuerpoRespuesta);
+            }
             span.setAttribute(RESPONSE_BODY_SIZE, (long) responseBody.length);
             cachedResponse.copyBodyToResponse();
             registrarHeadersResponse(span, response, responseBody.length);
@@ -76,7 +85,8 @@ public class HttpTelemetryFilter extends OncePerRequestFilter {
         for (String name : Collections.list(request.getHeaderNames())) {
             List<String> values = Collections.list(request.getHeaders(name));
             span.setAttribute(
-                    AttributeKey.stringArrayKey(REQUEST_HEADER_PREFIX + name.toLowerCase(Locale.ROOT)), values);
+                    AttributeKey.stringArrayKey(REQUEST_HEADER_PREFIX + name.toLowerCase(Locale.ROOT)),
+                    TelemetryRedactor.valoresHeader(name, values));
         }
     }
 
@@ -87,7 +97,7 @@ public class HttpTelemetryFilter extends OncePerRequestFilter {
             registrados.add(key);
             span.setAttribute(
                     AttributeKey.stringArrayKey(RESPONSE_HEADER_PREFIX + key),
-                    new ArrayList<>(response.getHeaders(name)));
+                    TelemetryRedactor.valoresHeader(name, new ArrayList<>(response.getHeaders(name))));
         }
         if (!registrados.contains("content-type") && response.getContentType() != null) {
             span.setAttribute(

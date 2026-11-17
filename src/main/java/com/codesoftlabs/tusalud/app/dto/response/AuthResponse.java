@@ -34,4 +34,9 @@ public record AuthResponse(
         boolean mfaRequerido,
 
         @Schema(description = "Token temporal (5 min) para el segundo paso; solo si mfaRequerido")
-        String mfaToken) {}
+        String mfaToken) {
+    @Override
+    public String toString() {
+        return "AuthResponse[REDACTADO]";
+    }
+}

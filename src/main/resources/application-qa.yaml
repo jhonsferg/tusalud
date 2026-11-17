@@ -27,3 +27,4 @@ logging:
     root: INFO
     com.codesoftlabs.tusalud.app: INFO
     org.hibernate.SQL: WARN
+    org.hibernate.orm.jdbc.bind: WARN

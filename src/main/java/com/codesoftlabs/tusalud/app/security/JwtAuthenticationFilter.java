@@ -79,7 +79,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException ex) {
             request.setAttribute(AUTH_ERROR_ATTRIBUTE, "El token ha expirado");
         } catch (JwtException | IllegalArgumentException ex) {
-            log.debug("Token JWT rechazado: {}", ex.getMessage());
+            log.debug("Token JWT rechazado: {}", ex.getClass().getSimpleName());
             request.setAttribute(AUTH_ERROR_ATTRIBUTE, "Token inválido");
         } catch (UsernameNotFoundException ex) {
             request.setAttribute(AUTH_ERROR_ATTRIBUTE, "El usuario del token ya no existe");

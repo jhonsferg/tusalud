@@ -37,4 +37,9 @@ public record PersonalCreateRequest(
         String telefono,
 
         @Schema(example = "[\"ROLE_LABORATORIO\"]") @NotEmpty(message = "Indique al menos un rol")
-        List<@NotNull(message = "El rol es obligatorio") RolNombre> roles) {}
+        List<@NotNull(message = "El rol es obligatorio") RolNombre> roles) {
+    @Override
+    public String toString() {
+        return "PersonalCreateRequest[REDACTADO]";
+    }
+}

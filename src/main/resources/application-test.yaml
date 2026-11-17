@@ -23,3 +23,4 @@ logging:
   level:
     com.codesoftlabs.tusalud.app: DEBUG
     org.hibernate.SQL: WARN
+    org.hibernate.orm.jdbc.bind: WARN

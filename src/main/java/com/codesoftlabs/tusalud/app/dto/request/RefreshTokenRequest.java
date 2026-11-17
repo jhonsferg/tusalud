@@ -7,4 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 public record RefreshTokenRequest(
         @Schema(description = "Refresh token entregado al iniciar sesión o en la renovación anterior")
         @NotBlank(message = "El refresh token es obligatorio")
-        String refreshToken) {}
+        String refreshToken) {
+    @Override
+    public String toString() {
+        return "RefreshTokenRequest[REDACTADO]";
+    }
+}

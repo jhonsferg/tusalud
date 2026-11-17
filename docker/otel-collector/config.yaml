@@ -22,6 +22,24 @@ processors:
           error_mode: ignore
           span:
             - 'kind == SPAN_KIND_SERVER and IsMatch(attributes["url.path"], "^/api/")'
+  attributes/sensibles:
+    actions:
+      - key: http.request.header.authorization
+        action: delete
+      - key: http.request.header.proxy-authorization
+        action: delete
+      - key: http.request.header.cookie
+        action: delete
+      - key: http.response.header.set-cookie
+        action: delete
+      - key: http.request.header.x-api-key
+        action: delete
+      - key: http.request.header.x-auth-token
+        action: delete
+      - key: http.request.header.x-csrf-token
+        action: delete
+      - key: http.request.header.x-xsrf-token
+        action: delete
   batch:
     send_batch_size: 1024
     timeout: 5s
@@ -43,7 +61,13 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [memory_limiter, tail_sampling/api-requests, batch]
+      processors:
+        [
+          memory_limiter,
+          attributes/sensibles,
+          tail_sampling/api-requests,
+          batch,
+        ]
       exporters: [otlp_grpc/jaeger]
     metrics:
       receivers: [otlp]

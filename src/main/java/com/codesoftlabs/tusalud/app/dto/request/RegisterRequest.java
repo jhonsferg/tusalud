@@ -43,4 +43,9 @@ public record RegisterRequest(
         @Schema(type = "string", example = "1992-04-15")
         @NotNull(message = "La fecha de nacimiento es obligatoria")
         @Past(message = "La fecha de nacimiento debe ser una fecha pasada")
-        LocalDate fechaNacimiento) {}
+        LocalDate fechaNacimiento) {
+    @Override
+    public String toString() {
+        return "RegisterRequest[REDACTADO]";
+    }
+}

@@ -41,3 +41,4 @@ logging:
     org.springframework.boot.SpringApplication: INFO
     org.springframework.boot.web.embedded.tomcat: INFO
     org.hibernate.SQL: WARN
+    org.hibernate.orm.jdbc.bind: WARN

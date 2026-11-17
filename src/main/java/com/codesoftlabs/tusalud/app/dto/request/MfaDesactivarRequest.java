@@ -12,4 +12,9 @@ public record MfaDesactivarRequest(
         @Schema(example = "123456")
         @NotBlank(message = "El código es obligatorio")
         @Size(max = 20, message = "El código no debe superar 20 caracteres")
-        String codigo) {}
+        String codigo) {
+    @Override
+    public String toString() {
+        return "MfaDesactivarRequest[REDACTADO]";
+    }
+}
