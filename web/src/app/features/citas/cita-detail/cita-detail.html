@@ -1,1 +1,107 @@
-<p>cita-detail works!</p>
+<app-page-header
+  title="Detalle de la cita"
+  icon="pi-calendar"
+  [backLink]="volver()"
+  backLabel="Volver"
+/>
+
+@if (store.selected.error(); as error) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      [title]="error.status === 404 ? 'No encontramos la cita' : 'No pudimos cargar la cita'"
+      [message]="error.message"
+    >
+      <p-button label="Volver" [routerLink]="volver()" />
+    </app-empty-state>
+  </div>
+} @else if (store.selected.value(); as cita) {
+  <div class="layout">
+    <section class="panel">
+      <div class="head">
+        <div>
+          <span class="text-muted">Cita #{{ cita.id }}</span>
+          <h2>{{ cita.fechaHora | date: 'fullDate' }}</h2>
+          <p class="hora">{{ cita.fechaHora | date: 'shortTime' }}</p>
+        </div>
+        <app-estado-cita-tag [estado]="cita.estado" />
+      </div>
+
+      <h4>Motivo de la consulta</h4>
+      <p class="motivo">{{ cita.motivo }}</p>
+
+      <div class="actions">
+        @if (puedeConfirmar(cita)) {
+          <p-button label="Confirmar cita" icon="pi pi-check" (onClick)="confirmar(cita)" />
+        }
+        @if (puedeAtender(cita)) {
+          <p-button
+            label="Marcar como atendida"
+            icon="pi pi-verified"
+            severity="success"
+            (onClick)="atender(cita)"
+          />
+        }
+        @if (puedeCancelar(cita)) {
+          <p-button
+            label="Cancelar cita"
+            icon="pi pi-times"
+            severity="danger"
+            [outlined]="true"
+            (onClick)="cancelar(cita)"
+          />
+        }
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Médico</h3>
+      <dl>
+        <div>
+          <dt>Nombre</dt>
+          <dd>{{ cita.medicoNombre }}</dd>
+        </div>
+        <div>
+          <dt>Especialidad</dt>
+          <dd>{{ cita.especialidad }}</dd>
+        </div>
+        <div>
+          <dt>Consultorio</dt>
+          <dd>{{ cita.consultorio || 'Por asignar' }}</dd>
+        </div>
+      </dl>
+
+      @if (!auth.isPaciente()) {
+        <h3>Paciente</h3>
+        <dl>
+          <div>
+            <dt>Nombre</dt>
+            <dd>{{ cita.pacienteNombre }}</dd>
+          </div>
+          <div>
+            <dt>DNI</dt>
+            <dd>{{ cita.pacienteDni }}</dd>
+          </div>
+        </dl>
+      }
+
+      <h3>Pago</h3>
+      <dl>
+        <div>
+          <dt>Monto</dt>
+          <dd>{{ cita.monto | currency: 'PEN' : 'symbol-narrow' }}</dd>
+        </div>
+        <div>
+          <dt>Reservada el</dt>
+          <dd>{{ cita.createdAt | date: 'medium' }}</dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+} @else {
+  <div class="layout">
+    <div class="panel"><p-skeleton height="14rem" /></div>
+    <div class="panel"><p-skeleton height="14rem" /></div>
+  </div>
+}

@@ -1,1 +1,102 @@
-<p>agenda works!</p>
+<app-page-header title="Mi agenda" subtitle="Tus pacientes del día" icon="pi-calendar" />
+
+<div class="panel toolbar">
+  <div class="nav">
+    <p-button
+      icon="pi pi-chevron-left"
+      [outlined]="true"
+      severity="secondary"
+      ariaLabel="Día anterior"
+      (onClick)="mover(-1)"
+    />
+    <p-datepicker
+      [ngModel]="fechaDate()"
+      (ngModelChange)="elegir($event)"
+      dateFormat="DD, d MM yy"
+      [showIcon]="true"
+      [readonlyInput]="true"
+      appendTo="body"
+    />
+    <p-button
+      icon="pi pi-chevron-right"
+      [outlined]="true"
+      severity="secondary"
+      ariaLabel="Día siguiente"
+      (onClick)="mover(1)"
+    />
+    @if (!esHoy()) {
+      <p-button label="Hoy" [text]="true" (onClick)="irAHoy()" />
+    }
+  </div>
+  <span class="text-muted">
+    {{ store.citasAgenda().length }} citas, {{ activas() }} por atender
+  </span>
+</div>
+
+@if (store.agenda.error(); as error) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar tu agenda"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="cargar()" />
+    </app-empty-state>
+  </div>
+} @else if (store.agenda.loading() && !store.agenda.hasValue()) {
+  <div class="panel"><p-skeleton height="10rem" /></div>
+} @else if (store.citasAgenda().length === 0) {
+  <div class="panel">
+    <app-empty-state
+      icon="pi-calendar-times"
+      title="Sin citas para este día"
+      message="No tienes pacientes agendados en la fecha seleccionada."
+    />
+  </div>
+} @else {
+  <ol class="timeline">
+    @for (cita of store.citasAgenda(); track cita.id) {
+      <li
+        class="panel item"
+        [class.done]="cita.estado === 'ATENDIDA' || cita.estado === 'CANCELADA'"
+      >
+        <time>{{ cita.fechaHora | date: 'HH:mm' }}</time>
+        <div class="info">
+          <strong>{{ cita.pacienteNombre }}</strong>
+          <span class="text-muted">DNI {{ cita.pacienteDni }}</span>
+          <p>{{ cita.motivo }}</p>
+        </div>
+        <div class="side">
+          <app-estado-cita-tag [estado]="cita.estado" />
+          <div class="buttons">
+            <p-button
+              icon="pi pi-eye"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              ariaLabel="Ver detalle"
+              [routerLink]="['/citas', cita.id]"
+            />
+            @if (cita.estado === 'PENDIENTE') {
+              <p-button
+                label="Confirmar"
+                size="small"
+                [outlined]="true"
+                (onClick)="confirmar(cita)"
+              />
+            }
+            @if (cita.estado === 'PENDIENTE' || cita.estado === 'CONFIRMADA') {
+              <p-button
+                label="Atendida"
+                size="small"
+                severity="success"
+                (onClick)="atender(cita)"
+              />
+            }
+          </div>
+        </div>
+      </li>
+    }
+  </ol>
+}

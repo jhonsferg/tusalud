@@ -1,1 +1,124 @@
-<p>mis-citas works!</p>
+<app-page-header
+  title="Mis citas"
+  subtitle="Revisa, consulta y cancela tus reservas"
+  icon="pi-calendar-clock"
+>
+  <p-button label="Reservar cita" icon="pi pi-calendar-plus" routerLink="/citas/nueva" />
+</app-page-header>
+
+<div class="stats">
+  @for (estado of estados; track estado) {
+    <div class="panel stat">
+      <span class="count">{{ store.conteoPorEstado()[estado] }}</span>
+      <span class="text-muted">{{ etiquetaEstado[estado] }}</span>
+    </div>
+  }
+</div>
+
+<div class="panel">
+  <div class="toolbar">
+    <p-selectbutton
+      [options]="opciones"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="vista()"
+      (ngModelChange)="vista.set($event ?? 'proximas')"
+      [allowEmpty]="false"
+      ariaLabel="Filtrar citas"
+    />
+    <p-datepicker
+      selectionMode="range"
+      [ngModel]="rango()"
+      (ngModelChange)="cambiarRango($event)"
+      [showIcon]="true"
+      [showButtonBar]="true"
+      dateFormat="dd/mm/yy"
+      placeholder="Filtrar por fechas"
+      [readonlyInput]="true"
+      appendTo="body"
+    />
+  </div>
+
+  @if (store.misCitas.error(); as error) {
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar tus citas"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="cargar()" />
+    </app-empty-state>
+  } @else {
+    <p-table
+      [value]="visibles()"
+      [loading]="store.misCitas.loading()"
+      [paginator]="visibles().length > 8"
+      [rows]="8"
+      [rowHover]="true"
+      responsiveLayout="scroll"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Fecha y hora</th>
+          <th>Médico</th>
+          <th>Estado</th>
+          <th class="text-right">Monto</th>
+          <th style="width: 8rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-cita>
+        <tr>
+          <td>
+            <div class="font-semibold">{{ cita.fechaHora | date: 'EEE d MMM y' }}</div>
+            <small class="text-muted">{{ cita.fechaHora | date: 'shortTime' }}</small>
+          </td>
+          <td>
+            <div class="font-semibold">{{ cita.medicoNombre }}</div>
+            <small class="text-muted">{{ cita.especialidad }}</small>
+          </td>
+          <td><app-estado-cita-tag [estado]="cita.estado" /></td>
+          <td class="text-right">{{ cita.monto | currency: 'PEN' : 'symbol-narrow' }}</td>
+          <td class="text-right">
+            <p-button
+              icon="pi pi-eye"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              ariaLabel="Ver detalle"
+              [routerLink]="['/citas', cita.id]"
+            />
+            @if (puedeCancelar(cita)) {
+              <p-button
+                icon="pi pi-times"
+                [text]="true"
+                [rounded]="true"
+                severity="danger"
+                ariaLabel="Cancelar cita"
+                (onClick)="cancelar(cita)"
+              />
+            }
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="5">
+            <app-empty-state
+              icon="pi-calendar"
+              [title]="
+                vista() === 'proximas' ? 'No tienes citas próximas' : 'No hay citas para mostrar'
+              "
+              message="Reserva una cita con el especialista que necesitas."
+            >
+              <p-button
+                label="Reservar cita"
+                icon="pi pi-calendar-plus"
+                routerLink="/citas/nueva"
+              />
+            </app-empty-state>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

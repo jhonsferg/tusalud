@@ -1,1 +1,140 @@
-<p>auditoria works!</p>
+<app-page-header
+  title="Auditoría"
+  subtitle="Panorama general de las citas de la clínica"
+  icon="pi-chart-bar"
+>
+  <p-button label="Actualizar" icon="pi pi-refresh" [outlined]="true" (onClick)="recargar()" />
+</app-page-header>
+
+@if (store.porEstado.error(); as error) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar el resumen"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="recargar()" />
+    </app-empty-state>
+  </div>
+} @else {
+  <div class="top">
+    <div class="kpis">
+      @for (item of store.resumen(); track item.estado) {
+        <div class="panel kpi">
+          <span class="icon" [style.color]="color[item.estado]">
+            <i [class]="'pi ' + icono[item.estado]"></i>
+          </span>
+          <span class="count">{{ item.cantidad }}</span>
+          <span class="text-muted">{{ etiqueta[item.estado] }}</span>
+        </div>
+      }
+      <div class="panel kpi wide">
+        <span class="icon"><i class="pi pi-wallet"></i></span>
+        <span class="count">{{
+          store.ingresosAtendidos() | currency: 'PEN' : 'symbol-narrow'
+        }}</span>
+        <span class="text-muted">Ingresos por citas atendidas del periodo</span>
+      </div>
+    </div>
+
+    <div class="panel chart">
+      <h3>Citas por estado</h3>
+      @if (store.totalCitas() === 0) {
+        <app-empty-state
+          icon="pi-chart-pie"
+          title="Sin datos todavía"
+          message="Aparecerán cuando se reserven citas."
+        />
+      } @else {
+        <div class="chart-box">
+          <p-chart type="doughnut" [data]="grafico()" [options]="opcionesGrafico" height="260px" />
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<div class="panel">
+  <div class="toolbar">
+    <h3>Detalle de citas</h3>
+    <p-datepicker
+      selectionMode="range"
+      [ngModel]="rango()"
+      (ngModelChange)="cambiarRango($event)"
+      [showIcon]="true"
+      [showButtonBar]="true"
+      dateFormat="dd/mm/yy"
+      placeholder="Filtrar por fechas"
+      [readonlyInput]="true"
+      appendTo="body"
+    />
+  </div>
+
+  @if (store.citas.error(); as error) {
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar las citas"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="cargarCitas()" />
+    </app-empty-state>
+  } @else {
+    <p-table
+      [value]="store.citas.value() ?? []"
+      [loading]="store.citas.loading()"
+      [paginator]="(store.citas.value() ?? []).length > 10"
+      [rows]="10"
+      [rowHover]="true"
+      responsiveLayout="scroll"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Fecha</th>
+          <th>Paciente</th>
+          <th>Médico</th>
+          <th>Estado</th>
+          <th class="text-right">Monto</th>
+          <th style="width: 4rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-cita>
+        <tr>
+          <td>{{ cita.fechaHora | date: 'dd/MM/y HH:mm' }}</td>
+          <td>
+            <div class="font-semibold">{{ cita.pacienteNombre }}</div>
+            <small class="text-muted">DNI {{ cita.pacienteDni }}</small>
+          </td>
+          <td>
+            <div class="font-semibold">{{ cita.medicoNombre }}</div>
+            <small class="text-muted">{{ cita.especialidad }}</small>
+          </td>
+          <td><app-estado-cita-tag [estado]="cita.estado" /></td>
+          <td class="text-right">{{ cita.monto | currency: 'PEN' : 'symbol-narrow' }}</td>
+          <td class="text-right">
+            <p-button
+              icon="pi pi-eye"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              ariaLabel="Ver detalle"
+              [routerLink]="['/citas', cita.id]"
+            />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6">
+            <app-empty-state
+              icon="pi-calendar"
+              title="No hay citas en el periodo"
+              message="Ajusta el rango de fechas para ver más resultados."
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

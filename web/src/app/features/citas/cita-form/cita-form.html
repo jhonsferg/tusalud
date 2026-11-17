@@ -1,1 +1,164 @@
-<p>cita-form works!</p>
+<app-page-header
+  title="Reservar cita"
+  subtitle="Elige médico, fecha y hora en tres pasos"
+  icon="pi-calendar-plus"
+  backLink="/citas"
+  backLabel="Volver a mis citas"
+/>
+
+<div class="layout">
+  <form class="panel" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="step">
+      <span class="num">1</span>
+      <app-form-field
+        label="Médico"
+        [control]="form.controls.medicoId"
+        inputId="cita-medico"
+        [required]="true"
+      >
+        <p-select
+          inputId="cita-medico"
+          formControlName="medicoId"
+          [options]="opcionesMedico()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Selecciona un médico"
+          [loading]="medicos.list.loading()"
+          [filter]="true"
+          filterPlaceholder="Buscar médico o especialidad"
+          emptyMessage="No hay médicos disponibles"
+          appendTo="body"
+          styleClass="w-full"
+          (onChange)="cambioMedicoOFecha()"
+        />
+      </app-form-field>
+    </div>
+
+    <div class="step">
+      <span class="num">2</span>
+      <app-form-field
+        label="Fecha"
+        [control]="form.controls.fecha"
+        inputId="cita-fecha"
+        [required]="true"
+      >
+        <p-datepicker
+          inputId="cita-fecha"
+          formControlName="fecha"
+          [minDate]="minimo"
+          dateFormat="dd/mm/yy"
+          [showIcon]="true"
+          [fluid]="true"
+          placeholder="dd/mm/aaaa"
+          appendTo="body"
+          (onSelect)="cambioMedicoOFecha()"
+        />
+      </app-form-field>
+    </div>
+
+    <div class="step">
+      <span class="num">3</span>
+      <app-form-field
+        label="Hora"
+        [control]="form.controls.hora"
+        inputId="cita-hora"
+        [required]="true"
+      >
+        @if (!form.controls.medicoId.value || !form.controls.fecha.value) {
+          <small class="text-muted"
+            >Elige primero un médico y una fecha para ver las horas libres.</small
+          >
+        } @else if (medicos.disponibilidad.error(); as error) {
+          <small class="text-red-600">{{ error.message }}</small>
+        } @else if (medicos.disponibilidad.loading()) {
+          <div class="slots">
+            @for (n of [1, 2, 3, 4, 5, 6]; track n) {
+              <p-skeleton height="2.4rem" />
+            }
+          </div>
+        } @else if (horas().length === 0) {
+          <app-empty-state
+            icon="pi-calendar-times"
+            title="Sin horas libres"
+            message="El médico no atiende ese día o no le quedan turnos. Prueba con otra fecha."
+          />
+        } @else {
+          <div class="slots" role="radiogroup" aria-label="Horas disponibles">
+            @for (hora of horas(); track hora) {
+              <p-button
+                [label]="hora"
+                size="small"
+                [outlined]="form.controls.hora.value !== hora"
+                role="radio"
+                [attr.aria-checked]="form.controls.hora.value === hora"
+                (onClick)="elegirHora(hora)"
+              />
+            }
+          </div>
+        }
+      </app-form-field>
+    </div>
+
+    <app-form-field
+      label="Motivo de la consulta"
+      [control]="form.controls.motivo"
+      inputId="cita-motivo"
+      [hint]="'Cuéntale al médico qué sientes. Máximo ' + motivoMax + ' caracteres'"
+      [required]="true"
+    >
+      <textarea
+        pTextarea
+        id="cita-motivo"
+        formControlName="motivo"
+        rows="4"
+        class="w-full"
+      ></textarea>
+    </app-form-field>
+
+    <div class="flex gap-2 justify-content-end mt-4">
+      <p-button label="Cancelar" severity="secondary" [outlined]="true" routerLink="/citas" />
+      <p-button
+        type="submit"
+        label="Confirmar reserva"
+        icon="pi pi-check"
+        [loading]="submitting()"
+      />
+    </div>
+  </form>
+
+  <aside class="panel summary">
+    <h3>Resumen</h3>
+    @if (medicoElegido(); as medico) {
+      <dl>
+        <div>
+          <dt>Médico</dt>
+          <dd>{{ medico.nombreCompleto }}</dd>
+        </div>
+        <div>
+          <dt>Especialidad</dt>
+          <dd>{{ medico.especialidadNombre }}</dd>
+        </div>
+        <div>
+          <dt>Consultorio</dt>
+          <dd>{{ medico.consultorio || 'Por asignar' }}</dd>
+        </div>
+        <div>
+          <dt>Fecha y hora</dt>
+          <dd>
+            @if (fechaHora(); as valor) {
+              {{ valor | date: 'EEE d MMM y, h:mm a' }}
+            } @else {
+              Por elegir
+            }
+          </dd>
+        </div>
+        <div class="total">
+          <dt>Total a pagar</dt>
+          <dd>{{ medico.precioConsulta | currency: 'PEN' : 'symbol-narrow' }}</dd>
+        </div>
+      </dl>
+    } @else {
+      <p class="text-muted">Selecciona un médico para ver el detalle de tu reserva.</p>
+    }
+  </aside>
+</div>
