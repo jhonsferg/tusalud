@@ -41,7 +41,7 @@ export const appConfig: ApplicationConfig = {
       translation: PRIMENG_TRANSLATION_ES,
       theme: {
         preset: TusaludPreset,
-        options: { darkModeSelector: false, cssLayer: false },
+        options: { darkModeSelector: '.app-dark', cssLayer: false },
       },
     }),
     MessageService,

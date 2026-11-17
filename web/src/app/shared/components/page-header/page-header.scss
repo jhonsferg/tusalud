@@ -31,8 +31,8 @@
   width: 2.75rem;
   height: 2.75rem;
   border-radius: 12px;
-  background: var(--p-primary-100);
-  color: var(--p-primary-700);
+  background: var(--app-primary-soft);
+  color: var(--app-primary-text);
   font-size: 1.25rem;
 }
 
@@ -43,7 +43,7 @@ h1 {
 
 p {
   margin: 0.2rem 0 0;
-  color: var(--p-surface-500);
+  color: var(--p-text-muted-color);
 }
 
 .actions {

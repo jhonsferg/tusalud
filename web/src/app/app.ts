@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 
+import { ThemeService } from '@tusalud/app/core/services/theme.service';
 import { LoadingBar } from '@tusalud/app/shared/components/loading-bar/loading-bar';
 import { NotificationOutlet } from '@tusalud/app/shared/components/notification-outlet/notification-outlet';
 
@@ -16,4 +17,8 @@ import { NotificationOutlet } from '@tusalud/app/shared/components/notification-
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class App {}
+export class App {
+  constructor() {
+    inject(ThemeService);
+  }
+}

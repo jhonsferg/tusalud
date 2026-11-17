@@ -17,7 +17,7 @@
   height: 4rem;
   margin-bottom: 1rem;
   border-radius: 50%;
-  background: var(--p-primary-50);
+  background: var(--app-primary-soft);
   color: var(--p-primary-600);
   font-size: 1.75rem;
 }
@@ -34,7 +34,7 @@ h3 {
 p {
   max-width: 28rem;
   margin: 0.4rem 0 0;
-  color: var(--p-surface-500);
+  color: var(--p-text-muted-color);
 }
 
 .actions {

@@ -1,40 +1,51 @@
-<ng-template #nav>
-  <div class="logo"><i class="pi pi-heart-fill"></i> TuSalud</div>
+<ng-template #nav let-compact="compact">
+  <a class="logo" routerLink="/" aria-label="TuSalud, ir al inicio">
+    <span class="logo-mark"><i class="pi pi-heart-fill"></i></span>
+    @if (!compact) {
+      <span class="logo-text">TuSalud</span>
+    }
+  </a>
+
   <nav aria-label="Navegación principal">
-    @for (item of items(); track item.link) {
-      <a
-        class="nav-link"
-        [routerLink]="item.link"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-        (click)="menuOpen.set(false)"
-      >
-        <i [class]="'pi ' + item.icon"></i>
-        <span>{{ item.label }}</span>
-      </a>
+    @for (grupo of grupos(); track grupo.title) {
+      <div class="group">
+        @if (!compact) {
+          <span class="group-title">{{ grupo.title }}</span>
+        } @else {
+          <span class="group-sep"></span>
+        }
+        @for (item of grupo.items; track item.link) {
+          <a
+            class="nav-link"
+            [routerLink]="item.link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+            [pTooltip]="compact ? item.label : ''"
+            tooltipPosition="right"
+            [attr.aria-label]="item.label"
+            (click)="menuOpen.set(false)"
+          >
+            <i [class]="'pi ' + item.icon"></i>
+            @if (!compact) {
+              <span class="label">{{ item.label }}</span>
+            }
+            @if (item.badge === 'notificaciones' && notificaciones.noLeidas() > 0) {
+              <p-badge
+                [value]="notificaciones.noLeidas() > 99 ? '99+' : '' + notificaciones.noLeidas()"
+                severity="danger"
+                [class.badge-compact]="compact"
+              />
+            }
+          </a>
+        }
+      </div>
     }
   </nav>
-  <div class="user">
-    <p-avatar [label]="iniciales()" shape="circle" styleClass="avatar" />
-    <div class="user-info">
-      <strong>{{ user()?.nombreCompleto }}</strong>
-      <small>{{ rol() }}</small>
-    </div>
-    <p-button
-      icon="pi pi-sign-out"
-      [text]="true"
-      severity="secondary"
-      ariaLabel="Cerrar sesión"
-      pTooltip="Cerrar sesión"
-      tooltipPosition="top"
-      (onClick)="salir()"
-    />
-  </div>
 </ng-template>
 
-<div class="shell">
+<div class="shell" [class.collapsed]="collapsed()">
   <aside class="sidebar">
-    <ng-container [ngTemplateOutlet]="nav" />
+    <ng-container [ngTemplateOutlet]="nav" [ngTemplateOutletContext]="{ compact: collapsed() }" />
   </aside>
 
   <div class="main">
@@ -43,25 +54,125 @@
         icon="pi pi-bars"
         [text]="true"
         severity="secondary"
+        class="only-mobile"
         ariaLabel="Abrir menú"
         (onClick)="menuOpen.set(true)"
       />
-      <span class="topbar-logo"><i class="pi pi-heart-fill"></i> TuSalud</span>
+      <p-button
+        [icon]="collapsed() ? 'pi pi-angle-double-right' : 'pi pi-angle-double-left'"
+        [text]="true"
+        severity="secondary"
+        class="only-desktop"
+        [ariaLabel]="collapsed() ? 'Expandir menú lateral' : 'Contraer menú lateral'"
+        (onClick)="alternarColapso()"
+      />
+      <span class="topbar-logo only-mobile"><i class="pi pi-heart-fill"></i> TuSalud</span>
+
+      <div class="spacer"></div>
+
+      <p-button
+        [icon]="theme.isDark() ? 'pi pi-sun' : 'pi pi-moon'"
+        [text]="true"
+        [rounded]="true"
+        severity="secondary"
+        [ariaLabel]="theme.isDark() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+        (onClick)="theme.toggle()"
+      />
+
+      <div class="bell">
+        <p-button
+          icon="pi pi-bell"
+          [text]="true"
+          [rounded]="true"
+          severity="secondary"
+          ariaLabel="Abrir notificaciones"
+          (onClick)="abrirNotificaciones($event, popover)"
+        />
+        @if (notificaciones.noLeidas() > 0) {
+          <span class="bell-count" aria-hidden="true">{{
+            notificaciones.noLeidas() > 9 ? '9+' : notificaciones.noLeidas()
+          }}</span>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="user-button"
+        aria-haspopup="menu"
+        aria-label="Menú de usuario"
+        (click)="menuDeUsuario.toggle($event)"
+      >
+        <app-user-avatar [nombre]="user()?.nombreCompleto ?? ''" [imagen]="avatar()" />
+        <span class="user-text">
+          <strong>{{ user()?.nombreCompleto }}</strong>
+          <small>{{ rol() }}</small>
+        </span>
+        <i class="pi pi-chevron-down user-caret"></i>
+      </button>
+      <p-menu #menuDeUsuario [model]="menuUsuario()" [popup]="true" appendTo="body" />
     </header>
+
     <div class="content">
       <div class="page"><router-outlet /></div>
     </div>
   </div>
 </div>
 
+<p-popover #popover styleClass="popover-notificaciones">
+  <div class="notif">
+    <div class="notif-head">
+      <strong>Notificaciones</strong>
+      @if (notificaciones.noLeidas() > 0) {
+        <button type="button" class="link-button" (click)="marcarTodas()">
+          Marcar todas como leídas
+        </button>
+      }
+    </div>
+
+    @if (notificaciones.recientes().length === 0) {
+      <p class="notif-vacia"><i class="pi pi-inbox"></i> No tienes notificaciones.</p>
+    } @else {
+      <ul>
+        @for (item of notificaciones.recientes(); track item.id) {
+          <li>
+            <button
+              type="button"
+              class="notif-item"
+              [class.unread]="!item.leida"
+              (click)="abrir(item, popover)"
+            >
+              <span class="notif-icon" [style.color]="color[item.tipo]">
+                <i [class]="'pi ' + icono[item.tipo]"></i>
+              </span>
+              <span class="notif-body">
+                <strong>{{ item.titulo }}</strong>
+                <span>{{ item.mensaje }}</span>
+                <small>{{ item.createdAt | date: 'd MMM, HH:mm' }}</small>
+              </span>
+              @if (!item.leida) {
+                <span class="dot" aria-label="No leída"></span>
+              }
+            </button>
+          </li>
+        }
+      </ul>
+    }
+
+    <a class="notif-footer" routerLink="/notificaciones" (click)="popover.hide()"
+      >Ver todas las notificaciones</a
+    >
+  </div>
+</p-popover>
+
 <p-drawer
   [visible]="menuOpen()"
   (visibleChange)="menuOpen.set($event)"
   position="left"
   [showCloseIcon]="true"
-  [style]="{ width: '18rem' }"
+  styleClass="drawer-nav"
+  [style]="{ width: '17rem' }"
 >
   <div class="drawer-body">
-    <ng-container [ngTemplateOutlet]="nav" />
+    <ng-container [ngTemplateOutlet]="nav" [ngTemplateOutletContext]="{ compact: false }" />
   </div>
 </p-drawer>

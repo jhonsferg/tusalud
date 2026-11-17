@@ -1,6 +1,22 @@
 @import 'primeicons/primeicons.css';
 @import 'primeflex/primeflex.css';
 
+:root {
+  --app-bg: #f3f6fb;
+  --app-primary-text: var(--p-primary-700);
+  --app-primary-soft: color-mix(in srgb, var(--p-primary-color) 12%, transparent);
+  --app-sidebar-bg: #0f1b33;
+  --app-sidebar-text: #b6c2d9;
+  --app-sidebar-hover: rgb(255 255 255 / 8%);
+}
+
+.app-dark {
+  --app-bg: #0a1020;
+  --app-primary-text: var(--p-primary-300);
+  --app-primary-soft: color-mix(in srgb, var(--p-primary-color) 22%, transparent);
+  --app-sidebar-bg: #0c1426;
+}
+
 *,
 *::before,
 *::after {
@@ -19,7 +35,7 @@ body {
     Roboto,
     sans-serif;
   color: var(--p-text-color);
-  background-color: var(--p-surface-50);
+  background-color: var(--app-bg);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -28,11 +44,11 @@ h2,
 h3,
 h4 {
   margin: 0;
-  color: var(--p-surface-900);
+  color: var(--p-text-color);
 }
 
 a {
-  color: var(--p-primary-700);
+  color: var(--app-primary-text);
   text-decoration: none;
 
   &:hover {
@@ -46,14 +62,14 @@ a {
 }
 
 .panel {
-  background: var(--p-surface-0);
-  border: 1px solid var(--p-surface-200);
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
   border-radius: 12px;
   padding: 1.25rem;
 }
 
 .text-muted {
-  color: var(--p-surface-500);
+  color: var(--p-text-muted-color);
 }
 
 .p-datatable .p-datatable-tbody > tr > td {
