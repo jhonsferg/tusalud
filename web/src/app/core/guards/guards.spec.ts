@@ -94,6 +94,11 @@ describe('rutas de la aplicación', () => {
     );
   });
 
+  it('permite al médico y al administrador abrir el detalle de una cita', async () => {
+    expect(await navigateAs(['ROLE_MEDICO'], '/citas/5', true)).toBe('/citas/5');
+    expect(await navigateAs(['ROLE_ADMIN'], '/citas/5', true)).toBe('/citas/5');
+  });
+
   it('muestra la página no encontrada para rutas desconocidas', async () => {
     expect(await navigateAs(['ROLE_PACIENTE'], '/no-existe', true)).toBe('/no-existe');
   });

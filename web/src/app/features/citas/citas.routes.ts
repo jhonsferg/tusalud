@@ -5,6 +5,7 @@ import { roleGuard } from '@tusalud/app/core/guards/role.guard';
 export const CITAS_ROUTES: Routes = [
   {
     path: '',
+    pathMatch: 'full',
     title: 'Mis citas',
     canMatch: [roleGuard('ROLE_PACIENTE')],
     loadComponent: () =>

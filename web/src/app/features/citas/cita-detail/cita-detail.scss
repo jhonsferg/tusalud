@@ -17,7 +17,11 @@
   margin-bottom: 1.5rem;
 
   h2 {
-    text-transform: capitalize;
+    text-transform: none;
+
+    &::first-letter {
+      text-transform: uppercase;
+    }
   }
 }
 
