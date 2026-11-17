@@ -98,7 +98,7 @@ public class CajaServiceImpl implements CajaService {
                 .montoApertura(escala(request.montoApertura()))
                 .estado(EstadoCaja.ABIERTA)
                 .build());
-        log.info("Caja {} abierta por {}", sesion.getId(), actor.getEmail());
+        log.info("Caja {} abierta por {}", sesion.getId(), actor.getId());
         return SesionCajaResponse.from(sesion);
     }
 
@@ -261,8 +261,7 @@ public class CajaServiceImpl implements CajaService {
                     "Se emitió el comprobante " + comprobante.getCodigo() + " por S/ " + total.toPlainString() + ".",
                     "/pagos");
         }
-        log.info(
-                "Comprobante {} emitido por {} en la caja {}", comprobante.getCodigo(), actor.getEmail(), caja.getId());
+        log.info("Comprobante {} emitido por {} en la caja {}", comprobante.getCodigo(), actor.getId(), caja.getId());
         return ComprobanteResponse.from(comprobante);
     }
 
@@ -344,7 +343,7 @@ public class CajaServiceImpl implements CajaService {
         comprobante.setMotivoAnulacion(motivo.trim());
         comprobante.setAnuladoEn(LocalDateTime.now());
         revertirOrigen(comprobante);
-        log.info("Comprobante {} anulado por {}", comprobante.getCodigo(), actor.getEmail());
+        log.info("Comprobante {} anulado por {}", comprobante.getCodigo(), actor.getId());
         return ComprobanteResponse.from(comprobante);
     }
 

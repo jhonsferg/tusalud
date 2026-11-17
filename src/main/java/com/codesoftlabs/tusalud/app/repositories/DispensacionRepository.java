@@ -16,6 +16,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DispensacionRepository extends JpaRepository<Dispensacion, UUID> {
 
+    boolean existsByAtencionIdAndEstado(UUID atencionId, EstadoDispensacion estado);
+
     @Query("""
             SELECT d FROM Dispensacion d
             JOIN FETCH d.usuario

@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "6b0d7c1e-3f5a-4e1b-9a7c-2d4e8f9a1c01",
     "name": "TuSalud API",
-    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 18, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
+    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 19, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -1492,8 +1492,8 @@
                   "const norm = s => String(s || '').normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').toLowerCase();",
                   "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
                   "const lista = asList(pm.response.json());",
-                  "const garcia = lista.find(m => m.email === 'dr.garcia@tusalud.com');",
-                  "const lopez = lista.find(m => m.email === 'dra.lopez@tusalud.com');",
+                  "const garcia = lista.find(m => m.colegiatura === 'CMP-12345');",
+                  "const lopez = lista.find(m => m.colegiatura === 'CMP-67890');",
                   "pm.test('Incluye a los médicos semilla', () => {",
                   "    pm.expect(garcia, 'Dr. García').to.be.an('object');",
                   "    pm.expect(lopez, 'Dra. López').to.be.an('object');",
@@ -1568,7 +1568,7 @@
                   "    pm.expect(lista.length).to.be.above(0);",
                   "    lista.forEach(m => pm.expect(m.especialidades.map(e => String(e.id))).to.include(String(pm.variables.get('especialidadCardiologiaId'))));",
                   "});",
-                  "pm.test('Incluye al Dr. García', () => pm.expect(lista.map(m => m.email)).to.include('dr.garcia@tusalud.com'));"
+                  "pm.test('Incluye al Dr. García', () => pm.expect(lista.map(m => m.colegiatura)).to.include('CMP-12345'));"
                 ]
               }
             }
@@ -9229,6 +9229,44 @@
       "name": "18 - Hospitalización y emergencia",
       "item": [
         {
+          "name": "Médico identifica a su paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const juan = pm.response.json().find(p => p.dni === \"12345678\");",
+                  "pm.test(\"Juan Pérez es paciente del médico\", () => pm.expect(juan).to.be.an(\"object\"));",
+                  "pm.collectionVariables.set(\"pacienteJuanId\", juan.pacienteId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/me/pacientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos", "me", "pacientes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Resumen de hospitalización",
           "event": [
             {
@@ -9394,7 +9432,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"pacienteId\": \"{{pacienteMostradorId}}\",\n  \"camaId\": \"{{camaId}}\",\n  \"motivo\": \"Neumonía adquirida en la comunidad\",\n  \"diagnosticoIngreso\": \"Neumonía\"\n}",
+              "raw": "{\n  \"pacienteId\": \"{{pacienteJuanId}}\",\n  \"camaId\": \"{{camaId}}\",\n  \"motivo\": \"Neumonía adquirida en la comunidad\",\n  \"diagnosticoIngreso\": \"Neumonía\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -9443,7 +9481,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"pacienteId\": \"{{pacienteMostradorId}}\",\n  \"camaId\": \"{{camaId}}\",\n  \"motivo\": \"Otro ingreso\"\n}",
+              "raw": "{\n  \"pacienteId\": \"{{pacienteJuanId}}\",\n  \"camaId\": \"{{camaId}}\",\n  \"motivo\": \"Otro ingreso\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -9492,7 +9530,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"pacienteId\": \"{{pacienteMostradorId}}\",\n  \"camaId\": \"{{camaId2}}\",\n  \"motivo\": \"Intento\"\n}",
+              "raw": "{\n  \"pacienteId\": \"{{pacienteJuanId}}\",\n  \"camaId\": \"{{camaId2}}\",\n  \"motivo\": \"Intento\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -10260,6 +10298,1556 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "19 - Seguridad y permisos",
+      "item": [
+        {
+          "name": "El paciente ya no puede editar sus datos médicos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404 o 405', () => pm.expect([404,405]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historia-clinica/datos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "historia-clinica", "datos-medicos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grupoSanguineo\": \"O+\",\n  \"alergias\": \"Penicilina\",\n  \"antecedentes\": \"Asma en la infancia\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente intenta editar datos médicos por el endpoint del personal (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteJuanId}}/datos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteJuanId}}",
+                "datos-medicos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grupoSanguineo\": \"O+\",\n  \"alergias\": \"Penicilina\",\n  \"antecedentes\": \"Asma en la infancia\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Administrador no edita datos médicos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteJuanId}}/datos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteJuanId}}",
+                "datos-medicos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grupoSanguineo\": \"O+\",\n  \"alergias\": \"Penicilina\",\n  \"antecedentes\": \"Asma en la infancia\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no edita datos médicos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteJuanId}}/datos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteJuanId}}",
+                "datos-medicos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grupoSanguineo\": \"O+\",\n  \"alergias\": \"Penicilina\",\n  \"antecedentes\": \"Asma en la infancia\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médico sin relación no edita datos médicos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteMostradorId}}/datos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteMostradorId}}",
+                "datos-medicos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grupoSanguineo\": \"O+\",\n  \"alergias\": \"Penicilina\",\n  \"antecedentes\": \"Asma en la infancia\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médico con relación edita los datos médicos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Guarda los datos y quién los modificó\", () => {",
+                  "    pm.expect(j.grupoSanguineo).to.eql(\"O+\");",
+                  "    pm.expect(j.datosMedicosActualizadoPor).to.be.a(\"string\");",
+                  "    pm.expect(j.datosMedicosActualizadoEn).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteJuanId}}/datos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteJuanId}}",
+                "datos-medicos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grupoSanguineo\": \"O+\",\n  \"alergias\": \"Penicilina\",\n  \"antecedentes\": \"Asma en la infancia\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Grupo sanguíneo inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteJuanId}}/datos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteJuanId}}",
+                "datos-medicos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grupoSanguineo\": \"Z+\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente ve sus datos médicos con quién los actualizó",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().paciente;",
+                  "pm.test(\"Ve los datos cargados por el personal\", () => {",
+                  "    pm.expect(p.grupoSanguineo).to.eql(\"O+\");",
+                  "    pm.expect(p.datosMedicosActualizadoPor).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historia-clinica",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "historia-clinica"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médico sin relación lee la historia de un paciente ajeno (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteMostradorId}}/historia-clinica",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteMostradorId}}",
+                "historia-clinica"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médico con relación lee la historia clínica",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Trae al paciente\", () => pm.expect(pm.response.json().paciente.pacienteId).to.eql(pm.collectionVariables.get(\"pacienteJuanId\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteJuanId}}/historia-clinica",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteJuanId}}",
+                "historia-clinica"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Administrador no lee historias clínicas (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteJuanId}}/historia-clinica",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteJuanId}}",
+                "historia-clinica"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Caja no lee historias clínicas (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteJuanId}}/historia-clinica",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteJuanId}}",
+                "historia-clinica"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no lee historias clínicas (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteJuanId}}/historia-clinica",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteJuanId}}",
+                "historia-clinica"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Farmacia no lee historias clínicas (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteJuanId}}/historia-clinica",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteJuanId}}",
+                "historia-clinica"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{farmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente no lee la historia de alguien más (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteJuanId}}/historia-clinica",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteJuanId}}",
+                "historia-clinica"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Administrador no lee la atención de una cita (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{citaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no lee el detalle de una cita (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{citaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Caja busca pacientes y recibe solo nombre, DNI y teléfono",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Sin datos de contacto ni de nacimiento\", () => {",
+                  "    pm.expect(j).to.have.lengthOf(1);",
+                  "    pm.expect(j[0]).to.have.property(\"dni\");",
+                  "    pm.expect(j[0]).to.not.have.property(\"email\");",
+                  "    pm.expect(j[0]).to.not.have.property(\"fechaNacimiento\");",
+                  "    pm.expect(j[0]).to.not.have.property(\"historialClinicoNumero\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recepcion/pacientes?q={{dniMostrador}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recepcion", "pacientes"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{dniMostrador}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción busca pacientes y recibe los datos de contacto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Con contacto\", () => {",
+                  "    pm.expect(j).to.have.lengthOf(1);",
+                  "    pm.expect(j[0].email).to.be.a(\"string\");",
+                  "    pm.expect(j[0].fechaNacimiento).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recepcion/pacientes?q={{dniMostrador}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recepcion", "pacientes"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{dniMostrador}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una búsqueda de un solo carácter no devuelve pacientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Vacía\", () => pm.expect(pm.response.json()).to.be.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recepcion/pacientes?q=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recepcion", "pacientes"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un médico solo encuentra a sus propios pacientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"No encuentra a un paciente sin relación\", () => pm.expect(pm.response.json()).to.be.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recepcion/pacientes?q={{dniMostrador}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recepcion", "pacientes"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{dniMostrador}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no ve el contacto del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Sin correo ni teléfono, con la colegiatura\", () => {",
+                  "    pm.expect(j).to.not.have.property(\"email\");",
+                  "    pm.expect(j).to.not.have.property(\"telefono\");",
+                  "    pm.expect(j.colegiatura).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/{{medicoGarciaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos", "{{medicoGarciaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador sí ve el contacto del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Con correo\", () => pm.expect(pm.response.json().email).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/{{medicoGarciaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos", "{{medicoGarciaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Farmacia no lee órdenes de laboratorio (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/ordenes/{{ordenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "laboratorio", "ordenes", "{{ordenId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{farmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Administrador no lee resultados de laboratorio (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/ordenes/{{ordenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "laboratorio", "ordenes", "{{ordenId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Caja no lista órdenes de laboratorio (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/ordenes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "laboratorio", "ordenes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Administrador no lee las recetas de farmacia (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/farmacia/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "farmacia", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Laboratorio no lee las recetas de farmacia (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/farmacia/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "farmacia", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{laboratorioToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Farmacia no lee comprobantes de caja (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/caja/comprobantes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "caja", "comprobantes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{farmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no lee evoluciones de hospitalización (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hospitalizacion/ingresos/{{ingresoId}}/evoluciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hospitalizacion",
+                "ingresos",
+                "{{ingresoId}}",
+                "evoluciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente no lee un ingreso hospitalario ajeno (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hospitalizacion/ingresos/{{ingresoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hospitalizacion",
+                "ingresos",
+                "{{ingresoId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no registra triajes (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hospitalizacion/emergencias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hospitalizacion", "emergencias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{pacienteEmergenciaId}}\",\n  \"triaje\": {\n    \"nivel\": 3,\n    \"motivoConsulta\": \"Intento de recepción\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Administrador no da de alta (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hospitalizacion/ingresos/{{ingresoId}}/alta",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hospitalizacion",
+                "ingresos",
+                "{{ingresoId}}",
+                "alta"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnosticoAlta\": \"No corresponde\",\n  \"indicacionesAlta\": \"No corresponde\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Administrador no ingresa pacientes (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Cuerpo con formato ErrorResponse', () => pm.expect(pm.response.json()).to.have.property('message'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hospitalizacion/ingresos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hospitalizacion", "ingresos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{pacienteJuanId}}\",\n  \"camaId\": \"{{camaId}}\",\n  \"motivo\": \"No corresponde\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un id con formato inválido responde 400 y no revela datos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/123/historia-clinica",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "pacientes", "123", "historia-clinica"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -10594,6 +12182,10 @@
     },
     {
       "key": "pacienteEmergenciaId",
+      "value": ""
+    },
+    {
+      "key": "pacienteJuanId",
       "value": ""
     }
   ]

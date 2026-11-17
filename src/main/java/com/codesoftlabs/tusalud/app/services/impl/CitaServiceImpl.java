@@ -272,7 +272,7 @@ public class CitaServiceImpl implements CitaService {
         cita.setEstado(EstadoCita.PENDIENTE);
         cita.setRecordatorioEnviado(false);
         Cita guardada = citaRepository.saveAndFlush(cita);
-        log.info("Cita {} reprogramada de {} a {} por {}", cita.getId(), anterior, nuevaFecha, actor.getEmail());
+        log.info("Cita {} reprogramada de {} a {} por {}", cita.getId(), anterior, nuevaFecha, actor.getId());
 
         notificarOtraParte(
                 guardada,
@@ -481,7 +481,7 @@ public class CitaServiceImpl implements CitaService {
         EstadoCita anterior = cita.getEstado();
         cita.setEstado(nuevoEstado);
         Cita actualizada = citaRepository.saveAndFlush(cita);
-        log.info("Cita {}: {} -> {} por {}", cita.getId(), anterior, nuevoEstado, actor.getEmail());
+        log.info("Cita {}: {} -> {} por {}", cita.getId(), anterior, nuevoEstado, actor.getId());
         return citaMapper.mapear(actualizada);
     }
 

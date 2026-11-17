@@ -12,7 +12,8 @@ public interface HistoriaClinicaService {
 
     HistoriaClinicaResponse obtenerMia(UsuarioPrincipal paciente);
 
-    PacienteHistoriaResponse actualizarDatosMedicos(UsuarioPrincipal paciente, DatosMedicosRequest request);
+    PacienteHistoriaResponse actualizarDatosMedicos(
+            UUID pacienteId, UsuarioPrincipal medico, DatosMedicosRequest request);
 
     HistoriaClinicaResponse obtenerDePaciente(UUID pacienteId, UsuarioPrincipal actor);
 

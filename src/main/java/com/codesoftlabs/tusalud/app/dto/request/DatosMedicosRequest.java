@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-@Schema(description = "Datos médicos básicos del paciente autenticado")
+@Schema(description = "Datos médicos básicos del paciente, editados por el personal clínico")
 public record DatosMedicosRequest(
         @Schema(example = "O+", description = "Uno de A+, A-, B+, B-, AB+, AB-, O+, O- (vacío para limpiar)")
         @Pattern(regexp = "^(A|B|AB|O)[+-]$", message = "El grupo sanguíneo no es válido")

@@ -38,6 +38,7 @@ import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.HospitalizacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
+import com.codesoftlabs.tusalud.app.services.interfaces.RelacionAsistencialService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -75,6 +76,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     private final MedicoRepository medicoRepository;
     private final UsuarioRepository usuarioRepository;
     private final NotificacionService notificacionService;
+    private final RelacionAsistencialService relacionAsistencial;
 
     @Override
     @Transactional(readOnly = true)
@@ -132,6 +134,10 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
 
     @Override
     public IngresoHospResponse crearIngreso(UsuarioPrincipal actor, IngresoHospCreateRequest request) {
+        relacionAsistencial.exigirRelacion(
+                actor,
+                request.pacienteId(),
+                "Solo puede ingresar a pacientes que atiende o que otro médico compartió con usted");
         Paciente paciente = buscarPaciente(request.pacienteId());
         Cama cama = buscarCamaLibre(request.camaId());
         validarSinIngresoActivo(paciente);
@@ -165,14 +171,15 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<IngresoHospResponse> listarIngresos(EstadoIngresoHosp estado, String busqueda) {
+    public List<IngresoHospResponse> listarIngresos(UsuarioPrincipal actor, EstadoIngresoHosp estado, String busqueda) {
         LocalDateTime ahora = LocalDateTime.now();
         String termino = busqueda == null ? "" : busqueda.trim().toLowerCase(Locale.ROOT);
         return ingresoRepository.findRecientes(PageRequest.of(0, 1000)).stream()
                 .filter(ingreso -> estado == null || ingreso.getEstado() == estado)
                 .filter(ingreso -> termino.isEmpty() || coincide(ingreso, termino))
+                .filter(ingreso -> puedeVer(actor, ingreso))
                 .limit(LIMITE_INGRESOS)
-                .map(ingreso -> IngresoHospResponse.from(ingreso, ahora))
+                .map(ingreso -> paraActor(IngresoHospResponse.from(ingreso, ahora), actor))
                 .toList();
     }
 
@@ -180,10 +187,10 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     @Transactional(readOnly = true)
     public IngresoHospResponse obtenerIngreso(UsuarioPrincipal actor, UUID id) {
         IngresoHospitalario ingreso = buscarIngreso(id);
-        if (!esPersonalClinico(actor) && !esDuenio(actor, ingreso)) {
+        if (!puedeVer(actor, ingreso)) {
             throw new ForbiddenOperationException("No tiene acceso a este ingreso");
         }
-        return IngresoHospResponse.from(ingreso, LocalDateTime.now());
+        return paraActor(IngresoHospResponse.from(ingreso, LocalDateTime.now()), actor);
     }
 
     @Override
@@ -224,8 +231,9 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     }
 
     @Override
-    public IngresoHospResponse darAlta(UUID id, AltaHospRequest request) {
+    public IngresoHospResponse darAlta(UsuarioPrincipal actor, UUID id, AltaHospRequest request) {
         IngresoHospitalario ingreso = buscarIngresoActivo(id);
+        exigirMedicoDelIngreso(actor, ingreso, "Solo el médico del ingreso puede dar el alta");
         LocalDateTime ahora = LocalDateTime.now();
         Cama cama = ingreso.getCama();
         if (cama != null) {
@@ -277,6 +285,9 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
                             ? "Solo un médico registra evoluciones médicas"
                             : "Solo el personal de enfermería registra evoluciones de enfermería");
         }
+        if (request.tipo() == TipoEvolucion.MEDICA) {
+            exigirMedicoDelIngreso(actor, ingreso, "Solo el médico del ingreso registra evoluciones médicas");
+        }
         Usuario autor = usuarioRepository
                 .findById(actor.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", actor.getId()));
@@ -298,8 +309,8 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     @Transactional(readOnly = true)
     public List<EvolucionHospResponse> listarEvoluciones(UsuarioPrincipal actor, UUID ingresoId) {
         IngresoHospitalario ingreso = buscarIngreso(ingresoId);
-        boolean personal = esPersonalClinico(actor);
-        if (!personal && !esDuenio(actor, ingreso)) {
+        boolean personal = tieneRol(actor, RolNombre.ROLE_MEDICO) || tieneRol(actor, RolNombre.ROLE_ENFERMERIA);
+        if (!puedeVerClinico(actor, ingreso)) {
             throw new ForbiddenOperationException("No tiene acceso a las evoluciones de este ingreso");
         }
         return evolucionRepository.findDelIngreso(ingresoId).stream()
@@ -316,9 +327,6 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
         Usuario registrador = usuarioRepository
                 .findById(actor.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", actor.getId()));
-        Medico medico = tieneRol(actor, RolNombre.ROLE_MEDICO)
-                ? medicoRepository.findByUsuarioEmail(actor.getEmail()).orElse(null)
-                : null;
         LocalDateTime ahora = LocalDateTime.now();
 
         IngresoHospitalario nuevo = IngresoHospitalario.builder()
@@ -326,7 +334,6 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
                 .tipo(TipoIngresoHosp.EMERGENCIA)
                 .estado(EstadoIngresoHosp.ACTIVO)
                 .paciente(paciente)
-                .medico(medico)
                 .motivo(triaje.motivoConsulta().trim())
                 .fechaIngreso(ahora)
                 .triajeNivel(triaje.nivel())
@@ -358,13 +365,13 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<IngresoHospResponse> listarEmergencias() {
+    public List<IngresoHospResponse> listarEmergencias(UsuarioPrincipal actor) {
         LocalDateTime ahora = LocalDateTime.now();
         return ingresoRepository.findEmergenciasActivas().stream()
                 .sorted(Comparator.comparing(
                                 IngresoHospitalario::getTriajeNivel, Comparator.nullsLast(Integer::compare))
                         .thenComparing(IngresoHospitalario::getFechaIngreso))
-                .map(ingreso -> IngresoHospResponse.from(ingreso, ahora))
+                .map(ingreso -> paraActor(IngresoHospResponse.from(ingreso, ahora), actor))
                 .toList();
     }
 
@@ -530,11 +537,54 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
         return ingreso.getPaciente().getUsuario().getId().equals(actor.getId());
     }
 
-    private static boolean esPersonalClinico(UsuarioPrincipal actor) {
-        return tieneRol(actor, RolNombre.ROLE_ADMIN)
-                || tieneRol(actor, RolNombre.ROLE_MEDICO)
+    private boolean puedeVerClinico(UsuarioPrincipal actor, IngresoHospitalario ingreso) {
+        if (esDuenio(actor, ingreso) || tieneRol(actor, RolNombre.ROLE_ENFERMERIA)) {
+            return true;
+        }
+        return tieneRol(actor, RolNombre.ROLE_MEDICO) && medicoPuedeVer(actor, ingreso);
+    }
+
+    private boolean puedeVer(UsuarioPrincipal actor, IngresoHospitalario ingreso) {
+        if (puedeVerClinico(actor, ingreso)) {
+            return true;
+        }
+        return tieneRol(actor, RolNombre.ROLE_ADMIN) || tieneRol(actor, RolNombre.ROLE_RECEPCION);
+    }
+
+    private boolean medicoPuedeVer(UsuarioPrincipal actor, IngresoHospitalario ingreso) {
+        Medico asignado = ingreso.getMedico();
+        if (asignado == null) {
+            return ingreso.getTipo() == TipoIngresoHosp.EMERGENCIA;
+        }
+        return asignado.getUsuario().getId().equals(actor.getId())
+                || relacionAsistencial.tieneRelacion(
+                        actor, ingreso.getPaciente().getId());
+    }
+
+    private IngresoHospResponse paraActor(IngresoHospResponse ingreso, UsuarioPrincipal actor) {
+        boolean clinico = tieneRol(actor, RolNombre.ROLE_MEDICO)
                 || tieneRol(actor, RolNombre.ROLE_ENFERMERIA)
-                || tieneRol(actor, RolNombre.ROLE_RECEPCION);
+                || actor.getRoles().contains(RolNombre.ROLE_PACIENTE.name());
+        return clinico ? ingreso : ingreso.sinDatosClinicos();
+    }
+
+    private void exigirMedicoDelIngreso(UsuarioPrincipal actor, IngresoHospitalario ingreso, String mensaje) {
+        if (!tieneRol(actor, RolNombre.ROLE_MEDICO)) {
+            throw new ForbiddenOperationException(mensaje);
+        }
+        Medico asignado = ingreso.getMedico();
+        if (asignado == null) {
+            if (ingreso.getTipo() != TipoIngresoHosp.EMERGENCIA) {
+                throw new ForbiddenOperationException(mensaje);
+            }
+            ingreso.setMedico(medicoRepository
+                    .findByUsuarioEmail(actor.getEmail())
+                    .orElseThrow(() -> new ForbiddenOperationException(mensaje)));
+            return;
+        }
+        if (!asignado.getUsuario().getId().equals(actor.getId())) {
+            throw new ForbiddenOperationException(mensaje);
+        }
     }
 
     private static boolean tieneRol(UsuarioPrincipal actor, RolNombre rol) {

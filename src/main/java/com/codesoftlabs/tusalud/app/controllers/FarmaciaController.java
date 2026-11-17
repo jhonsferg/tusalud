@@ -49,7 +49,7 @@ public class FarmaciaController {
     }
 
     @GetMapping("/recetas")
-    @PreAuthorize("hasAnyRole('FARMACIA', 'ADMIN')")
+    @PreAuthorize("hasRole('FARMACIA')")
     @Operation(
             summary = "Recetas para dispensar",
             description = "Recetas de los últimos 90 días. Por defecto devuelve las pendientes y parciales.")

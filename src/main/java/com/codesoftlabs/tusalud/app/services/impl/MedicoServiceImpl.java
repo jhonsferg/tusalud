@@ -111,7 +111,7 @@ public class MedicoServiceImpl implements MedicoService {
                 .build();
         medico = medicoRepository.save(medico);
 
-        log.info("Médico creado: {} (id {}, {})", email, medico.getId(), colegiatura);
+        log.info("Médico creado: {} ({})", medico.getId(), colegiatura);
         return MedicoResponse.from(medico);
     }
 

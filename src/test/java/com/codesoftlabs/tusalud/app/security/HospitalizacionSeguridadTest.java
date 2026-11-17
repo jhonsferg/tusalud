@@ -12,10 +12,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.codesoftlabs.tusalud.app.entities.Medico;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
+import com.codesoftlabs.tusalud.app.entities.enums.EstadoCita;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import com.codesoftlabs.tusalud.app.services.ServiceTestFixture;
 import com.jayway.jsonpath.JsonPath;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -93,6 +95,7 @@ class HospitalizacionSeguridadTest {
     }
 
     private UUID crearIngreso(UUID camaId, Paciente destino) throws Exception {
+        fixture.cita(medico, destino, LocalDateTime.now().plusDays(2), EstadoCita.CONFIRMADA);
         MvcResult resultado = mockMvc.perform(post(BASE + "/ingresos")
                         .header(HttpHeaders.AUTHORIZATION, tokenMedico)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -176,7 +179,7 @@ class HospitalizacionSeguridadTest {
     }
 
     @Test
-    void laRecepcionVeElMapaYRegistraEmergenciasPeroNoIngresaNiDaAlta() throws Exception {
+    void laRecepcionVeElMapaPeroNoRegistraTriajeNiIngresaNiDaAltaNiVeDatosClinicos() throws Exception {
         mockMvc.perform(get(BASE + "/mapa").header(HttpHeaders.AUTHORIZATION, tokenRecepcion))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.areas", hasSize(4)));
@@ -187,12 +190,32 @@ class HospitalizacionSeguridadTest {
                         .header(HttpHeaders.AUTHORIZATION, tokenRecepcion)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(triaje(3, paciente)))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(post(BASE + "/emergencias")
+                        .header(HttpHeaders.AUTHORIZATION, tokenMedico)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(triaje(3, paciente)))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(post(BASE + "/emergencias")
+                        .header(HttpHeaders.AUTHORIZATION, tokenAdmin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(triaje(3, paciente)))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(post(BASE + "/emergencias")
+                        .header(HttpHeaders.AUTHORIZATION, tokenEnfermeria)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(triaje(3, paciente)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.tipo", is("EMERGENCIA")))
-                .andExpect(jsonPath("$.triaje.clasificacion", is("AMARILLO")));
+                .andExpect(jsonPath("$.triaje.clasificacion", is("AMARILLO")))
+                .andExpect(jsonPath("$.triaje.motivoConsulta", is("Dolor abdominal")));
         mockMvc.perform(get(BASE + "/emergencias").header(HttpHeaders.AUTHORIZATION, tokenRecepcion))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].esperaMinutos", notNullValue()));
+                .andExpect(jsonPath("$[0].esperaMinutos", notNullValue()))
+                .andExpect(jsonPath("$[0].triaje.nivel", is(3)))
+                .andExpect(jsonPath("$[0].triaje.motivoConsulta").doesNotExist())
+                .andExpect(jsonPath("$[0].triaje.presionArterial").doesNotExist())
+                .andExpect(jsonPath("$[0].motivo").doesNotExist());
         mockMvc.perform(post(BASE + "/ingresos")
                         .header(HttpHeaders.AUTHORIZATION, tokenRecepcion)
                         .contentType(MediaType.APPLICATION_JSON)

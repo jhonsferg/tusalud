@@ -106,7 +106,7 @@ public class PagoServiceImpl implements PagoService {
                 "Se registró el pago de S/ " + total.toPlainString() + " por su cita del "
                         + cita.getFechaHora().format(FORMATO_FECHA) + ". Comprobante " + pago.getComprobante() + ".",
                 "/citas/" + cita.getId());
-        log.info("Pago {} registrado para la cita {} por {}", pago.getComprobante(), cita.getId(), actor.getEmail());
+        log.info("Pago {} registrado para la cita {} por {}", pago.getComprobante(), cita.getId(), actor.getId());
         return PagoResponse.from(pago);
     }
 

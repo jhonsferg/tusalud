@@ -71,8 +71,12 @@ public class MedicoController {
     public ResponseEntity<List<MedicoResponse>> listar(
             @Parameter(description = "Filtrar por ID de especialidad (opcional)", example = "1")
                     @RequestParam(required = false)
-                    UUID especialidadId) {
-        return ResponseEntity.ok(medicoService.listar(especialidadId));
+                    UUID especialidadId,
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
+        boolean admin = principal.getRoles().contains("ROLE_ADMIN");
+        return ResponseEntity.ok(medicoService.listar(especialidadId).stream()
+                .map(medico -> medico.paraActor(principal.getId(), admin))
+                .toList());
     }
 
     @GetMapping("/{id}")
@@ -91,8 +95,10 @@ public class MedicoController {
     })
     public ResponseEntity<MedicoResponse> obtener(
             @Parameter(description = "ID del médico", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
-                    UUID id) {
-        return ResponseEntity.ok(medicoService.obtener(id));
+                    UUID id,
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
+        boolean admin = principal.getRoles().contains("ROLE_ADMIN");
+        return ResponseEntity.ok(medicoService.obtener(id).paraActor(principal.getId(), admin));
     }
 
     @PostMapping

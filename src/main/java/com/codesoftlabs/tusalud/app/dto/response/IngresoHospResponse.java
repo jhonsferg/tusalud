@@ -38,6 +38,31 @@ public record IngresoHospResponse(
         @Schema(example = "25", description = "Solo en emergencias que aún esperan una cama")
         Long esperaMinutos) {
 
+    public IngresoHospResponse sinDatosClinicos() {
+        return new IngresoHospResponse(
+                id,
+                codigo,
+                tipo,
+                estado,
+                pacienteId,
+                pacienteNombre,
+                dni,
+                camaId,
+                camaCodigo,
+                medicoId,
+                medicoNombre,
+                null,
+                null,
+                fechaIngreso,
+                fechaAlta,
+                null,
+                null,
+                diasEstancia,
+                cargoCama,
+                triaje == null ? null : triaje.soloPrioridad(),
+                esperaMinutos);
+    }
+
     public static IngresoHospResponse from(IngresoHospitalario ingreso, LocalDateTime ahora) {
         Cama cama = ingreso.getCama();
         boolean activo = ingreso.getEstado() == EstadoIngresoHosp.ACTIVO;

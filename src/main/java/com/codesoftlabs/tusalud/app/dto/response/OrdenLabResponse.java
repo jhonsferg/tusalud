@@ -97,6 +97,27 @@ public record OrdenLabResponse(
         }
     }
 
+    public static OrdenLabResponse deAdministracion(OrdenLaboratorio orden) {
+        OrdenLabResponse completa = from(orden, false);
+        return new OrdenLabResponse(
+                completa.id(),
+                completa.codigo(),
+                completa.fecha(),
+                completa.estado(),
+                completa.prioridad(),
+                completa.pacienteId(),
+                completa.pacienteNombre(),
+                null,
+                completa.medicoId(),
+                completa.medicoNombre(),
+                null,
+                null,
+                completa.total(),
+                completa.tomaMuestraEn(),
+                completa.completadaEn(),
+                completa.items());
+    }
+
     public static OrdenLabResponse from(OrdenLaboratorio orden, boolean incluirResultados) {
         return new OrdenLabResponse(
                 orden.getId(),

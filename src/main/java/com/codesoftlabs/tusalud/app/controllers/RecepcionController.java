@@ -183,11 +183,16 @@ public class RecepcionController {
 
     @GetMapping("/pacientes")
     @PreAuthorize("hasAnyRole('RECEPCION', 'ADMIN', 'CAJA', 'MEDICO', 'FARMACIA', 'ENFERMERIA')")
-    @Operation(summary = "Buscar pacientes", description = "Busca por DNI o nombre y devuelve hasta 30 resultados.")
+    @Operation(
+            summary = "Buscar pacientes",
+            description =
+                    "Busca por DNI o nombre y devuelve hasta 30 resultados. Recepción y administración reciben los datos de contacto; el resto de roles solo nombre, DNI y teléfono, y los médicos únicamente entre sus pacientes.")
     @ApiResponse(responseCode = "200", description = "Pacientes encontrados")
     public ResponseEntity<List<PacienteMostradorResponse>> buscarPacientes(
-            @Parameter(description = "DNI o parte del nombre") @RequestParam(required = false) String q) {
-        return ResponseEntity.ok(admisionService.buscarPacientes(q));
+            @Parameter(description = "DNI o parte del nombre, mínimo 2 caracteres") @RequestParam(required = false)
+                    String q,
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
+        return ResponseEntity.ok(admisionService.buscarPacientes(q, principal));
     }
 
     @PostMapping("/pacientes")

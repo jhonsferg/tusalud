@@ -76,7 +76,7 @@ public class PerfilServiceImpl implements PerfilService {
                 .findByUsuarioEmail(usuario.getEmail())
                 .ifPresent(medico -> medico.setConsultorio(vacioANulo(request.consultorio())));
 
-        log.info("Perfil actualizado para {}", usuario.getEmail());
+        log.info("Perfil actualizado para {}", usuario.getId());
         return construir(usuario, principal);
     }
 
@@ -104,7 +104,7 @@ public class PerfilServiceImpl implements PerfilService {
                 "Contraseña actualizada",
                 "Su contraseña fue cambiada. Si no fue usted, comuníquese con soporte.",
                 "/perfil");
-        log.info("Contraseña actualizada para {}", usuario.getEmail());
+        log.info("Contraseña actualizada para {}", usuario.getId());
     }
 
     @Override
@@ -152,7 +152,7 @@ public class PerfilServiceImpl implements PerfilService {
             throw new DatosInvalidosException("La imagen no debe superar 300 KB");
         }
         usuario.setAvatar(imagen);
-        log.info("Avatar actualizado para {} ({} bytes)", usuario.getEmail(), contenido.length);
+        log.info("Avatar actualizado para {} ({} bytes)", usuario.getId(), contenido.length);
         return construir(usuario, principal);
     }
 

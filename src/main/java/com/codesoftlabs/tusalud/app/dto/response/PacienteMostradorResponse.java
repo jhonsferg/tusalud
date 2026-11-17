@@ -17,6 +17,15 @@ public record PacienteMostradorResponse(
         @Schema(type = "string", example = "1990-05-15") LocalDate fechaNacimiento,
         @Schema(example = "HC-000001") String historialClinicoNumero) {
 
+    public static PacienteMostradorResponse minimo(
+            UUID pacienteId, String nombreCompleto, String dni, String telefono) {
+        return new PacienteMostradorResponse(pacienteId, nombreCompleto, dni, telefono, null, null, null);
+    }
+
+    public PacienteMostradorResponse sinDatosPersonales() {
+        return minimo(pacienteId, nombreCompleto, dni, telefono);
+    }
+
     public static PacienteMostradorResponse from(Paciente paciente) {
         var usuario = paciente.getUsuario();
         return new PacienteMostradorResponse(

@@ -111,4 +111,22 @@ class ValoracionServiceImplTest {
                         .promedio())
                 .isZero();
     }
+
+    @Test
+    void laListaPublicaDeValoracionesAbreviaElNombreDelPaciente() {
+        Medico medico = fixture.medicoConHorarioLunes(new BigDecimal("90.00"));
+        Paciente paciente = fixture.paciente();
+        Cita cita = atendida(medico, paciente);
+        valoracionService.valorar(
+                cita.getId(), new ValoracionRequest(5, "Excelente"), fixture.principal(paciente.getUsuario()));
+
+        ValoracionesMedicoResponse publico = valoracionService.listarDeMedico(medico.getId());
+
+        String completo = paciente.getUsuario().getNombreCompleto();
+        assertThat(publico.valoraciones()).singleElement().satisfies(v -> {
+            assertThat(v.pacienteNombre()).isNotEqualTo(completo).endsWith(".");
+            assertThat(v.pacienteNombre()).startsWith(paciente.getUsuario().getNombre());
+            assertThat(v.comentario()).isEqualTo("Excelente");
+        });
+    }
 }

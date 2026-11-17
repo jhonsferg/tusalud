@@ -20,6 +20,10 @@ public record TriajeResponse(
         String registradoPor,
         LocalDateTime fecha) {
 
+    public TriajeResponse soloPrioridad() {
+        return new TriajeResponse(nivel, clasificacion, null, null, null, null, null, null, null, null, fecha);
+    }
+
     public static TriajeResponse from(IngresoHospitalario ingreso) {
         if (!ingreso.tieneTriaje()) {
             return null;

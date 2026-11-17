@@ -172,6 +172,7 @@ public interface CitaRepository extends JpaRepository<Cita, UUID> {
             SELECT COUNT(c) > 0 FROM Cita c
             WHERE c.medico.usuario.id = :usuarioId
               AND c.paciente.id = :pacienteId
+              AND c.estado <> com.codesoftlabs.tusalud.app.entities.enums.EstadoCita.CANCELADA
             """)
     boolean existsRelacionMedicoPaciente(@Param("usuarioId") UUID usuarioId, @Param("pacienteId") UUID pacienteId);
 
@@ -180,6 +181,7 @@ public interface CitaRepository extends JpaRepository<Cita, UUID> {
             JOIN FETCH c.paciente p
             JOIN FETCH p.usuario
             WHERE c.medico.usuario.id = :usuarioId
+              AND c.estado <> com.codesoftlabs.tusalud.app.entities.enums.EstadoCita.CANCELADA
             ORDER BY c.fechaHora DESC
             """)
     List<Cita> findDelMedicoConPacientes(@Param("usuarioId") UUID usuarioId);

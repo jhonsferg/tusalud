@@ -99,10 +99,10 @@ public class AtencionController {
     }
 
     @GetMapping("/{id}/atencion")
-    @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO', 'PACIENTE')")
+    @PreAuthorize("hasAnyRole('MEDICO', 'PACIENTE')")
     @Operation(
             summary = "Obtener atención",
-            description = "Visible para el paciente dueño de la cita, el médico de la cita o un ADMIN.")
+            description = "Visible solo para el paciente dueño de la cita y el médico de la cita.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Atención encontrada"),
         @ApiResponse(

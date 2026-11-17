@@ -28,16 +28,15 @@ import com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException;
 import com.codesoftlabs.tusalud.app.exceptions.ForbiddenOperationException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.AtencionRepository;
-import com.codesoftlabs.tusalud.app.repositories.CitaRepository;
 import com.codesoftlabs.tusalud.app.repositories.ExamenLabRepository;
 import com.codesoftlabs.tusalud.app.repositories.MedicoRepository;
 import com.codesoftlabs.tusalud.app.repositories.OrdenLaboratorioRepository;
-import com.codesoftlabs.tusalud.app.repositories.PacienteCompartidoRepository;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.LaboratorioService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
+import com.codesoftlabs.tusalud.app.services.interfaces.RelacionAsistencialService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -73,8 +72,7 @@ public class LaboratorioServiceImpl implements LaboratorioService {
     private final PacienteRepository pacienteRepository;
     private final MedicoRepository medicoRepository;
     private final AtencionRepository atencionRepository;
-    private final CitaRepository citaRepository;
-    private final PacienteCompartidoRepository compartidoRepository;
+    private final RelacionAsistencialService relacionAsistencial;
     private final UsuarioRepository usuarioRepository;
     private final NotificacionService notificacionService;
 
@@ -132,12 +130,10 @@ public class LaboratorioServiceImpl implements LaboratorioService {
         Paciente paciente = pacienteRepository
                 .findByIdWithUsuario(request.pacienteId())
                 .orElseThrow(() -> new ResourceNotFoundException("Paciente", "id", request.pacienteId()));
-        boolean atiende = citaRepository.existsRelacionMedicoPaciente(actor.getId(), paciente.getId())
-                || compartidoRepository.existsParaUsuario(paciente.getId(), actor.getId());
-        if (!atiende) {
-            throw new ForbiddenOperationException(
-                    "Solo puede solicitar exámenes para pacientes que atiende o que otro médico compartió con usted");
-        }
+        relacionAsistencial.exigirRelacion(
+                actor,
+                paciente.getId(),
+                "Solo puede solicitar exámenes para pacientes que atiende o que otro médico compartió con usted");
         Atencion atencion = resolverAtencion(request.atencionId(), paciente, medico);
         List<ExamenLab> examenes = resolverExamenes(request.examenIds());
         BigDecimal total = examenes.stream().map(ExamenLab::getPrecio).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -168,6 +164,7 @@ public class LaboratorioServiceImpl implements LaboratorioService {
     @Transactional(readOnly = true)
     public List<OrdenLabResponse> listarOrdenes(
             UsuarioPrincipal actor, EstadoOrdenLab estado, String busqueda, PrioridadOrden prioridad) {
+        boolean administracion = !tieneRol(actor, RolNombre.ROLE_LABORATORIO) && tieneRol(actor, RolNombre.ROLE_ADMIN);
         boolean personal = tieneRol(actor, RolNombre.ROLE_LABORATORIO) || tieneRol(actor, RolNombre.ROLE_ADMIN);
         List<OrdenLaboratorio> base = personal
                 ? ordenRepository.findRecientes(PageRequest.of(0, VENTANA_CONSULTA))
@@ -180,7 +177,8 @@ public class LaboratorioServiceImpl implements LaboratorioService {
                 .sorted(Comparator.comparingInt(LaboratorioServiceImpl::rango)
                         .thenComparing(OrdenLaboratorio::getFecha, Comparator.reverseOrder()))
                 .limit(LIMITE_ORDENES)
-                .map(orden -> OrdenLabResponse.from(orden, true))
+                .map(orden ->
+                        administracion ? OrdenLabResponse.deAdministracion(orden) : OrdenLabResponse.from(orden, true))
                 .toList();
     }
 
@@ -188,7 +186,7 @@ public class LaboratorioServiceImpl implements LaboratorioService {
     @Transactional(readOnly = true)
     public OrdenLabResponse obtenerOrden(UsuarioPrincipal actor, UUID id) {
         OrdenLaboratorio orden = buscarOrden(id);
-        boolean personal = tieneRol(actor, RolNombre.ROLE_LABORATORIO) || tieneRol(actor, RolNombre.ROLE_ADMIN);
+        boolean personal = tieneRol(actor, RolNombre.ROLE_LABORATORIO);
         boolean solicitante = orden.getMedico().getUsuario().getId().equals(actor.getId());
         boolean paciente = orden.getPaciente().getUsuario().getId().equals(actor.getId());
         if (personal || solicitante) {

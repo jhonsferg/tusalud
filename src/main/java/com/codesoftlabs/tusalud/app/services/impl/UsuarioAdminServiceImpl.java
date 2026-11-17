@@ -116,7 +116,7 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
                 "Tus roles fueron actualizados",
                 "Un administrador modificó tus permisos. Vuelve a iniciar sesión para aplicarlos.",
                 "/perfil");
-        log.info("Roles de {} actualizados a {} por {}", usuario.getEmail(), nuevos, actor.getEmail());
+        log.info("Roles de {} actualizados a {} por {}", usuario.getId(), nuevos, actor.getId());
         return UsuarioAdminResponse.from(usuario, ultimosAccesos().get(usuarioId));
     }
 
@@ -148,7 +148,7 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
                 .estado(EstadoUsuario.ACTIVO)
                 .roles(entidades)
                 .build());
-        log.info("Personal {} creado con roles {} por {}", email, roles, actor.getEmail());
+        log.info("Personal {} creado con roles {} por {}", usuario.getId(), roles, actor.getId());
         return UsuarioAdminResponse.from(usuario, null);
     }
 
@@ -181,7 +181,7 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
             sesionRepository.revocarTodasDelUsuario(usuarioId);
             refreshTokenRepository.revocarDeUsuario(usuarioId);
         }
-        log.info("Usuario {} cambió a {} por {}", usuario.getEmail(), estado, actor.getEmail());
+        log.info("Usuario {} cambió a {} por {}", usuario.getId(), estado, actor.getId());
         return UsuarioAdminResponse.from(usuario, ultimosAccesos().get(usuarioId));
     }
 

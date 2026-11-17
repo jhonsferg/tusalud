@@ -18,7 +18,13 @@ public record PacienteHistoriaResponse(
         @Schema(example = "36") Integer edad,
         @Schema(example = "O+") String grupoSanguineo,
         @Schema(example = "Penicilina") String alergias,
-        @Schema(example = "Hipertensión familiar") String antecedentes) {
+        @Schema(example = "Hipertensión familiar") String antecedentes,
+
+        @Schema(example = "Luis García", description = "Quién actualizó por última vez los datos médicos")
+        String datosMedicosActualizadoPor,
+
+        @Schema(type = "string", example = "2026-10-12T21:00:00")
+        java.time.LocalDateTime datosMedicosActualizadoEn) {
 
     public static PacienteHistoriaResponse from(Paciente paciente) {
         LocalDate nacimiento = paciente.getFechaNacimiento();
@@ -33,6 +39,10 @@ public record PacienteHistoriaResponse(
                         : Period.between(nacimiento, LocalDate.now()).getYears(),
                 paciente.getGrupoSanguineo(),
                 paciente.getAlergias(),
-                paciente.getAntecedentes());
+                paciente.getAntecedentes(),
+                paciente.getDatosMedicosModificadoPor() == null
+                        ? null
+                        : paciente.getDatosMedicosModificadoPor().getNombreCompleto(),
+                paciente.getDatosMedicosModificadoEn());
     }
 }

@@ -34,6 +34,24 @@ public record MedicoResponse(
 
         @Schema(example = "ACTIVO") EstadoUsuario estado) {
 
+    public MedicoResponse paraActor(java.util.UUID usuarioActorId, boolean administrador) {
+        if (administrador || usuarioId.equals(usuarioActorId)) {
+            return this;
+        }
+        return new MedicoResponse(
+                id,
+                usuarioId,
+                nombre,
+                apellido,
+                nombreCompleto,
+                null,
+                null,
+                colegiatura,
+                consultorio,
+                especialidades,
+                estado);
+    }
+
     public static MedicoResponse from(Medico medico) {
         Usuario usuario = medico.getUsuario();
         return new MedicoResponse(

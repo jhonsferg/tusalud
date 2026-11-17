@@ -116,7 +116,7 @@ public class HospitalizacionController {
     }
 
     @PostMapping("/ingresos")
-    @PreAuthorize("hasAnyRole('MEDICO', 'ADMIN')")
+    @PreAuthorize("hasRole('MEDICO')")
     @Operation(
             summary = "Registrar un ingreso hospitalario",
             description = "Ocupa una cama libre. Un paciente no puede tener dos ingresos activos.")
@@ -144,8 +144,9 @@ public class HospitalizacionController {
     @ApiResponse(responseCode = "200", description = "Listado de ingresos")
     public ResponseEntity<List<IngresoHospResponse>> listarIngresos(
             @Parameter(description = "Estado del ingreso") @RequestParam(required = false) EstadoIngresoHosp estado,
-            @Parameter(description = "Texto en el código, DNI o nombre") @RequestParam(required = false) String q) {
-        return ResponseEntity.ok(hospitalizacionService.listarIngresos(estado, q));
+            @Parameter(description = "Texto en el código, DNI o nombre") @RequestParam(required = false) String q,
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
+        return ResponseEntity.ok(hospitalizacionService.listarIngresos(principal, estado, q));
     }
 
     @GetMapping("/ingresos/{id}")
@@ -168,7 +169,7 @@ public class HospitalizacionController {
     }
 
     @PutMapping("/ingresos/{id}/trasladar")
-    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERIA', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('MEDICO', 'ENFERMERIA')")
     @Operation(summary = "Trasladar a otra cama", description = "Libera la cama anterior a limpieza.")
     @ApiResponse(responseCode = "200", description = "Traslado realizado")
     public ResponseEntity<IngresoHospResponse> trasladar(
@@ -188,12 +189,14 @@ public class HospitalizacionController {
     }
 
     @PutMapping("/ingresos/{id}/alta")
-    @PreAuthorize("hasAnyRole('MEDICO', 'ADMIN')")
+    @PreAuthorize("hasRole('MEDICO')")
     @Operation(summary = "Dar de alta", description = "Cierra el ingreso, liquida la cama y la deja en limpieza.")
     @ApiResponse(responseCode = "200", description = "Alta registrada")
     public ResponseEntity<IngresoHospResponse> darAlta(
-            @PathVariable UUID id, @Valid @RequestBody AltaHospRequest request) {
-        return ResponseEntity.ok(hospitalizacionService.darAlta(id, request));
+            @PathVariable UUID id,
+            @Valid @RequestBody AltaHospRequest request,
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
+        return ResponseEntity.ok(hospitalizacionService.darAlta(principal, id, request));
     }
 
     @PutMapping("/ingresos/{id}/cancelar")
@@ -221,7 +224,7 @@ public class HospitalizacionController {
     }
 
     @GetMapping("/ingresos/{id}/evoluciones")
-    @PreAuthorize("hasAnyRole('ENFERMERIA', 'MEDICO', 'ADMIN', 'RECEPCION', 'PACIENTE')")
+    @PreAuthorize("hasAnyRole('ENFERMERIA', 'MEDICO', 'PACIENTE')")
     @Operation(
             summary = "Listar las evoluciones de un ingreso",
             description = "El paciente dueño solo ve las evoluciones médicas resumidas.")
@@ -232,7 +235,7 @@ public class HospitalizacionController {
     }
 
     @PostMapping("/emergencias")
-    @PreAuthorize("hasAnyRole('ENFERMERIA', 'MEDICO', 'RECEPCION', 'ADMIN')")
+    @PreAuthorize("hasRole('ENFERMERIA')")
     @Operation(
             summary = "Registrar una emergencia",
             description = "Crea un ingreso de emergencia con su triaje. Los niveles 1 y 2 avisan a los médicos.")
@@ -254,8 +257,9 @@ public class HospitalizacionController {
             summary = "Cola de emergencias",
             description = "Emergencias activas ordenadas por nivel de triaje y antigüedad.")
     @ApiResponse(responseCode = "200", description = "Emergencias activas")
-    public ResponseEntity<List<IngresoHospResponse>> listarEmergencias() {
-        return ResponseEntity.ok(hospitalizacionService.listarEmergencias());
+    public ResponseEntity<List<IngresoHospResponse>> listarEmergencias(
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
+        return ResponseEntity.ok(hospitalizacionService.listarEmergencias(principal));
     }
 
     @GetMapping("/mapa")

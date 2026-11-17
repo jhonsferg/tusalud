@@ -153,7 +153,7 @@ public class LaboratorioController {
     }
 
     @GetMapping("/ordenes/{id}")
-    @PreAuthorize("hasAnyRole('LABORATORIO', 'ADMIN', 'MEDICO', 'PACIENTE')")
+    @PreAuthorize("hasAnyRole('LABORATORIO', 'MEDICO', 'PACIENTE')")
     @Operation(
             summary = "Obtener una orden",
             description =

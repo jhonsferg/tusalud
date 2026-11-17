@@ -89,6 +89,14 @@ public interface IngresoHospitalarioRepository extends JpaRepository<IngresoHosp
 
     boolean existsByPacienteIdAndEstado(UUID pacienteId, EstadoIngresoHosp estado);
 
+    @Query("""
+            SELECT COUNT(i) > 0 FROM IngresoHospitalario i
+            WHERE i.medico.usuario.id = :usuarioId
+              AND i.paciente.id = :pacienteId
+              AND i.estado = com.codesoftlabs.tusalud.app.entities.enums.EstadoIngresoHosp.ACTIVO
+            """)
+    boolean existsActivoDelMedico(@Param("usuarioId") UUID usuarioId, @Param("pacienteId") UUID pacienteId);
+
     long countByEstado(EstadoIngresoHosp estado);
 
     long countByEstadoAndTipoAndCamaIsNull(EstadoIngresoHosp estado, TipoIngresoHosp tipo);

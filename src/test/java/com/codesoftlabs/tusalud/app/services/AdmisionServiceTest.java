@@ -19,6 +19,7 @@ import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
 import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
+import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.AdmisionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import java.math.BigDecimal;
@@ -141,23 +142,76 @@ class AdmisionServiceTest {
         usuario.setNombre("Zacarías");
         usuario.setApellido("Quiñonezmostrador");
         usuarioRepository.save(usuario);
+        UsuarioPrincipal recepcion = principalDe(RolNombre.ROLE_RECEPCION);
 
-        assertThat(admisionService.buscarPacientes(paciente.getDni()))
+        assertThat(admisionService.buscarPacientes(paciente.getDni(), recepcion))
                 .extracting(PacienteMostradorResponse::pacienteId)
                 .contains(paciente.getId());
-        assertThat(admisionService.buscarPacientes("quiñonezMOSTRADOR"))
+        assertThat(admisionService.buscarPacientes("quiñonezMOSTRADOR", recepcion))
                 .extracting(PacienteMostradorResponse::pacienteId)
                 .containsExactly(paciente.getId());
-        assertThat(admisionService.buscarPacientes("zzz-inexistente-zzz")).isEmpty();
+        assertThat(admisionService.buscarPacientes("zzz-inexistente-zzz", recepcion))
+                .isEmpty();
     }
 
     @Test
-    void labusquedaSinTextoDevuelveComoMaximoTreintaResultados() {
+    void laBusquedaConMenosDeDosCaracteresNoDevuelveNada() {
         for (int i = 0; i < 32; i++) {
             fixture.paciente();
         }
-        assertThat(admisionService.buscarPacientes(null)).hasSize(30);
-        assertThat(admisionService.buscarPacientes("  ")).hasSize(30);
+        UsuarioPrincipal recepcion = principalDe(RolNombre.ROLE_RECEPCION);
+
+        assertThat(admisionService.buscarPacientes(null, recepcion)).isEmpty();
+        assertThat(admisionService.buscarPacientes("  ", recepcion)).isEmpty();
+        assertThat(admisionService.buscarPacientes("9", recepcion)).isEmpty();
+        assertThat(admisionService.buscarPacientes("90", recepcion)).hasSize(30);
+    }
+
+    @Test
+    void recepcionVeLosDatosDeContactoYElRestoDeRolesSoloNombreDniYTelefono() {
+        paciente.getUsuario().setTelefono("987654321");
+        usuarioRepository.save(paciente.getUsuario());
+
+        PacienteMostradorResponse completo = admisionService
+                .buscarPacientes(paciente.getDni(), principalDe(RolNombre.ROLE_RECEPCION))
+                .get(0);
+        assertThat(completo.email()).isNotNull();
+        assertThat(completo.fechaNacimiento()).isNotNull();
+        assertThat(completo.historialClinicoNumero()).isNotNull();
+
+        for (RolNombre rol : List.of(RolNombre.ROLE_CAJA, RolNombre.ROLE_FARMACIA, RolNombre.ROLE_ENFERMERIA)) {
+            PacienteMostradorResponse minimo = admisionService
+                    .buscarPacientes(paciente.getDni(), principalDe(rol))
+                    .get(0);
+            assertThat(minimo.pacienteId()).isEqualTo(paciente.getId());
+            assertThat(minimo.nombreCompleto()).isNotBlank();
+            assertThat(minimo.dni()).isEqualTo(paciente.getDni());
+            assertThat(minimo.telefono()).isEqualTo("987654321");
+            assertThat(minimo.email()).isNull();
+            assertThat(minimo.fechaNacimiento()).isNull();
+            assertThat(minimo.historialClinicoNumero()).isNull();
+        }
+    }
+
+    @Test
+    void elMedicoSoloEncuentraASusPacientes() {
+        Paciente propio = fixture.paciente();
+        fixture.cita(medico, propio, proximoLunes(10, 0), EstadoCita.PENDIENTE);
+        UsuarioPrincipal principalMedico = fixture.principal(medico.getUsuario());
+
+        assertThat(admisionService.buscarPacientes(propio.getDni(), principalMedico))
+                .singleElement()
+                .satisfies(encontrado -> {
+                    assertThat(encontrado.pacienteId()).isEqualTo(propio.getId());
+                    assertThat(encontrado.email()).isNull();
+                    assertThat(encontrado.fechaNacimiento()).isNull();
+                });
+        assertThat(admisionService.buscarPacientes(paciente.getDni(), principalMedico))
+                .isEmpty();
+    }
+
+    private UsuarioPrincipal principalDe(RolNombre rol) {
+        return fixture.principal(fixture.usuario("rol", rol));
     }
 
     @Test

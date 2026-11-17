@@ -67,6 +67,28 @@ public record TurnoResponse(
                 espera(turno, ahora));
     }
 
+    public TurnoResponse sinMotivo() {
+        return new TurnoResponse(
+                id,
+                numero,
+                fecha,
+                pacienteId,
+                pacienteNombre,
+                dni,
+                citaId,
+                medicoId,
+                medicoNombre,
+                prioridad,
+                estado,
+                null,
+                consultorio,
+                creadoEn,
+                llamadoEn,
+                inicioAtencionEn,
+                finAtencionEn,
+                esperaMinutos);
+    }
+
     private static long espera(Turno turno, LocalDateTime ahora) {
         LocalDateTime fin = turno.getEstado() == EstadoTurno.EN_ESPERA
                 ? ahora

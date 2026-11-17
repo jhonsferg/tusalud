@@ -73,7 +73,7 @@ public class AuthServiceImpl implements AuthService {
                 .findById(principal.getId())
                 .orElseThrow(() -> new IllegalStateException("Usuario autenticado inexistente: " + principal.getId()));
         if (mfaService.estaActivo(usuario.getId())) {
-            log.info("Inicio de sesión pendiente de verificación en dos pasos para {}", principal.getEmail());
+            log.info("Inicio de sesión pendiente de verificación en dos pasos para {}", principal.getId());
             return AuthResponse.builder()
                     .tokenType(TOKEN_TYPE)
                     .usuarioId(principal.getId())
@@ -85,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
                     .build();
         }
         UUID tokenId = sesionService.iniciarSesion(usuario, contexto);
-        log.info("Inicio de sesión exitoso para {}", principal.getEmail());
+        log.info("Inicio de sesión exitoso para {}", principal.getId());
         return construirRespuesta(principal, tokenId);
     }
 
@@ -104,7 +104,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new BadCredentialsException("El token de verificación no es válido o expiró"));
         mfaService.validarSegundoPaso(usuarioId, request.codigo());
         UUID tokenId = sesionService.iniciarSesion(usuario, contexto);
-        log.info("Inicio de sesión con verificación en dos pasos para {}", usuario.getEmail());
+        log.info("Inicio de sesión con verificación en dos pasos para {}", usuario.getId());
         return construirRespuesta(UsuarioPrincipal.from(usuario), tokenId);
     }
 
@@ -144,7 +144,10 @@ public class AuthServiceImpl implements AuthService {
         pacienteRepository.save(paciente);
 
         UUID tokenId = sesionService.iniciarSesion(usuario, contexto);
-        log.info("Paciente registrado: {} (historia clínica {})", email, paciente.getHistorialClinicoNumero());
+        log.info(
+                "Paciente registrado: {} (historia clínica {})",
+                paciente.getId(),
+                paciente.getHistorialClinicoNumero());
         return construirRespuesta(UsuarioPrincipal.from(usuario), tokenId);
     }
 
@@ -166,7 +169,7 @@ public class AuthServiceImpl implements AuthService {
                     "Sesión cerrada por seguridad",
                     "Detectamos un intento de reutilizar una credencial de sesión ya renovada y cerramos esa sesión. Si no fuiste tú, cambia tu contraseña.",
                     "/perfil");
-            log.warn("Reutilización de refresh token detectada para {}", usuario.getEmail());
+            log.warn("Reutilización de refresh token detectada para {}", usuario.getId());
             throw new BadCredentialsException(MENSAJE_REFRESH_INVALIDO);
         }
         LocalDateTime ahora = LocalDateTime.now();

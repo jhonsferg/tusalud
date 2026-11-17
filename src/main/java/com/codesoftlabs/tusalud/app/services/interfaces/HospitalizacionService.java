@@ -31,7 +31,7 @@ public interface HospitalizacionService {
 
     IngresoHospResponse crearIngreso(UsuarioPrincipal actor, IngresoHospCreateRequest request);
 
-    List<IngresoHospResponse> listarIngresos(EstadoIngresoHosp estado, String busqueda);
+    List<IngresoHospResponse> listarIngresos(UsuarioPrincipal actor, EstadoIngresoHosp estado, String busqueda);
 
     IngresoHospResponse obtenerIngreso(UsuarioPrincipal actor, UUID id);
 
@@ -39,7 +39,7 @@ public interface HospitalizacionService {
 
     IngresoHospResponse asignarCama(UUID id, CamaAsignacionRequest request);
 
-    IngresoHospResponse darAlta(UUID id, AltaHospRequest request);
+    IngresoHospResponse darAlta(UsuarioPrincipal actor, UUID id, AltaHospRequest request);
 
     IngresoHospResponse cancelarIngreso(UUID id);
 
@@ -49,7 +49,7 @@ public interface HospitalizacionService {
 
     IngresoHospResponse registrarEmergencia(UsuarioPrincipal actor, EmergenciaRequest request);
 
-    List<IngresoHospResponse> listarEmergencias();
+    List<IngresoHospResponse> listarEmergencias(UsuarioPrincipal actor);
 
     MapaCamasResponse mapa();
 

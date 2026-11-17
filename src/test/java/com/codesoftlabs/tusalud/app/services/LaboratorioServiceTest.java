@@ -395,7 +395,8 @@ class LaboratorioServiceTest {
 
         assertThat(laboratorioService.obtenerOrden(laboratorio, orden.id()).id())
                 .isEqualTo(orden.id());
-        assertThat(laboratorioService.obtenerOrden(admin, orden.id()).id()).isEqualTo(orden.id());
+        assertThatThrownBy(() -> laboratorioService.obtenerOrden(admin, orden.id()))
+                .isInstanceOf(ForbiddenOperationException.class);
         assertThat(laboratorioService.obtenerOrden(medicoPrincipal, orden.id()).id())
                 .isEqualTo(orden.id());
         assertThatThrownBy(() -> laboratorioService.obtenerOrden(ajeno, orden.id()))
@@ -602,5 +603,27 @@ class LaboratorioServiceTest {
 
         OrdenLabResponse orden = laboratorioService.crearOrden(colegaPrincipal, solicitud);
         assertThat(orden.medicoId()).isEqualTo(colega.getId());
+    }
+
+    @Test
+    void laAdministracionVeLasOrdenesSinResultadosIndicacionesNiDni() {
+        OrdenLabResponse orden = solicitar(PrioridadOrden.NORMAL, hemograma);
+
+        OrdenLabResponse vista = laboratorioService
+                .listarOrdenes(admin, null, orden.codigo(), null)
+                .get(0);
+
+        assertThat(vista.id()).isEqualTo(orden.id());
+        assertThat(vista.pacienteNombre()).isNotBlank();
+        assertThat(vista.dni()).isNull();
+        assertThat(vista.indicaciones()).isNull();
+        assertThat(vista.atencionId()).isNull();
+        assertThat(vista.items())
+                .allSatisfy(item -> assertThat(item.resultados()).isEmpty());
+        assertThat(laboratorioService
+                        .listarOrdenes(laboratorio, null, orden.codigo(), null)
+                        .get(0)
+                        .dni())
+                .isNotNull();
     }
 }

@@ -37,7 +37,7 @@ public record CitaHoyResponse(
                 cita.getId(),
                 cita.getFechaHora(),
                 cita.getEstado(),
-                cita.getMotivo(),
+                null,
                 cita.getPaciente().getId(),
                 cita.getPaciente().getUsuario().getNombreCompleto(),
                 cita.getPaciente().getDni(),

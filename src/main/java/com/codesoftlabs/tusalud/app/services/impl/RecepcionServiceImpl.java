@@ -161,7 +161,7 @@ public class RecepcionServiceImpl implements RecepcionService {
                 .sorted(Comparator.comparingInt(
                                 (Turno turno) -> turno.getPrioridad().orden())
                         .thenComparing(Turno::getCreadoEn))
-                .map(turno -> TurnoResponse.from(turno, ahora))
+                .map(turno -> paraActor(TurnoResponse.from(turno, ahora), actor))
                 .toList();
     }
 
@@ -181,7 +181,7 @@ public class RecepcionServiceImpl implements RecepcionService {
                 "Es tu turno",
                 "Turno " + turno.getNumero() + ": acércate a " + lugar + ".",
                 null);
-        return respuesta(turno);
+        return respuesta(turno, actor);
     }
 
     @Override
@@ -210,7 +210,7 @@ public class RecepcionServiceImpl implements RecepcionService {
         autorizarOperacion(turno, actor);
         exigirEstado(turno, ESTADOS_CERRABLES, "Solo se marca ausente a un turno en espera o llamado");
         turno.setEstado(EstadoTurno.AUSENTE);
-        return respuesta(turno);
+        return respuesta(turno, actor);
     }
 
     @Override
@@ -219,7 +219,7 @@ public class RecepcionServiceImpl implements RecepcionService {
         autorizarOperacion(turno, actor);
         exigirEstado(turno, ESTADOS_CERRABLES, "Solo se cancela un turno en espera o llamado");
         turno.setEstado(EstadoTurno.CANCELADO);
-        return respuesta(turno);
+        return respuesta(turno, actor);
     }
 
     @Override
@@ -296,6 +296,14 @@ public class RecepcionServiceImpl implements RecepcionService {
 
     private TurnoResponse respuesta(Turno turno) {
         return TurnoResponse.from(turno, LocalDateTime.now());
+    }
+
+    private TurnoResponse respuesta(Turno turno, UsuarioPrincipal actor) {
+        return paraActor(respuesta(turno), actor);
+    }
+
+    private TurnoResponse paraActor(TurnoResponse turno, UsuarioPrincipal actor) {
+        return actor.getRoles().contains(RolNombre.ROLE_MEDICO.name()) ? turno : turno.sinMotivo();
     }
 
     private void exigirEstado(Turno turno, Set<EstadoTurno> permitidos, String mensaje) {

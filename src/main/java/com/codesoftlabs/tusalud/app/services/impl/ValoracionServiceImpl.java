@@ -84,6 +84,7 @@ public class ValoracionServiceImpl implements ValoracionService {
         }
         List<ValoracionResponse> valoraciones = valoracionRepository.findByMedicoIdConDetalle(medicoId).stream()
                 .map(ValoracionResponse::from)
+                .map(ValoracionResponse::conNombreAbreviado)
                 .toList();
         double promedio = valoraciones.isEmpty()
                 ? 0

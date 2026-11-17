@@ -23,6 +23,15 @@ public record ValoracionResponse(
         @Schema(type = "string", example = "2026-10-19T10:15:30")
         LocalDateTime createdAt) {
 
+    public ValoracionResponse conNombreAbreviado() {
+        String[] partes =
+                pacienteNombre == null ? new String[0] : pacienteNombre.trim().split("\\s+");
+        String abreviado = partes.length == 0
+                ? null
+                : partes.length == 1 ? partes[0] : partes[0] + " " + partes[partes.length - 1].charAt(0) + ".";
+        return new ValoracionResponse(id, citaId, medicoId, abreviado, puntuacion, comentario, createdAt);
+    }
+
     public static ValoracionResponse from(Valoracion valoracion) {
         return new ValoracionResponse(
                 valoracion.getId(),

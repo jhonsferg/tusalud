@@ -19,6 +19,7 @@ import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.AdmisionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.CitaService;
+import com.codesoftlabs.tusalud.app.services.interfaces.HistoriaClinicaService;
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdmisionServiceImpl implements AdmisionService {
 
     private static final int LIMITE_BUSQUEDA = 30;
+    private static final int LONGITUD_MINIMA_BUSQUEDA = 2;
     private static final int LONGITUD_PASSWORD = 10;
     private static final String MAYUSCULAS = "ABCDEFGHJKLMNPQRSTUVWXYZ";
     private static final String MINUSCULAS = "abcdefghijkmnopqrstuvwxyz";
@@ -49,14 +51,38 @@ public class AdmisionServiceImpl implements AdmisionService {
     private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
     private final CitaService citaService;
+    private final HistoriaClinicaService historiaClinicaService;
     private final SecureRandom aleatorio = new SecureRandom();
 
     @Override
     @Transactional(readOnly = true)
-    public List<PacienteMostradorResponse> buscarPacientes(String q) {
+    public List<PacienteMostradorResponse> buscarPacientes(String q, UsuarioPrincipal actor) {
         String termino = q == null ? "" : q.trim();
+        if (termino.length() < LONGITUD_MINIMA_BUSQUEDA) {
+            return List.of();
+        }
+        boolean mostrador = actor.getRoles().contains(RolNombre.ROLE_RECEPCION.name())
+                || actor.getRoles().contains(RolNombre.ROLE_ADMIN.name());
+        if (mostrador) {
+            return pacienteRepository.buscarEnMostrador(termino, PageRequest.of(0, LIMITE_BUSQUEDA)).stream()
+                    .map(PacienteMostradorResponse::from)
+                    .toList();
+        }
+        if (actor.getRoles().contains(RolNombre.ROLE_MEDICO.name())) {
+            String buscado = termino.toLowerCase(Locale.ROOT);
+            return historiaClinicaService.listarPacientesDeMedico(actor).stream()
+                    .filter(paciente -> paciente.dni().startsWith(termino)
+                            || paciente.nombreCompleto()
+                                    .toLowerCase(Locale.ROOT)
+                                    .contains(buscado))
+                    .limit(LIMITE_BUSQUEDA)
+                    .map(paciente -> PacienteMostradorResponse.minimo(
+                            paciente.pacienteId(), paciente.nombreCompleto(), paciente.dni(), null))
+                    .toList();
+        }
         return pacienteRepository.buscarEnMostrador(termino, PageRequest.of(0, LIMITE_BUSQUEDA)).stream()
                 .map(PacienteMostradorResponse::from)
+                .map(PacienteMostradorResponse::sinDatosPersonales)
                 .toList();
     }
 
@@ -96,7 +122,7 @@ public class AdmisionServiceImpl implements AdmisionService {
                 .build());
         log.info(
                 "Paciente registrado en mostrador: {} (historia clínica {})",
-                email,
+                paciente.getId(),
                 paciente.getHistorialClinicoNumero());
         return new PacienteRegistradoResponse(PacienteMostradorResponse.from(paciente), passwordTemporal);
     }

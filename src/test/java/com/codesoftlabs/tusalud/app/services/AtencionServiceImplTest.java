@@ -7,16 +7,23 @@ import com.codesoftlabs.tusalud.app.dto.request.AtencionRequest;
 import com.codesoftlabs.tusalud.app.dto.request.RecetaItemRequest;
 import com.codesoftlabs.tusalud.app.dto.response.AtencionResponse;
 import com.codesoftlabs.tusalud.app.dto.response.NotificacionResponse;
+import com.codesoftlabs.tusalud.app.entities.Atencion;
 import com.codesoftlabs.tusalud.app.entities.Cita;
+import com.codesoftlabs.tusalud.app.entities.Dispensacion;
 import com.codesoftlabs.tusalud.app.entities.Medico;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoCita;
+import com.codesoftlabs.tusalud.app.entities.enums.EstadoDispensacion;
+import com.codesoftlabs.tusalud.app.entities.enums.MetodoPagoFarmacia;
+import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
 import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
 import com.codesoftlabs.tusalud.app.exceptions.ForbiddenOperationException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
+import com.codesoftlabs.tusalud.app.repositories.AtencionRepository;
 import com.codesoftlabs.tusalud.app.repositories.CitaRepository;
+import com.codesoftlabs.tusalud.app.repositories.DispensacionRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.AtencionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
@@ -42,6 +49,12 @@ class AtencionServiceImplTest {
 
     @Autowired
     private CitaRepository citaRepository;
+
+    @Autowired
+    private AtencionRepository atencionRepository;
+
+    @Autowired
+    private DispensacionRepository dispensacionRepository;
 
     @Autowired
     private NotificacionService notificacionService;
@@ -177,5 +190,53 @@ class AtencionServiceImplTest {
 
         assertThatThrownBy(() -> atencionService.obtener(UUID.randomUUID(), principalMedico))
                 .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void laAtencionYaNoSeModificaPasadasCuarentaYOchoHoras() {
+        prepararCita(EstadoCita.CONFIRMADA);
+        AtencionResponse creada = atencionService.registrar(cita.getId(), atencion("Hipertensión"), principalMedico);
+        Atencion guardada = atencionRepository.findById(creada.id()).orElseThrow();
+        guardada.setFecha(LocalDateTime.now().minusHours(49));
+        atencionRepository.saveAndFlush(guardada);
+
+        assertThatThrownBy(() -> atencionService.actualizar(cita.getId(), atencion("Falsificado"), principalMedico))
+                .isInstanceOf(ConflictException.class);
+        assertThat(atencionService.obtener(cita.getId(), principalPaciente).diagnostico())
+                .isEqualTo("Hipertensión");
+    }
+
+    @Test
+    void laAtencionConRecetaDispensadaNoSePuedeModificar() {
+        prepararCita(EstadoCita.CONFIRMADA);
+        AtencionResponse creada = atencionService.registrar(cita.getId(), atencion("Hipertensión"), principalMedico);
+        Atencion guardada = atencionRepository.findById(creada.id()).orElseThrow();
+        dispensacionRepository.save(Dispensacion.builder()
+                .fecha(LocalDateTime.now())
+                .comprobante("F001-" + ServiceTestFixture.siguiente())
+                .estado(EstadoDispensacion.EMITIDA)
+                .paciente(paciente)
+                .atencion(guardada)
+                .usuario(medico.getUsuario())
+                .metodoPago(MetodoPagoFarmacia.EFECTIVO)
+                .total(BigDecimal.TEN)
+                .build());
+
+        assertThatThrownBy(() -> atencionService.actualizar(cita.getId(), atencion("Cambiada"), principalMedico))
+                .isInstanceOf(ConflictException.class);
+    }
+
+    @Test
+    void elAdministradorYUnMedicoAjenoNoLeenLaAtencion() {
+        prepararCita(EstadoCita.CONFIRMADA);
+        atencionService.registrar(cita.getId(), atencion("Hipertensión"), principalMedico);
+        UsuarioPrincipal administrador = fixture.principal(fixture.usuario("admin", RolNombre.ROLE_ADMIN));
+        UsuarioPrincipal ajeno = fixture.principal(
+                fixture.medicoConHorarioLunes(new BigDecimal("100.00")).getUsuario());
+
+        assertThatThrownBy(() -> atencionService.obtener(cita.getId(), administrador))
+                .isInstanceOf(ForbiddenOperationException.class);
+        assertThatThrownBy(() -> atencionService.obtener(cita.getId(), ajeno))
+                .isInstanceOf(ForbiddenOperationException.class);
     }
 }

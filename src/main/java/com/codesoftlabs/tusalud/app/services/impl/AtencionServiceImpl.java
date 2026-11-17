@@ -7,7 +7,7 @@ import com.codesoftlabs.tusalud.app.entities.Atencion;
 import com.codesoftlabs.tusalud.app.entities.Cita;
 import com.codesoftlabs.tusalud.app.entities.RecetaItem;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoCita;
-import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
+import com.codesoftlabs.tusalud.app.entities.enums.EstadoDispensacion;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
 import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
@@ -15,6 +15,7 @@ import com.codesoftlabs.tusalud.app.exceptions.ForbiddenOperationException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.AtencionRepository;
 import com.codesoftlabs.tusalud.app.repositories.CitaRepository;
+import com.codesoftlabs.tusalud.app.repositories.DispensacionRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.AtencionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
@@ -35,9 +36,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class AtencionServiceImpl implements AtencionService {
 
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final long VENTANA_EDICION_HORAS = 48;
 
     private final CitaRepository citaRepository;
     private final AtencionRepository atencionRepository;
+    private final DispensacionRepository dispensacionRepository;
     private final NotificacionService notificacionService;
 
     @Override
@@ -85,6 +88,13 @@ public class AtencionServiceImpl implements AtencionService {
             throw new ForbiddenOperationException("Solo el médico de la cita puede editar su atención");
         }
         Atencion atencion = buscarAtencion(citaId);
+        if (atencion.getFecha().isBefore(LocalDateTime.now().minusHours(VENTANA_EDICION_HORAS))) {
+            throw new ConflictException(
+                    "La atención ya no se puede modificar: pasaron más de " + VENTANA_EDICION_HORAS + " horas");
+        }
+        if (dispensacionRepository.existsByAtencionIdAndEstado(atencion.getId(), EstadoDispensacion.EMITIDA)) {
+            throw new ConflictException("La receta de esta atención ya fue dispensada y no se puede modificar");
+        }
         aplicar(atencion, request);
         return AtencionResponse.from(atencion);
     }
@@ -92,9 +102,8 @@ public class AtencionServiceImpl implements AtencionService {
     @Override
     public AtencionResponse obtener(UUID citaId, UsuarioPrincipal actor) {
         Cita cita = buscarCita(citaId);
-        boolean admin = actor.getRoles().contains(RolNombre.ROLE_ADMIN.name());
         boolean paciente = cita.getPaciente().getUsuario().getId().equals(actor.getId());
-        if (!admin && !paciente && !esMedicoDe(cita, actor)) {
+        if (!paciente && !esMedicoDe(cita, actor)) {
             throw new ForbiddenOperationException("No tiene permiso para ver la atención de esta cita");
         }
         return AtencionResponse.from(buscarAtencion(citaId));
