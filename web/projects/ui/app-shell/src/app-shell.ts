@@ -110,8 +110,13 @@ export class AppShell implements OnInit {
   constructor() {
     effect(() => {
       const preferencias = this.perfil.preferencias.value();
-      if (preferencias && !preferencias.tourCompletado && !this.tourOfrecido) {
+      if (
+        preferencias &&
+        !this.tourOfrecido &&
+        this.tour.debeOfrecerse(preferencias.tourCompletado)
+      ) {
         this.tourOfrecido = true;
+        this.tour.marcarVisto();
         setTimeout(() => this.iniciarTour(), 600);
       }
     });

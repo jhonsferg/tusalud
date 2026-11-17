@@ -1618,6 +1618,7 @@ pgAdmin queda en `http://localhost:5050` con el usuario `admin@tusalud.com` y la
 ## Aplicación web
 
 La carpeta `web` es un workspace de Angular 21 con varios proyectos, al estilo de un monorepo. Cada actor de la clínica tiene su propia aplicación, con sus rutas, su menú, su guía de bienvenida y sus flujos, y todas comparten librerías propias. El login es común: vive en un portal y, al autenticarse, el usuario es enviado a la aplicación de su rol. Todo usa componentes standalone, detección de cambios sin zone.js, SCSS, TypeScript en modo estricto y Vitest para las pruebas unitarias.
+nLa guía de bienvenida se ofrece una sola vez por usuario y navegador. Se recuerda en el almacenamiento local con la clave `tusalud.tour.visto` seguida del id del usuario, además de la preferencia guardada en el servidor, así que no reaparece al recargar ni al volver a iniciar sesión. Cada paso lleva a la pantalla que explica y, al terminar o al omitirla, el usuario vuelve a la pantalla de inicio de su rol. Desde el menú de usuario se puede abrir de nuevo cuando se quiera.
 
 ### Requisitos
 
@@ -1798,7 +1799,7 @@ Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrec
 
 ### Pruebas del frontend
 
-Las 238 pruebas unitarias corren con Vitest, repartidas entre los proyectos, y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, el enrutamiento entre aplicaciones, las rutas de cada aplicación con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API. Cada aplicación tiene una prueba de humo que resuelve todos sus componentes perezosos.
+Las 240 pruebas unitarias corren con Vitest, repartidas entre los proyectos, y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, el enrutamiento entre aplicaciones, las rutas de cada aplicación con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API. Cada aplicación tiene una prueba de humo que resuelve todos sus componentes perezosos.
 
 ```bash
 npm test

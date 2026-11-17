@@ -9,6 +9,8 @@ import {
   signal,
 } from '@angular/core';
 
+import { Router } from '@angular/router';
+
 import { Rol } from '../models';
 import { AuthService } from './auth.service';
 
@@ -268,6 +270,7 @@ export function provideTourSteps(pasos: readonly TourStep[]): EnvironmentProvide
 @Injectable({ providedIn: 'root' })
 export class TourService {
   private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
   private readonly pasos = inject(TOUR_STEPS);
 
   private readonly activeState = signal(false);
@@ -293,6 +296,26 @@ export class TourService {
     this.stepsState.set(visibles);
     this.indexState.set(0);
     this.activeState.set(true);
+    this.navegarAlPaso();
+  }
+
+  debeOfrecerse(completadoEnServidor: boolean): boolean {
+    if (completadoEnServidor) {
+      return false;
+    }
+    try {
+      return localStorage.getItem(this.claveVisto()) === null;
+    } catch {
+      return true;
+    }
+  }
+
+  marcarVisto(): void {
+    try {
+      localStorage.setItem(this.claveVisto(), new Date().toISOString());
+    } catch {
+      return;
+    }
   }
 
   next(): void {
@@ -301,17 +324,38 @@ export class TourService {
       return;
     }
     this.indexState.update((value) => value + 1);
+    this.navegarAlPaso();
   }
 
   previous(): void {
     this.indexState.update((value) => Math.max(0, value - 1));
+    this.navegarAlPaso();
   }
 
   close(): void {
+    const estabaActivo = this.activeState();
     this.activeState.set(false);
     const callback = this.onClose;
     this.onClose = null;
     callback?.();
+    if (estabaActivo) {
+      this.navegar(this.auth.homeUrl());
+    }
+  }
+
+  private claveVisto(): string {
+    return `tusalud.tour.visto.${this.auth.user()?.id ?? 'anonimo'}`;
+  }
+
+  private navegarAlPaso(): void {
+    const target = this.step()?.target;
+    if (target?.startsWith('nav:')) {
+      this.navegar(target.slice(4));
+    }
+  }
+
+  private navegar(url: string): void {
+    this.router.navigateByUrl(url).catch(() => false);
   }
 
   element(target: string): HTMLElement | null {

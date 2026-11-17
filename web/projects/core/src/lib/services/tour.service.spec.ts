@@ -1,11 +1,11 @@
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 
 import { createSession } from '../../testing/auth-fixtures';
 import { Rol } from '../models';
-import { SESSION_STORAGE_KEY } from './auth.service';
+import { AuthService, SESSION_STORAGE_KEY } from './auth.service';
 import { TourService } from './tour.service';
 
 function crearTour(roles: Rol[], destinos: string[]): TourService {
@@ -69,5 +69,29 @@ describe('TourService', () => {
       'usuario',
       null,
     ]);
+  });
+
+  it('navega a la pantalla de cada paso y vuelve al inicio al terminar', async () => {
+    const tour = crearTour(['ROLE_PACIENTE'], ['nav:/citas', 'nav:/citas/nueva']);
+    const router = TestBed.inject(Router);
+    const navegar = vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    tour.start();
+    tour.next();
+    expect(navegar).toHaveBeenLastCalledWith('/citas/nueva');
+    tour.next();
+    expect(navegar).toHaveBeenLastCalledWith('/citas');
+    while (!tour.isLast()) {
+      tour.next();
+    }
+    tour.next();
+    expect(navegar).toHaveBeenLastCalledWith(TestBed.inject(AuthService).homeUrl());
+  });
+
+  it('solo se ofrece la primera vez en el navegador y no si el servidor ya la marcó', () => {
+    const tour = crearTour(['ROLE_PACIENTE'], []);
+    expect(tour.debeOfrecerse(false)).toBe(true);
+    expect(tour.debeOfrecerse(true)).toBe(false);
+    tour.marcarVisto();
+    expect(tour.debeOfrecerse(false)).toBe(false);
   });
 });

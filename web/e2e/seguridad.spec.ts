@@ -53,20 +53,39 @@ test.describe('acceso por rol', () => {
 
 test.describe('guía de bienvenida', () => {
   test('se muestra en el primer ingreso y se puede abrir de nuevo', async ({ page }) => {
-    await registrarPaciente(page, 'guia');
+    const cuenta = await registrarPaciente(page, 'guia');
     const guia = page.getByRole('dialog', { name: 'Te damos la bienvenida a TuSalud' });
     await expect(guia).toBeVisible({ timeout: 10_000 });
     await guia.getByRole('button', { name: 'Comenzar' }).click();
     await expect(page.getByRole('dialog', { name: 'Reserva tu cita' })).toBeVisible();
+    await expect(page).toHaveURL(/\/paciente\/citas\/nueva/);
+    await page.getByRole('button', { name: 'Siguiente' }).click();
+    await expect(page.getByRole('dialog', { name: 'Mis citas' })).toBeVisible();
+    await expect(page).toHaveURL(/\/paciente\/citas$/);
+    await page.getByRole('button', { name: 'Siguiente' }).click();
+    await expect(page.getByRole('dialog', { name: 'Tu historia clínica' })).toBeVisible();
+    await expect(page).toHaveURL(/\/paciente\/historia-clinica/);
     const guardado = page.waitForResponse(
       (r) => r.url().includes('/perfil/preferencias') && r.request().method() === 'PUT',
     );
     await page.keyboard.press('Escape');
     await guardado;
-    await expect(page.getByRole('dialog', { name: 'Reserva tu cita' })).toHaveCount(0);
+    await expect(page.getByRole('dialog', { name: 'Tu historia clínica' })).toHaveCount(0);
+    await expect(page).toHaveURL(/\/paciente\/citas$/);
 
     await page.reload();
     await expect(page.getByRole('button', { name: 'Menú de usuario' })).toBeVisible();
+    await page.waitForTimeout(1500);
+    await expect(
+      page.getByRole('dialog', { name: 'Te damos la bienvenida a TuSalud' }),
+    ).toHaveCount(0);
+
+    await cerrarSesion(page);
+    await expect(page).toHaveURL(/\/auth\/login/);
+    await page.getByLabel('Email').fill(cuenta.email);
+    await page.locator('#login-password').fill(cuenta.password);
+    await page.getByRole('button', { name: 'Iniciar sesión' }).click();
+    await expect(page).toHaveURL(/\/paciente\/citas$/);
     await page.waitForTimeout(1500);
     await expect(
       page.getByRole('dialog', { name: 'Te damos la bienvenida a TuSalud' }),
