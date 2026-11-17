@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test';
 
-import { formatoFecha, iniciarSesion, proximoDiaHabil } from './support';
+import {
+  formatoFecha,
+  iniciarSesion,
+  diaHabilAleatorio,
+  reservarPrimeraHoraLibre,
+} from './support';
 
 test.describe('paciente', () => {
   test('ve el catálogo de especialidades y médicos', async ({ page }) => {
@@ -23,15 +28,10 @@ test.describe('paciente', () => {
     await page.getByRole('button', { name: 'Reservar' }).first().click();
     await expect(page).toHaveURL(/\/citas\/nueva\?medicoId=/);
 
-    await page.locator('#cita-fecha').pressSequentially(formatoFecha(proximoDiaHabil()));
+    await page.locator('#cita-fecha').pressSequentially(formatoFecha(diaHabilAleatorio()));
     await page.keyboard.press('Escape');
 
-    const horas = page.getByRole('radio');
-    await expect(horas.first()).toBeVisible();
-    await horas.nth(Math.floor(Math.random() * (await horas.count()))).click();
-
-    await page.locator('#cita-motivo').fill('Control de rutina e2e');
-    await page.getByRole('button', { name: 'Confirmar reserva' }).click();
+    await reservarPrimeraHoraLibre(page, 'Control de rutina e2e');
 
     await expect(page).toHaveURL(/\/citas\/\d+$/);
     await expect(page.getByText('Control de rutina e2e')).toBeVisible();

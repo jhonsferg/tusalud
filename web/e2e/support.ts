@@ -28,3 +28,29 @@ export function formatoFecha(fecha: Date): string {
   const mes = String(fecha.getMonth() + 1).padStart(2, '0');
   return [dia, mes, fecha.getFullYear()].join('/');
 }
+
+export async function reservarPrimeraHoraLibre(page: Page, motivo: string): Promise<void> {
+  const horas = page.getByRole('radio');
+  await expect(horas.first()).toBeVisible();
+  const total = await horas.count();
+  for (let intento = 0; intento < total; intento++) {
+    await horas.nth(intento).click();
+    await page.locator('#cita-motivo').fill(motivo);
+    await page.getByRole('button', { name: 'Confirmar reserva' }).click();
+    try {
+      await page.waitForURL(/\/citas\/\d+$/, { timeout: 4000 });
+      return;
+    } catch {
+      await expect(horas.first()).toBeVisible();
+    }
+  }
+  throw new Error('No quedaron horas libres para reservar');
+}
+
+export function diaHabilAleatorio(): Date {
+  const fecha = new Date();
+  do {
+    fecha.setTime(Date.now() + (1 + Math.floor(Math.random() * 90)) * 86_400_000);
+  } while (fecha.getDay() === 0 || fecha.getDay() === 6);
+  return fecha;
+}
