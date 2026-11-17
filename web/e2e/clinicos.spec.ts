@@ -124,7 +124,7 @@ test.describe('farmacia', () => {
     await iniciarSesion(page, 'farmacia');
     await expect(page.getByText('Recetas pendientes', { exact: true }).first()).toBeVisible();
     await page.getByRole('button', { name: 'Dispensar' }).first().click();
-    await expect(page).toHaveURL(/\/farmacia\/dispensar\?atencionId=\d+/);
+    await expect(page).toHaveURL(/\/farmacia\/dispensar\?atencionId=[0-9a-f-]{36}/);
 
     const filas = page.locator('[id^="disp-producto-"]');
     await expect(filas.first()).toBeVisible();
@@ -183,9 +183,11 @@ test.describe('laboratorio', () => {
       .click();
     await medico.keyboard.press('Escape');
     await medico.getByRole('button', { name: /Enviar al laboratorio$/ }).click();
-    await expect(medico).toHaveURL(/\/laboratorio\/ordenes\/\d+$/);
+    await expect(medico).toHaveURL(/\/laboratorio\/ordenes\/[0-9a-f-]{36}$/);
     const ruta = new URL(medico.url()).pathname;
-    const codigo = (await medico.getByRole('heading', { level: 1 }).innerText()).trim();
+    const titulo = medico.getByRole('heading', { level: 1 });
+    await expect(titulo).toHaveText(/LAB-\d+/);
+    const codigo = (await titulo.innerText()).trim();
 
     const lab = await (await browser.newContext()).newPage();
     await iniciarSesion(lab, 'laboratorio');
@@ -218,6 +220,7 @@ test.describe('laboratorio', () => {
     await iniciarSesion(page, 'laboratorio');
     await expect(page.getByRole('row').nth(1)).toBeVisible();
     await page.goto('/laboratorio/examenes');
+    await page.getByPlaceholder('Buscar examen').fill('Hemograma');
     await expect(page.getByRole('cell', { name: /Hemograma/ }).first()).toBeVisible();
   });
 

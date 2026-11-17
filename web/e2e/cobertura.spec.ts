@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { iniciarSesion, reservarPrimeraHoraLibre } from './support';
+import { idDeMedico, iniciarSesion, reservarPrimeraHoraLibre, idDeGarcia } from './support';
 
 test.describe('administrador', () => {
   test('registra un médico y configura y elimina un horario', async ({ page }) => {
@@ -17,7 +17,7 @@ test.describe('administrador', () => {
     await page.getByRole('option').first().click();
     await page.getByRole('button', { name: 'Registrar médico' }).click();
 
-    await expect(page).toHaveURL(/\/medicos\/\d+\/horarios$/);
+    await expect(page).toHaveURL(/\/medicos\/[0-9a-f-]{36}\/horarios$/);
     await expect(page.getByText('Sin bloques de atención')).toBeVisible();
 
     await page.locator('#hor-dia').click();
@@ -78,9 +78,9 @@ test.describe('ciclo de vida de una cita', () => {
     test.setTimeout(90_000);
     const paciente = await (await browser.newContext()).newPage();
     await iniciarSesion(paciente, 'paciente');
-    await paciente.goto('/citas/nueva?medicoId=1');
+    await paciente.goto(`/citas/nueva?medicoId=${await idDeGarcia(paciente)}`);
     await reservarPrimeraHoraLibre(paciente, 'Chequeo del ciclo completo');
-    await expect(paciente).toHaveURL(/\/citas\/\d+$/);
+    await expect(paciente).toHaveURL(/\/citas\/[0-9a-f-]{36}$/);
     const url = paciente.url();
     await expect(paciente.getByRole('button', { name: 'Confirmar cita' })).toHaveCount(0);
 
@@ -119,7 +119,7 @@ test.describe('ciclo de vida de una cita', () => {
 
   test('el paciente revisa la disponibilidad pública de un médico', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/medicos/2/disponibilidad');
+    await page.goto(`/medicos/${await idDeMedico(page, 1)}/disponibilidad`);
     await expect(page.getByRole('heading', { name: 'Disponibilidad' })).toBeVisible();
     await expect(page.getByRole('grid', { name: 'Calendario mensual' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Siguiente', exact: true })).toBeVisible();

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { iniciarSesion } from './support';
+import { idDeMedico, iniciarSesion } from './support';
 
 const NOMBRE_CALENDARIO = 'Calendario';
 
@@ -191,14 +191,14 @@ test.describe('planificador', () => {
     page,
   }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/medicos/1/disponibilidad');
+    await page.goto(`/medicos/${await idDeMedico(page, 0)}/disponibilidad`);
     await expect(page.locator('p-datepicker')).toHaveCount(0);
     await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
     const huecos = page.getByRole('button', { name: /^Elegir / });
     await expect(huecos.first()).toBeVisible();
     await huecos.first().click();
     await page.getByRole('button', { name: 'Continuar con la reserva' }).click();
-    await expect(page).toHaveURL(/\/citas\/nueva\?.*medicoId=1/);
+    await expect(page).toHaveURL(/\/citas\/nueva\?.*medicoId=[0-9a-f-]{36}/);
     await expect(page.getByText('Por elegir')).toHaveCount(0);
   });
 });

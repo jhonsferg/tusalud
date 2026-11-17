@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { iniciarSesion, omitirGuia, reservarPrimeraHoraLibre } from './support';
+import { iniciarSesion, omitirGuia, reservarPrimeraHoraLibre, idDeGarcia } from './support';
 
 test.describe('pagos del paciente', () => {
   test('agrega y elimina una tarjeta', async ({ page }) => {
@@ -36,7 +36,7 @@ test.describe('pagos del paciente', () => {
 
   test('reserva, paga con cupón y ve el comprobante', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/citas/nueva?medicoId=1');
+    await page.goto(`/citas/nueva?medicoId=${await idDeGarcia(page)}`);
     await reservarPrimeraHoraLibre(page, 'Pago con cupón e2e');
 
     await page.getByRole('button', { name: 'Pagar cita' }).click();
@@ -62,7 +62,7 @@ test.describe('billeteras digitales', () => {
   ] as const) {
     test(`paga con ${billetera} escaneando un QR y confirmando desde la app`, async ({ page }) => {
       await iniciarSesion(page, 'paciente');
-      await page.goto('/citas/nueva?medicoId=1');
+      await page.goto(`/citas/nueva?medicoId=${await idDeGarcia(page)}`);
       await reservarPrimeraHoraLibre(page, `Pago con ${nombre} e2e`);
 
       await page.getByRole('button', { name: 'Pagar cita' }).click();
@@ -78,7 +78,7 @@ test.describe('billeteras digitales', () => {
 
   test('cancela un QR pendiente al cambiar de billetera', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/citas/nueva?medicoId=1');
+    await page.goto(`/citas/nueva?medicoId=${await idDeGarcia(page)}`);
     await reservarPrimeraHoraLibre(page, 'Cambio de billetera e2e');
 
     await page.getByRole('button', { name: 'Pagar cita' }).click();

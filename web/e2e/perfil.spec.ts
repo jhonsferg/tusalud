@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { Page, expect, test } from '@playwright/test';
 
 import { cerrarSesion, iniciarSesion, omitirGuia, registrarPaciente } from './support';
 
@@ -18,6 +18,25 @@ test.describe('perfil', () => {
 
     await page.reload();
     await expect(page.locator('#per-telefono')).toHaveValue('999888777');
+  });
+
+  test('la anticipación del recordatorio se elige de una lista y se conserva', async ({ page }) => {
+    await iniciarSesion(page, 'paciente');
+    await fijarAnticipacion(page, 1440);
+    await page.goto('/perfil');
+    await page.getByRole('tab', { name: /Avisos/ }).click();
+    await expect(page.locator('#per-anticipacion')).toBeVisible();
+    await expect(page.getByRole('spinbutton')).toHaveCount(0);
+    await page.locator('p-select[inputid="per-anticipacion"]').click();
+    await page.getByRole('option', { name: '12 horas antes' }).click();
+    await page.getByRole('button', { name: /Guardar preferencias$/ }).click();
+    await expect(page.getByText(/preferencias/i).first()).toBeVisible();
+    await page.reload();
+    await page.getByRole('tab', { name: /Avisos/ }).click();
+    await expect(page.locator('p-select[inputid="per-anticipacion"]')).toContainText(
+      '12 horas antes',
+    );
+    await fijarAnticipacion(page, 1440);
   });
 
   test('valida los datos personales', async ({ page }) => {
@@ -89,3 +108,15 @@ test.describe('perfil', () => {
     await expect(page.getByText('Tu contraseña fue actualizada.')).toBeVisible();
   });
 });
+
+async function fijarAnticipacion(page: Page, minutos: number): Promise<void> {
+  const token = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('tusalud.session') ?? '{}').token as string,
+  );
+  const headers = { Authorization: `Bearer ${token}` };
+  const actual = await (await page.request.get('/api/v1/perfil/preferencias', { headers })).json();
+  await page.request.put('/api/v1/perfil/preferencias', {
+    headers,
+    data: { ...actual, minutosAntelacionRecordatorio: minutos },
+  });
+}

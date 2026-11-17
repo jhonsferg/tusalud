@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { iniciarSesion, reservarPrimeraHoraLibre } from './support';
+import { iniciarSesion, reservarPrimeraHoraLibre, idDeGarcia } from './support';
 
 test.describe('calendario', () => {
   test('el paciente ve sus citas en las vistas de mes, semana y día', async ({ page }) => {
@@ -24,7 +24,7 @@ test.describe('calendario', () => {
 
   test('el paciente elige un hueco libre en el calendario para reservar', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/citas/nueva?medicoId=1');
+    await page.goto(`/citas/nueva?medicoId=${await idDeGarcia(page)}`);
     await expect(page.getByText('Por elegir')).toBeVisible();
 
     await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
@@ -43,7 +43,7 @@ test.describe('calendario', () => {
 
   test('exige elegir una hora antes de confirmar la reserva', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/citas/nueva?medicoId=1');
+    await page.goto(`/citas/nueva?medicoId=${await idDeGarcia(page)}`);
     await page.locator('#cita-motivo').fill('Sin hora elegida');
     await page.getByRole('button', { name: 'Confirmar reserva' }).click();
     await expect(page.getByText('Elige una hora libre en el calendario.')).toBeVisible();
@@ -71,10 +71,10 @@ test.describe('reprogramación', () => {
     await iniciarSesion(page, 'paciente');
     await page.goto('/citas');
     await page.getByRole('button', { name: 'Ver detalle' }).first().click();
-    await expect(page).toHaveURL(/\/citas\/\d+$/);
+    await expect(page).toHaveURL(/\/citas\/[0-9a-f-]{36}$/);
     const detalle = new URL(page.url()).pathname;
     await page.getByRole('button', { name: 'Reprogramar' }).click();
-    await expect(page).toHaveURL(/\/citas\/\d+\/reprogramar$/);
+    await expect(page).toHaveURL(/\/citas\/[0-9a-f-]{36}\/reprogramar$/);
     await expect(page.locator('p-datepicker')).toHaveCount(0);
     await expect(page.getByText('Cita actual').first()).toBeVisible();
 
@@ -92,7 +92,7 @@ test.describe('reprogramación', () => {
   test('una cita cancelada no se puede reprogramar', async ({ page }) => {
     test.setTimeout(90_000);
     await iniciarSesion(page, 'paciente');
-    await page.goto('/citas/nueva?medicoId=1');
+    await page.goto(`/citas/nueva?medicoId=${await idDeGarcia(page)}`);
     await reservarPrimeraHoraLibre(page, 'Cita para cancelar y no reprogramar');
     const url = new URL(page.url()).pathname;
     await page.getByRole('button', { name: 'Cancelar cita' }).click();

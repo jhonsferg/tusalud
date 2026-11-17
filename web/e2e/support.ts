@@ -61,7 +61,7 @@ export async function reservarPrimeraHoraLibre(page: Page, motivo: string): Prom
     await page.locator('#cita-motivo').fill(motivo);
     await page.getByRole('button', { name: 'Confirmar reserva' }).click();
     try {
-      await page.waitForURL(/\/citas\/\d+$/, { timeout: 4000 });
+      await page.waitForURL(/\/citas\/[0-9a-f-]{36}$/, { timeout: 4000 });
       return;
     } catch {
       await page.waitForTimeout(400);
@@ -116,4 +116,26 @@ export async function registrarPaciente(page: Page, etiqueta: string) {
   await page.getByRole('button', { name: 'Crear cuenta' }).click();
   await expect(page).toHaveURL(/\/citas$/);
   return cuenta;
+}
+
+export async function idDeMedico(page: Page, indice: number): Promise<string> {
+  const token = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('tusalud.session') ?? '{}').token as string,
+  );
+  const respuesta = await page.request.get('/api/v1/medicos', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const medicos = (await respuesta.json()) as { id: string }[];
+  return medicos[indice].id;
+}
+
+export async function idDeGarcia(page: Page): Promise<string> {
+  const token = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('tusalud.session') ?? '{}').token as string,
+  );
+  const respuesta = await page.request.get('/api/v1/medicos', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const medicos = (await respuesta.json()) as { id: string; email: string }[];
+  return medicos.find((m) => m.email === 'dr.garcia@tusalud.com')!.id;
 }

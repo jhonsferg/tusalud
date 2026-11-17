@@ -28,13 +28,27 @@ test.describe('paciente', () => {
 
     await reservarPrimeraHoraLibre(page, 'Control de rutina e2e');
 
-    await expect(page).toHaveURL(/\/citas\/\d+$/);
+    await expect(page).toHaveURL(/\/citas\/[0-9a-f-]{36}$/);
     await expect(page.getByText('Control de rutina e2e')).toBeVisible();
     await expect(page.getByText('Pendiente', { exact: true })).toBeVisible();
 
     await page.getByRole('button', { name: 'Cancelar cita' }).click();
     await page.getByRole('button', { name: 'Sí, cancelar cita' }).click();
     await expect(page.getByText('Cancelada', { exact: true })).toBeVisible();
+  });
+
+  test('elegir un solo día en el filtro de fechas ya filtra las citas', async ({ page }) => {
+    await iniciarSesion(page, 'paciente');
+    await page.goto('/citas');
+    await expect(page.locator('p-datepicker input')).toBeVisible();
+    await page.locator('p-datepicker input').click();
+    const peticion = page.waitForRequest((r) => {
+      const q = new URL(r.url());
+      const inicio = q.searchParams.get('inicio');
+      return q.pathname.endsWith('/mis-citas') && !!inicio && inicio === q.searchParams.get('fin');
+    });
+    await page.locator('.p-datepicker-panel .p-datepicker-today').first().click();
+    await peticion;
   });
 
   test('no puede entrar a las secciones de administración', async ({ page }) => {
