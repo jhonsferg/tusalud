@@ -188,6 +188,10 @@ La API es completamente sin estado. Spring Security 7 trabaja con `SessionCreati
 - Todas las entidades y tablas usan UUID versión 4 como identificador, generado en la aplicación y con `gen_random_uuid()` como valor por defecto en la base. Así los ids no se pueden adivinar ni recorrer en orden. Un id con formato inválido en la ruta responde 400 y uno inexistente responde 404. Los códigos legibles de negocio, como los comprobantes, los turnos y los ingresos, siguen siendo correlativos.
 - CORS permite peticiones desde `http://localhost:4200` con los métodos GET, POST, PUT, DELETE y OPTIONS. El origen se configura con `CORS_ALLOWED_ORIGINS`.
 - La autorización combina reglas por URL en `SecurityConfig` con `@PreAuthorize` en cada método de los controladores.
+- Tener el rol correcto no basta para ver los datos de una persona: hace falta una relación con ella. `RelacionAsistencialService` es la única regla y la cumple un médico que atendió al paciente en una cita no cancelada, que tiene un ingreso activo a su cargo o a quien otro médico le compartió el paciente. Ese acceso se aplica a la historia clínica, el laboratorio, la hospitalización y la lista de pacientes del médico.
+- Los datos clínicos los modifica solo el personal de salud. El paciente consulta su historia y, si algún dato no es correcto, se comunica con el centro de salud. El médico con relación actualiza los datos médicos y queda registrado quién y cuándo, y cada consulta de una historia ajena se guarda en `auditoria_clinica`.
+- Cada rol recibe solo los campos que necesita: recepción y administración no ven diagnósticos ni indicaciones, caja no ve datos clínicos, farmacia solo ve las recetas, el correo y el teléfono de un médico solo los ven el administrador y el propio médico, y las valoraciones públicas abrevian el nombre del paciente. El administrador gestiona la institución pero no lee ni escribe datos clínicos.
+- Una atención no se reescribe pasadas 48 horas ni cuando su receta ya fue dispensada.
 
 | Rol             | Permisos                                                                                                                                               |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -1699,13 +1703,13 @@ Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrec
 
 ### Pruebas del frontend
 
-Las 118 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API.
+Las 119 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API.
 
 ```bash
 npm test
 ```
 
-Las 85 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal los flujos de almacén, farmacia y laboratorio, y los de recepción, caja y hospitalización. Requieren el stack levantado con datos de prueba.
+Las 89 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal los flujos de almacén, farmacia y laboratorio, y los de recepción, caja y hospitalización. Requieren el stack levantado con datos de prueba.
 
 ```bash
 npm run e2e
@@ -1916,27 +1920,28 @@ El archivo `postman/Tusalud.postman_collection.json` es la única colección del
 
 Para usarla en Postman, importa el archivo y ejecuta la colección completa con Run collection. Las carpetas están numeradas y se ejecutan en orden, porque cada una reutiliza los tokens e identificadores que capturan las anteriores:
 
-| Carpeta                                                 | Contenido                                                                          |
-| ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `00 - Autenticación`                                    | Login de los cinco usuarios de prueba, registro de un paciente y errores 400 y 401 |
-| `01 - Especialidades`                                   | Alta, consulta, actualización, duplicado, acceso sin permiso y eliminación         |
-| `02 - Médicos y Horarios`                               | Listados, alta de médico, bloques de horario, solapamiento y disponibilidad        |
-| `03 - Citas (Paciente)`                                 | Reserva en el primer turno libre, conflictos y acceso a citas ajenas               |
-| `04 - Citas (Médico)`                                   | Agenda, confirmación, atención y transiciones inválidas                            |
-| `05 - Cancelación`                                      | Cancelación de una segunda cita y cancelación repetida                             |
-| `06 - Auditoría (Admin)`                                | Reportes por estado y por rango, y accesos no permitidos                           |
-| `07 - Seguridad`                                        | Peticiones sin token y con token inválido                                          |
-| `08 - Perfil`                                           | Datos personales, contraseña y preferencias                                        |
-| `09 - Tarifas, roles y pacientes compartidos`           | Tarifa por especialidad, especialidades del médico, roles y pacientes compartidos  |
-| `10 - Pagos con Yape y Plin`                            | Reserva, generación del QR, consulta y confirmación simulada                       |
-| `11 - Verificación en dos pasos y renovación del token` | Configuración del autenticador y errores del refresh token                         |
-| `12 - Calendario y eventos`                             | Eventos personales, arrastre, privacidad y límites del rango                       |
-| `13 - Personal y almacén`                               | Alta de personal, productos, proveedores, ingresos, salidas y alertas              |
-| `14 - Farmacia`                                         | Catálogo, venta libre, anulación y entregas del paciente                           |
-| `15 - Laboratorio`                                      | Orden del médico, muestra, resultados fuera de rango, validación y acceso          |
-| `16 - Recepción y turnos`                               | Registro de pacientes, turnos, cola, llamado, pantalla y permisos                  |
-| `17 - Caja y facturación`                               | Apertura, cobros con IGV, factura, anulación, reporte, cierre y permisos           |
-| `18 - Hospitalización y emergencia`                     | Ingreso, evoluciones por rol, traslado, triaje, alta y permisos                    |
+| Carpeta                                                 | Contenido                                                                              |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `00 - Autenticación`                                    | Login de los cinco usuarios de prueba, registro de un paciente y errores 400 y 401     |
+| `01 - Especialidades`                                   | Alta, consulta, actualización, duplicado, acceso sin permiso y eliminación             |
+| `02 - Médicos y Horarios`                               | Listados, alta de médico, bloques de horario, solapamiento y disponibilidad            |
+| `03 - Citas (Paciente)`                                 | Reserva en el primer turno libre, conflictos y acceso a citas ajenas                   |
+| `04 - Citas (Médico)`                                   | Agenda, confirmación, atención y transiciones inválidas                                |
+| `05 - Cancelación`                                      | Cancelación de una segunda cita y cancelación repetida                                 |
+| `06 - Auditoría (Admin)`                                | Reportes por estado y por rango, y accesos no permitidos                               |
+| `07 - Seguridad`                                        | Peticiones sin token y con token inválido                                              |
+| `08 - Perfil`                                           | Datos personales, contraseña y preferencias                                            |
+| `09 - Tarifas, roles y pacientes compartidos`           | Tarifa por especialidad, especialidades del médico, roles y pacientes compartidos      |
+| `10 - Pagos con Yape y Plin`                            | Reserva, generación del QR, consulta y confirmación simulada                           |
+| `11 - Verificación en dos pasos y renovación del token` | Configuración del autenticador y errores del refresh token                             |
+| `12 - Calendario y eventos`                             | Eventos personales, arrastre, privacidad y límites del rango                           |
+| `13 - Personal y almacén`                               | Alta de personal, productos, proveedores, ingresos, salidas y alertas                  |
+| `14 - Farmacia`                                         | Catálogo, venta libre, anulación y entregas del paciente                               |
+| `15 - Laboratorio`                                      | Orden del médico, muestra, resultados fuera de rango, validación y acceso              |
+| `16 - Recepción y turnos`                               | Registro de pacientes, turnos, cola, llamado, pantalla y permisos                      |
+| `17 - Caja y facturación`                               | Apertura, cobros con IGV, factura, anulación, reporte, cierre y permisos               |
+| `18 - Hospitalización y emergencia`                     | Ingreso, evoluciones por rol, traslado, triaje, alta y permisos                        |
+| `19 - Seguridad y permisos`                             | Accesos indebidos por relación, por rol y a datos clínicos, y campos que no se exponen |
 
 Desde la línea de comandos:
 
