@@ -1,0 +1,99 @@
+.tarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  gap: 1.25rem;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  padding: 1.25rem 1.4rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #1e293b, #334155);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgb(15 23 42 / 18%);
+
+  &.marca-visa {
+    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  }
+
+  &.marca-mastercard {
+    background: linear-gradient(135deg, #b91c1c, #f97316);
+  }
+
+  &.marca-amex {
+    background: linear-gradient(135deg, #0f766e, #14b8a6);
+  }
+
+  &.vencida {
+    filter: grayscale(0.85);
+    opacity: 0.8;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .marca {
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+
+  .numero {
+    font-size: 1.3rem;
+    letter-spacing: 0.12em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+
+    small {
+      display: block;
+      opacity: 0.75;
+    }
+  }
+
+  .acciones {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 -0.5rem -0.5rem;
+  }
+
+  :host ::ng-deep .p-button {
+    color: #ffffff;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 0.75rem;
+}
+
+.opcion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.pie {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}

@@ -4,3 +4,8 @@ export * from './cita.model';
 export * from './especialidad.model';
 export * from './medico.model';
 export * from './perfil.model';
+export * from './notificacion.model';
+export * from './seguridad.model';
+export * from './pagos.model';
+export * from './clinica.model';
+export * from './admin.model';

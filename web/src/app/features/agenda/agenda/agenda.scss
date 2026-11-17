@@ -41,7 +41,7 @@
 time {
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--p-primary-700);
+  color: var(--app-primary-text);
 }
 
 .info {
@@ -52,7 +52,7 @@ time {
 
   p {
     margin: 0.35rem 0 0;
-    color: var(--p-surface-600);
+    color: var(--p-text-muted-color);
     overflow-wrap: anywhere;
   }
 }

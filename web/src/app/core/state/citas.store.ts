@@ -95,6 +95,21 @@ export class CitasStore {
     return this.api.atender(id).pipe(tap((cita) => this.sincronizar(cita)));
   }
 
+  reprogramar(id: number, fechaHora: string): Observable<CitaResponse> {
+    return this.api.reprogramar(id, fechaHora).pipe(tap((cita) => this.sincronizar(cita)));
+  }
+
+  marcarPagada(id: number): void {
+    const marcar = (items: CitaResponse[] | undefined) =>
+      items?.map((item) => (item.id === id ? { ...item, pagado: true } : item));
+    this.misCitas.update(marcar);
+    this.agenda.update(marcar);
+    const actual = this.selected.value();
+    if (actual?.id === id) {
+      this.selected.set({ ...actual, pagado: true });
+    }
+  }
+
   reset(): void {
     this.rangoActual.set({});
     this.fechaAgendaActual.set(null);

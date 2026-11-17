@@ -1,0 +1,115 @@
+<app-page-header
+  title="Usuarios"
+  subtitle="Cuentas de pacientes, médicos y administradores"
+  icon="pi-id-card"
+/>
+
+<div class="panel">
+  <div class="flex flex-wrap gap-3 mb-3">
+    <p-iconfield class="w-full md:w-20rem">
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        type="search"
+        class="w-full"
+        placeholder="Buscar por nombre o correo"
+        aria-label="Buscar usuario"
+        [ngModel]="busqueda()"
+        (ngModelChange)="escribir($event)"
+      />
+    </p-iconfield>
+    <p-select
+      [options]="roles"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="rol()"
+      (ngModelChange)="cambiarRol($event)"
+      placeholder="Todos los roles"
+      [showClear]="true"
+      ariaLabel="Filtrar por rol"
+      appendTo="body"
+      styleClass="w-full md:w-14rem"
+    />
+  </div>
+
+  @if (store.usuarios.error(); as error) {
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar los usuarios"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="cargar()" />
+    </app-empty-state>
+  } @else {
+    <p-table
+      [value]="store.usuarios.value() ?? []"
+      [loading]="store.usuarios.loading()"
+      [paginator]="(store.usuarios.value() ?? []).length > 10"
+      [rows]="10"
+      [rowHover]="true"
+      responsiveLayout="scroll"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Usuario</th>
+          <th>Rol</th>
+          <th>Último acceso</th>
+          <th>Estado</th>
+          <th style="width: 9rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-usuario>
+        <tr>
+          <td>
+            <div class="flex align-items-center gap-2">
+              <app-user-avatar [nombre]="usuario.nombreCompleto" />
+              <div>
+                <div class="font-semibold">{{ usuario.nombreCompleto }}</div>
+                <small class="text-muted">{{ usuario.email }}</small>
+              </div>
+            </div>
+          </td>
+          <td>
+            @for (r of usuario.roles; track r) {
+              <p-tag [value]="etiquetaRol[r]" severity="info" styleClass="mr-1" />
+            }
+          </td>
+          <td>
+            {{ usuario.ultimoAcceso ? (usuario.ultimoAcceso | date: 'd MMM y, HH:mm') : 'Nunca' }}
+          </td>
+          <td>
+            <p-tag
+              [value]="usuario.estado === 'ACTIVO' ? 'Activo' : 'Inactivo'"
+              [severity]="usuario.estado === 'ACTIVO' ? 'success' : 'secondary'"
+            />
+          </td>
+          <td class="text-right">
+            @if (!esYo(usuario)) {
+              <p-button
+                [label]="usuario.estado === 'ACTIVO' ? 'Desactivar' : 'Activar'"
+                size="small"
+                [outlined]="true"
+                [severity]="usuario.estado === 'ACTIVO' ? 'danger' : 'success'"
+                (onClick)="alternarEstado(usuario)"
+              />
+            } @else {
+              <span class="text-muted">Tú</span>
+            }
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="5">
+            <app-empty-state
+              icon="pi-id-card"
+              title="No encontramos usuarios"
+              message="Prueba con otra búsqueda o cambia el rol."
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

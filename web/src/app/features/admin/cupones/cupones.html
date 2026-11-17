@@ -1,0 +1,217 @@
+<app-page-header
+  title="Cupones de descuento"
+  subtitle="Promociones que los pacientes aplican al pagar"
+  icon="pi-ticket"
+>
+  <p-button label="Nuevo cupón" icon="pi pi-plus" (onClick)="nuevo()" />
+</app-page-header>
+
+<div class="panel">
+  @if (store.cupones.error(); as error) {
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar los cupones"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="store.cargarCupones()" />
+    </app-empty-state>
+  } @else {
+    <p-table
+      [value]="store.cupones.value() ?? []"
+      [loading]="store.cupones.loading()"
+      [rowHover]="true"
+      responsiveLayout="scroll"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Código</th>
+          <th>Descuento</th>
+          <th>Vigencia</th>
+          <th class="text-right">Usos</th>
+          <th>Estado</th>
+          <th style="width: 8rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-cupon>
+        <tr>
+          <td>
+            <div class="font-semibold">{{ cupon.codigo }}</div>
+            <small class="text-muted">{{ cupon.descripcion }}</small>
+          </td>
+          <td>
+            {{
+              cupon.tipo === 'PORCENTAJE'
+                ? cupon.valor + ' %'
+                : (cupon.valor | currency: 'PEN' : 'symbol-narrow')
+            }}
+          </td>
+          <td>
+            {{ cupon.fechaInicio | date: 'd MMM y' }} al {{ cupon.fechaFin | date: 'd MMM y' }}
+          </td>
+          <td class="text-right">
+            {{ cupon.usosActuales }}{{ cupon.usosMaximos ? ' / ' + cupon.usosMaximos : '' }}
+          </td>
+          <td>
+            <p-tag
+              [value]="cupon.vigente ? 'Vigente' : cupon.activo ? 'No vigente' : 'Inactivo'"
+              [severity]="cupon.vigente ? 'success' : 'secondary'"
+            />
+          </td>
+          <td class="text-right">
+            <p-button
+              icon="pi pi-pencil"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              [ariaLabel]="'Editar ' + cupon.codigo"
+              (onClick)="editar(cupon)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              [text]="true"
+              [rounded]="true"
+              severity="danger"
+              [ariaLabel]="'Eliminar ' + cupon.codigo"
+              (onClick)="eliminar(cupon)"
+            />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6">
+            <app-empty-state
+              icon="pi-ticket"
+              title="Aún no hay cupones"
+              message="Crea el primero para ofrecer descuentos a tus pacientes."
+            >
+              <p-button label="Nuevo cupón" icon="pi pi-plus" (onClick)="nuevo()" />
+            </app-empty-state>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>
+
+<p-dialog
+  [header]="editandoId() ? 'Editar cupón' : 'Nuevo cupón'"
+  [visible]="dialogo()"
+  (visibleChange)="dialogo.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '34rem', maxWidth: '95vw' }"
+>
+  <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+    <div class="form-grid">
+      <app-form-field
+        label="Código"
+        [control]="form.controls.codigo"
+        inputId="cu-codigo"
+        [required]="true"
+      >
+        <input
+          pInputText
+          id="cu-codigo"
+          formControlName="codigo"
+          class="w-full"
+          style="text-transform: uppercase"
+        />
+      </app-form-field>
+      <app-form-field
+        label="Tipo"
+        [control]="form.controls.tipo"
+        inputId="cu-tipo"
+        [required]="true"
+      >
+        <p-select
+          inputId="cu-tipo"
+          formControlName="tipo"
+          [options]="tipos"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </app-form-field>
+      <app-form-field
+        label="Valor"
+        [control]="form.controls.valor"
+        inputId="cu-valor"
+        [hint]="esPorcentaje() ? 'Porcentaje entre 1 y 100' : 'Monto en soles'"
+        [required]="true"
+      >
+        <p-inputnumber
+          inputId="cu-valor"
+          formControlName="valor"
+          [min]="0"
+          [max]="esPorcentaje() ? 100 : 100000"
+          [suffix]="esPorcentaje() ? ' %' : ''"
+          [prefix]="esPorcentaje() ? '' : 'S/ '"
+          [maxFractionDigits]="2"
+          [fluid]="true"
+        />
+      </app-form-field>
+      <app-form-field
+        label="Usos máximos"
+        [control]="form.controls.usosMaximos"
+        inputId="cu-usos"
+        hint="Vacío significa sin límite"
+      >
+        <p-inputnumber inputId="cu-usos" formControlName="usosMaximos" [min]="1" [fluid]="true" />
+      </app-form-field>
+      <app-form-field
+        label="Válido desde"
+        [control]="form.controls.fechaInicio"
+        inputId="cu-inicio"
+        [required]="true"
+      >
+        <p-datepicker
+          inputId="cu-inicio"
+          formControlName="fechaInicio"
+          dateFormat="dd/mm/yy"
+          [showIcon]="true"
+          [fluid]="true"
+          appendTo="body"
+        />
+      </app-form-field>
+      <app-form-field
+        label="Válido hasta"
+        [control]="form.controls.fechaFin"
+        inputId="cu-fin"
+        [required]="true"
+      >
+        <p-datepicker
+          inputId="cu-fin"
+          formControlName="fechaFin"
+          dateFormat="dd/mm/yy"
+          [showIcon]="true"
+          [fluid]="true"
+          appendTo="body"
+        />
+      </app-form-field>
+      <app-form-field
+        class="full"
+        label="Descripción"
+        [control]="form.controls.descripcion"
+        inputId="cu-desc"
+      >
+        <input pInputText id="cu-desc" formControlName="descripcion" class="w-full" />
+      </app-form-field>
+      <div class="full flex align-items-center justify-content-between">
+        <label for="cu-activo">Cupón activo</label>
+        <p-toggleswitch inputId="cu-activo" formControlName="activo" />
+      </div>
+    </div>
+    <div class="flex justify-content-end gap-2 mt-4">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="dialogo.set(false)"
+      />
+      <p-button type="submit" label="Guardar cupón" icon="pi pi-check" [loading]="guardando()" />
+    </div>
+  </form>
+</p-dialog>

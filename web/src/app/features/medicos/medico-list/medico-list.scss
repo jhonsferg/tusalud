@@ -45,7 +45,7 @@
     margin: 0;
     padding: 0;
     list-style: none;
-    color: var(--p-surface-600);
+    color: var(--p-text-muted-color);
     font-size: 0.92rem;
   }
 
@@ -72,7 +72,7 @@
 }
 
 :host ::ng-deep .avatar {
-  background: var(--p-primary-100);
-  color: var(--p-primary-800);
+  background: var(--app-primary-soft);
+  color: var(--app-primary-text);
   font-weight: 700;
 }

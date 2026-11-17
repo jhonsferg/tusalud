@@ -71,6 +71,7 @@ test.describe('médico', () => {
 test.describe('administrador', () => {
   test('ve la auditoría con sus indicadores', async ({ page }) => {
     await iniciarSesion(page, 'admin');
+    await page.goto('/admin/auditoria');
     await expect(page.getByRole('heading', { name: 'Auditoría' })).toBeVisible();
     await expect(page.getByText('Citas por estado')).toBeVisible();
     await expect(page.getByText('Detalle de citas')).toBeVisible();

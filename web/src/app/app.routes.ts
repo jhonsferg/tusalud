@@ -52,6 +52,32 @@ export const routes: Routes = [
           import('@tusalud/app/features/citas/citas.routes').then((m) => m.CITAS_ROUTES),
       },
       {
+        path: 'pagos',
+        loadChildren: () =>
+          import('@tusalud/app/features/pagos/pagos.routes').then((m) => m.PAGOS_ROUTES),
+      },
+      {
+        path: 'historia-clinica',
+        loadChildren: () =>
+          import('@tusalud/app/features/historia-clinica/historia-clinica.routes').then(
+            (m) => m.HISTORIA_CLINICA_ROUTES,
+          ),
+      },
+      {
+        path: 'pacientes',
+        loadChildren: () =>
+          import('@tusalud/app/features/historia-clinica/historia-clinica.routes').then(
+            (m) => m.PACIENTES_ROUTES,
+          ),
+      },
+      {
+        path: 'notificaciones',
+        loadChildren: () =>
+          import('@tusalud/app/features/notificaciones/notificaciones.routes').then(
+            (m) => m.NOTIFICACIONES_ROUTES,
+          ),
+      },
+      {
         path: 'perfil',
         loadChildren: () =>
           import('@tusalud/app/features/perfil/perfil.routes').then((m) => m.PERFIL_ROUTES),

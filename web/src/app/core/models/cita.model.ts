@@ -23,6 +23,7 @@ export interface CitaResponse {
   pacienteNombre: string;
   pacienteDni: string;
   createdAt: string;
+  pagado?: boolean;
 }
 
 export interface CitaCreateRequest {

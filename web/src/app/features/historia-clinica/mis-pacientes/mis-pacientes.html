@@ -1,0 +1,87 @@
+<app-page-header
+  title="Mis pacientes"
+  subtitle="Pacientes que has atendido o tienen citas contigo"
+  icon="pi-users"
+/>
+
+<div class="panel">
+  @if (store.pacientes.error(); as error) {
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar tus pacientes"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="store.cargarMisPacientes()" />
+    </app-empty-state>
+  } @else {
+    <p-table
+      [value]="filtrados()"
+      [loading]="store.pacientes.loading()"
+      [paginator]="filtrados().length > 10"
+      [rows]="10"
+      [rowHover]="true"
+      responsiveLayout="scroll"
+    >
+      <ng-template #caption>
+        <p-iconfield class="w-full md:w-20rem">
+          <p-inputicon class="pi pi-search" />
+          <input
+            pInputText
+            type="search"
+            class="w-full"
+            placeholder="Buscar por nombre, DNI o historia"
+            aria-label="Buscar paciente"
+            [ngModel]="busqueda()"
+            (ngModelChange)="busqueda.set($event)"
+          />
+        </p-iconfield>
+      </ng-template>
+      <ng-template #header>
+        <tr>
+          <th>Paciente</th>
+          <th>Historia</th>
+          <th>Última cita</th>
+          <th class="text-right">Citas</th>
+          <th style="width: 9rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-paciente>
+        <tr>
+          <td>
+            <div class="flex align-items-center gap-2">
+              <app-user-avatar [nombre]="paciente.nombreCompleto" />
+              <div>
+                <div class="font-semibold">{{ paciente.nombreCompleto }}</div>
+                <small class="text-muted">DNI {{ paciente.dni }}</small>
+              </div>
+            </div>
+          </td>
+          <td>{{ paciente.historialClinicoNumero }}</td>
+          <td>{{ paciente.ultimaCita ? (paciente.ultimaCita | date: 'd MMM y') : '—' }}</td>
+          <td class="text-right">{{ paciente.totalCitas }}</td>
+          <td class="text-right">
+            <p-button
+              label="Historia"
+              icon="pi pi-folder-open"
+              size="small"
+              [outlined]="true"
+              [routerLink]="['/pacientes', paciente.pacienteId, 'historia-clinica']"
+            />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="5">
+            <app-empty-state
+              icon="pi-users"
+              [title]="busqueda() ? 'Sin coincidencias' : 'Aún no tienes pacientes'"
+              message="Aparecerán aquí cuando tengas citas reservadas contigo."
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

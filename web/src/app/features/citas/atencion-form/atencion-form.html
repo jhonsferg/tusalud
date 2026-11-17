@@ -1,0 +1,219 @@
+<app-page-header
+  [title]="editando() ? 'Editar atención médica' : 'Registrar atención médica'"
+  subtitle="Diagnóstico, receta y signos vitales de la consulta"
+  icon="pi-file-edit"
+  [backLink]="id() ? '/citas/' + id() : '/agenda'"
+  backLabel="Volver a la cita"
+/>
+
+@if (citas.selected.error(); as error) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar la cita"
+      [message]="error.message"
+    >
+      <p-button label="Volver a la agenda" routerLink="/agenda" />
+    </app-empty-state>
+  </div>
+} @else if (citas.selected.value(); as cita) {
+  <div class="paciente panel">
+    <i class="pi pi-user"></i>
+    <div>
+      <strong>{{ cita.pacienteNombre }}</strong>
+      <span class="text-muted"
+        >DNI {{ cita.pacienteDni }} · {{ cita.fechaHora | date: 'd MMM y, h:mm a' }} ·
+        {{ cita.motivo }}</span
+      >
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+    <section class="panel">
+      <h3>Signos vitales</h3>
+      <div class="signos">
+        <app-form-field label="Peso (kg)" [control]="form.controls.pesoKg" inputId="at-peso">
+          <p-inputnumber
+            inputId="at-peso"
+            formControlName="pesoKg"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="1"
+            [fluid]="true"
+          />
+        </app-form-field>
+        <app-form-field label="Talla (cm)" [control]="form.controls.tallaCm" inputId="at-talla">
+          <p-inputnumber
+            inputId="at-talla"
+            formControlName="tallaCm"
+            [maxFractionDigits]="1"
+            [fluid]="true"
+          />
+        </app-form-field>
+        <div class="campo">
+          <label for="at-presion">Presión arterial</label>
+          <input
+            pInputText
+            id="at-presion"
+            formControlName="presionArterial"
+            placeholder="120/80"
+            class="w-full"
+          />
+          @if (form.controls.presionArterial.invalid && form.controls.presionArterial.touched) {
+            <small class="text-red-600">Usa el formato 120/80.</small>
+          }
+        </div>
+        <app-form-field
+          label="Temperatura (°C)"
+          [control]="form.controls.temperaturaC"
+          inputId="at-temp"
+        >
+          <p-inputnumber
+            inputId="at-temp"
+            formControlName="temperaturaC"
+            [minFractionDigits]="1"
+            [maxFractionDigits]="1"
+            [fluid]="true"
+          />
+        </app-form-field>
+        <app-form-field
+          label="Frecuencia cardíaca (lpm)"
+          [control]="form.controls.frecuenciaCardiaca"
+          inputId="at-fc"
+        >
+          <p-inputnumber inputId="at-fc" formControlName="frecuenciaCardiaca" [fluid]="true" />
+        </app-form-field>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h3>Evaluación</h3>
+      <div class="texto">
+        <app-form-field
+          label="Diagnóstico"
+          [control]="form.controls.diagnostico"
+          inputId="at-diagnostico"
+          [required]="true"
+        >
+          <textarea
+            pTextarea
+            id="at-diagnostico"
+            formControlName="diagnostico"
+            rows="3"
+            class="w-full"
+          ></textarea>
+        </app-form-field>
+        <app-form-field
+          label="Tratamiento"
+          [control]="form.controls.tratamiento"
+          inputId="at-tratamiento"
+        >
+          <textarea
+            pTextarea
+            id="at-tratamiento"
+            formControlName="tratamiento"
+            rows="3"
+            class="w-full"
+          ></textarea>
+        </app-form-field>
+        <app-form-field
+          label="Indicaciones para el paciente"
+          [control]="form.controls.indicaciones"
+          inputId="at-indicaciones"
+        >
+          <textarea
+            pTextarea
+            id="at-indicaciones"
+            formControlName="indicaciones"
+            rows="3"
+            class="w-full"
+          ></textarea>
+        </app-form-field>
+        <app-form-field
+          label="Observaciones"
+          [control]="form.controls.observaciones"
+          inputId="at-observaciones"
+        >
+          <textarea
+            pTextarea
+            id="at-observaciones"
+            formControlName="observaciones"
+            rows="2"
+            class="w-full"
+          ></textarea>
+        </app-form-field>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="receta-head">
+        <h3>Receta médica</h3>
+        <p-button
+          label="Agregar medicamento"
+          icon="pi pi-plus"
+          size="small"
+          [outlined]="true"
+          (onClick)="agregarMedicamento()"
+        />
+      </div>
+
+      @if (receta.length === 0) {
+        <p class="text-muted">No se agregaron medicamentos.</p>
+      }
+      <div formArrayName="receta" class="medicamentos">
+        @for (grupo of receta.controls; track $index; let i = $index) {
+          <div class="medicamento" [formGroupName]="i">
+            <input
+              pInputText
+              formControlName="medicamento"
+              placeholder="Medicamento"
+              [attr.aria-label]="'Medicamento ' + (i + 1)"
+              class="w-full"
+            />
+            <input
+              pInputText
+              formControlName="dosis"
+              placeholder="Dosis"
+              [attr.aria-label]="'Dosis ' + (i + 1)"
+              class="w-full"
+            />
+            <input
+              pInputText
+              formControlName="frecuencia"
+              placeholder="Frecuencia"
+              [attr.aria-label]="'Frecuencia ' + (i + 1)"
+              class="w-full"
+            />
+            <input
+              pInputText
+              formControlName="duracion"
+              placeholder="Duración"
+              [attr.aria-label]="'Duración ' + (i + 1)"
+              class="w-full"
+            />
+            <p-button
+              icon="pi pi-trash"
+              [text]="true"
+              [rounded]="true"
+              severity="danger"
+              [ariaLabel]="'Quitar medicamento ' + (i + 1)"
+              (onClick)="quitarMedicamento(i)"
+            />
+          </div>
+        }
+      </div>
+    </section>
+
+    <div class="acciones">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        [outlined]="true"
+        [routerLink]="['/citas', id()]"
+      />
+      <p-button type="submit" label="Guardar atención" icon="pi pi-check" [loading]="guardando()" />
+    </div>
+  </form>
+} @else {
+  <div class="panel"><p-skeleton height="18rem" /></div>
+}

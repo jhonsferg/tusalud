@@ -1,0 +1,115 @@
+<p-dialog
+  header="Pagar cita"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '30rem', maxWidth: '95vw' }"
+>
+  @if (cita(); as cita) {
+    <div class="contenido">
+      <div class="resumen">
+        <strong>{{ cita.medicoNombre }}</strong>
+        <span class="text-muted"
+          >{{ cita.especialidad }} · {{ cita.fechaHora | date: 'EEE d MMM, h:mm a' }}</span
+        >
+      </div>
+
+      @if (error(); as mensaje) {
+        <p-message severity="error" icon="pi pi-exclamation-circle">{{ mensaje }}</p-message>
+      }
+
+      <div class="campo">
+        <label for="pago-metodo">Método de pago</label>
+        @if (opciones().length > 0) {
+          <p-select
+            inputId="pago-metodo"
+            [options]="opciones()"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="metodoId()"
+            (ngModelChange)="metodoId.set($event)"
+            placeholder="Selecciona una tarjeta"
+            appendTo="body"
+            styleClass="w-full"
+          />
+        } @else {
+          <p class="sin-metodos">
+            <i class="pi pi-credit-card"></i>
+            No tienes tarjetas vigentes.
+            <a routerLink="/pagos/metodos" (click)="visible.set(false)">Agregar una tarjeta</a>
+          </p>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="pago-cupon">¿Tienes un cupón de descuento?</label>
+        <div class="cupon">
+          <input
+            pInputText
+            id="pago-cupon"
+            class="w-full"
+            placeholder="Ej. BIENVENIDA10"
+            [ngModel]="codigo()"
+            (ngModelChange)="codigo.set($event)"
+            [disabled]="cupon()?.valido ?? false"
+            (keydown.enter)="aplicarCupon(); $event.preventDefault()"
+          />
+          @if (cupon()?.valido) {
+            <p-button
+              label="Quitar"
+              severity="secondary"
+              [outlined]="true"
+              (onClick)="quitarCupon()"
+            />
+          } @else {
+            <p-button
+              label="Aplicar"
+              [loading]="validando()"
+              [disabled]="!codigo().trim()"
+              (onClick)="aplicarCupon()"
+            />
+          }
+        </div>
+        @if (cupon(); as respuesta) {
+          <small [class]="respuesta.valido ? 'ok' : 'mal'">
+            <i [class]="respuesta.valido ? 'pi pi-check-circle' : 'pi pi-times-circle'"></i>
+            {{
+              respuesta.mensaje || (respuesta.valido ? 'Cupón aplicado.' : 'El cupón no es válido.')
+            }}
+          </small>
+        }
+      </div>
+
+      <dl>
+        <div>
+          <dt>Consulta</dt>
+          <dd>{{ cita.monto | currency: 'PEN' : 'symbol-narrow' }}</dd>
+        </div>
+        <div class="descuento">
+          <dt>Descuento</dt>
+          <dd>- {{ descuento() | currency: 'PEN' : 'symbol-narrow' }}</dd>
+        </div>
+        <div class="total">
+          <dt>Total a pagar</dt>
+          <dd>{{ total() | currency: 'PEN' : 'symbol-narrow' }}</dd>
+        </div>
+      </dl>
+    </div>
+  }
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="visible.set(false)"
+    />
+    <p-button
+      label="Pagar ahora"
+      icon="pi pi-lock"
+      [loading]="pagando()"
+      [disabled]="metodoId() === null"
+      (onClick)="pagar()"
+    />
+  </ng-template>
+</p-dialog>

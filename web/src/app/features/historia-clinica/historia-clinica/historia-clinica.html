@@ -1,0 +1,220 @@
+<app-page-header
+  [title]="esPropia() ? 'Mi historia clínica' : 'Historia clínica del paciente'"
+  subtitle="Datos médicos y registro de todas las atenciones"
+  icon="pi-folder-open"
+  [backLink]="esPropia() ? undefined : volver()"
+  backLabel="Volver"
+/>
+
+@if (store.historia.error(); as error) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar la historia clínica"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="recargar()" />
+    </app-empty-state>
+  </div>
+} @else if (store.historia.value(); as historia) {
+  <section class="panel ficha">
+    <div class="ficha-head">
+      <div>
+        <h2>{{ historia.paciente.nombreCompleto }}</h2>
+        <span class="text-muted"
+          >DNI {{ historia.paciente.dni }} · Historia
+          {{ historia.paciente.historialClinicoNumero }}</span
+        >
+      </div>
+      @if (esPropia() && !editando()) {
+        <p-button
+          label="Editar datos médicos"
+          icon="pi pi-pencil"
+          [outlined]="true"
+          (onClick)="editar()"
+        />
+      }
+    </div>
+
+    @if (editando()) {
+      <form [formGroup]="form" (ngSubmit)="guardar()" novalidate class="edicion">
+        <app-form-field
+          label="Grupo sanguíneo"
+          [control]="form.controls.grupoSanguineo"
+          inputId="hc-grupo"
+        >
+          <p-select
+            inputId="hc-grupo"
+            formControlName="grupoSanguineo"
+            [options]="grupos"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Selecciona"
+            [showClear]="true"
+            appendTo="body"
+            styleClass="w-full"
+          />
+        </app-form-field>
+        <app-form-field
+          label="Alergias"
+          [control]="form.controls.alergias"
+          inputId="hc-alergias"
+          hint="Medicamentos, alimentos u otras"
+        >
+          <textarea
+            pTextarea
+            id="hc-alergias"
+            formControlName="alergias"
+            rows="2"
+            class="w-full"
+          ></textarea>
+        </app-form-field>
+        <app-form-field
+          label="Antecedentes médicos"
+          [control]="form.controls.antecedentes"
+          inputId="hc-antecedentes"
+        >
+          <textarea
+            pTextarea
+            id="hc-antecedentes"
+            formControlName="antecedentes"
+            rows="3"
+            class="w-full"
+          ></textarea>
+        </app-form-field>
+        <div class="acciones">
+          <p-button
+            label="Cancelar"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="editando.set(false)"
+          />
+          <p-button type="submit" label="Guardar" icon="pi pi-check" [loading]="guardando()" />
+        </div>
+      </form>
+    } @else {
+      <div class="datos">
+        <div>
+          <span>Edad</span>
+          <strong
+            >{{ historia.paciente.edad ?? '—' }}{{ historia.paciente.edad ? ' años' : '' }}</strong
+          >
+        </div>
+        <div>
+          <span>Nacimiento</span>
+          <strong>{{
+            historia.paciente.fechaNacimiento
+              ? (historia.paciente.fechaNacimiento | date: 'd MMM y')
+              : '—'
+          }}</strong>
+        </div>
+        <div>
+          <span>Grupo sanguíneo</span>
+          <strong>{{ historia.paciente.grupoSanguineo || 'Sin registrar' }}</strong>
+        </div>
+        <div class="ancho">
+          <span>Alergias</span>
+          <strong>{{ historia.paciente.alergias || 'Sin alergias registradas' }}</strong>
+        </div>
+        <div class="ancho">
+          <span>Antecedentes</span>
+          <strong>{{ historia.paciente.antecedentes || 'Sin antecedentes registrados' }}</strong>
+        </div>
+      </div>
+    }
+  </section>
+
+  <h3 class="titulo">
+    Atenciones <p-tag [value]="'' + historia.atenciones.length" severity="secondary" />
+  </h3>
+
+  @if (historia.atenciones.length === 0) {
+    <div class="panel">
+      <app-empty-state
+        icon="pi-file"
+        title="Sin atenciones registradas"
+        message="Cuando un médico registre una consulta aparecerá aquí con su diagnóstico y su receta."
+      />
+    </div>
+  } @else {
+    <ol class="linea">
+      @for (atencion of historia.atenciones; track atencion.id) {
+        <li>
+          <span class="punto"></span>
+          <article class="panel">
+            <header>
+              <div>
+                <strong>{{ atencion.fecha | date: 'd MMMM y' }}</strong>
+                <span class="text-muted"
+                  >{{ atencion.medicoNombre }} · {{ atencion.especialidad }}</span
+                >
+              </div>
+              <p-button
+                label="Ver cita"
+                icon="pi pi-external-link"
+                size="small"
+                [text]="true"
+                [routerLink]="['/citas', atencion.citaId]"
+              />
+            </header>
+
+            <h4>Diagnóstico</h4>
+            <p>{{ atencion.diagnostico }}</p>
+            @if (atencion.tratamiento) {
+              <h4>Tratamiento</h4>
+              <p>{{ atencion.tratamiento }}</p>
+            }
+            @if (atencion.indicaciones) {
+              <h4>Indicaciones</h4>
+              <p>{{ atencion.indicaciones }}</p>
+            }
+
+            @if (
+              atencion.pesoKg ||
+              atencion.tallaCm ||
+              atencion.presionArterial ||
+              atencion.temperaturaC ||
+              atencion.frecuenciaCardiaca
+            ) {
+              <div class="chips">
+                @if (atencion.pesoKg) {
+                  <p-tag [value]="atencion.pesoKg + ' kg'" severity="info" />
+                }
+                @if (atencion.tallaCm) {
+                  <p-tag [value]="atencion.tallaCm + ' cm'" severity="info" />
+                }
+                @if (atencion.presionArterial) {
+                  <p-tag [value]="'PA ' + atencion.presionArterial" severity="info" />
+                }
+                @if (atencion.temperaturaC) {
+                  <p-tag [value]="atencion.temperaturaC + ' °C'" severity="info" />
+                }
+                @if (atencion.frecuenciaCardiaca) {
+                  <p-tag [value]="atencion.frecuenciaCardiaca + ' lpm'" severity="info" />
+                }
+              </div>
+            }
+
+            @if (atencion.receta.length > 0) {
+              <h4>Receta</h4>
+              <ul class="receta">
+                @for (item of atencion.receta; track $index) {
+                  <li>
+                    <strong>{{ item.medicamento }}</strong>
+                    <span class="text-muted"
+                      >{{ item.dosis }} {{ item.frecuencia ? '· ' + item.frecuencia : '' }}
+                      {{ item.duracion ? '· ' + item.duracion : '' }}</span
+                    >
+                  </li>
+                }
+              </ul>
+            }
+          </article>
+        </li>
+      }
+    </ol>
+  }
+} @else {
+  <div class="panel"><p-skeleton height="14rem" /></div>
+}

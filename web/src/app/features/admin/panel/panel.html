@@ -1,0 +1,118 @@
+<app-page-header
+  title="Panel de control"
+  subtitle="Resumen general de la clínica"
+  icon="pi-th-large"
+>
+  <p-button
+    label="Actualizar"
+    icon="pi pi-refresh"
+    [outlined]="true"
+    (onClick)="store.cargarEstadisticas()"
+  />
+</app-page-header>
+
+@if (store.estadisticas.error(); as error) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar las estadísticas"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="store.cargarEstadisticas()" />
+    </app-empty-state>
+  </div>
+} @else if (store.estadisticas.value(); as datos) {
+  <div class="kpis">
+    <div class="panel kpi">
+      <span class="icono azul"><i class="pi pi-users"></i></span>
+      <div>
+        <strong>{{ datos.totalPacientes }}</strong
+        ><span>Pacientes</span>
+      </div>
+    </div>
+    <div class="panel kpi">
+      <span class="icono verde"><i class="pi pi-user-plus"></i></span>
+      <div>
+        <strong>{{ datos.totalMedicos }}</strong
+        ><span>Médicos</span>
+      </div>
+    </div>
+    <div class="panel kpi">
+      <span class="icono ambar"><i class="pi pi-calendar"></i></span>
+      <div>
+        <strong>{{ datos.citasHoy }}</strong
+        ><span>Citas de hoy</span>
+      </div>
+    </div>
+    <div class="panel kpi">
+      <span class="icono violeta"><i class="pi pi-clock"></i></span>
+      <div>
+        <strong>{{ datos.citasPendientes }}</strong
+        ><span>Citas pendientes</span>
+      </div>
+    </div>
+    <div class="panel kpi">
+      <span class="icono verde"><i class="pi pi-wallet"></i></span>
+      <div>
+        <strong>{{ datos.ingresosMes | currency: 'PEN' : 'symbol-narrow' : '1.0-0' }}</strong>
+        <span>Ingresos del mes</span>
+      </div>
+    </div>
+    <div class="panel kpi">
+      <span class="icono azul"><i class="pi pi-chart-line"></i></span>
+      <div>
+        <strong>{{ datos.ingresosTotales | currency: 'PEN' : 'symbol-narrow' : '1.0-0' }}</strong>
+        <span>Ingresos totales</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="graficos">
+    <section class="panel">
+      <h3>Ingresos de los últimos meses</h3>
+      <div class="grafico">
+        <p-chart type="bar" [data]="graficoIngresos()" [options]="opcionesBarras" height="280px" />
+      </div>
+    </section>
+    <section class="panel">
+      <h3>Citas por especialidad</h3>
+      @if (datos.citasPorEspecialidad.length === 0) {
+        <app-empty-state icon="pi-chart-pie" title="Sin datos todavía" />
+      } @else {
+        <div class="grafico">
+          <p-chart
+            type="doughnut"
+            [data]="graficoEspecialidades()"
+            [options]="opcionesDona"
+            height="280px"
+          />
+        </div>
+      }
+    </section>
+  </div>
+
+  <section class="panel">
+    <h3>Médicos con más citas atendidas</h3>
+    @if (datos.topMedicos.length === 0) {
+      <app-empty-state icon="pi-users" title="Aún no hay citas atendidas" />
+    } @else {
+      <ol class="top">
+        @for (medico of datos.topMedicos; track medico.medicoId; let i = $index) {
+          <li>
+            <span class="posicion">{{ i + 1 }}</span>
+            <app-user-avatar [nombre]="medico.nombre" />
+            <a [routerLink]="['/medicos', medico.medicoId]">{{ medico.nombre }}</a>
+            <strong>{{ medico.citasAtendidas }} atendidas</strong>
+          </li>
+        }
+      </ol>
+    }
+  </section>
+} @else {
+  <div class="kpis">
+    @for (n of [1, 2, 3, 4, 5, 6]; track n) {
+      <div class="panel"><p-skeleton height="3rem" /></div>
+    }
+  </div>
+}

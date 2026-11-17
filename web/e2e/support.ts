@@ -3,7 +3,7 @@ import { Page, expect } from '@playwright/test';
 export const CUENTAS = {
   paciente: { email: 'juan.perez@correo.com', password: 'Paciente123!', home: /\/citas$/ },
   medico: { email: 'dr.garcia@tusalud.com', password: 'Medico123!', home: /\/agenda$/ },
-  admin: { email: 'admin@tusalud.com', password: 'Admin123!', home: /\/admin\/auditoria$/ },
+  admin: { email: 'admin@tusalud.com', password: 'Admin123!', home: /\/admin\/panel$/ },
 } as const;
 
 export async function iniciarSesion(page: Page, rol: keyof typeof CUENTAS): Promise<void> {

@@ -76,7 +76,7 @@ describe('guards', () => {
 
 describe('rutas de la aplicación', () => {
   it('redirige la raíz según el rol', async () => {
-    expect(await navigateAs(['ROLE_ADMIN'], '/', true)).toBe('/admin/auditoria');
+    expect(await navigateAs(['ROLE_ADMIN'], '/', true)).toBe('/admin/panel');
     expect(await navigateAs(['ROLE_MEDICO'], '/', true)).toBe('/agenda');
     expect(await navigateAs(['ROLE_PACIENTE'], '/', true)).toBe('/citas');
     expect(await navigateAs(null, '/', true)).toBe('/auth/login');

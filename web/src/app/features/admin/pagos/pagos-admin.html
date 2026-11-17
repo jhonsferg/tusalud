@@ -1,0 +1,94 @@
+<app-page-header title="Pagos" subtitle="Cobros registrados por las citas" icon="pi-wallet" />
+
+<div class="panel">
+  <div class="flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+    <p-datepicker
+      selectionMode="range"
+      [ngModel]="rango()"
+      (ngModelChange)="cambiarRango($event)"
+      [showIcon]="true"
+      [showButtonBar]="true"
+      dateFormat="dd/mm/yy"
+      placeholder="Filtrar por fechas"
+      [readonlyInput]="true"
+      appendTo="body"
+    />
+    <span>
+      <span class="text-muted">Total recaudado:</span>
+      <strong class="ml-2 text-xl">{{
+        store.totalRecaudado() | currency: 'PEN' : 'symbol-narrow'
+      }}</strong>
+    </span>
+  </div>
+
+  @if (store.pagos.error(); as error) {
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar los pagos"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="cargar()" />
+    </app-empty-state>
+  } @else {
+    <p-table
+      [value]="store.pagos.value() ?? []"
+      [loading]="store.pagos.loading()"
+      [paginator]="(store.pagos.value() ?? []).length > 10"
+      [rows]="10"
+      [rowHover]="true"
+      responsiveLayout="scroll"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Comprobante</th>
+          <th>Paciente</th>
+          <th>Médico</th>
+          <th>Método</th>
+          <th class="text-right">Total</th>
+          <th>Estado</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-pago>
+        <tr>
+          <td>
+            <div class="font-semibold">{{ pago.comprobante }}</div>
+            <small class="text-muted">{{ pago.fechaPago | date: 'd MMM y, HH:mm' }}</small>
+          </td>
+          <td>{{ pago.pacienteNombre }}</td>
+          <td>
+            <div class="font-semibold">{{ pago.medicoNombre }}</div>
+            <small class="text-muted">{{ pago.especialidad }}</small>
+          </td>
+          <td>{{ pago.metodo }}</td>
+          <td class="text-right">
+            <div class="font-semibold">{{ pago.total | currency: 'PEN' : 'symbol-narrow' }}</div>
+            @if (pago.descuento > 0) {
+              <small class="text-muted"
+                >Desc. {{ pago.descuento | currency: 'PEN' : 'symbol-narrow' }}
+                {{ pago.codigoCupon }}</small
+              >
+            }
+          </td>
+          <td>
+            <p-tag
+              [value]="pago.estado === 'PAGADO' ? 'Pagado' : 'Reembolsado'"
+              [severity]="pago.estado === 'PAGADO' ? 'success' : 'info'"
+            />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6">
+            <app-empty-state
+              icon="pi-wallet"
+              title="No hay pagos en el periodo"
+              message="Ajusta el rango de fechas para ver más resultados."
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

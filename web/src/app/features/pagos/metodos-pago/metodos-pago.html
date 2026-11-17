@@ -1,0 +1,216 @@
+<app-page-header
+  title="Métodos de pago"
+  subtitle="Guarda tus tarjetas para pagar tus citas más rápido"
+  icon="pi-credit-card"
+  backLink="/pagos"
+  backLabel="Volver a mis pagos"
+>
+  <p-button label="Agregar tarjeta" icon="pi pi-plus" (onClick)="abrir()" />
+</app-page-header>
+
+@if (store.metodos.error(); as error) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar tus tarjetas"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="store.cargarMetodos()" />
+    </app-empty-state>
+  </div>
+} @else if (store.metodos.loading() && !store.metodos.hasValue()) {
+  <div class="tarjetas">
+    <p-skeleton height="11rem" borderRadius="16px" />
+    <p-skeleton height="11rem" borderRadius="16px" />
+  </div>
+} @else if (metodos().length === 0) {
+  <div class="panel">
+    <app-empty-state
+      icon="pi-credit-card"
+      title="No tienes tarjetas guardadas"
+      message="Agrega una tarjeta para pagar tus citas en un solo paso. Nunca guardamos el número completo ni el código de seguridad."
+    >
+      <p-button label="Agregar tarjeta" icon="pi pi-plus" (onClick)="abrir()" />
+    </app-empty-state>
+  </div>
+} @else {
+  <div class="tarjetas">
+    @for (metodo of metodos(); track metodo.id) {
+      <article
+        class="tarjeta"
+        [class]="'marca-' + metodo.marca.toLowerCase()"
+        [class.vencida]="metodo.vencida"
+      >
+        <header>
+          <span class="marca">{{ metodo.marca }}</span>
+          @if (metodo.predeterminado) {
+            <p-tag value="Predeterminada" severity="success" [rounded]="true" />
+          } @else if (metodo.vencida) {
+            <p-tag value="Vencida" severity="danger" [rounded]="true" />
+          }
+        </header>
+        <div class="numero">•••• •••• •••• {{ metodo.ultimos4 }}</div>
+        <footer>
+          <div>
+            <small>Titular</small>
+            <strong>{{ metodo.titular }}</strong>
+          </div>
+          <div>
+            <small>Vence</small>
+            <strong
+              >{{ metodo.vencimientoMes < 10 ? '0' : '' }}{{ metodo.vencimientoMes }}/{{
+                metodo.vencimientoAnio % 100
+              }}</strong
+            >
+          </div>
+        </footer>
+        <div class="acciones">
+          @if (!metodo.predeterminado && !metodo.vencida) {
+            <p-button
+              label="Usar por defecto"
+              size="small"
+              [text]="true"
+              (onClick)="predeterminar(metodo)"
+            />
+          }
+          <p-button
+            icon="pi pi-trash"
+            size="small"
+            [text]="true"
+            [rounded]="true"
+            severity="danger"
+            [ariaLabel]="'Eliminar tarjeta terminada en ' + metodo.ultimos4"
+            (onClick)="eliminar(metodo)"
+          />
+        </div>
+      </article>
+    }
+  </div>
+}
+
+<p-dialog
+  header="Agregar tarjeta"
+  [visible]="dialogo()"
+  (visibleChange)="dialogo.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '30rem', maxWidth: '95vw' }"
+>
+  <form [formGroup]="form" (ngSubmit)="guardar()" novalidate class="form">
+    <app-form-field label="Tipo" [control]="form.controls.tipo" inputId="mp-tipo" [required]="true">
+      <p-select
+        inputId="mp-tipo"
+        formControlName="tipo"
+        [options]="tipos"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+      />
+    </app-form-field>
+
+    <app-form-field
+      label="Nombre del titular"
+      [control]="form.controls.titular"
+      inputId="mp-titular"
+      [required]="true"
+    >
+      <input
+        pInputText
+        id="mp-titular"
+        formControlName="titular"
+        autocomplete="cc-name"
+        class="w-full"
+      />
+    </app-form-field>
+
+    <app-form-field
+      label="Número de tarjeta"
+      [control]="form.controls.numeroTarjeta"
+      inputId="mp-numero"
+      [required]="true"
+      hint="Solo guardamos los últimos 4 dígitos"
+    >
+      <input
+        pInputText
+        id="mp-numero"
+        formControlName="numeroTarjeta"
+        inputmode="numeric"
+        autocomplete="cc-number"
+        placeholder="0000 0000 0000 0000"
+        maxlength="23"
+        class="w-full"
+        (input)="formatearNumero()"
+      />
+    </app-form-field>
+
+    <div class="fila">
+      <app-form-field
+        label="Mes"
+        [control]="form.controls.vencimientoMes"
+        inputId="mp-mes"
+        [required]="true"
+      >
+        <p-select
+          inputId="mp-mes"
+          formControlName="vencimientoMes"
+          [options]="meses"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="MM"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </app-form-field>
+      <app-form-field
+        label="Año"
+        [control]="form.controls.vencimientoAnio"
+        inputId="mp-anio"
+        [required]="true"
+      >
+        <p-select
+          inputId="mp-anio"
+          formControlName="vencimientoAnio"
+          [options]="anios"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="AAAA"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </app-form-field>
+      <app-form-field label="CVV" [control]="form.controls.cvv" inputId="mp-cvv" [required]="true">
+        <input
+          pInputText
+          id="mp-cvv"
+          type="password"
+          formControlName="cvv"
+          inputmode="numeric"
+          autocomplete="cc-csc"
+          maxlength="4"
+          class="w-full"
+        />
+      </app-form-field>
+    </div>
+
+    @if (errorVencimiento(); as mensaje) {
+      <small class="text-red-600" role="alert">{{ mensaje }}</small>
+    }
+
+    <div class="opcion">
+      <label for="mp-pred">Usar como método predeterminado</label>
+      <p-toggleswitch inputId="mp-pred" formControlName="predeterminado" />
+    </div>
+
+    <div class="pie">
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="dialogo.set(false)"
+      />
+      <p-button type="submit" label="Guardar tarjeta" icon="pi pi-lock" [loading]="guardando()" />
+    </div>
+  </form>
+</p-dialog>

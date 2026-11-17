@@ -1,0 +1,73 @@
+.contenido {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.resumen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  background: var(--app-primary-soft);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  label {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+}
+
+.cupon {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ok {
+  color: var(--p-green-600);
+}
+
+.mal {
+  color: var(--p-red-600);
+}
+
+.sin-metodos {
+  margin: 0;
+  color: var(--p-text-muted-color);
+}
+
+dl {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  dd {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .descuento dd {
+    color: var(--p-green-600);
+  }
+
+  .total {
+    padding-top: 0.6rem;
+    border-top: 1px dashed var(--p-content-border-color);
+    font-size: 1.15rem;
+
+    dd {
+      color: var(--app-primary-text);
+    }
+  }
+}

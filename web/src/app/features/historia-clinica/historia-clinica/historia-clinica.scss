@@ -1,0 +1,141 @@
+.ficha-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+
+  h2 {
+    margin-bottom: 0.2rem;
+  }
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    background: var(--app-primary-soft);
+  }
+
+  span {
+    color: var(--p-text-muted-color);
+    font-size: 0.82rem;
+  }
+
+  .ancho {
+    grid-column: 1 / -1;
+  }
+}
+
+.edicion {
+  display: grid;
+  gap: 1rem;
+  max-width: 40rem;
+}
+
+.acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 1.75rem 0 1rem;
+  font-size: 1.1rem;
+}
+
+.linea {
+  position: relative;
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0 0 0 1.75rem;
+  list-style: none;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    left: 0.45rem;
+    width: 2px;
+    background: var(--p-content-border-color);
+  }
+
+  > li {
+    position: relative;
+  }
+}
+
+.punto {
+  position: absolute;
+  top: 1.35rem;
+  left: -1.7rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 3px solid var(--p-content-background);
+  border-radius: 50%;
+  background: var(--p-primary-color);
+}
+
+article header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+
+  div {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+h4 {
+  margin: 0.8rem 0 0.2rem;
+  color: var(--p-text-muted-color);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+article p {
+  margin: 0;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+}
+
+.receta {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+  }
+}

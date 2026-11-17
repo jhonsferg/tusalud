@@ -8,6 +8,10 @@ import { CitasApiService } from './citas-api.service';
 import { EspecialidadesApiService } from './especialidades-api.service';
 import { MedicosApiService } from './medicos-api.service';
 import { PerfilApiService } from './perfil-api.service';
+import { AdminApiService } from './admin-api.service';
+import { ClinicaApiService } from './clinica-api.service';
+import { NotificacionesApiService } from './notificaciones-api.service';
+import { PagosApiService } from './pagos-api.service';
 
 interface Expected {
   method: string;
@@ -164,6 +168,167 @@ describe('servicios de la API', () => {
       method: 'GET',
       url: '/api/v1/admin/auditoria/citas',
       params: { inicio: '2026-10-01' },
+    });
+  });
+
+  it('PerfilApiService cubre avatar, preferencias y sesiones', () => {
+    const api = TestBed.inject(PerfilApiService);
+    const preferencias = {
+      recordatoriosActivos: true,
+      horasAntelacionRecordatorio: 24,
+      alertasInicioSesion: true,
+    };
+    api.actualizarAvatar('data:image/png;base64,AAAA').subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: '/api/v1/perfil/avatar',
+      body: { imagen: 'data:image/png;base64,AAAA' },
+    });
+    api.eliminarAvatar().subscribe();
+    expectRequest({ method: 'DELETE', url: '/api/v1/perfil/avatar' });
+    api.obtenerPreferencias().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/perfil/preferencias' });
+    api.actualizarPreferencias(preferencias).subscribe();
+    expectRequest({ method: 'PUT', url: '/api/v1/perfil/preferencias', body: preferencias });
+    api.listarSesiones().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/perfil/sesiones' });
+    api.cerrarSesion(4).subscribe();
+    expectRequest({ method: 'DELETE', url: '/api/v1/perfil/sesiones/4' });
+    api.cerrarOtrasSesiones().subscribe();
+    expectRequest({ method: 'DELETE', url: '/api/v1/perfil/sesiones' });
+  });
+
+  it('NotificacionesApiService cubre bandeja y contador', () => {
+    const api = TestBed.inject(NotificacionesApiService);
+    api.listar(true, 10).subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/notificaciones',
+      params: { soloNoLeidas: 'true', limit: '10' },
+    });
+    api.resumen().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/notificaciones/resumen' });
+    api.marcarLeida(3).subscribe();
+    expectRequest({ method: 'PUT', url: '/api/v1/notificaciones/3/leida' });
+    api.marcarTodasLeidas().subscribe();
+    expectRequest({ method: 'PUT', url: '/api/v1/notificaciones/leidas' });
+    api.eliminar(3).subscribe();
+    expectRequest({ method: 'DELETE', url: '/api/v1/notificaciones/3' });
+  });
+
+  it('PagosApiService cubre métodos de pago, cupones y pagos', () => {
+    const api = TestBed.inject(PagosApiService);
+    const metodo = {
+      tipo: 'TARJETA_CREDITO' as const,
+      titular: 'JUAN PEREZ',
+      numeroTarjeta: '4242424242424242',
+      vencimientoMes: 12,
+      vencimientoAnio: 2030,
+      cvv: '123',
+      predeterminado: true,
+    };
+    api.listarMetodos().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/metodos-pago' });
+    api.crearMetodo(metodo).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/metodos-pago', body: metodo });
+    api.marcarPredeterminado(2).subscribe();
+    expectRequest({ method: 'PUT', url: '/api/v1/metodos-pago/2/predeterminado' });
+    api.eliminarMetodo(2).subscribe();
+    expectRequest({ method: 'DELETE', url: '/api/v1/metodos-pago/2' });
+    api.validarCupon('SALUD20', 150).subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/cupones/validar',
+      params: { codigo: 'SALUD20', monto: '150' },
+    });
+    api.pagarCita(9, { metodoPagoId: 2, codigoCupon: 'SALUD20' }).subscribe();
+    expectRequest({
+      method: 'POST',
+      url: '/api/v1/citas/9/pago',
+      body: { metodoPagoId: 2, codigoCupon: 'SALUD20' },
+    });
+    api.listarPagos().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/pagos' });
+    api.obtenerPago(5).subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/pagos/5' });
+  });
+
+  it('ClinicaApiService cubre atención, historia clínica y valoraciones', () => {
+    const api = TestBed.inject(ClinicaApiService);
+    const atencion = { diagnostico: 'Hipertensión leve', receta: [{ medicamento: 'Enalapril' }] };
+    api.obtenerAtencion(7).subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/citas/7/atencion' });
+    api.registrarAtencion(7, atencion).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/citas/7/atencion', body: atencion });
+    api.actualizarAtencion(7, atencion).subscribe();
+    expectRequest({ method: 'PUT', url: '/api/v1/citas/7/atencion', body: atencion });
+    api.miHistoria().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/historia-clinica' });
+    api.actualizarDatosMedicos({ grupoSanguineo: 'O+' }).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: '/api/v1/historia-clinica/datos-medicos',
+      body: { grupoSanguineo: 'O+' },
+    });
+    api.historiaDePaciente(3).subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/pacientes/3/historia-clinica' });
+    api.misPacientes().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/medicos/me/pacientes' });
+    api.obtenerValoracion(7).subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/citas/7/valoracion' });
+    api.valorar(7, { puntuacion: 5 }).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/citas/7/valoracion', body: { puntuacion: 5 } });
+    api.valoracionesDeMedico(1).subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/medicos/1/valoraciones' });
+  });
+
+  it('AdminApiService cubre estadísticas, cupones, pagos y usuarios', () => {
+    const api = TestBed.inject(AdminApiService);
+    const cupon = {
+      codigo: 'SALUD20',
+      tipo: 'PORCENTAJE' as const,
+      valor: 20,
+      fechaInicio: '2026-01-01',
+      fechaFin: '2026-12-31',
+      activo: true,
+    };
+    api.estadisticas().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/admin/estadisticas' });
+    api.listarCupones().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/admin/cupones' });
+    api.crearCupon(cupon).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/admin/cupones', body: cupon });
+    api.actualizarCupon(1, cupon).subscribe();
+    expectRequest({ method: 'PUT', url: '/api/v1/admin/cupones/1', body: cupon });
+    api.eliminarCupon(1).subscribe();
+    expectRequest({ method: 'DELETE', url: '/api/v1/admin/cupones/1' });
+    api.listarPagos({ inicio: '2026-01-01', fin: '2026-01-31' }).subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/admin/pagos',
+      params: { inicio: '2026-01-01', fin: '2026-01-31' },
+    });
+    api.listarUsuarios('ROLE_MEDICO', 'garcia').subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/admin/usuarios',
+      params: { rol: 'ROLE_MEDICO', q: 'garcia' },
+    });
+    api.cambiarEstadoUsuario(4, 'INACTIVO').subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: '/api/v1/admin/usuarios/4/estado',
+      body: { estado: 'INACTIVO' },
+    });
+  });
+
+  it('CitasApiService reprograma una cita', () => {
+    const api = TestBed.inject(CitasApiService);
+    api.reprogramar(8, '2026-12-01T10:00:00').subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: '/api/v1/citas/8/reprogramar',
+      body: { fechaHora: '2026-12-01T10:00:00' },
     });
   });
 });

@@ -112,6 +112,46 @@
       }
     </section>
   </div>
+
+  <section class="panel valoraciones">
+    <div class="val-head">
+      <h3><i class="pi pi-star"></i> Valoraciones de pacientes</h3>
+      @if (clinica.valoraciones.value(); as resumen) {
+        @if (resumen.total > 0) {
+          <span class="promedio">
+            <strong>{{ resumen.promedio }}</strong>
+            <p-rating [ngModel]="resumen.promedio" [readonly]="true" [stars]="5" />
+            <span class="text-muted"
+              >{{ resumen.total }} {{ resumen.total === 1 ? 'valoración' : 'valoraciones' }}</span
+            >
+          </span>
+        }
+      }
+    </div>
+    @if (clinica.valoraciones.value(); as resumen) {
+      @if (resumen.valoraciones.length === 0) {
+        <app-empty-state
+          icon="pi-star"
+          title="Aún no hay valoraciones"
+          message="Los pacientes podrán valorar a este médico después de su atención."
+        />
+      } @else {
+        <ul class="val-lista">
+          @for (item of resumen.valoraciones.slice(0, 6); track item.id) {
+            <li>
+              <p-rating [ngModel]="item.puntuacion" [readonly]="true" [stars]="5" />
+              @if (item.comentario) {
+                <p>{{ item.comentario }}</p>
+              }
+              <small class="text-muted"
+                >{{ item.pacienteNombre }} · {{ item.createdAt | date: 'd MMM y' }}</small
+              >
+            </li>
+          }
+        </ul>
+      }
+    }
+  </section>
 } @else {
   <div class="layout">
     <div class="panel"><p-skeleton height="16rem" /></div>

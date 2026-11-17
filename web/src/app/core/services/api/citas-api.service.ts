@@ -33,6 +33,10 @@ export class CitasApiService {
     return this.http.put<CitaResponse>(`${this.baseUrl}/${id}/confirmar`, null);
   }
 
+  reprogramar(id: number, fechaHora: string): Observable<CitaResponse> {
+    return this.http.put<CitaResponse>(`${this.baseUrl}/${id}/reprogramar`, { fechaHora });
+  }
+
   atender(id: number): Observable<CitaResponse> {
     return this.http.put<CitaResponse>(`${this.baseUrl}/${id}/atender`, null);
   }

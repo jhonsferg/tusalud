@@ -23,7 +23,50 @@ function toMinutes(time: string): number {
   return hours * 60 + minutes;
 }
 
+function luhnValido(numero: string): boolean {
+  let suma = 0;
+  let alterno = false;
+  for (let i = numero.length - 1; i >= 0; i--) {
+    let digito = Number(numero[i]);
+    if (alterno) {
+      digito *= 2;
+      if (digito > 9) {
+        digito -= 9;
+      }
+    }
+    suma += digito;
+    alterno = !alterno;
+  }
+  return suma % 10 === 0;
+}
+
 export class AppValidators {
+  static tarjeta(control: AbstractControl): ValidationErrors | null {
+    if (isEmpty(control.value)) {
+      return null;
+    }
+    const numero = String(control.value).replace(/\s+/g, '');
+    return /^\d{13,19}$/.test(numero) && luhnValido(numero) ? null : { tarjeta: true };
+  }
+
+  static cvv(control: AbstractControl): ValidationErrors | null {
+    return isEmpty(control.value) || /^\d{3,4}$/.test(String(control.value)) ? null : { cvv: true };
+  }
+
+  static vencimientoTarjeta(mesKey: string, anioKey: string): ValidatorFn {
+    return (group: AbstractControl): ValidationErrors | null => {
+      const mes = Number(group.get(mesKey)?.value);
+      const anio = Number(group.get(anioKey)?.value);
+      if (!mes || !anio) {
+        return null;
+      }
+      const hoy = new Date();
+      const vencida =
+        anio < hoy.getFullYear() || (anio === hoy.getFullYear() && mes < hoy.getMonth() + 1);
+      return vencida ? { tarjetaVencida: true } : null;
+    };
+  }
+
   static notBlank(control: AbstractControl): ValidationErrors | null {
     return typeof control.value === 'string' &&
       control.value.length > 0 &&

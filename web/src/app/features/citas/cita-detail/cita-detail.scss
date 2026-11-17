@@ -29,12 +29,12 @@
   margin: 0.15rem 0 0;
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--p-primary-700);
+  color: var(--app-primary-text);
 }
 
 h4 {
   margin-bottom: 0.4rem;
-  color: var(--p-surface-500);
+  color: var(--p-text-muted-color);
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -70,12 +70,85 @@ dl {
   }
 
   dt {
-    color: var(--p-surface-500);
+    color: var(--p-text-muted-color);
   }
 
   dd {
     margin: 0;
     font-weight: 600;
     text-align: right;
+  }
+}
+
+.columna {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.etiquetas {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+}
+
+h3 i {
+  margin-right: 0.4rem;
+  color: var(--p-primary-color);
+}
+
+.texto {
+  margin: 0 0 1rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.signos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8rem, 1fr));
+  gap: 0.6rem;
+  margin: 0.5rem 0 1rem;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    padding: 0.6rem 0.8rem;
+    border-radius: 10px;
+    background: var(--app-primary-soft);
+  }
+
+  span {
+    color: var(--p-text-muted-color);
+    font-size: 0.8rem;
+  }
+}
+
+.receta {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--p-content-border-color);
+    border-radius: 10px;
+  }
+
+  i {
+    margin-top: 0.2rem;
+    color: var(--p-primary-color);
+  }
+
+  span {
+    display: flex;
+    flex-direction: column;
   }
 }

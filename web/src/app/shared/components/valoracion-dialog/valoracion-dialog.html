@@ -1,0 +1,56 @@
+<p-dialog
+  header="Valora tu atención"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '28rem', maxWidth: '95vw' }"
+>
+  @if (cita(); as cita) {
+    <div class="flex flex-column gap-3">
+      <p class="m-0">
+        ¿Cómo fue tu consulta con <strong>{{ cita.medicoNombre }}</strong
+        >?
+      </p>
+
+      @if (error(); as mensaje) {
+        <p-message severity="error" icon="pi pi-exclamation-circle">{{ mensaje }}</p-message>
+      }
+
+      <p-rating
+        [ngModel]="puntuacion()"
+        (ngModelChange)="puntuacion.set($event ?? 0)"
+        [stars]="5"
+      />
+
+      <div class="flex flex-column gap-2">
+        <label for="val-comentario" class="font-semibold">Comentario (opcional)</label>
+        <textarea
+          pTextarea
+          id="val-comentario"
+          rows="4"
+          maxlength="500"
+          class="w-full"
+          placeholder="Cuéntanos qué tal fue la atención"
+          [ngModel]="comentario()"
+          (ngModelChange)="comentario.set($event)"
+        ></textarea>
+      </div>
+    </div>
+  }
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="visible.set(false)"
+    />
+    <p-button
+      label="Enviar valoración"
+      icon="pi pi-star"
+      [loading]="guardando()"
+      [disabled]="puntuacion() < 1"
+      (onClick)="enviar()"
+    />
+  </ng-template>
+</p-dialog>

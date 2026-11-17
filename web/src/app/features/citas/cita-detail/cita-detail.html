@@ -18,42 +18,159 @@
   </div>
 } @else if (store.selected.value(); as cita) {
   <div class="layout">
-    <section class="panel">
-      <div class="head">
-        <div>
-          <span class="text-muted">Cita #{{ cita.id }}</span>
-          <h2>{{ cita.fechaHora | date: 'fullDate' }}</h2>
-          <p class="hora">{{ cita.fechaHora | date: 'shortTime' }}</p>
+    <div class="columna">
+      <section class="panel">
+        <div class="head">
+          <div>
+            <span class="text-muted">Cita #{{ cita.id }}</span>
+            <h2>{{ cita.fechaHora | date: 'fullDate' }}</h2>
+            <p class="hora">{{ cita.fechaHora | date: 'shortTime' }}</p>
+          </div>
+          <div class="etiquetas">
+            <app-estado-cita-tag [estado]="cita.estado" />
+            @if (cita.pagado) {
+              <p-tag value="Pagada" severity="success" icon="pi pi-check" />
+            }
+          </div>
         </div>
-        <app-estado-cita-tag [estado]="cita.estado" />
-      </div>
 
-      <h4>Motivo de la consulta</h4>
-      <p class="motivo">{{ cita.motivo }}</p>
+        <h4>Motivo de la consulta</h4>
+        <p class="motivo">{{ cita.motivo }}</p>
 
-      <div class="actions">
-        @if (puedeConfirmar(cita)) {
-          <p-button label="Confirmar cita" icon="pi pi-check" (onClick)="confirmar(cita)" />
-        }
-        @if (puedeAtender(cita)) {
-          <p-button
-            label="Marcar como atendida"
-            icon="pi pi-verified"
-            severity="success"
-            (onClick)="atender(cita)"
-          />
-        }
-        @if (puedeCancelar(cita)) {
-          <p-button
-            label="Cancelar cita"
-            icon="pi pi-times"
-            severity="danger"
-            [outlined]="true"
-            (onClick)="cancelar(cita)"
-          />
-        }
-      </div>
-    </section>
+        <div class="actions">
+          @if (puedePagar(cita)) {
+            <p-button
+              label="Pagar cita"
+              icon="pi pi-credit-card"
+              (onClick)="pagoVisible.set(true)"
+            />
+          }
+          @if (puedeConfirmar(cita)) {
+            <p-button label="Confirmar cita" icon="pi pi-check" (onClick)="confirmar(cita)" />
+          }
+          @if (puedeAtender(cita)) {
+            <p-button
+              [label]="clinica.atencion.hasValue() ? 'Editar atención' : 'Registrar atención'"
+              icon="pi pi-file-edit"
+              severity="success"
+              [routerLink]="['/citas', cita.id, 'atencion']"
+            />
+          }
+          @if (puedeReprogramar(cita)) {
+            <p-button
+              label="Reprogramar"
+              icon="pi pi-refresh"
+              severity="secondary"
+              [outlined]="true"
+              (onClick)="reprogramarVisible.set(true)"
+            />
+          }
+          @if (puedeValorar(cita)) {
+            <p-button
+              label="Valorar atención"
+              icon="pi pi-star"
+              severity="warn"
+              [outlined]="true"
+              (onClick)="valoracionVisible.set(true)"
+            />
+          }
+          @if (puedeCancelar(cita)) {
+            <p-button
+              label="Cancelar cita"
+              icon="pi pi-times"
+              severity="danger"
+              [outlined]="true"
+              (onClick)="cancelar(cita)"
+            />
+          }
+        </div>
+      </section>
+
+      @if (cita.estado === 'ATENDIDA') {
+        <section class="panel">
+          <h3><i class="pi pi-file"></i> Atención médica</h3>
+          @if (clinica.atencion.loading() && !clinica.atencion.hasValue()) {
+            <p-skeleton height="8rem" />
+          } @else if (clinica.atencion.value(); as atencion) {
+            <h4>Diagnóstico</h4>
+            <p class="texto">{{ atencion.diagnostico }}</p>
+            @if (atencion.tratamiento) {
+              <h4>Tratamiento</h4>
+              <p class="texto">{{ atencion.tratamiento }}</p>
+            }
+            @if (atencion.indicaciones) {
+              <h4>Indicaciones</h4>
+              <p class="texto">{{ atencion.indicaciones }}</p>
+            }
+            @if (atencion.observaciones) {
+              <h4>Observaciones</h4>
+              <p class="texto">{{ atencion.observaciones }}</p>
+            }
+
+            <div class="signos">
+              @if (atencion.pesoKg) {
+                <div>
+                  <span>Peso</span><strong>{{ atencion.pesoKg }} kg</strong>
+                </div>
+              }
+              @if (atencion.tallaCm) {
+                <div>
+                  <span>Talla</span><strong>{{ atencion.tallaCm }} cm</strong>
+                </div>
+              }
+              @if (atencion.presionArterial) {
+                <div>
+                  <span>Presión</span><strong>{{ atencion.presionArterial }}</strong>
+                </div>
+              }
+              @if (atencion.temperaturaC) {
+                <div>
+                  <span>Temperatura</span><strong>{{ atencion.temperaturaC }} °C</strong>
+                </div>
+              }
+              @if (atencion.frecuenciaCardiaca) {
+                <div>
+                  <span>Frecuencia</span><strong>{{ atencion.frecuenciaCardiaca }} lpm</strong>
+                </div>
+              }
+            </div>
+
+            @if (atencion.receta.length > 0) {
+              <h4>Receta médica</h4>
+              <ul class="receta">
+                @for (item of atencion.receta; track $index) {
+                  <li>
+                    <i class="pi pi-plus-circle"></i>
+                    <span>
+                      <strong>{{ item.medicamento }}</strong>
+                      <small class="text-muted">
+                        {{ item.dosis }}
+                        @if (item.frecuencia) {
+                          · {{ item.frecuencia }}
+                        }
+                        @if (item.duracion) {
+                          · {{ item.duracion }}
+                        }
+                      </small>
+                    </span>
+                  </li>
+                }
+              </ul>
+            }
+          } @else {
+            <p class="text-muted">Aún no se registró la atención médica de esta cita.</p>
+          }
+
+          @if (clinica.valoracion.value(); as valoracion) {
+            <h4>Tu valoración</h4>
+            <p-rating [ngModel]="valoracion.puntuacion" [readonly]="true" [stars]="5" />
+            @if (valoracion.comentario) {
+              <p class="texto">{{ valoracion.comentario }}</p>
+            }
+          }
+        </section>
+      }
+    </div>
 
     <section class="panel">
       <h3>Médico</h3>
@@ -84,13 +201,24 @@
             <dd>{{ cita.pacienteDni }}</dd>
           </div>
         </dl>
+        <p-button
+          label="Ver historia clínica"
+          icon="pi pi-folder-open"
+          [outlined]="true"
+          size="small"
+          [routerLink]="['/pacientes', cita.pacienteId, 'historia-clinica']"
+        />
       }
 
-      <h3>Pago</h3>
+      <h3 class="mt-4">Pago</h3>
       <dl>
         <div>
           <dt>Monto</dt>
           <dd>{{ cita.monto | currency: 'PEN' : 'symbol-narrow' }}</dd>
+        </div>
+        <div>
+          <dt>Estado del pago</dt>
+          <dd>{{ cita.pagado ? 'Pagada' : 'Pendiente de pago' }}</dd>
         </div>
         <div>
           <dt>Reservada el</dt>
@@ -99,6 +227,10 @@
       </dl>
     </section>
   </div>
+
+  <app-pago-dialog [cita]="cita" [(visible)]="pagoVisible" />
+  <app-reprogramar-dialog [cita]="cita" [(visible)]="reprogramarVisible" />
+  <app-valoracion-dialog [cita]="cita" [(visible)]="valoracionVisible" />
 } @else {
   <div class="layout">
     <div class="panel"><p-skeleton height="14rem" /></div>

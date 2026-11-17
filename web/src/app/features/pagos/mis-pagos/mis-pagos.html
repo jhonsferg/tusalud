@@ -1,0 +1,177 @@
+<app-page-header
+  title="Mis pagos"
+  subtitle="Historial de pagos y comprobantes de tus citas"
+  icon="pi-wallet"
+>
+  <p-button
+    label="Métodos de pago"
+    icon="pi pi-credit-card"
+    [outlined]="true"
+    routerLink="/pagos/metodos"
+  />
+</app-page-header>
+
+<div class="resumen">
+  <div class="panel kpi">
+    <span class="text-muted">Total pagado</span>
+    <strong>{{ store.totalPagado() | currency: 'PEN' : 'symbol-narrow' }}</strong>
+  </div>
+  <div class="panel kpi">
+    <span class="text-muted">Pagos registrados</span>
+    <strong>{{ (store.pagos.value() ?? []).length }}</strong>
+  </div>
+</div>
+
+<div class="panel">
+  @if (store.pagos.error(); as error) {
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar tus pagos"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="store.cargarPagos()" />
+    </app-empty-state>
+  } @else {
+    <p-table
+      [value]="store.pagos.value() ?? []"
+      [loading]="store.pagos.loading()"
+      [paginator]="(store.pagos.value() ?? []).length > 8"
+      [rows]="8"
+      [rowHover]="true"
+      responsiveLayout="scroll"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Comprobante</th>
+          <th>Cita</th>
+          <th>Método</th>
+          <th class="text-right">Descuento</th>
+          <th class="text-right">Total</th>
+          <th>Estado</th>
+          <th style="width: 4rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-pago>
+        <tr>
+          <td>
+            <div class="font-semibold">{{ pago.comprobante }}</div>
+            <small class="text-muted">{{ pago.fechaPago | date: 'd MMM y, HH:mm' }}</small>
+          </td>
+          <td>
+            <div class="font-semibold">{{ pago.medicoNombre }}</div>
+            <small class="text-muted"
+              >{{ pago.especialidad }} · {{ pago.fechaCita | date: 'd MMM y' }}</small
+            >
+          </td>
+          <td>{{ pago.metodo }}</td>
+          <td class="text-right">
+            @if (pago.descuento > 0) {
+              <span class="text-green-600"
+                >- {{ pago.descuento | currency: 'PEN' : 'symbol-narrow' }}</span
+              >
+              @if (pago.codigoCupon) {
+                <br /><small class="text-muted">{{ pago.codigoCupon }}</small>
+              }
+            } @else {
+              <span class="text-muted">Sin descuento</span>
+            }
+          </td>
+          <td class="text-right font-semibold">
+            {{ pago.total | currency: 'PEN' : 'symbol-narrow' }}
+          </td>
+          <td>
+            <p-tag
+              [value]="pago.estado === 'PAGADO' ? 'Pagado' : 'Reembolsado'"
+              [severity]="pago.estado === 'PAGADO' ? 'success' : 'info'"
+            />
+          </td>
+          <td class="text-right">
+            <p-button
+              icon="pi pi-file"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              ariaLabel="Ver comprobante"
+              (onClick)="ver(pago)"
+            />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="7">
+            <app-empty-state
+              icon="pi-wallet"
+              title="Aún no tienes pagos"
+              message="Paga tus citas desde el detalle de cada reserva para obtener tu comprobante."
+            >
+              <p-button label="Ver mis citas" routerLink="/citas" />
+            </app-empty-state>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>
+
+<p-dialog
+  header="Comprobante de pago"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '28rem', maxWidth: '95vw' }"
+>
+  @if (seleccionado(); as pago) {
+    <div class="comprobante">
+      <div class="comprobante-head">
+        <i class="pi pi-heart-fill"></i>
+        <strong>TuSalud</strong>
+        <span>{{ pago.comprobante }}</span>
+      </div>
+      <dl>
+        <div>
+          <dt>Paciente</dt>
+          <dd>{{ pago.pacienteNombre }}</dd>
+        </div>
+        <div>
+          <dt>Médico</dt>
+          <dd>{{ pago.medicoNombre }}</dd>
+        </div>
+        <div>
+          <dt>Especialidad</dt>
+          <dd>{{ pago.especialidad }}</dd>
+        </div>
+        <div>
+          <dt>Fecha de la cita</dt>
+          <dd>{{ pago.fechaCita | date: 'd MMM y, HH:mm' }}</dd>
+        </div>
+        <div>
+          <dt>Método</dt>
+          <dd>{{ pago.metodo }}</dd>
+        </div>
+        <div>
+          <dt>Fecha de pago</dt>
+          <dd>{{ pago.fechaPago | date: 'd MMM y, HH:mm' }}</dd>
+        </div>
+        <div>
+          <dt>Subtotal</dt>
+          <dd>{{ pago.monto | currency: 'PEN' : 'symbol-narrow' }}</dd>
+        </div>
+        <div>
+          <dt>Descuento {{ pago.codigoCupon ? '(' + pago.codigoCupon + ')' : '' }}</dt>
+          <dd>- {{ pago.descuento | currency: 'PEN' : 'symbol-narrow' }}</dd>
+        </div>
+        <div class="total">
+          <dt>Total</dt>
+          <dd>{{ pago.total | currency: 'PEN' : 'symbol-narrow' }}</dd>
+        </div>
+      </dl>
+    </div>
+  }
+  <ng-template #footer>
+    <p-button label="Imprimir" icon="pi pi-print" [outlined]="true" (onClick)="imprimir()" />
+    <p-button label="Cerrar" (onClick)="visible.set(false)" />
+  </ng-template>
+</p-dialog>

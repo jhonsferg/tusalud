@@ -61,7 +61,7 @@ form {
   }
 
   dt {
-    color: var(--p-surface-500);
+    color: var(--p-text-muted-color);
   }
 
   dd {
@@ -72,11 +72,11 @@ form {
 
   .total {
     padding-top: 0.75rem;
-    border-top: 1px dashed var(--p-surface-300);
+    border-top: 1px dashed var(--p-content-border-color);
     font-size: 1.1rem;
 
     dd {
-      color: var(--p-primary-700);
+      color: var(--app-primary-text);
     }
   }
 }

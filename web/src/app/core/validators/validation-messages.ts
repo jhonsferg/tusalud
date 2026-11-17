@@ -36,6 +36,9 @@ const MESSAGES: Readonly<Record<string, MessageFactory>> = {
   timeRange: () => 'La hora de fin debe ser posterior a la hora de inicio.',
   bloqueCorto: () => 'El bloque de horario debe admitir al menos una cita completa.',
   passwordMismatch: () => 'Las contraseñas no coinciden.',
+  tarjeta: () => 'El número de tarjeta no es válido.',
+  cvv: () => 'El código de seguridad debe tener 3 o 4 dígitos.',
+  tarjetaVencida: () => 'La tarjeta está vencida.',
   server: (detail) => String(detail),
 };
 
