@@ -49,25 +49,23 @@ public class EventoCalendarioServiceImpl implements EventoCalendarioService {
     private static final Set<TipoEvento> TIPOS_PERSONAL =
             EnumSet.of(TipoEvento.REUNION, TipoEvento.TAREA, TipoEvento.RECORDATORIO, TipoEvento.PERSONAL);
 
-    private static final Map<RolNombre, Set<TipoEvento>> TIPOS_POR_ROL = Map.of(
-            RolNombre.ROLE_PACIENTE,
-            EnumSet.of(TipoEvento.PERSONAL, TipoEvento.RECORDATORIO),
-            RolNombre.ROLE_ADMIN,
-            EnumSet.of(TipoEvento.REUNION, TipoEvento.TAREA, TipoEvento.RECORDATORIO, TipoEvento.PERSONAL),
-            RolNombre.ROLE_MEDICO,
-            EnumSet.allOf(TipoEvento.class),
-            RolNombre.ROLE_LABORATORIO,
-            TIPOS_PERSONAL,
-            RolNombre.ROLE_FARMACIA,
-            TIPOS_PERSONAL,
-            RolNombre.ROLE_ALMACEN,
-            TIPOS_PERSONAL,
-            RolNombre.ROLE_RECEPCION,
-            TIPOS_PERSONAL,
-            RolNombre.ROLE_CAJA,
-            TIPOS_PERSONAL,
-            RolNombre.ROLE_ENFERMERIA,
-            TIPOS_PERSONAL);
+    private static final Map<RolNombre, Set<TipoEvento>> TIPOS_POR_ROL = Map.ofEntries(
+            Map.entry(RolNombre.ROLE_PACIENTE, EnumSet.of(TipoEvento.PERSONAL, TipoEvento.RECORDATORIO)),
+            Map.entry(
+                    RolNombre.ROLE_ADMIN,
+                    EnumSet.of(TipoEvento.REUNION, TipoEvento.TAREA, TipoEvento.RECORDATORIO, TipoEvento.PERSONAL)),
+            Map.entry(RolNombre.ROLE_MEDICO, EnumSet.allOf(TipoEvento.class)),
+            Map.entry(RolNombre.ROLE_LABORATORIO, TIPOS_PERSONAL),
+            Map.entry(RolNombre.ROLE_FARMACIA, TIPOS_PERSONAL),
+            Map.entry(RolNombre.ROLE_ALMACEN, TIPOS_PERSONAL),
+            Map.entry(RolNombre.ROLE_RECEPCION, TIPOS_PERSONAL),
+            Map.entry(RolNombre.ROLE_CAJA, TIPOS_PERSONAL),
+            Map.entry(RolNombre.ROLE_ENFERMERIA, TIPOS_PERSONAL),
+            Map.entry(RolNombre.ROLE_GERENCIA, TIPOS_PERSONAL),
+            Map.entry(RolNombre.ROLE_FINANZAS, TIPOS_PERSONAL),
+            Map.entry(RolNombre.ROLE_OPERACIONES, TIPOS_PERSONAL),
+            Map.entry(RolNombre.ROLE_RRHH, TIPOS_PERSONAL),
+            Map.entry(RolNombre.ROLE_CALIDAD, TIPOS_PERSONAL));
 
     private static final List<TipoEvento> ORDEN_TIPOS = List.of(
             TipoEvento.PERSONAL, TipoEvento.RECORDATORIO, TipoEvento.REUNION, TipoEvento.TAREA, TipoEvento.BLOQUEO);

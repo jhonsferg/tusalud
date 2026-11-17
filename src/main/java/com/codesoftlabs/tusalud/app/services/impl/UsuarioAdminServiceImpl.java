@@ -126,7 +126,7 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
         Set<RolNombre> roles = EnumSet.copyOf(request.roles());
         if (roles.contains(RolNombre.ROLE_MEDICO) || roles.contains(RolNombre.ROLE_PACIENTE)) {
             throw new DatosInvalidosException(
-                    "El personal solo admite los roles de administrador, laboratorio, farmacia, almacén, recepción, caja o enfermería");
+                    "El personal solo admite los roles de administrador, laboratorio, farmacia, almacén, recepción, caja, enfermería, gerencia, finanzas, operaciones, recursos humanos o calidad");
         }
         String email = request.email().trim().toLowerCase(Locale.ROOT);
         if (usuarioRepository.existsByEmailIgnoreCase(email)) {
@@ -163,6 +163,11 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
             case ROLE_RECEPCION -> "Registra pacientes, gestiona la sala de espera y los turnos de atención";
             case ROLE_CAJA -> "Emite comprobantes, cobra servicios y cierra la caja diaria";
             case ROLE_ENFERMERIA -> "Realiza el triaje, registra signos vitales y atiende la hospitalización";
+            case ROLE_GERENCIA -> "Consulta los indicadores ejecutivos y todos los reportes de la clínica";
+            case ROLE_FINANZAS -> "Consulta los reportes financieros, los ingresos y las diferencias de caja";
+            case ROLE_OPERACIONES -> "Consulta la ocupación, las esperas, la demanda y el inventario crítico";
+            case ROLE_RRHH -> "Gestiona las fichas del personal, sus turnos, ausencias y vacaciones";
+            case ROLE_CALIDAD -> "Consulta las valoraciones, las cancelaciones y los indicadores de calidad";
         };
     }
 

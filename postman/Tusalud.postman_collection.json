@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "6b0d7c1e-3f5a-4e1b-9a7c-2d4e8f9a1c01",
     "name": "TuSalud API",
-    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 19, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
+    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 21, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -11848,6 +11848,3524 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "20 - Reportes y BI",
+      "item": [
+        {
+          "name": "Login gerencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('gerenciaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión del personal.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"gerencia@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login finanzas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('finanzasToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión del personal.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"finanzas@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login operaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('operacionesToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión del personal.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"operaciones@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login recursos humanos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('rrhhToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión del personal.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"rrhh@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login calidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('calidadToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión del personal.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"calidad@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reporte ejecutivo de gerencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('El periodo es de 30 días agrupado por día', () => { pm.expect(j.periodo.dias).to.eql(30); pm.expect(j.periodo.agrupacion).to.eql('DIA'); });",
+                  "pm.test('Compara con el periodo anterior de igual duración', () => pm.expect(j.periodoAnterior.dias).to.eql(30));",
+                  "pm.test('citas trae actual y anterior', () => { const i = j.citas; pm.expect(i).to.have.property('actual'); pm.expect(i).to.have.property('anterior'); });",
+                  "pm.test('ingresos trae actual y anterior', () => { const i = j.ingresos; pm.expect(i).to.have.property('actual'); pm.expect(i).to.have.property('anterior'); });",
+                  "pm.test('ocupacionHospitalariaPct trae actual y anterior', () => { const i = j.ocupacionHospitalariaPct; pm.expect(i).to.have.property('actual'); pm.expect(i).to.have.property('anterior'); });",
+                  "pm.test('La serie cubre cada día del periodo', () => pm.expect(j.serie).to.have.lengthOf(30));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/ejecutivo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "ejecutivo"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{gerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reporte ejecutivo agrupado por semana",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Agrupa por semana', () => pm.expect(pm.response.json().periodo.agrupacion).to.eql('SEMANA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/ejecutivo?agrupacion=SEMANA",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "ejecutivo"],
+              "query": [
+                {
+                  "key": "agrupacion",
+                  "value": "SEMANA"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas no ve el ejecutivo (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/ejecutivo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "ejecutivo"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente no ve el ejecutivo (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/ejecutivo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "ejecutivo"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reportes sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/ejecutivo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "ejecutivo"]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Rango invertido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/financiero?desde=2026-02-10&hasta=2026-02-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "financiero"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "2026-02-10"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-02-01"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rango de más de 366 días (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/operativo?desde=2024-01-01&hasta=2026-01-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "operativo"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-01-01"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{operacionesToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Agrupación inválida (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/calidad?agrupacion=ANO",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "calidad"],
+              "query": [
+                {
+                  "key": "agrupacion",
+                  "value": "ANO"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{calidadToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reporte financiero de finanzas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Trae totales y ticket promedio', () => { pm.expect(j).to.have.property('totalCobrado'); pm.expect(j).to.have.property('ticketPromedio'); });",
+                  "pm.test('Desglosa por origen e identifica el devengado', () => { pm.expect(j.porOrigen).to.have.lengthOf(5); pm.expect(j.porOrigen.filter(o => o.devengado).map(o => o.origen)).to.eql(['HOSPITALIZACION']); });",
+                  "pm.test('Trae comprobantes, cajas y cuentas por cobrar', () => { pm.expect(j.comprobantes).to.have.property('tasaAnulacionPct'); pm.expect(j.cajas).to.have.property('neto'); pm.expect(j.porCobrar).to.have.property('total'); });",
+                  "pm.test('Por día cubre el periodo', () => pm.expect(j.porDia).to.have.lengthOf(30));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/financiero",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "financiero"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reporte financiero agrupado por mes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Cada cubeta cae en el día 1', () => pm.response.json().porDia.forEach(d => pm.expect(d.fecha.slice(8)).to.eql('01')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/financiero?agrupacion=MES",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "financiero"],
+              "query": [
+                {
+                  "key": "agrupacion",
+                  "value": "MES"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{gerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Operaciones no ve el financiero (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/financiero",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "financiero"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{operacionesToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad no ve el financiero (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/financiero",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "financiero"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{calidadToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reporte operativo de operaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Trae la ocupación por área y la serie', () => { pm.expect(j.camasActuales).to.be.an('array').that.is.not.empty; pm.expect(j.ocupacionSerie).to.have.lengthOf(30); });",
+                  "pm.test('Trae esperas, demanda y agenda', () => { pm.expect(j.esperas).to.have.property('p90Min'); pm.expect(j.demanda).to.be.an('array'); pm.expect(j.agenda).to.be.an('array'); });",
+                  "pm.test('Trae el inventario crítico sin datos personales', () => { pm.expect(j.inventario).to.have.property('bajoMinimo'); pm.expect(j.inventario).to.have.property('lotesPorVencer'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/operativo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "operativo"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{operacionesToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas no ve el operativo (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/operativo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "operativo"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reporte de calidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Trae la distribución de valoraciones de 5 niveles', () => pm.expect(j.valoraciones.distribucion).to.have.lengthOf(5));",
+                  "pm.test('Trae cancelaciones, laboratorio y anulaciones', () => { pm.expect(j.citasPorEspecialidad).to.be.an('array'); pm.expect(j.laboratorio).to.have.property('entregaP90Horas'); pm.expect(j.anulaciones).to.have.property('comprobantes'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/calidad",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "calidad"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{calidadToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Los reportes no exponen datos de pacientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const texto = pm.response.text();",
+                  "pm.test('No incluye correos ni DNI de pacientes', () => { pm.expect(texto).to.not.include('juan.perez'); pm.expect(texto).to.not.include('maria.rodriguez'); pm.expect(texto).to.not.include('12345678'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/calidad",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "calidad"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{gerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas no ve la calidad (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/calidad",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "calidad"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médico no ve reportes (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/operativo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "operativo"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "21 - Recursos humanos",
+      "item": [
+        {
+          "name": "Resumen de la plantilla para RRHH",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Trae conteos, áreas y masa salarial', () => { pm.expect(j.totalEmpleados).to.be.at.least(19); pm.expect(j.porArea).to.be.an('array').that.is.not.empty; pm.expect(j.masaSalarial).to.be.a('number'); });",
+                  "pm.test('Trae el detalle de ausentes de hoy', () => pm.expect(j.ausentesHoyDetalle).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resumen para gerencia sin detalle de ausentes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Gerencia ve la masa salarial pero no los nombres de ausentes', () => { pm.expect(j.masaSalarial).to.be.a('number'); pm.expect(j.ausentesHoyDetalle).to.be.oneOf([null, undefined]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{gerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resumen para el administrador sin masa salarial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('El administrador no ve la masa salarial', () => pm.expect(pm.response.json().masaSalarial).to.be.oneOf([null, undefined]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Empleados con sueldo para RRHH",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Encuentra al cajero con su sueldo', () => { pm.expect(j).to.have.lengthOf.at.least(1); pm.expect(j[0].sueldo).to.be.a('number'); });",
+                  "pm.collectionVariables.set('empleadoCajaId', j[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados?q=cajero",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "empleados"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "cajero"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Empleados sin sueldo para el administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('El administrador no ve sueldo ni contacto', () => pm.response.json().forEach(e => { pm.expect(e.sueldo).to.be.oneOf([null, undefined]); pm.expect(e.contactoEmergenciaNombre).to.be.oneOf([null, undefined]); }));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados?q=cajero",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "empleados"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "cajero"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ficha de un empleado sin sueldo para el administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Sin sueldo', () => pm.expect(pm.response.json().sueldo).to.be.oneOf([null, undefined]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados/{{empleadoCajaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "empleados", "{{empleadoCajaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ficha inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados/00000000-0000-4000-8000-000000000000",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "rrhh",
+                "empleados",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Identificador inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados/uno",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "empleados", "uno"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente no ve empleados (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "empleados"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Caja no ve el resumen de RRHH (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad no ve empleados (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "empleados"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{calidadToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RRHH sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "empleados"]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Administrador registra personal nuevo",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('nuevoPersonalEmail', 'empleado.' + Date.now() + '@tusalud.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('nuevoPersonalUsuarioId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/personal",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "personal"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Marta\",\n  \"apellido\": \"Soto\",\n  \"email\": \"{{nuevoPersonalEmail}}\",\n  \"password\": \"Personal123!\",\n  \"roles\": [\n    \"ROLE_CAJA\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Usuarios sin ficha laboral",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye al personal nuevo', () => pm.expect(pm.response.json().some(u => u.usuarioId === pm.collectionVariables.get('nuevoPersonalUsuarioId'))).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/usuarios-disponibles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "usuarios-disponibles"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RRHH crea la ficha laboral",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda activa con su sueldo', () => { pm.expect(j.estado).to.eql('ACTIVO'); pm.expect(j.sueldo).to.eql(3200); });",
+                  "pm.collectionVariables.set('nuevoEmpleadoId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "empleados"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": \"{{nuevoPersonalUsuarioId}}\",\n  \"cargo\": \"Cajera\",\n  \"area\": \"CAJA\",\n  \"tipoContrato\": \"INDEFINIDO\",\n  \"fechaIngreso\": \"2025-01-15\",\n  \"sueldo\": 3200,\n  \"contactoEmergenciaNombre\": \"Pedro Soto\",\n  \"contactoEmergenciaTelefono\": \"987654321\",\n  \"diasVacacionesAnuales\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ficha duplicada (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "empleados"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": \"{{nuevoPersonalUsuarioId}}\",\n  \"cargo\": \"Cajera\",\n  \"area\": \"CAJA\",\n  \"tipoContrato\": \"INDEFINIDO\",\n  \"fechaIngreso\": \"2025-01-15\",\n  \"sueldo\": 3200\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sueldo negativo (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "empleados"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": \"{{nuevoPersonalUsuarioId}}\",\n  \"cargo\": \"Cajera\",\n  \"area\": \"CAJA\",\n  \"tipoContrato\": \"INDEFINIDO\",\n  \"fechaIngreso\": \"2025-01-15\",\n  \"sueldo\": -5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Contrato a plazo sin fecha de fin (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "empleados"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": \"00000000-0000-4000-8000-000000000000\",\n  \"cargo\": \"Cajera\",\n  \"area\": \"CAJA\",\n  \"tipoContrato\": \"PLAZO_FIJO\",\n  \"fechaIngreso\": \"2025-01-15\",\n  \"sueldo\": 1000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador no crea fichas (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "empleados"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": \"{{nuevoPersonalUsuarioId}}\",\n  \"cargo\": \"Cajera\",\n  \"area\": \"CAJA\",\n  \"tipoContrato\": \"INDEFINIDO\",\n  \"fechaIngreso\": \"2025-01-15\",\n  \"sueldo\": 3200\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia no crea fichas (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "empleados"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{gerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": \"{{nuevoPersonalUsuarioId}}\",\n  \"cargo\": \"Cajera\",\n  \"area\": \"CAJA\",\n  \"tipoContrato\": \"INDEFINIDO\",\n  \"fechaIngreso\": \"2025-01-15\",\n  \"sueldo\": 3200\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RRHH actualiza la ficha",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Refleja el cambio', () => { const j = pm.response.json(); pm.expect(j.cargo).to.eql('Cajera principal'); pm.expect(j.sueldo).to.eql(3500); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados/{{nuevoEmpleadoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "empleados", "{{nuevoEmpleadoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cargo\": \"Cajera principal\",\n  \"area\": \"CAJA\",\n  \"tipoContrato\": \"INDEFINIDO\",\n  \"fechaIngreso\": \"2025-01-15\",\n  \"sueldo\": 3500,\n  \"diasVacacionesAnuales\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login del personal nuevo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('nuevoPersonalToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión del personal.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{nuevoPersonalEmail}}\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El empleado ve su ficha sin sueldo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Sin sueldo', () => { const j = pm.response.json(); pm.expect(j.cargo).to.eql('Cajera principal'); pm.expect(j.sueldo).to.be.oneOf([null, undefined]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/mi-ficha",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "mi-ficha"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPersonalToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Plantillas de turno",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Trae las tres plantillas', () => pm.expect(j.map(p => p.nombre)).to.include.members(['Mañana', 'Tarde', 'Noche']));",
+                  "pm.test('La noche cruza la medianoche', () => pm.expect(j.find(p => p.nombre === 'Noche').cruzaMedianoche).to.be.true);",
+                  "pm.collectionVariables.set('plantillaId', j.find(p => p.nombre === 'Mañana').id);",
+                  "pm.collectionVariables.set('plantillaTardeId', j.find(p => p.nombre === 'Tarde').id);",
+                  "pm.collectionVariables.set('plantillaNocheId', j.find(p => p.nombre === 'Noche').id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/plantillas-turno",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "plantillas-turno"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RRHH asigna un turno",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date();",
+                  "d.setDate(d.getDate() + 40 + Math.floor(Math.random() * 200));",
+                  "pm.collectionVariables.set('fechaTurno', d.toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Dura 8 horas', () => pm.expect(j.horas).to.eql(8));",
+                  "pm.collectionVariables.set('turnoPersonalId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "turnos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{nuevoEmpleadoId}}\",\n  \"plantillaId\": \"{{plantillaId}}\",\n  \"fecha\": \"{{fechaTurno}}\",\n  \"notas\": \"Turno de la colección\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Turno que se cruza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "turnos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{nuevoEmpleadoId}}\",\n  \"plantillaId\": \"{{plantillaId}}\",\n  \"fecha\": \"{{fechaTurno}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Turno sin plantilla (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "turnos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{nuevoEmpleadoId}}\",\n  \"fecha\": \"{{fechaTurno}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Turno en una fecha pasada (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "turnos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{nuevoEmpleadoId}}\",\n  \"plantillaId\": \"{{plantillaId}}\",\n  \"fecha\": \"2020-01-06\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador no asigna turnos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "turnos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{nuevoEmpleadoId}}\",\n  \"plantillaId\": \"{{plantillaId}}\",\n  \"fecha\": \"{{fechaTurno}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Turnos de la semana por área",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Trae siete días por empleado', () => { pm.expect(j.filas).to.be.an('array').that.is.not.empty; pm.expect(j.filas[0].dias).to.have.lengthOf(7); });",
+                  "pm.test('Incluye al empleado nuevo con sus 8 horas', () => { const f = j.filas.find(x => x.empleadoId === pm.collectionVariables.get('nuevoEmpleadoId')); pm.expect(f.horasSemana).to.eql(8); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/turnos/semana?fecha={{fechaTurno}}&area=CAJA",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "turnos", "semana"],
+              "query": [
+                {
+                  "key": "fecha",
+                  "value": "{{fechaTurno}}"
+                },
+                {
+                  "key": "area",
+                  "value": "CAJA"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listado de turnos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae el turno', () => pm.expect(pm.response.json()).to.have.lengthOf(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/turnos?desde={{fechaTurno}}&hasta={{fechaTurno}}&empleadoId={{nuevoEmpleadoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "turnos"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "{{fechaTurno}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{fechaTurno}}"
+                },
+                {
+                  "key": "empleadoId",
+                  "value": "{{nuevoEmpleadoId}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rango de turnos mayor a 62 días (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/turnos?desde=2026-01-01&hasta=2026-06-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "turnos"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "2026-01-01"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-06-01"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El empleado ve sus turnos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Ve solo el suyo', () => { const j = pm.response.json(); pm.expect(j).to.have.lengthOf(1); pm.expect(j[0].empleadoId).to.eql(pm.collectionVariables.get('nuevoEmpleadoId')); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/mis-turnos?desde={{fechaTurno}}&hasta={{fechaTurno}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "mis-turnos"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "{{fechaTurno}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{fechaTurno}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPersonalToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La enfermera de la demo ve sus turnos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/mis-turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "mis-turnos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{enfermeriaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no ve turnos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/mis-turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "mis-turnos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El empleado solicita vacaciones",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const hoy = new Date();",
+                  "const finAnio = Date.UTC(hoy.getFullYear(), 11, 31);",
+                  "const dias = Math.max(1, Math.min(35, Math.floor((finAnio - hoy.getTime()) / 86400000)));",
+                  "const d = new Date();",
+                  "d.setDate(d.getDate() + 1 + Math.floor(Math.random() * dias));",
+                  "pm.collectionVariables.set('fechaAusencia', d.toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda solicitada por un día', () => { pm.expect(j.estado).to.eql('SOLICITADA'); pm.expect(j.dias).to.eql(1); });",
+                  "pm.collectionVariables.set('ausenciaId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/mis-ausencias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "mis-ausencias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPersonalToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"VACACIONES\",\n  \"fechaInicio\": \"{{fechaAusencia}}\",\n  \"fechaFin\": \"{{fechaAusencia}}\",\n  \"motivo\": \"Descanso anual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ausencia que se superpone (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/mis-ausencias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "mis-ausencias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPersonalToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"PERMISO\",\n  \"fechaInicio\": \"{{fechaAusencia}}\",\n  \"fechaFin\": \"{{fechaAusencia}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Vacaciones que superan el saldo (409)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date(); d.setDate(d.getDate() + 800); pm.collectionVariables.set('fechaSinSaldo', d.toISOString().slice(0, 10)); d.setDate(d.getDate() + 44); pm.collectionVariables.set('fechaSinSaldoFin', d.toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/mis-ausencias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "mis-ausencias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPersonalToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"VACACIONES\",\n  \"fechaInicio\": \"{{fechaSinSaldo}}\",\n  \"fechaFin\": \"{{fechaSinSaldoFin}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ausencia con fechas invertidas (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/mis-ausencias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "mis-ausencias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPersonalToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"PERMISO\",\n  \"fechaInicio\": \"2099-02-10\",\n  \"fechaFin\": \"2099-02-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no solicita ausencias (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/mis-ausencias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "mis-ausencias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"PERMISO\",\n  \"fechaInicio\": \"2099-03-10\",\n  \"fechaFin\": \"2099-03-10\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mis ausencias y mi saldo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('El saldo descuenta lo pendiente', () => { pm.expect(j.saldo.diasAnuales).to.eql(30); pm.expect(j.saldo.pendientesAprobacion).to.eql(1); pm.expect(j.saldo.saldo).to.eql(29); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/mis-ausencias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "mis-ausencias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPersonalToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador no aprueba ausencias (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/ausencias/{{ausenciaId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "rrhh",
+                "ausencias",
+                "{{ausenciaId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El empleado no aprueba su propia ausencia (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/ausencias/{{ausenciaId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "rrhh",
+                "ausencias",
+                "{{ausenciaId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPersonalToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ausencia inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/ausencias/00000000-0000-4000-8000-000000000000/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "rrhh",
+                "ausencias",
+                "00000000-0000-4000-8000-000000000000",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RRHH aprueba la ausencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda aprobada y resuelta por RRHH', () => { const j = pm.response.json(); pm.expect(j.estado).to.eql('APROBADA'); pm.expect(j.resueltoPor).to.be.a('string'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/ausencias/{{ausenciaId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "rrhh",
+                "ausencias",
+                "{{ausenciaId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Autorizada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resolver dos veces (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/ausencias/{{ausenciaId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "rrhh",
+                "ausencias",
+                "{{ausenciaId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No se asigna un turno sobre una ausencia (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/turnos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "turnos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{nuevoEmpleadoId}}\",\n  \"plantillaId\": \"{{plantillaTardeId}}\",\n  \"fecha\": \"{{fechaAusencia}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El empleado solicita un permiso para rechazarlo",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date();",
+                  "d.setDate(d.getDate() + 800 + Math.floor(Math.random() * 300));",
+                  "pm.collectionVariables.set('fechaPermiso', d.toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('ausenciaId2', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/mis-ausencias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "mis-ausencias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPersonalToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"PERMISO\",\n  \"fechaInicio\": \"{{fechaPermiso}}\",\n  \"fechaFin\": \"{{fechaPermiso}}\",\n  \"motivo\": \"Trámite\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rechazar sin motivo (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/ausencias/{{ausenciaId2}}/rechazar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "rrhh",
+                "ausencias",
+                "{{ausenciaId2}}",
+                "rechazar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RRHH rechaza con motivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda rechazada con su motivo', () => { const j = pm.response.json(); pm.expect(j.estado).to.eql('RECHAZADA'); pm.expect(j.motivoResolucion).to.eql('Cobertura insuficiente'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/ausencias/{{ausenciaId2}}/rechazar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "rrhh",
+                "ausencias",
+                "{{ausenciaId2}}",
+                "rechazar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Cobertura insuficiente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calendario de ausencias para RRHH con motivos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye la ausencia con su motivo', () => { const a = pm.response.json().find(x => x.id === pm.collectionVariables.get('ausenciaId')); pm.expect(a.motivo).to.eql('Descanso anual'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/ausencias?estado=APROBADA&desde={{fechaAusencia}}&hasta={{fechaAusencia}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "ausencias"],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "APROBADA"
+                },
+                {
+                  "key": "desde",
+                  "value": "{{fechaAusencia}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{fechaAusencia}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calendario de ausencias para el administrador sin motivos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Oculta los motivos', () => pm.response.json().forEach(a => pm.expect(a.motivo).to.be.oneOf([null, undefined])));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/ausencias?estado=APROBADA&desde={{fechaAusencia}}&hasta={{fechaAusencia}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "ausencias"],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "APROBADA"
+                },
+                {
+                  "key": "desde",
+                  "value": "{{fechaAusencia}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{fechaAusencia}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Saldo de vacaciones del empleado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Descuenta el día aprobado', () => { const j = pm.response.json(); pm.expect(j.tomados).to.eql(1); pm.expect(j.saldo).to.eql(29); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados/{{nuevoEmpleadoId}}/saldo-vacaciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "rrhh",
+                "empleados",
+                "{{nuevoEmpleadoId}}",
+                "saldo-vacaciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador no ve el saldo (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/empleados/{{nuevoEmpleadoId}}/saldo-vacaciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "rrhh",
+                "empleados",
+                "{{nuevoEmpleadoId}}",
+                "saldo-vacaciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RRHH cancela la ausencia aprobada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda cancelada', () => pm.expect(pm.response.json().estado).to.eql('CANCELADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/ausencias/{{ausenciaId}}/cancelar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "rrhh",
+                "ausencias",
+                "{{ausenciaId}}",
+                "cancelar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RRHH quita el turno futuro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/turnos/{{turnoPersonalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "turnos", "{{turnoPersonalId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Quitar un turno inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/rrhh/turnos/{{turnoPersonalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "rrhh", "turnos", "{{turnoPersonalId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -12186,6 +15704,90 @@
     },
     {
       "key": "pacienteJuanId",
+      "value": ""
+    },
+    {
+      "key": "gerenciaToken",
+      "value": ""
+    },
+    {
+      "key": "finanzasToken",
+      "value": ""
+    },
+    {
+      "key": "operacionesToken",
+      "value": ""
+    },
+    {
+      "key": "rrhhToken",
+      "value": ""
+    },
+    {
+      "key": "calidadToken",
+      "value": ""
+    },
+    {
+      "key": "empleadoCajaId",
+      "value": ""
+    },
+    {
+      "key": "nuevoPersonalEmail",
+      "value": ""
+    },
+    {
+      "key": "nuevoPersonalUsuarioId",
+      "value": ""
+    },
+    {
+      "key": "nuevoEmpleadoId",
+      "value": ""
+    },
+    {
+      "key": "nuevoPersonalToken",
+      "value": ""
+    },
+    {
+      "key": "plantillaId",
+      "value": ""
+    },
+    {
+      "key": "plantillaTardeId",
+      "value": ""
+    },
+    {
+      "key": "plantillaNocheId",
+      "value": ""
+    },
+    {
+      "key": "fechaTurno",
+      "value": ""
+    },
+    {
+      "key": "turnoPersonalId",
+      "value": ""
+    },
+    {
+      "key": "fechaAusencia",
+      "value": ""
+    },
+    {
+      "key": "ausenciaId",
+      "value": ""
+    },
+    {
+      "key": "ausenciaId2",
+      "value": ""
+    },
+    {
+      "key": "fechaSinSaldo",
+      "value": ""
+    },
+    {
+      "key": "fechaSinSaldoFin",
+      "value": ""
+    },
+    {
+      "key": "fechaPermiso",
       "value": ""
     }
   ]
