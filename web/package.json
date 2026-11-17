@@ -19,8 +19,9 @@
     "e2e:ui": "playwright test --ui",
     "test:core": "ng test core --watch=false",
     "test:ui": "ng test ui --watch=false",
-    "test:all": "ng test core --watch=false && ng test ui --watch=false && ng test tusalud --watch=false",
-    "build:libs": "ng build core && ng build ui"
+    "test:all": "ng test core --watch=false && ng test ui --watch=false && ng test features --watch=false && ng test tusalud --watch=false",
+    "build:libs": "ng build core && ng build ui && ng build features",
+    "test:features": "ng test features --watch=false"
   },
   "private": true,
   "packageManager": "npm@11.19.0",

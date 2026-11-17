@@ -13,6 +13,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
+import { NAV_GROUPS } from './nav.config';
+import { provideAppShell } from '@tusalud/ui/shell-config';
 import {
   API_URL,
   AppTitleStrategy,
@@ -36,6 +38,7 @@ export const appConfig: ApplicationConfig = {
       withRouterConfig({ paramsInheritanceStrategy: 'always' }),
     ),
     { provide: TitleStrategy, useClass: AppTitleStrategy },
+    provideAppShell({ brand: 'TuSalud', grupos: NAV_GROUPS }),
     { provide: LOCALE_ID, useValue: 'es-PE' },
     { provide: API_URL, useValue: environment.apiUrl },
     provideHttpClient(

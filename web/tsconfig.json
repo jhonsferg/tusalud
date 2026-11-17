@@ -16,7 +16,8 @@
     "paths": {
       "@tusalud/core/testing": ["projects/core/src/testing/index.ts"],
       "@tusalud/core": ["projects/core/src/public-api.ts"],
-      "@tusalud/ui/*": ["projects/ui/*/src/public-api.ts"]
+      "@tusalud/ui/*": ["projects/ui/*/src/public-api.ts"],
+      "@tusalud/features/*": ["projects/features/*/src/public-api.ts"]
     }
   },
   "angularCompilerOptions": {

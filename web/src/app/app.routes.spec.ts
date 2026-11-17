@@ -7,6 +7,8 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { routes } from './app.routes';
+import { NAV_GROUPS } from './nav.config';
+import { provideAppShell } from '@tusalud/ui/shell-config';
 import { createSession } from '@tusalud/core/testing';
 import { authGuard, guestGuard, Rol, roleGuard, SESSION_STORAGE_KEY } from '@tusalud/core';
 
@@ -23,6 +25,7 @@ async function navigateAs(roles: Rol[] | null, url: string, useAppRoutes = false
     providers: [
       provideHttpClient(),
       provideHttpClientTesting(),
+      provideAppShell({ brand: 'TuSalud', grupos: NAV_GROUPS }),
       ConfirmationService,
       MessageService,
       provideRouter(

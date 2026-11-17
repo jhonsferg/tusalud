@@ -1,4 +1,13 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import {
+  EnvironmentProviders,
+  Injectable,
+  InjectionToken,
+  Provider,
+  computed,
+  inject,
+  makeEnvironmentProviders,
+  signal,
+} from '@angular/core';
 
 import { Rol } from '../models';
 import { AuthService } from './auth.service';
@@ -11,7 +20,7 @@ export interface TourStep {
   readonly roles?: readonly Rol[];
 }
 
-const PASOS: readonly TourStep[] = [
+export const PASOS_TOUR_PREDETERMINADOS: readonly TourStep[] = [
   {
     target: null,
     icon: 'pi-heart-fill',
@@ -190,9 +199,20 @@ const PASOS: readonly TourStep[] = [
   },
 ];
 
+export const TOUR_STEPS = new InjectionToken<readonly TourStep[]>('TOUR_STEPS', {
+  providedIn: 'root',
+  factory: () => PASOS_TOUR_PREDETERMINADOS,
+});
+
+export function provideTourSteps(pasos: readonly TourStep[]): EnvironmentProviders {
+  const proveedor: Provider = { provide: TOUR_STEPS, useValue: pasos };
+  return makeEnvironmentProviders([proveedor]);
+}
+
 @Injectable({ providedIn: 'root' })
 export class TourService {
   private readonly auth = inject(AuthService);
+  private readonly pasos = inject(TOUR_STEPS);
 
   private readonly activeState = signal(false);
   private readonly indexState = signal(0);
@@ -207,9 +227,9 @@ export class TourService {
   readonly isLast = computed(() => this.indexState() >= this.stepsState().length - 1);
 
   start(onClose?: () => void): void {
-    const visibles = PASOS.filter((paso) => !paso.roles || this.auth.hasAnyRole(paso.roles)).filter(
-      (paso) => paso.target === null || this.element(paso.target) !== null,
-    );
+    const visibles = this.pasos
+      .filter((paso) => !paso.roles || this.auth.hasAnyRole(paso.roles))
+      .filter((paso) => paso.target === null || this.element(paso.target) !== null);
     if (visibles.length === 0) {
       return;
     }

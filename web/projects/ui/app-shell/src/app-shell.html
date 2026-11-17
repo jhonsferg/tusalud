@@ -1,0 +1,249 @@
+<ng-template #nav let-compact="compact">
+  <a class="logo" routerLink="/" [attr.aria-label]="marca + ', ir al inicio'">
+    <span class="logo-mark"><i class="pi pi-heart-fill"></i></span>
+    @if (!compact) {
+      <span class="logo-text">{{ marca }}</span>
+    }
+  </a>
+
+  <nav aria-label="Navegación principal">
+    @for (grupo of grupos(); track grupo.title) {
+      <div class="group">
+        @if (!compact) {
+          <span class="group-title">{{ grupo.title }}</span>
+        } @else {
+          <span class="group-sep"></span>
+        }
+        @for (item of grupo.items; track item.link) {
+          <a
+            class="nav-link"
+            [attr.data-tour]="'nav:' + item.link"
+            [routerLink]="item.link"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+            [pTooltip]="compact ? item.label : ''"
+            tooltipPosition="right"
+            [attr.aria-label]="item.label"
+            (click)="menuOpen.set(false)"
+          >
+            <i [class]="'pi ' + item.icon"></i>
+            @if (!compact) {
+              <span class="label">{{ item.label }}</span>
+            }
+            @if (item.badge === 'notificaciones' && notificaciones.noLeidas() > 0) {
+              <p-badge
+                [value]="notificaciones.noLeidas() > 99 ? '99+' : '' + notificaciones.noLeidas()"
+                severity="danger"
+                [class.badge-compact]="compact"
+              />
+            }
+          </a>
+        }
+      </div>
+    }
+  </nav>
+
+  @if (!compact) {
+    <button type="button" class="ayuda" (click)="iniciarTour()">
+      <i class="pi pi-compass"></i>
+      <span>
+        <strong>¿Primera vez aquí?</strong>
+        <small>Recorre la guía paso a paso</small>
+      </span>
+    </button>
+  }
+</ng-template>
+
+<div class="shell" [class.collapsed]="collapsed()">
+  <aside class="sidebar">
+    <ng-container [ngTemplateOutlet]="nav" [ngTemplateOutletContext]="{ compact: collapsed() }" />
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <p-button
+        icon="pi pi-bars"
+        [text]="true"
+        severity="secondary"
+        class="only-mobile"
+        ariaLabel="Abrir menú"
+        (onClick)="menuOpen.set(true)"
+      />
+      <p-button
+        [icon]="collapsed() ? 'pi pi-angle-double-right' : 'pi pi-angle-double-left'"
+        [text]="true"
+        severity="secondary"
+        class="only-desktop"
+        [ariaLabel]="collapsed() ? 'Expandir menú lateral' : 'Contraer menú lateral'"
+        (onClick)="alternarColapso()"
+      />
+      <span class="topbar-logo only-mobile"><i class="pi pi-heart-fill"></i> {{ marca }}</span>
+
+      <div class="spacer"></div>
+
+      <p-button
+        data-tour="tema"
+        [icon]="theme.isDark() ? 'pi pi-sun' : 'pi pi-moon'"
+        [text]="true"
+        [rounded]="true"
+        severity="secondary"
+        [ariaLabel]="theme.isDark() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+        (onClick)="theme.toggle()"
+      />
+
+      <div class="bell" data-tour="bell">
+        <p-button
+          icon="pi pi-bell"
+          [text]="true"
+          [rounded]="true"
+          severity="secondary"
+          ariaLabel="Abrir notificaciones"
+          (onClick)="abrirNotificaciones($event, popover)"
+        />
+        @if (notificaciones.noLeidas() > 0) {
+          <span class="bell-count" aria-hidden="true">{{
+            notificaciones.noLeidas() > 9 ? '9+' : notificaciones.noLeidas()
+          }}</span>
+        }
+      </div>
+
+      <button
+        type="button"
+        class="user-button"
+        data-tour="usuario"
+        aria-haspopup="menu"
+        aria-label="Menú de usuario"
+        (click)="panelUsuario.toggle($event)"
+      >
+        <app-user-avatar [nombre]="user()?.nombreCompleto ?? ''" [imagen]="avatar()" />
+        <span class="user-text">
+          <strong>{{ user()?.nombreCompleto }}</strong>
+          <small>{{ rol() }}</small>
+        </span>
+        <i class="pi pi-chevron-down user-caret"></i>
+      </button>
+    </header>
+
+    <div class="content">
+      <div class="page"><router-outlet /></div>
+    </div>
+  </div>
+</div>
+
+<p-popover #panelUsuario styleClass="popover-cuenta" appendTo="body">
+  <div class="cuenta">
+    <div class="cuenta-head">
+      <app-user-avatar [nombre]="user()?.nombreCompleto ?? ''" [imagen]="avatar()" size="xlarge" />
+      <div class="cuenta-id">
+        <strong>{{ user()?.nombreCompleto }}</strong>
+        <span>{{ correo() }}</span>
+        <span class="rol-chip">{{ rol() }}</span>
+      </div>
+    </div>
+
+    <ul class="cuenta-links">
+      @for (acceso of accesos; track acceso.label) {
+        <li>
+          <a
+            [routerLink]="acceso.link"
+            [queryParams]="acceso.tab ? { tab: acceso.tab } : null"
+            (click)="panelUsuario.hide()"
+          >
+            <i [class]="'pi ' + acceso.icon"></i>
+            <span>{{ acceso.label }}</span>
+          </a>
+        </li>
+      }
+      <li>
+        <button type="button" (click)="iniciarTour(panelUsuario)">
+          <i class="pi pi-compass"></i>
+          <span>Guía de bienvenida</span>
+        </button>
+      </li>
+    </ul>
+
+    <div class="cuenta-tema" role="radiogroup" aria-label="Apariencia">
+      @for (modo of modos; track modo.valor) {
+        <button
+          type="button"
+          role="radio"
+          [attr.aria-checked]="theme.mode() === modo.valor"
+          [class.on]="theme.mode() === modo.valor"
+          (click)="alternarTema(modo.valor)"
+        >
+          <i [class]="'pi ' + modo.icon"></i>
+          {{ modo.label }}
+        </button>
+      }
+    </div>
+
+    <button type="button" class="cuenta-salir" (click)="salirDelPanel(panelUsuario)">
+      <i class="pi pi-sign-out"></i>
+      Cerrar sesión
+    </button>
+  </div>
+</p-popover>
+
+<p-popover #popover styleClass="popover-notificaciones">
+  <div class="notif">
+    <div class="notif-head">
+      <strong>Notificaciones</strong>
+      @if (notificaciones.enVivo()) {
+        <span class="live" title="Recibiendo avisos en tiempo real">En vivo</span>
+      }
+      @if (notificaciones.noLeidas() > 0) {
+        <button type="button" class="link-button" (click)="marcarTodas()">
+          Marcar todas como leídas
+        </button>
+      }
+    </div>
+
+    @if (notificaciones.recientes().length === 0) {
+      <p class="notif-vacia"><i class="pi pi-inbox"></i> No tienes notificaciones.</p>
+    } @else {
+      <ul>
+        @for (item of notificaciones.recientes(); track item.id) {
+          <li>
+            <button
+              type="button"
+              class="notif-item"
+              [class.unread]="!item.leida"
+              (click)="abrir(item, popover)"
+            >
+              <span class="notif-icon" [style.color]="color[item.tipo]">
+                <i [class]="'pi ' + icono[item.tipo]"></i>
+              </span>
+              <span class="notif-body">
+                <strong>{{ item.titulo }}</strong>
+                <span>{{ item.mensaje }}</span>
+                <small>{{ item.createdAt | date: 'd MMM, HH:mm' }}</small>
+              </span>
+              @if (!item.leida) {
+                <span class="dot" aria-label="No leída"></span>
+              }
+            </button>
+          </li>
+        }
+      </ul>
+    }
+
+    <a class="notif-footer" routerLink="/notificaciones" (click)="popover.hide()"
+      >Ver todas las notificaciones</a
+    >
+  </div>
+</p-popover>
+
+<p-drawer
+  [visible]="menuOpen()"
+  (visibleChange)="menuOpen.set($event)"
+  position="left"
+  [showCloseIcon]="true"
+  styleClass="drawer-nav"
+  [style]="{ width: '17rem' }"
+>
+  <div class="drawer-body">
+    <ng-container [ngTemplateOutlet]="nav" [ngTemplateOutletContext]="{ compact: false }" />
+  </div>
+</p-drawer>
+
+<app-tour />
