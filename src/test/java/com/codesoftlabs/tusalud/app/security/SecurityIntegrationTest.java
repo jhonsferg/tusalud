@@ -162,6 +162,33 @@ class SecurityIntegrationTest {
     }
 
     @Test
+    void elCalendarioPersonalAceptaUnCuerpoMinimoYAislaLosEventosDeCadaUsuario() throws Exception {
+        String cuerpo =
+                "{\"titulo\":\"Llamar\",\"tipo\":\"TAREA\",\"inicio\":\"2027-01-04T09:00:00\",\"fin\":\"2027-01-04T10:00:00\"}";
+        mockMvc.perform(post("/api/v1/calendario/eventos")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cuerpo))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(jsonPath("$.todoElDia").value(false))
+                .andExpect(jsonPath("$.completado").value(false));
+        mockMvc.perform(get("/api/v1/calendario/eventos")
+                        .param("inicio", "2027-01-01")
+                        .param("fin", "2027-01-31")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].titulo").value("Llamar"));
+        mockMvc.perform(get("/api/v1/calendario/eventos").param("inicio", "2027-01-01"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/v1/calendario/eventos")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cuerpo.replace("TAREA", "BLOQUEO")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void losPagosConBilleteraSonDelPacienteYLosPacientesCompartidosDelMedico() throws Exception {
         mockMvc.perform(post("/api/v1/pagos/qr")).andExpect(status().isUnauthorized());
         mockMvc.perform(post("/api/v1/pacientes/1/compartir")

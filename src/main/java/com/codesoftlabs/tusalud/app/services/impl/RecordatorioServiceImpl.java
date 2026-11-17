@@ -2,11 +2,13 @@ package com.codesoftlabs.tusalud.app.services.impl;
 
 import com.codesoftlabs.tusalud.app.dto.response.PreferenciasResponse;
 import com.codesoftlabs.tusalud.app.entities.Cita;
+import com.codesoftlabs.tusalud.app.entities.EventoCalendario;
 import com.codesoftlabs.tusalud.app.entities.Medico;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
 import com.codesoftlabs.tusalud.app.entities.PreferenciaUsuario;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.repositories.CitaRepository;
+import com.codesoftlabs.tusalud.app.repositories.EventoCalendarioRepository;
 import com.codesoftlabs.tusalud.app.repositories.PreferenciaUsuarioRepository;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.RecordatorioService;
@@ -27,10 +29,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecordatorioServiceImpl implements RecordatorioService {
 
     private static final Duration HORIZONTE = Duration.ofHours(72);
+    private static final Duration HORIZONTE_EVENTOS = Duration.ofDays(7);
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private final CitaRepository citaRepository;
     private final PreferenciaUsuarioRepository preferenciaRepository;
+    private final EventoCalendarioRepository eventoRepository;
     private final NotificacionService notificacionService;
 
     @Scheduled(fixedRate = 15, timeUnit = TimeUnit.MINUTES, initialDelay = 1)
@@ -73,6 +77,25 @@ public class RecordatorioServiceImpl implements RecordatorioService {
                     "Tiene una cita con " + paciente.getUsuario().getNombreCompleto() + " el " + fecha + ".",
                     enlace);
             cita.setRecordatorioEnviado(true);
+            enviados++;
+        }
+        return enviados + enviarRecordatoriosDeEventos(ahora);
+    }
+
+    private int enviarRecordatoriosDeEventos(LocalDateTime ahora) {
+        int enviados = 0;
+        for (EventoCalendario evento :
+                eventoRepository.findRecordatoriosPendientes(ahora, ahora.plus(HORIZONTE_EVENTOS))) {
+            if (evento.getInicio().minusMinutes(evento.getRecordatorioMinutos()).isAfter(ahora)) {
+                continue;
+            }
+            notificacionService.crear(
+                    evento.getUsuario(),
+                    TipoNotificacion.RECORDATORIO_EVENTO,
+                    "Recordatorio: " + evento.getTitulo(),
+                    "Empieza el " + evento.getInicio().format(FORMATO_FECHA) + ".",
+                    "/calendario");
+            evento.setRecordatorioEnviado(true);
             enviados++;
         }
         return enviados;

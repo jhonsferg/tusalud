@@ -7,6 +7,7 @@ import com.codesoftlabs.tusalud.app.dto.response.DisponibilidadRangoResponse;
 import com.codesoftlabs.tusalud.app.dto.response.DisponibilidadResponse;
 import com.codesoftlabs.tusalud.app.entities.Cita;
 import com.codesoftlabs.tusalud.app.entities.Especialidad;
+import com.codesoftlabs.tusalud.app.entities.EventoCalendario;
 import com.codesoftlabs.tusalud.app.entities.HorarioAtencion;
 import com.codesoftlabs.tusalud.app.entities.Medico;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
@@ -21,6 +22,7 @@ import com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException;
 import com.codesoftlabs.tusalud.app.exceptions.ForbiddenOperationException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.CitaRepository;
+import com.codesoftlabs.tusalud.app.repositories.EventoCalendarioRepository;
 import com.codesoftlabs.tusalud.app.repositories.HorarioAtencionRepository;
 import com.codesoftlabs.tusalud.app.repositories.MedicoRepository;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
@@ -69,6 +71,7 @@ public class CitaServiceImpl implements CitaService {
     private final MedicoRepository medicoRepository;
     private final PacienteRepository pacienteRepository;
     private final HorarioAtencionRepository horarioRepository;
+    private final EventoCalendarioRepository eventoRepository;
     private final NotificacionService notificacionService;
     private final CitaResponseMapper citaMapper;
 
@@ -322,21 +325,23 @@ public class CitaServiceImpl implements CitaService {
                         .map(LocalDateTime::toLocalTime)
                         .toList();
         LocalTime ahora = dia.equals(hoy) ? LocalTime.now() : null;
+        List<EventoCalendario> bloqueos = eventoRepository.findBloqueosSolapados(
+                medico.getUsuario().getId(), dia.atStartOfDay(), dia.plusDays(1).atStartOfDay());
 
         return new DisponibilidadResponse(
                 medico.getId(),
                 medico.getUsuario().getNombreCompleto(),
                 dia,
-                new ArrayList<>(calcularLibres(horarios, ocupadas, ahora)));
+                new ArrayList<>(calcularLibres(horarios, ocupadas, ahora, dia, bloqueos)));
     }
 
     @Override
     public List<DisponibilidadRangoResponse> consultarDisponibilidadRango(
             Long medicoId, LocalDate inicio, LocalDate fin) {
         validarRangoCalendario(inicio, fin);
-        if (!medicoRepository.existsById(medicoId)) {
-            throw new ResourceNotFoundException("Médico", "id", medicoId);
-        }
+        Medico medico = medicoRepository
+                .findById(medicoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Médico", "id", medicoId));
         LocalDate hoy = LocalDate.now();
         LocalDate primero = inicio.isBefore(hoy) ? hoy : inicio;
         if (primero.isAfter(fin)) {
@@ -356,6 +361,11 @@ public class CitaServiceImpl implements CitaService {
                                 LocalDateTime::toLocalDate,
                                 Collectors.mapping(LocalDateTime::toLocalTime, Collectors.toList())));
 
+        List<EventoCalendario> bloqueos = eventoRepository.findBloqueosSolapados(
+                medico.getUsuario().getId(),
+                primero.atStartOfDay(),
+                fin.plusDays(1).atStartOfDay());
+
         List<DisponibilidadRangoResponse> dias = new ArrayList<>();
         for (LocalDate dia = primero; !dia.isAfter(fin); dia = dia.plusDays(1)) {
             List<HorarioAtencion> bloques = horariosPorDia.get(dia.getDayOfWeek());
@@ -363,20 +373,30 @@ public class CitaServiceImpl implements CitaService {
                 continue;
             }
             List<LocalTime> libres = new ArrayList<>(calcularLibres(
-                    bloques, ocupadasPorDia.getOrDefault(dia, List.of()), dia.equals(hoy) ? LocalTime.now() : null));
+                    bloques,
+                    ocupadasPorDia.getOrDefault(dia, List.of()),
+                    dia.equals(hoy) ? LocalTime.now() : null,
+                    dia,
+                    bloqueos));
             dias.add(new DisponibilidadRangoResponse(dia, libres, libres.size()));
         }
         return dias;
     }
 
     private static TreeSet<LocalTime> calcularLibres(
-            List<HorarioAtencion> horarios, List<LocalTime> ocupadas, LocalTime ahora) {
+            List<HorarioAtencion> horarios,
+            List<LocalTime> ocupadas,
+            LocalTime ahora,
+            LocalDate dia,
+            List<EventoCalendario> bloqueos) {
         TreeSet<LocalTime> libres = new TreeSet<>();
         for (HorarioAtencion bloque : horarios) {
             int duracion = bloque.getDuracionCitaMinutos();
             LocalTime turno = bloque.getHoraInicio();
             while (bloque.admiteCitaEn(turno)) {
-                if ((ahora == null || turno.isAfter(ahora)) && !seSuperpone(turno, duracion, ocupadas)) {
+                if ((ahora == null || turno.isAfter(ahora))
+                        && !seSuperpone(turno, duracion, ocupadas)
+                        && !chocaConBloqueo(dia.atTime(turno), duracion, bloqueos)) {
                     libres.add(turno);
                 }
                 LocalTime siguiente = turno.plusMinutes(duracion);
@@ -387,6 +407,12 @@ public class CitaServiceImpl implements CitaService {
             }
         }
         return libres;
+    }
+
+    private static boolean chocaConBloqueo(LocalDateTime inicio, int duracion, List<EventoCalendario> bloqueos) {
+        LocalDateTime fin = inicio.plusMinutes(duracion);
+        return bloqueos.stream()
+                .anyMatch(b -> b.getInicio().isBefore(fin) && b.getFin().isAfter(inicio));
     }
 
     private static void validarRangoCalendario(LocalDate inicio, LocalDate fin) {
@@ -416,6 +442,13 @@ public class CitaServiceImpl implements CitaService {
                         hora.format(FORMATO_HORA), nombreDia(dia), describirBloques(horarios))));
 
         int duracion = bloque.getDuracionCitaMinutos();
+        if (chocaConBloqueo(
+                fechaHora,
+                duracion,
+                eventoRepository.findBloqueosSolapados(
+                        medico.getUsuario().getId(), fechaHora, fechaHora.plusMinutes(duracion)))) {
+            throw new ConflictException("El médico no atiende en ese horario");
+        }
         LocalDateTime desde = fechaHora.minusMinutes(duracion);
         LocalDateTime hasta = fechaHora.plusMinutes(duracion);
 
