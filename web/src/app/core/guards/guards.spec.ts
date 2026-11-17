@@ -1,7 +1,10 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { routes } from '@tusalud/app/app.routes';
 import { createSession } from '@tusalud/testing/auth-fixtures';
@@ -22,6 +25,10 @@ async function navigateAs(roles: Rol[] | null, url: string, useAppRoutes = false
   }
   TestBed.configureTestingModule({
     providers: [
+      provideHttpClient(),
+      provideHttpClientTesting(),
+      ConfirmationService,
+      MessageService,
       provideRouter(
         useAppRoutes
           ? routes
