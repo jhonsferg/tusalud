@@ -22,8 +22,14 @@ TuSalud es el sistema de gestión de citas y consultas médicas. El repositorio 
   - [Citas](#citas)
   - [Auditoría](#auditoría)
   - [Perfil](#perfil)
+  - [Notificaciones en tiempo real](#notificaciones-en-tiempo-real)
+  - [Sesiones y alertas de inicio de sesión](#sesiones-y-alertas-de-inicio-de-sesión)
+  - [Pagos, tarjetas y cupones](#pagos-tarjetas-y-cupones)
+  - [Historia clínica](#historia-clínica)
+  - [Reprogramación y valoraciones](#reprogramación-y-valoraciones)
 - [Manejo de errores](#manejo-de-errores)
 - [Perfiles y configuración](#perfiles-y-configuración)
+- [Migraciones con Flyway](#migraciones-con-flyway)
 - [Ejecución local](#ejecución-local)
 - [Docker](#docker)
 - [Aplicación web](#aplicación-web)
@@ -176,34 +182,75 @@ La API es completamente sin estado. Spring Security 7 trabaja con `SessionCreati
 
 La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y la especificación OpenAPI en `http://localhost:8080/v3/api-docs`. Para probar endpoints protegidos desde Swagger UI, obtén un token con el login y pégalo en el botón Authorize.
 
-| Método   | Ruta                                         | Acceso                         | Respuesta |
-| -------- | -------------------------------------------- | ------------------------------ | --------- |
-| `POST`   | `/api/v1/auth/login`                         | Público                        | 200       |
-| `POST`   | `/api/v1/auth/register`                      | Público, registra pacientes    | 201       |
-| `GET`    | `/api/v1/especialidades`                     | Autenticado                    | 200       |
-| `GET`    | `/api/v1/especialidades/{id}`                | Autenticado                    | 200       |
-| `POST`   | `/api/v1/especialidades`                     | Admin                          | 201       |
-| `PUT`    | `/api/v1/especialidades/{id}`                | Admin                          | 200       |
-| `DELETE` | `/api/v1/especialidades/{id}`                | Admin                          | 204       |
-| `GET`    | `/api/v1/medicos?especialidadId=`            | Autenticado                    | 200       |
-| `GET`    | `/api/v1/medicos/{id}`                       | Autenticado                    | 200       |
-| `POST`   | `/api/v1/medicos`                            | Admin                          | 201       |
-| `GET`    | `/api/v1/medicos/{id}/horarios`              | Autenticado                    | 200       |
-| `POST`   | `/api/v1/medicos/{id}/horarios`              | Admin                          | 201       |
-| `DELETE` | `/api/v1/medicos/{id}/horarios/{horarioId}`  | Admin                          | 204       |
-| `GET`    | `/api/v1/medicos/{id}/disponibilidad?fecha=` | Autenticado                    | 200       |
-| `GET`    | `/api/v1/medicos/me/agenda?fecha=`           | Médico                         | 200       |
-| `POST`   | `/api/v1/citas`                              | Paciente                       | 201       |
-| `GET`    | `/api/v1/citas/mis-citas?inicio=&fin=`       | Paciente                       | 200       |
-| `GET`    | `/api/v1/citas/{id}`                         | Paciente dueño, médico o admin | 200       |
-| `PUT`    | `/api/v1/citas/{id}/cancelar`                | Paciente dueño o admin         | 200       |
-| `PUT`    | `/api/v1/citas/{id}/confirmar`               | Médico de la cita o admin      | 200       |
-| `PUT`    | `/api/v1/citas/{id}/atender`                 | Médico de la cita              | 200       |
-| `GET`    | `/api/v1/admin/auditoria/citas-por-estado`   | Admin                          | 200       |
-| `GET`    | `/api/v1/admin/auditoria/citas?inicio=&fin=` | Admin                          | 200       |
-| `GET`    | `/api/v1/perfil`                             | Autenticado                    | 200       |
-| `PUT`    | `/api/v1/perfil`                             | Autenticado                    | 200       |
-| `PUT`    | `/api/v1/perfil/password`                    | Autenticado                    | 204       |
+| Método   | Ruta                                         | Acceso                                | Respuesta |
+| -------- | -------------------------------------------- | ------------------------------------- | --------- |
+| `POST`   | `/api/v1/auth/login`                         | Público                               | 200       |
+| `POST`   | `/api/v1/auth/register`                      | Público, registra pacientes           | 201       |
+| `GET`    | `/api/v1/especialidades`                     | Autenticado                           | 200       |
+| `GET`    | `/api/v1/especialidades/{id}`                | Autenticado                           | 200       |
+| `POST`   | `/api/v1/especialidades`                     | Admin                                 | 201       |
+| `PUT`    | `/api/v1/especialidades/{id}`                | Admin                                 | 200       |
+| `DELETE` | `/api/v1/especialidades/{id}`                | Admin                                 | 204       |
+| `GET`    | `/api/v1/medicos?especialidadId=`            | Autenticado                           | 200       |
+| `GET`    | `/api/v1/medicos/{id}`                       | Autenticado                           | 200       |
+| `POST`   | `/api/v1/medicos`                            | Admin                                 | 201       |
+| `GET`    | `/api/v1/medicos/{id}/horarios`              | Autenticado                           | 200       |
+| `POST`   | `/api/v1/medicos/{id}/horarios`              | Admin                                 | 201       |
+| `DELETE` | `/api/v1/medicos/{id}/horarios/{horarioId}`  | Admin                                 | 204       |
+| `GET`    | `/api/v1/medicos/{id}/disponibilidad?fecha=` | Autenticado                           | 200       |
+| `GET`    | `/api/v1/medicos/me/agenda?fecha=`           | Médico                                | 200       |
+| `POST`   | `/api/v1/citas`                              | Paciente                              | 201       |
+| `GET`    | `/api/v1/citas/mis-citas?inicio=&fin=`       | Paciente                              | 200       |
+| `GET`    | `/api/v1/citas/{id}`                         | Paciente dueño, médico o admin        | 200       |
+| `PUT`    | `/api/v1/citas/{id}/cancelar`                | Paciente dueño o admin                | 200       |
+| `PUT`    | `/api/v1/citas/{id}/confirmar`               | Médico de la cita o admin             | 200       |
+| `PUT`    | `/api/v1/citas/{id}/atender`                 | Médico de la cita                     | 200       |
+| `GET`    | `/api/v1/admin/auditoria/citas-por-estado`   | Admin                                 | 200       |
+| `GET`    | `/api/v1/admin/auditoria/citas?inicio=&fin=` | Admin                                 | 200       |
+| `POST`   | `/api/v1/auth/logout`                        | Autenticado                           | 204       |
+| `PUT`    | `/api/v1/citas/{id}/reprogramar`             | Paciente dueño o admin                | 200       |
+| `POST`   | `/api/v1/citas/{id}/pago`                    | Paciente dueño                        | 201       |
+| `POST`   | `/api/v1/citas/{id}/atencion`                | Médico de la cita                     | 201       |
+| `PUT`    | `/api/v1/citas/{id}/atencion`                | Médico de la cita                     | 200       |
+| `GET`    | `/api/v1/citas/{id}/atencion`                | Paciente dueño, médico o admin        | 200       |
+| `POST`   | `/api/v1/citas/{id}/valoracion`              | Paciente dueño                        | 201       |
+| `GET`    | `/api/v1/citas/{id}/valoracion`              | Paciente dueño, médico o admin        | 200       |
+| `GET`    | `/api/v1/medicos/{id}/valoraciones`          | Autenticado                           | 200       |
+| `GET`    | `/api/v1/medicos/me/pacientes`               | Médico                                | 200       |
+| `GET`    | `/api/v1/pacientes/{id}/historia-clinica`    | Médico con citas del paciente o admin | 200       |
+| `GET`    | `/api/v1/historia-clinica`                   | Paciente                              | 200       |
+| `PUT`    | `/api/v1/historia-clinica/datos-medicos`     | Paciente                              | 200       |
+| `GET`    | `/api/v1/notificaciones`                     | Autenticado                           | 200       |
+| `GET`    | `/api/v1/notificaciones/resumen`             | Autenticado                           | 200       |
+| `GET`    | `/api/v1/notificaciones/stream`              | Autenticado                           | 200       |
+| `PUT`    | `/api/v1/notificaciones/{id}/leida`          | Autenticado                           | 200       |
+| `PUT`    | `/api/v1/notificaciones/leidas`              | Autenticado                           | 204       |
+| `DELETE` | `/api/v1/notificaciones/{id}`                | Autenticado                           | 204       |
+| `GET`    | `/api/v1/metodos-pago`                       | Paciente                              | 200       |
+| `POST`   | `/api/v1/metodos-pago`                       | Paciente                              | 201       |
+| `PUT`    | `/api/v1/metodos-pago/{id}/predeterminado`   | Paciente                              | 200       |
+| `DELETE` | `/api/v1/metodos-pago/{id}`                  | Paciente                              | 204       |
+| `GET`    | `/api/v1/cupones/validar?codigo=&monto=`     | Paciente                              | 200       |
+| `GET`    | `/api/v1/pagos`                              | Paciente                              | 200       |
+| `GET`    | `/api/v1/pagos/{id}`                         | Paciente dueño o admin                | 200       |
+| `GET`    | `/api/v1/admin/pagos?inicio=&fin=`           | Admin                                 | 200       |
+| `GET`    | `/api/v1/admin/cupones`                      | Admin                                 | 200       |
+| `POST`   | `/api/v1/admin/cupones`                      | Admin                                 | 201       |
+| `PUT`    | `/api/v1/admin/cupones/{id}`                 | Admin                                 | 200       |
+| `DELETE` | `/api/v1/admin/cupones/{id}`                 | Admin                                 | 204       |
+| `GET`    | `/api/v1/admin/estadisticas`                 | Admin                                 | 200       |
+| `GET`    | `/api/v1/admin/usuarios?rol=&q=`             | Admin                                 | 200       |
+| `PUT`    | `/api/v1/admin/usuarios/{id}/estado`         | Admin                                 | 200       |
+| `GET`    | `/api/v1/perfil/preferencias`                | Autenticado                           | 200       |
+| `PUT`    | `/api/v1/perfil/preferencias`                | Autenticado                           | 200       |
+| `PUT`    | `/api/v1/perfil/avatar`                      | Autenticado                           | 200       |
+| `DELETE` | `/api/v1/perfil/avatar`                      | Autenticado                           | 204       |
+| `GET`    | `/api/v1/perfil/sesiones`                    | Autenticado                           | 200       |
+| `DELETE` | `/api/v1/perfil/sesiones/{id}`               | Autenticado                           | 204       |
+| `DELETE` | `/api/v1/perfil/sesiones`                    | Autenticado                           | 204       |
+| `GET`    | `/api/v1/perfil`                             | Autenticado                           | 200       |
+| `PUT`    | `/api/v1/perfil`                             | Autenticado                           | 200       |
+| `PUT`    | `/api/v1/perfil/password`                    | Autenticado                           | 204       |
 
 Las fechas de los parámetros usan el formato `yyyy-MM-dd` y `fechaHora` usa `yyyy-MM-ddTHH:mm:ss`. Las rutas de creación responden con el header `Location` apuntando al recurso nuevo.
 
@@ -1028,6 +1075,38 @@ sequenceDiagram
 | `PUT /api/v1/perfil`          | Actualiza nombre, apellido y teléfono. Un paciente puede cambiar además su fecha de nacimiento y un médico su consultorio. El email, el DNI y la colegiatura no se modifican                                                       |
 | `PUT /api/v1/perfil/password` | Verifica la contraseña actual y guarda la nueva cifrada con BCrypt. Responde 409 si la actual no coincide o si la nueva es igual a la actual, y 400 si la nueva no tiene entre 8 y 72 caracteres                                   |
 
+### Notificaciones en tiempo real
+
+Los avisos se guardan en la tabla `notificaciones` y se entregan al navegador por Server-Sent Events, sin sondeo constante. `NotificacionServiceImpl` publica un `NotificacionCreadaEvent` y `NotificacionStreamServiceImpl` lo envía a las conexiones abiertas del usuario solo después de confirmar la transacción, de modo que nunca se anuncia algo que luego se revierta.
+
+| Evento SSE     | Contenido                                              |
+| -------------- | ------------------------------------------------------ |
+| `conectado`    | Confirma que el flujo quedó abierto                    |
+| `notificacion` | El JSON de cada aviso nuevo                            |
+| `ping`         | Latido cada 25 segundos para mantener viva la conexión |
+
+El navegador no puede enviar cabeceras con `EventSource`, así que el frontend abre el flujo con `fetch` y el token en la cabecera `Authorization`. Si la conexión se cae, reconecta con espera exponencial de 1 a 30 segundos, y solo consulta el contador cada 2 minutos mientras el flujo esté caído. El filtro de telemetría HTTP excluye este endpoint porque buffereaba el cuerpo de la respuesta, y nginx lo atiende sin buffering y con un timeout de una hora.
+
+Los avisos se generan al crear, confirmar, cancelar, atender y reprogramar una cita, al registrar o reembolsar un pago, al cambiar la contraseña y al iniciar sesión desde un dispositivo nuevo. Una tarea programada cada 15 minutos crea los recordatorios según la antelación que eligió cada usuario en sus preferencias.
+
+### Sesiones y alertas de inicio de sesión
+
+Cada login crea una fila en `sesiones_usuario` y el JWT incluye su identificador en el claim `jti`. El filtro de autenticación rechaza un token cuya sesión esté revocada o vencida, de modo que cerrar una sesión remota o desactivar una cuenta surte efecto al instante aunque el token no haya expirado. Los tokens sin `jti` siguen siendo válidos.
+
+### Pagos, tarjetas y cupones
+
+- Las tarjetas se validan con el algoritmo de Luhn y solo se guardan la marca, los últimos cuatro dígitos y el vencimiento. El número completo y el código de seguridad nunca se almacenan.
+- Un cupón puede ser de porcentaje o de monto fijo, con fechas de vigencia y un máximo de usos opcional. El endpoint de validación informa el descuento sin cobrar nada.
+- Pagar una cita genera un comprobante con formato `B001-000001` y notifica al paciente. Cancelar una cita pagada marca el pago como reembolsado.
+
+### Historia clínica
+
+El médico registra la atención de una cita con diagnóstico, tratamiento, indicaciones, signos vitales y receta. Registrarla marca la cita como atendida. El paciente consulta su historia completa y mantiene su grupo sanguíneo, alergias y antecedentes. Un médico solo abre la historia de pacientes con los que tiene o tuvo una cita, y un administrador puede abrir cualquiera.
+
+### Reprogramación y valoraciones
+
+Reprogramar aplica las mismas validaciones de horario y solapamiento que la reserva, excluyendo la propia cita, y deja la cita en estado pendiente. Los pacientes valoran de 1 a 5 las citas atendidas, una sola vez por cita, y el promedio del médico se redondea a un decimal.
+
 ## Manejo de errores
 
 `GlobalExceptionHandler` traduce cada excepción a una respuesta con el mismo formato. Los errores 401 y 403 que produce Spring Security antes de llegar a un controlador usan ese mismo formato.
@@ -1067,15 +1146,15 @@ La configuración de Spring vive en `src/main/resources` y se divide en un archi
 
 | Perfil  | Base de datos                                                                     | `ddl-auto`    | Logs                                                     | `JWT_SECRET` | Datos de prueba                                      |
 | ------- | --------------------------------------------------------------------------------- | ------------- | -------------------------------------------------------- | ------------ | ---------------------------------------------------- |
-| `local` | PostgreSQL en `localhost:5432/tusalud` con usuario y clave `postgres` por defecto | `update`      | DEBUG, con SQL, parámetros, Spring Web y Spring Security | Opcional     | Activos                                              |
-| `dev`   | PostgreSQL desde `DB_URL`, `DB_USERNAME` y `DB_PASSWORD`, con valores por defecto | `update`      | DEBUG de la aplicación, con SQL y parámetros             | Opcional     | Activos                                              |
-| `qa`    | PostgreSQL desde variables de entorno, con valores por defecto                    | `update`      | INFO, sin SQL                                            | Opcional     | Activos                                              |
+| `local` | PostgreSQL en `localhost:5432/tusalud` con usuario y clave `postgres` por defecto | `validate`    | DEBUG, con SQL, parámetros, Spring Web y Spring Security | Opcional     | Activos                                              |
+| `dev`   | PostgreSQL desde `DB_URL`, `DB_USERNAME` y `DB_PASSWORD`, con valores por defecto | `validate`    | DEBUG de la aplicación, con SQL y parámetros             | Opcional     | Activos                                              |
+| `qa`    | PostgreSQL desde variables de entorno, con valores por defecto                    | `validate`    | INFO, sin SQL                                            | Opcional     | Activos                                              |
 | `test`  | H2 en memoria en modo PostgreSQL, con consola H2                                  | `create-drop` | DEBUG de la aplicación, SQL en WARN                      | Opcional     | Activos                                              |
-| `prod`  | PostgreSQL solo desde variables de entorno, sin valores por defecto               | `update`      | WARN general e INFO de la aplicación                     | Obligatorio  | Inactivos, se activan con `DATA_INITIALIZER_ENABLED` |
+| `prod`  | PostgreSQL solo desde variables de entorno, sin valores por defecto               | `validate`    | WARN general e INFO de la aplicación                     | Obligatorio  | Inactivos, se activan con `DATA_INITIALIZER_ENABLED` |
 
 Ninguna respuesta de error incluye stacktraces en ningún perfil. En `prod` la consola H2 está deshabilitada y la API no arranca si falta `JWT_SECRET`, `DB_URL`, `DB_USERNAME` o `DB_PASSWORD`.
 
-El proyecto no usa una herramienta de migraciones, por eso `prod` también trabaja con `ddl-auto: update`. Hibernate crea tablas y agrega columnas nuevas, pero no elimina ni renombra columnas ni migra datos. Un cambio incompatible del modelo requiere preparar un script SQL antes de desplegar.
+El esquema y los datos iniciales los gestiona Flyway, por eso Hibernate solo valida que las entidades coincidan con las tablas. La sección de migraciones explica cómo funciona.
 
 ### Selección del perfil
 
@@ -1097,6 +1176,30 @@ El `pom.xml` define los perfiles `local`, `dev`, `qa`, `test` y `prod`. Cada uno
 ```
 
 Al cambiar de perfil de Maven conviene ejecutar `./mvnw clean` antes, para que no se reutilicen recursos filtrados con el perfil anterior.
+
+## Migraciones con Flyway
+
+Todos los perfiles que usan PostgreSQL crean y evolucionan la base con Flyway. Los scripts viven en `src/main/resources/db` y se ejecutan al arrancar la API, antes de que Hibernate valide el modelo.
+
+| Carpeta        | Perfiles                      | Contenido                                                                                                                                                                 |
+| -------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `db/migration` | `local`, `dev`, `qa` y `prod` | `V1__esquema_inicial.sql` con todas las tablas, restricciones e índices, y `V2__datos_base.sql` con los tres roles y las siete especialidades                             |
+| `db/demo`      | `local`, `dev` y `qa`         | `V100__datos_demostracion.sql` con usuarios, médicos, horarios, pacientes, citas, atenciones, recetas, pagos, cupones, tarjetas, valoraciones y notificaciones de ejemplo |
+
+Reglas de uso:
+
+- Un cambio del modelo se publica como una migración nueva, por ejemplo `V3__agrega_columna.sql`. Nunca se edita una migración ya aplicada, porque Flyway verifica su checksum al arrancar.
+- Los datos de demostración usan fechas relativas a la fecha de ejecución. Cada cita cae en un día y una hora de atención del médico, calculados con una función temporal de PostgreSQL.
+- `baseline-on-migrate` está activo con la versión 1, de modo que una base que ya existía con el esquema anterior se adopta sin volver a ejecutar `V1`.
+- La configuración `test` desactiva Flyway porque las pruebas usan H2 con el esquema generado por Hibernate y sus propios inicializadores.
+- Producción solo aplica `db/migration`, de modo que nunca recibe datos de demostración.
+
+Para volver a un estado limpio con los datos de demostración basta con recrear el volumen de PostgreSQL:
+
+```bash
+docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml down -v
+docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml up -d --build
+```
 
 ## Ejecución local
 
@@ -1290,28 +1393,39 @@ Una petición puede excluirse de cada interceptor con los contextos `SKIP_LOADIN
 
 Todas las pantallas se cargan de forma diferida. Los parámetros de ruta llegan a los componentes como inputs con signals gracias a `withComponentInputBinding`, y cada ruta define su título.
 
-| Ruta                          | Acceso                  | Pantalla                        |
-| ----------------------------- | ----------------------- | ------------------------------- |
-| `/auth/login`                 | Sin sesión              | Inicio de sesión                |
-| `/auth/registro`              | Sin sesión              | Registro de pacientes           |
-| `/`                           | Con sesión              | Redirige a la página del rol    |
-| `/especialidades`             | Con sesión              | Lista de especialidades         |
-| `/especialidades/nueva`       | Admin                   | Alta de especialidad            |
-| `/especialidades/:id/editar`  | Admin                   | Edición de especialidad         |
-| `/medicos`                    | Con sesión              | Lista de médicos                |
-| `/medicos/nuevo`              | Admin                   | Alta de médico                  |
-| `/medicos/:id`                | Con sesión              | Detalle del médico              |
-| `/medicos/:id/horarios`       | Admin                   | Bloques de atención             |
-| `/medicos/:id/disponibilidad` | Con sesión              | Horas libres del médico         |
-| `/citas`                      | Paciente                | Mis citas                       |
-| `/citas/nueva`                | Paciente                | Reserva de cita                 |
-| `/citas/:id`                  | Paciente, médico, admin | Detalle de la cita              |
-| `/agenda`                     | Médico                  | Agenda del día                  |
-| `/admin/auditoria`            | Admin                   | Reportes de auditoría           |
-| `/perfil`                     | Con sesión              | Datos personales y contraseña   |
-| `/acceso-denegado`            | Todos                   | Aviso de permisos insuficientes |
+| Ruta                              | Acceso                  | Pantalla                        |
+| --------------------------------- | ----------------------- | ------------------------------- |
+| `/auth/login`                     | Sin sesión              | Inicio de sesión                |
+| `/auth/registro`                  | Sin sesión              | Registro de pacientes           |
+| `/`                               | Con sesión              | Redirige a la página del rol    |
+| `/especialidades`                 | Con sesión              | Lista de especialidades         |
+| `/especialidades/nueva`           | Admin                   | Alta de especialidad            |
+| `/especialidades/:id/editar`      | Admin                   | Edición de especialidad         |
+| `/medicos`                        | Con sesión              | Lista de médicos                |
+| `/medicos/nuevo`                  | Admin                   | Alta de médico                  |
+| `/medicos/:id`                    | Con sesión              | Detalle del médico              |
+| `/medicos/:id/horarios`           | Admin                   | Bloques de atención             |
+| `/medicos/:id/disponibilidad`     | Con sesión              | Horas libres del médico         |
+| `/citas`                          | Paciente                | Mis citas                       |
+| `/citas/nueva`                    | Paciente                | Reserva de cita                 |
+| `/citas/:id`                      | Paciente, médico, admin | Detalle de la cita              |
+| `/agenda`                         | Médico                  | Agenda del día                  |
+| `/admin/auditoria`                | Admin                   | Reportes de auditoría           |
+| `/perfil`                         | Con sesión              | Datos, seguridad, avisos y tema |
+| `/notificaciones`                 | Con sesión              | Bandeja de notificaciones       |
+| `/citas/:id/atencion`             | Médico                  | Registro de la atención médica  |
+| `/historia-clinica`               | Paciente                | Historia clínica del paciente   |
+| `/pacientes`                      | Médico                  | Pacientes del médico            |
+| `/pacientes/:id/historia-clinica` | Médico, admin           | Historia clínica de un paciente |
+| `/pagos`                          | Paciente                | Historial de pagos              |
+| `/pagos/metodos`                  | Paciente                | Tarjetas guardadas              |
+| `/admin/panel`                    | Admin                   | Indicadores de la clínica       |
+| `/admin/usuarios`                 | Admin                   | Gestión de cuentas              |
+| `/admin/pagos`                    | Admin                   | Pagos registrados               |
+| `/admin/cupones`                  | Admin                   | Cupones de descuento            |
+| `/acceso-denegado`                | Todos                   | Aviso de permisos insuficientes |
 
-Al entrar a la raíz, el administrador va a la auditoría, el médico a su agenda y el paciente a sus citas. Quien no inició sesión va al login, y si intentaba abrir una ruta protegida, la URL viaja como `returnUrl`. Un usuario autenticado sin el rol necesario termina en `/acceso-denegado`.
+Al entrar a la raíz, el administrador va al panel de control, el médico a su agenda y el paciente a sus citas. Quien no inició sesión va al login, y si intentaba abrir una ruta protegida, la URL viaja como `returnUrl`. Un usuario autenticado sin el rol necesario termina en `/acceso-denegado`.
 
 ### Validaciones
 
@@ -1335,13 +1449,13 @@ Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrec
 
 ### Pruebas del frontend
 
-Las 63 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores y cada uno de los 26 endpoints de los clientes de la API.
+Las 71 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores y cada uno de los endpoints de los clientes de la API.
 
 ```bash
 npm test
 ```
 
-Las 27 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil y el cambio de contraseña, los filtros y los permisos por rol. Requieren el stack levantado con datos de prueba.
+Las 39 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol. Requieren el stack levantado con datos de prueba.
 
 ```bash
 npm run e2e
@@ -1455,7 +1569,7 @@ Tomcat agrega los headers `Connection`, `Keep-Alive` y `Transfer-Encoding` al en
 
 ## Datos de prueba
 
-`DataInitializer` carga datos al arrancar cuando `app.data-initializer.enabled` está activo. Es idempotente: crea cada registro solo si no existe, de modo que reiniciar la aplicación sobre una base persistente no duplica nada.
+En los perfiles `local`, `dev` y `qa` los datos se cargan con las migraciones de Flyway descritas arriba. `DataInitializer` y `DemoDataInitializer` siguen existiendo para las pruebas con H2 y para un stack de producción que necesite datos de prueba, y se activan con `DATA_INITIALIZER_ENABLED` y `DEMO_DATA_ENABLED`. Ambos son idempotentes: crean cada registro solo si no existe.
 
 | Rol      | Nombre          | Email                        | Contraseña     |
 | -------- | --------------- | ---------------------------- | -------------- |
@@ -1472,7 +1586,7 @@ Tomcat agrega los headers `Connection`, `Keep-Alive` y `Transfer-Encoding` al en
 
 ### Datos de demostración
 
-`DemoDataInitializer` amplía esos datos cuando `app.demo-data.enabled` está activo, algo que ocurre por defecto en los perfiles `dev` y `local` y se controla con la variable `DEMO_DATA_ENABLED`. Corre después de `DataInitializer`, es idempotente y nunca se ejecuta en producción ni en las pruebas, salvo en su propia prueba.
+`V100__datos_demostracion.sql` amplía esos datos en los perfiles `local`, `dev` y `qa`. `DemoDataInitializer` y `DemoClinicalDataInitializer` reproducen el mismo contenido para las pruebas y solo corren cuando `app.demo-data.enabled` está activo.
 
 - Cinco médicos más, de Medicina General, Dermatología, Traumatología, Ginecología y Oftalmología, cada uno con sus horarios.
 - Ocho pacientes más con nombres, DNI y fechas de nacimiento ficticios.
@@ -1573,7 +1687,7 @@ Para ejecutarla contra otro servidor sin editar el archivo:
 npx newman run postman/Tusalud.postman_collection.json --env-var baseUrl=https://otro-servidor
 ```
 
-Si los datos de prueba no están cargados, la carpeta de autenticación falla porque no encuentra a los usuarios de prueba. En el perfil `prod` hay que levantar el stack con `DATA_INITIALIZER_ENABLED=true`.
+Si los datos de prueba no están cargados, la carpeta de autenticación falla porque no encuentra a los usuarios de prueba. Los perfiles `local`, `dev` y `qa` los traen con Flyway. En un stack de producción hay que levantarlo con `DATA_INITIALIZER_ENABLED=true`.
 
 La colección puede ejecutarse varias veces sobre la misma base. Genera emails, DNI, colegiaturas y nombres únicos en cada corrida y calcula la fecha de la cita buscando el primer turno libre, sin depender de identificadores fijos. Cada ejecución deja en la base un paciente, un médico y una especialidad nuevos, además de una cita atendida y otra cancelada.
 

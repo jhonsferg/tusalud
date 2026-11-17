@@ -1,7 +1,7 @@
 USUARIOS DE PRUEBA DE TUSALUD
 =============================
 
-Los datos son ficticios y se cargan solo en los perfiles dev y local, o en qa si se habilita.
+Los datos son ficticios y los carga Flyway con la migración V100 en los perfiles local, dev y qa.
 Para cargarlos: docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml up -d --build
 Para reiniciarlos desde cero: docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml down -v
 
