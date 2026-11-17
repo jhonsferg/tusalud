@@ -48,6 +48,9 @@ const TIPOS_POR_ROL: Readonly<Record<Rol, readonly TipoEvento[]>> = {
   ROLE_PACIENTE: ['PERSONAL', 'RECORDATORIO'],
   ROLE_ADMIN: ['REUNION', 'TAREA', 'RECORDATORIO', 'PERSONAL'],
   ROLE_MEDICO: ['REUNION', 'TAREA', 'RECORDATORIO', 'PERSONAL', 'BLOQUEO'],
+  ROLE_LABORATORIO: ['REUNION', 'TAREA', 'RECORDATORIO', 'PERSONAL'],
+  ROLE_FARMACIA: ['REUNION', 'TAREA', 'RECORDATORIO', 'PERSONAL'],
+  ROLE_ALMACEN: ['REUNION', 'TAREA', 'RECORDATORIO', 'PERSONAL'],
 };
 
 const ORDEN_TIPOS: readonly TipoEvento[] = [
@@ -68,7 +71,8 @@ export function tiposPermitidos(roles: readonly Rol[]): TipoEvento[] {
 
 export function categoriasPara(roles: readonly Rol[]): CalCategoria[] {
   const tipos = new Set<string>(tiposPermitidos(roles));
-  const esSoloAdmin = roles.length > 0 && roles.every((rol) => rol === 'ROLE_ADMIN');
+  const esSoloAdmin =
+    roles.length > 0 && roles.every((rol) => rol !== 'ROLE_MEDICO' && rol !== 'ROLE_PACIENTE');
   const base = CATEGORIAS_BASE.filter((categoria) =>
     categoria.clave === 'CITA' ? !esSoloAdmin : tipos.has(categoria.clave),
   );

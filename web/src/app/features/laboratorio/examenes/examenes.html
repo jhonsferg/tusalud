@@ -1,0 +1,276 @@
+<app-page-header
+  title="Catálogo de exámenes"
+  subtitle="Pruebas disponibles, parámetros y valores de referencia"
+  icon="pi-book"
+  backLink="/laboratorio"
+  backLabel="Volver a laboratorio"
+>
+  @if (gestiona()) {
+    <p-button label="Nuevo examen" icon="pi pi-plus" (onClick)="abrir(null)" />
+  }
+</app-page-header>
+
+<div class="panel">
+  <div class="filtros">
+    <p-iconfield class="w-full md:w-20rem">
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        type="search"
+        class="w-full"
+        placeholder="Buscar examen"
+        aria-label="Buscar examen"
+        [ngModel]="busqueda()"
+        (ngModelChange)="buscar($event)"
+      />
+    </p-iconfield>
+    <p-select
+      [options]="categorias"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="categoria()"
+      (ngModelChange)="categoria.set($event); cargar()"
+      placeholder="Todas las categorías"
+      [showClear]="true"
+      ariaLabel="Filtrar por categoría"
+      appendTo="body"
+      styleClass="w-full md:w-14rem"
+    />
+  </div>
+
+  <p-table
+    [value]="store.examenes.value() ?? []"
+    [loading]="store.examenes.loading()"
+    [paginator]="(store.examenes.value() ?? []).length > 12"
+    [rows]="12"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+  >
+    <ng-template #header>
+      <tr>
+        <th>Examen</th>
+        <th>Categoría</th>
+        <th>Muestra</th>
+        <th class="text-right">Entrega</th>
+        <th class="text-right">Precio</th>
+        <th style="width: 8rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-examen>
+      <tr>
+        <td>
+          <div class="font-semibold">{{ examen.nombre }}</div>
+          <small class="text-muted"
+            >{{ examen.codigo }} · {{ examen.parametros.length }} parámetros</small
+          >
+          @if (!examen.activo) {
+            <p-tag value="Inactivo" severity="secondary" styleClass="ml-2" />
+          }
+          @if (examen.indicaciones) {
+            <small class="indic block"
+              ><i class="pi pi-info-circle"></i> {{ examen.indicaciones }}</small
+            >
+          }
+        </td>
+        <td>{{ etiquetaCategoria[examen.categoria] }}</td>
+        <td>{{ examen.muestra }}</td>
+        <td class="text-right">{{ examen.tiempoEntregaHoras }} h</td>
+        <td class="text-right">{{ examen.precio | currency: 'PEN' : 'symbol-narrow' }}</td>
+        <td class="text-right acciones">
+          <p-button
+            icon="pi pi-eye"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            [ariaLabel]="'Ver parámetros de ' + examen.nombre"
+            (onClick)="detalle.set(examen)"
+          />
+          @if (gestiona()) {
+            <p-button
+              icon="pi pi-pencil"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              [ariaLabel]="'Editar ' + examen.nombre"
+              (onClick)="abrir(examen)"
+            />
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="6">
+          <app-empty-state
+            icon="pi-book"
+            title="Sin exámenes"
+            message="Registra los exámenes que ofrece el laboratorio."
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [header]="detalle()?.nombre ?? ''"
+  [visible]="detalle() !== null"
+  (visibleChange)="$event ? null : detalle.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '38rem', maxWidth: '96vw' }"
+>
+  @if (detalle(); as examen) {
+    <p-table [value]="examen.parametros" responsiveLayout="scroll">
+      <ng-template #header>
+        <tr>
+          <th>Parámetro</th>
+          <th>Tipo</th>
+          <th>Referencia</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-p>
+        <tr>
+          <td>{{ p.nombre }}</td>
+          <td>{{ p.tipo === 'NUMERICO' ? 'Numérico' : 'Texto' }}</td>
+          <td>{{ rango(p.valorMin, p.valorMax, p.unidad) }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</p-dialog>
+
+<p-dialog
+  [header]="editando() ? 'Editar examen' : 'Nuevo examen'"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '52rem', maxWidth: '96vw' }"
+>
+  <form class="form" [formGroup]="form" (submit)="$event.preventDefault(); guardar()" novalidate>
+    @if (error(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    <div class="dos">
+      <label
+        >Código <input pInputText id="exa-codigo" formControlName="codigo" class="w-full"
+      /></label>
+      <label
+        >Nombre <input pInputText id="exa-nombre" formControlName="nombre" class="w-full"
+      /></label>
+    </div>
+    <div class="cuatro">
+      <label>
+        Categoría
+        <p-select
+          formControlName="categoria"
+          [options]="categorias"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </label>
+      <label>
+        Muestra
+        <p-select
+          formControlName="muestra"
+          [options]="muestras"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </label>
+      <label>
+        Precio
+        <p-inputnumber
+          inputId="exa-precio"
+          formControlName="precio"
+          mode="currency"
+          currency="PEN"
+          locale="es-PE"
+          [min]="0"
+          [fluid]="true"
+        />
+      </label>
+      <label>
+        Entrega (horas)
+        <p-inputnumber
+          inputId="exa-entrega"
+          formControlName="tiempoEntregaHoras"
+          [min]="1"
+          [fluid]="true"
+        />
+      </label>
+    </div>
+    <label>
+      Indicaciones para el paciente
+      <textarea pTextarea formControlName="indicaciones" rows="2" class="w-full"></textarea>
+    </label>
+    <label class="check"><p-toggleswitch formControlName="activo" /> Examen activo</label>
+
+    <h4>Parámetros</h4>
+    <div class="parametros" formArrayName="parametros">
+      @for (p of parametros.controls; track p; let i = $index) {
+        <div class="parametro" [formGroupName]="i">
+          <input
+            pInputText
+            [id]="'exa-par-nombre-' + i"
+            formControlName="nombre"
+            placeholder="Nombre"
+            class="w-full"
+          />
+          <input pInputText formControlName="unidad" placeholder="Unidad" class="w-full" />
+          <p-select
+            formControlName="tipo"
+            [options]="tiposParametro"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            styleClass="w-full"
+          />
+          <p-inputnumber
+            formControlName="valorMin"
+            placeholder="Mín."
+            [minFractionDigits]="0"
+            [maxFractionDigits]="3"
+            [fluid]="true"
+          />
+          <p-inputnumber
+            formControlName="valorMax"
+            placeholder="Máx."
+            [minFractionDigits]="0"
+            [maxFractionDigits]="3"
+            [fluid]="true"
+          />
+          <p-button
+            icon="pi pi-trash"
+            [text]="true"
+            [rounded]="true"
+            severity="danger"
+            [disabled]="parametros.length === 1"
+            ariaLabel="Quitar parámetro"
+            (onClick)="quitarParametro(i)"
+          />
+        </div>
+      }
+    </div>
+    <p-button
+      label="Agregar parámetro"
+      icon="pi pi-plus"
+      [text]="true"
+      (onClick)="agregarParametro()"
+    />
+  </form>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="visible.set(false)"
+    />
+    <p-button label="Guardar" icon="pi pi-check" [loading]="guardando()" (onClick)="guardar()" />
+  </ng-template>
+</p-dialog>

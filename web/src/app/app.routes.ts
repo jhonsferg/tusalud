@@ -83,6 +83,37 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'almacen',
+        loadChildren: () =>
+          import('@tusalud/app/features/almacen/almacen.routes').then((m) => m.ALMACEN_ROUTES),
+      },
+      {
+        path: 'farmacia',
+        loadChildren: () =>
+          import('@tusalud/app/features/farmacia/farmacia.routes').then((m) => m.FARMACIA_ROUTES),
+      },
+      {
+        path: 'mis-medicamentos',
+        loadChildren: () =>
+          import('@tusalud/app/features/farmacia/farmacia.routes').then(
+            (m) => m.MEDICAMENTOS_ROUTES,
+          ),
+      },
+      {
+        path: 'laboratorio',
+        loadChildren: () =>
+          import('@tusalud/app/features/laboratorio/laboratorio.routes').then(
+            (m) => m.LABORATORIO_ROUTES,
+          ),
+      },
+      {
+        path: 'mis-resultados',
+        loadChildren: () =>
+          import('@tusalud/app/features/laboratorio/laboratorio.routes').then(
+            (m) => m.RESULTADOS_ROUTES,
+          ),
+      },
+      {
         path: 'notificaciones',
         loadChildren: () =>
           import('@tusalud/app/features/notificaciones/notificaciones.routes').then(

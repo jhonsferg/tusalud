@@ -1,0 +1,141 @@
+<app-page-header
+  title="Historial de dispensaciones"
+  subtitle="Comprobantes emitidos por la farmacia"
+  icon="pi-history"
+  backLink="/farmacia"
+  backLabel="Volver a farmacia"
+/>
+
+<div class="panel">
+  <div class="filtros">
+    <p-iconfield class="w-full md:w-20rem">
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        type="search"
+        class="w-full"
+        placeholder="Buscar por comprobante o paciente"
+        aria-label="Buscar dispensación"
+        [ngModel]="busqueda()"
+        (ngModelChange)="buscar($event)"
+      />
+    </p-iconfield>
+    <p-datepicker
+      selectionMode="range"
+      [ngModel]="rango()"
+      (ngModelChange)="cambiarRango($event)"
+      [showIcon]="true"
+      [showButtonBar]="true"
+      dateFormat="dd/mm/yy"
+      placeholder="Filtrar por fechas"
+      [readonlyInput]="true"
+      appendTo="body"
+    />
+  </div>
+
+  <p-table
+    [value]="store.dispensaciones.value() ?? []"
+    [loading]="store.dispensaciones.loading()"
+    [paginator]="(store.dispensaciones.value() ?? []).length > 12"
+    [rows]="12"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+  >
+    <ng-template #header>
+      <tr>
+        <th>Comprobante</th>
+        <th>Fecha</th>
+        <th>Paciente</th>
+        <th>Pago</th>
+        <th class="text-right">Total</th>
+        <th>Estado</th>
+        <th style="width: 8rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-d>
+      <tr>
+        <td class="font-semibold">{{ d.comprobante }}</td>
+        <td>{{ d.fecha | date: 'd MMM y, HH:mm' }}</td>
+        <td>{{ d.pacienteNombre }}</td>
+        <td>{{ etiquetaMetodo[d.metodoPago] }}</td>
+        <td class="text-right">{{ d.total | currency: 'PEN' : 'symbol-narrow' }}</td>
+        <td>
+          <p-tag
+            [value]="d.estado === 'ANULADA' ? 'Anulada' : 'Emitida'"
+            [severity]="d.estado === 'ANULADA' ? 'secondary' : 'success'"
+          />
+        </td>
+        <td class="text-right acciones">
+          <p-button
+            icon="pi pi-eye"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            [ariaLabel]="'Ver ' + d.comprobante"
+            (onClick)="detalle.set(d)"
+          />
+          @if (d.estado === 'EMITIDA') {
+            <p-button
+              icon="pi pi-undo"
+              [text]="true"
+              [rounded]="true"
+              severity="danger"
+              [ariaLabel]="'Anular ' + d.comprobante"
+              (onClick)="anular(d)"
+            />
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="7">
+          <app-empty-state
+            icon="pi-history"
+            title="Sin dispensaciones"
+            message="Aún no hay comprobantes con esos filtros."
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  header="Comprobante"
+  [visible]="detalle() !== null"
+  (visibleChange)="$event ? null : detalle.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '30rem', maxWidth: '96vw' }"
+>
+  @if (detalle(); as c) {
+    <div class="comprobante">
+      <h4>{{ c.comprobante }}</h4>
+      <p class="text-muted">{{ c.fecha | date: 'd MMM y, HH:mm' }} · {{ c.pacienteNombre }}</p>
+      <table>
+        @for (item of c.items; track $index) {
+          <tr>
+            <td>{{ item.cantidad }} × {{ item.productoNombre }}</td>
+            <td class="text-right">{{ item.subtotal | currency: 'PEN' : 'symbol-narrow' }}</td>
+          </tr>
+        }
+        <tr class="total-fila">
+          <td>Total</td>
+          <td class="text-right">{{ c.total | currency: 'PEN' : 'symbol-narrow' }}</td>
+        </tr>
+      </table>
+      <small class="text-muted">Atendió {{ c.farmaceuticoNombre }}</small>
+    </div>
+  }
+  <ng-template #footer>
+    <p-button
+      label="Imprimir"
+      icon="pi pi-print"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="imprimir()"
+    />
+    <p-button label="Cerrar" (onClick)="detalle.set(null)" />
+  </ng-template>
+</p-dialog>

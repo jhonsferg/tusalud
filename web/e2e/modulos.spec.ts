@@ -153,6 +153,28 @@ test.describe('notificaciones y perfil', () => {
   });
 });
 
+async function restaurarTarifa(page: import('@playwright/test').Page): Promise<void> {
+  const token = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('tusalud.session') ?? '{}').token as string,
+  );
+  const headers = { Authorization: `Bearer ${token}` };
+  const lista = (await (await page.request.get('/api/v1/especialidades', { headers })).json()) as {
+    id: number;
+    nombre: string;
+    descripcion: string;
+  }[];
+  const oftalmologia = lista.find((item) => item.nombre === 'Oftalmología')!;
+  const respuesta = await page.request.put(`/api/v1/especialidades/${oftalmologia.id}`, {
+    headers,
+    data: {
+      nombre: oftalmologia.nombre,
+      descripcion: oftalmologia.descripcion,
+      precioConsulta: 110,
+    },
+  });
+  expect(respuesta.ok()).toBe(true);
+}
+
 test.describe('especialidades y roles', () => {
   test('el administrador cambia la tarifa de una especialidad y el paciente la ve al reservar', async ({
     browser,
@@ -165,7 +187,7 @@ test.describe('especialidades y roles', () => {
     await expect(admin.locator('#esp-precio')).not.toHaveValue('');
     await admin.locator('#esp-precio').click();
     await admin.keyboard.press('Control+a');
-    await admin.locator('#esp-precio').pressSequentially('115');
+    await admin.locator('#esp-precio').pressSequentially('115', { delay: 60 });
     await admin.getByRole('button', { name: 'Guardar cambios' }).click();
     await expect(
       admin.getByRole('row', { name: /Oftalmología/ }).getByText(/115\.00/),
@@ -184,15 +206,7 @@ test.describe('especialidades y roles', () => {
     await paciente.getByRole('option', { name: /Marcos Delgado/ }).click();
     await expect(paciente.locator('.summary').getByText(/115.00/)).toBeVisible();
 
-    await admin.getByRole('button', { name: 'Editar Oftalmología' }).click();
-    await expect(admin.locator('#esp-precio')).not.toHaveValue('');
-    await admin.locator('#esp-precio').click();
-    await admin.keyboard.press('Control+a');
-    await admin.locator('#esp-precio').pressSequentially('110');
-    await admin.getByRole('button', { name: 'Guardar cambios' }).click();
-    await expect(
-      admin.getByRole('row', { name: /Oftalmología/ }).getByText(/110\.00/),
-    ).toBeVisible();
+    await restaurarTarifa(admin);
   });
 
   test('el administrador edita las especialidades de un médico', async ({ page }) => {

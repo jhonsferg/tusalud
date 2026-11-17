@@ -10,3 +10,6 @@ export * from './pagos.model';
 export * from './clinica.model';
 export * from './admin.model';
 export * from './calendario.model';
+export * from './almacen.model';
+export * from './farmacia.model';
+export * from './laboratorio.model';

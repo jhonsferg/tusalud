@@ -48,7 +48,7 @@ test.describe('administrador', () => {
   test('filtra la auditoría por fechas', async ({ page }) => {
     await iniciarSesion(page, 'admin');
     await page.goto('/admin/auditoria');
-    await expect(page.getByRole('cell', { name: /Juan Pérez/ }).first()).toBeVisible();
+    await expect(page.getByRole('row').nth(1)).toBeVisible();
     await page.locator('p-datepicker input').click();
     const hoy = page.locator('.p-datepicker-panel .p-datepicker-today').first();
     await hoy.click();

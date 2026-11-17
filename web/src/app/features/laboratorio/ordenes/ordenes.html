@@ -1,0 +1,129 @@
+<app-page-header
+  [title]="esPersonal() ? 'Laboratorio' : 'Mis órdenes de laboratorio'"
+  [subtitle]="
+    esPersonal()
+      ? 'Cola de trabajo, muestras y resultados'
+      : 'Exámenes que solicitaste a tus pacientes'
+  "
+  icon="pi-filter"
+>
+  @if (esMedico()) {
+    <p-button label="Solicitar exámenes" icon="pi pi-plus" routerLink="/laboratorio/solicitar" />
+  }
+</app-page-header>
+
+@if (esPersonal() && store.resumen.value(); as resumen) {
+  <div class="kpis">
+    <app-kpi
+      etiqueta="Por tomar muestra"
+      [valor]="resumen.pendientes"
+      icono="pi-clock"
+      [tono]="resumen.pendientes > 0 ? 'alerta' : 'exito'"
+    />
+    <app-kpi etiqueta="En proceso" [valor]="resumen.enProceso" icono="pi-spinner" />
+    <app-kpi
+      etiqueta="Completadas hoy"
+      [valor]="resumen.completadasHoy"
+      icono="pi-check-circle"
+      tono="exito"
+    />
+    <app-kpi
+      etiqueta="Urgentes"
+      [valor]="resumen.urgentes"
+      icono="pi-exclamation-triangle"
+      [tono]="resumen.urgentes > 0 ? 'peligro' : 'exito'"
+    />
+  </div>
+}
+
+<div class="panel">
+  <div class="filtros">
+    <p-iconfield class="w-full md:w-20rem">
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        type="search"
+        class="w-full"
+        placeholder="Buscar por código, DNI o paciente"
+        aria-label="Buscar orden"
+        [ngModel]="busqueda()"
+        (ngModelChange)="buscar($event)"
+      />
+    </p-iconfield>
+    <p-select
+      [options]="estados"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="estado()"
+      (ngModelChange)="estado.set($event); cargar()"
+      placeholder="Todos los estados"
+      [showClear]="true"
+      ariaLabel="Filtrar por estado"
+      appendTo="body"
+      styleClass="w-full md:w-14rem"
+    />
+  </div>
+
+  <p-table
+    [value]="store.ordenes.value() ?? []"
+    [loading]="store.ordenes.loading()"
+    [paginator]="(store.ordenes.value() ?? []).length > 12"
+    [rows]="12"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+  >
+    <ng-template #header>
+      <tr>
+        <th>Orden</th>
+        <th>Paciente</th>
+        <th>Médico</th>
+        <th>Exámenes</th>
+        <th>Estado</th>
+        <th style="width: 7rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-orden>
+      <tr>
+        <td>
+          <div class="font-semibold">{{ orden.codigo }}</div>
+          <small class="text-muted">{{ orden.fecha | date: 'd MMM y, HH:mm' }}</small>
+          @if (orden.prioridad === 'URGENTE') {
+            <p-tag value="Urgente" severity="danger" styleClass="ml-2" />
+          }
+        </td>
+        <td>
+          {{ orden.pacienteNombre }}
+          <small class="text-muted block">DNI {{ orden.dni }}</small>
+        </td>
+        <td>{{ orden.medicoNombre }}</td>
+        <td>{{ orden.items.length }}</td>
+        <td>
+          <p-tag
+            [value]="etiqueta[orden.estado]"
+            [severity]="severidad[orden.estado]"
+            [icon]="'pi ' + icono[orden.estado]"
+          />
+        </td>
+        <td class="text-right">
+          <p-button
+            label="Abrir"
+            size="small"
+            [outlined]="true"
+            [routerLink]="['/laboratorio/ordenes', orden.id]"
+          />
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="6">
+          <app-empty-state
+            icon="pi-filter"
+            title="Sin órdenes"
+            message="No hay órdenes de laboratorio con esos filtros."
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

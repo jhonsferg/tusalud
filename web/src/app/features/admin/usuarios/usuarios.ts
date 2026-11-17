@@ -1,6 +1,8 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MultiSelect } from 'primeng/multiselect';
+import { Password } from 'primeng/password';
 import { ConfirmationService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
@@ -16,7 +18,13 @@ import { Tooltip } from 'primeng/tooltip';
 import { Subject, debounceTime } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { UsuarioAdminResponse } from '@tusalud/app/core/models';
+import {
+  DESCRIPCION_ROL,
+  ETIQUETA_ROL,
+  ROLES,
+  ROLES_PERSONAL,
+  UsuarioAdminResponse,
+} from '@tusalud/app/core/models';
 import { AuthService } from '@tusalud/app/core/services/auth.service';
 import { NotificationService } from '@tusalud/app/core/services/notification.service';
 import { AdminStore } from '@tusalud/app/core/state/admin.store';
@@ -24,17 +32,14 @@ import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-sta
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
 import { UserAvatar } from '@tusalud/app/shared/components/user-avatar/user-avatar';
 
-const ETIQUETA_ROL: Readonly<Record<string, string>> = {
-  ROLE_ADMIN: 'Administrador',
-  ROLE_MEDICO: 'Médico',
-  ROLE_PACIENTE: 'Paciente',
-};
-
 @Component({
   selector: 'app-usuarios',
   imports: [
     DatePipe,
     FormsModule,
+    ReactiveFormsModule,
+    MultiSelect,
+    Password,
     Button,
     Checkbox,
     Dialog,
@@ -64,11 +69,11 @@ export class Usuarios implements OnInit {
   protected readonly busqueda = signal('');
   private readonly busquedaCambia = new Subject<void>();
   protected readonly etiquetaRol = ETIQUETA_ROL;
-  protected readonly roles = [
-    { label: 'Administradores', value: 'ROLE_ADMIN' },
-    { label: 'Médicos', value: 'ROLE_MEDICO' },
-    { label: 'Pacientes', value: 'ROLE_PACIENTE' },
-  ];
+  protected readonly roles = ROLES.map((rol) => ({ label: ETIQUETA_ROL[rol], value: rol }));
+  protected readonly rolesPersonal = ROLES_PERSONAL.map((rol) => ({
+    label: ETIQUETA_ROL[rol],
+    value: rol,
+  }));
 
   constructor() {
     this.busquedaCambia
@@ -80,15 +85,66 @@ export class Usuarios implements OnInit {
   protected readonly seleccion = signal<string[]>([]);
   protected readonly guardando = signal(false);
   protected readonly errorRoles = signal<string | null>(null);
-  protected readonly descripcionRol: Readonly<Record<string, string>> = {
-    ROLE_ADMIN: 'Gestiona usuarios, roles, tarifas, cupones y pagos.',
-    ROLE_MEDICO: 'Atiende pacientes y administra su agenda. Requiere perfil médico.',
-    ROLE_PACIENTE: 'Reserva citas y paga consultas. Requiere perfil de paciente.',
-  };
+  protected readonly descripcionRol = DESCRIPCION_ROL;
 
   ngOnInit(): void {
     this.cargar();
     this.store.cargarRoles();
+  }
+
+  protected readonly personalVisible = signal(false);
+  protected readonly creandoPersonal = signal(false);
+  protected readonly errorPersonal = signal<string | null>(null);
+  protected readonly personal = inject(FormBuilder).nonNullable.group({
+    nombre: ['', [Validators.required, Validators.maxLength(80)]],
+    apellido: ['', [Validators.required, Validators.maxLength(80)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
+    telefono: ['', [Validators.pattern(/^$|^\d{9}$/)]],
+    roles: [[] as string[], [Validators.required, Validators.minLength(1)]],
+  });
+
+  protected abrirPersonal(): void {
+    this.errorPersonal.set(null);
+    this.personal.reset({
+      nombre: '',
+      apellido: '',
+      email: '',
+      password: '',
+      telefono: '',
+      roles: [],
+    });
+    this.personalVisible.set(true);
+  }
+
+  protected crearPersonal(): void {
+    this.errorPersonal.set(null);
+    if (this.personal.invalid) {
+      this.personal.markAllAsTouched();
+      return;
+    }
+    const valor = this.personal.getRawValue();
+    this.creandoPersonal.set(true);
+    this.store
+      .crearPersonal({
+        nombre: valor.nombre.trim(),
+        apellido: valor.apellido.trim(),
+        email: valor.email.trim().toLowerCase(),
+        password: valor.password,
+        telefono: valor.telefono || null,
+        roles: valor.roles,
+      })
+      .subscribe({
+        next: (usuario) => {
+          this.creandoPersonal.set(false);
+          this.personalVisible.set(false);
+          this.notifications.success(`${usuario.nombreCompleto} fue registrado como personal.`);
+        },
+        error: (error: { message: string }) => {
+          this.creandoPersonal.set(false);
+          this.errorPersonal.set(error.message);
+        },
+      });
   }
 
   protected abrirRoles(usuario: UsuarioAdminResponse): void {

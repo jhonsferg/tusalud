@@ -1,0 +1,84 @@
+<app-page-header
+  title="Solicitar exámenes"
+  subtitle="Envía una orden al laboratorio para tu paciente"
+  icon="pi-filter"
+  backLink="/laboratorio"
+  backLabel="Volver a las órdenes"
+/>
+
+<form class="panel form" [formGroup]="form" (submit)="$event.preventDefault(); enviar()" novalidate>
+  @if (error(); as mensaje) {
+    <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+  }
+
+  <label>
+    Paciente
+    <p-select
+      inputId="sol-paciente"
+      formControlName="pacienteId"
+      [options]="pacientes()"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Selecciona un paciente"
+      [filter]="true"
+      appendTo="body"
+      styleClass="w-full"
+    />
+  </label>
+
+  <label>
+    Exámenes
+    <p-multiselect
+      inputId="sol-examenes"
+      formControlName="examenIds"
+      [options]="examenes()"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Selecciona uno o más exámenes"
+      [filter]="true"
+      display="chip"
+      appendTo="body"
+      styleClass="w-full"
+    />
+  </label>
+
+  @if (indicacionesExamenes().length > 0) {
+    <ul class="indicaciones">
+      @for (texto of indicacionesExamenes(); track texto) {
+        <li><i class="pi pi-info-circle"></i> {{ texto }}</li>
+      }
+    </ul>
+  }
+
+  <label>
+    Prioridad
+    <p-selectbutton
+      formControlName="prioridad"
+      [options]="prioridades"
+      optionLabel="label"
+      optionValue="value"
+      [allowEmpty]="false"
+    />
+  </label>
+
+  <label>
+    Indicaciones clínicas
+    <textarea
+      pTextarea
+      formControlName="indicaciones"
+      rows="3"
+      class="w-full"
+      placeholder="Diagnóstico presuntivo u observaciones para el laboratorio"
+    ></textarea>
+  </label>
+
+  <div class="pie">
+    <strong>Total estimado {{ total() | currency: 'PEN' : 'symbol-narrow' }}</strong>
+    <p-button
+      label="Enviar al laboratorio"
+      icon="pi pi-send"
+      [loading]="guardando()"
+      (onClick)="enviar()"
+    />
+  </div>
+</form>

@@ -81,6 +81,15 @@
               />
             }
             <p-button
+              icon="pi pi-filter"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              [ariaLabel]="'Solicitar examen para ' + paciente.nombreCompleto"
+              routerLink="/laboratorio/solicitar"
+              [queryParams]="{ pacienteId: paciente.pacienteId }"
+            />
+            <p-button
               label="Historia"
               icon="pi pi-folder-open"
               size="small"

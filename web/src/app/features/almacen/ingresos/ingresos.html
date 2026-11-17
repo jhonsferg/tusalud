@@ -1,0 +1,213 @@
+<app-page-header
+  title="Ingresos de mercadería"
+  subtitle="Registro de compras, lotes y vencimientos"
+  icon="pi-download"
+>
+  <p-button label="Nuevo ingreso" icon="pi pi-plus" (onClick)="abrir()" />
+</app-page-header>
+
+<div class="panel">
+  <p-table
+    [value]="store.ingresos.value() ?? []"
+    [loading]="store.ingresos.loading()"
+    [paginator]="(store.ingresos.value() ?? []).length > 10"
+    [rows]="10"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+  >
+    <ng-template #header>
+      <tr>
+        <th>Fecha</th>
+        <th>Documento</th>
+        <th>Proveedor</th>
+        <th class="text-right">Ítems</th>
+        <th class="text-right">Total</th>
+        <th>Registró</th>
+        <th style="width: 5rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-ingreso>
+      <tr>
+        <td>{{ ingreso.fecha | date: 'd MMM y, HH:mm' }}</td>
+        <td>{{ ingreso.documento || '—' }}</td>
+        <td>{{ ingreso.proveedorNombre || '—' }}</td>
+        <td class="text-right">{{ ingreso.items.length }}</td>
+        <td class="text-right font-semibold">
+          {{ ingreso.total | currency: 'PEN' : 'symbol-narrow' }}
+        </td>
+        <td>{{ ingreso.usuarioNombre }}</td>
+        <td class="text-right">
+          <p-button
+            icon="pi pi-eye"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            ariaLabel="Ver detalle del ingreso"
+            (onClick)="detalle.set(ingreso)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="7">
+          <app-empty-state
+            icon="pi-download"
+            title="Sin ingresos"
+            message="Registra la primera compra para generar lotes y stock."
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  header="Nuevo ingreso de mercadería"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '64rem', maxWidth: '96vw' }"
+>
+  <form class="form" [formGroup]="form" (submit)="$event.preventDefault(); guardar()" novalidate>
+    @if (error(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    <div class="cabecera">
+      <label>
+        Proveedor
+        <p-select
+          inputId="ing-proveedor"
+          formControlName="proveedorId"
+          [options]="opcionesProveedor()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Sin proveedor"
+          [showClear]="true"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </label>
+      <label>
+        Documento
+        <input
+          pInputText
+          id="ing-documento"
+          formControlName="documento"
+          placeholder="Factura o guía"
+          class="w-full"
+        />
+      </label>
+    </div>
+
+    <h4>Ítems</h4>
+    <div class="items" formArrayName="items">
+      @for (item of items.controls; track item; let i = $index) {
+        <div class="item" [formGroupName]="i">
+          <p-select
+            [inputId]="'ing-producto-' + i"
+            formControlName="productoId"
+            [options]="opcionesProducto()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Producto"
+            [filter]="true"
+            appendTo="body"
+            styleClass="w-full"
+          />
+          <input
+            pInputText
+            [id]="'ing-lote-' + i"
+            formControlName="numeroLote"
+            placeholder="Lote"
+            class="w-full"
+          />
+          <p-datepicker
+            [inputId]="'ing-vence-' + i"
+            formControlName="fechaVencimiento"
+            [minDate]="manana"
+            dateFormat="dd/mm/yy"
+            placeholder="Vence"
+            appendTo="body"
+            [fluid]="true"
+          />
+          <p-inputnumber
+            [inputId]="'ing-cantidad-' + i"
+            formControlName="cantidad"
+            [min]="1"
+            [fluid]="true"
+          />
+          <p-inputnumber
+            [inputId]="'ing-costo-' + i"
+            formControlName="costoUnitario"
+            mode="currency"
+            currency="PEN"
+            locale="es-PE"
+            [min]="0"
+            [fluid]="true"
+          />
+          <p-button
+            icon="pi pi-trash"
+            [text]="true"
+            [rounded]="true"
+            severity="danger"
+            [disabled]="items.length === 1"
+            ariaLabel="Quitar ítem"
+            (onClick)="quitarItem(i)"
+          />
+        </div>
+      }
+    </div>
+    <div class="pie-items">
+      <p-button label="Agregar ítem" icon="pi pi-plus" [text]="true" (onClick)="agregarItem()" />
+      <strong>Total {{ total() | currency: 'PEN' : 'symbol-narrow' }}</strong>
+    </div>
+  </form>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="visible.set(false)"
+    />
+    <p-button
+      label="Registrar ingreso"
+      icon="pi pi-check"
+      [loading]="guardando()"
+      (onClick)="guardar()"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Detalle del ingreso"
+  [visible]="detalle() !== null"
+  (visibleChange)="$event ? null : detalle.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '46rem', maxWidth: '96vw' }"
+>
+  @if (detalle(); as ingreso) {
+    <p-table [value]="ingreso.items" responsiveLayout="scroll">
+      <ng-template #header>
+        <tr>
+          <th>Producto</th>
+          <th>Lote</th>
+          <th>Vence</th>
+          <th class="text-right">Cantidad</th>
+          <th class="text-right">Costo</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-lote>
+        <tr>
+          <td>{{ lote.productoNombre }}</td>
+          <td>{{ lote.numeroLote }}</td>
+          <td>{{ lote.fechaVencimiento | date: 'd MMM y' }}</td>
+          <td class="text-right">{{ lote.cantidadInicial }}</td>
+          <td class="text-right">{{ lote.costoUnitario | currency: 'PEN' : 'symbol-narrow' }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</p-dialog>

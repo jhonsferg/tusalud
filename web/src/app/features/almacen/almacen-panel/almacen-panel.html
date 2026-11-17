@@ -1,0 +1,120 @@
+<app-page-header
+  title="Almacén"
+  subtitle="Existencias, lotes y alertas de reposición"
+  icon="pi-box"
+>
+  <p-button label="Registrar ingreso" icon="pi pi-plus" routerLink="/almacen/ingresos" />
+</app-page-header>
+
+@if (store.resumen.value(); as resumen) {
+  <div class="kpis">
+    <app-kpi etiqueta="Productos activos" [valor]="resumen.totalProductos" icono="pi-box" />
+    <app-kpi
+      etiqueta="Bajo el stock mínimo"
+      [valor]="resumen.productosBajoStock"
+      icono="pi-exclamation-triangle"
+      [tono]="resumen.productosBajoStock > 0 ? 'alerta' : 'exito'"
+    />
+    <app-kpi
+      etiqueta="Lotes por vencer"
+      [valor]="resumen.lotesPorVencer"
+      icono="pi-clock"
+      [tono]="resumen.lotesPorVencer > 0 ? 'alerta' : 'exito'"
+    />
+    <app-kpi
+      etiqueta="Lotes vencidos"
+      [valor]="resumen.lotesVencidos"
+      icono="pi-ban"
+      [tono]="resumen.lotesVencidos > 0 ? 'peligro' : 'exito'"
+    />
+    <app-kpi
+      etiqueta="Valor del inventario"
+      [valor]="(resumen.valorInventario | currency: 'PEN' : 'symbol-narrow') ?? ''"
+      icono="pi-wallet"
+    />
+  </div>
+}
+
+<div class="alertas">
+  <section class="panel">
+    <h3><i class="pi pi-exclamation-triangle"></i> Productos bajo el mínimo</h3>
+    @if (store.alertas.value()?.bajoStock; as productos) {
+      @if (productos.length === 0) {
+        <app-empty-state
+          icon="pi-check-circle"
+          title="Todo en orden"
+          message="Ningún producto está por debajo de su stock mínimo."
+        />
+      } @else {
+        <ul class="lista">
+          @for (producto of productos; track producto.id) {
+            <li>
+              <span>
+                <strong>{{ producto.nombre }}</strong>
+                <small class="text-muted">{{ producto.codigo }}</small>
+              </span>
+              <p-tag
+                [value]="producto.stockActual + ' / ' + producto.stockMinimo"
+                severity="warn"
+              />
+            </li>
+          }
+        </ul>
+      }
+    }
+  </section>
+
+  <section class="panel">
+    <h3><i class="pi pi-clock"></i> Lotes por vencer</h3>
+    @if (store.alertas.value()?.porVencer; as lotes) {
+      @if (lotes.length === 0) {
+        <app-empty-state
+          icon="pi-check-circle"
+          title="Sin vencimientos próximos"
+          message="No hay lotes que venzan en los próximos 60 días."
+        />
+      } @else {
+        <ul class="lista">
+          @for (lote of lotes; track lote.id) {
+            <li>
+              <span>
+                <strong>{{ lote.productoNombre }}</strong>
+                <small class="text-muted"
+                  >Lote {{ lote.numeroLote }} · {{ lote.cantidadActual }} unidades</small
+                >
+              </span>
+              <p-tag [value]="(lote.fechaVencimiento | date: 'd MMM y') ?? ''" severity="warn" />
+            </li>
+          }
+        </ul>
+      }
+    }
+  </section>
+
+  <section class="panel">
+    <h3><i class="pi pi-ban"></i> Lotes vencidos</h3>
+    @if (store.alertas.value()?.vencidos; as lotes) {
+      @if (lotes.length === 0) {
+        <app-empty-state
+          icon="pi-check-circle"
+          title="Sin lotes vencidos"
+          message="No hay existencias vencidas por retirar."
+        />
+      } @else {
+        <ul class="lista">
+          @for (lote of lotes; track lote.id) {
+            <li>
+              <span>
+                <strong>{{ lote.productoNombre }}</strong>
+                <small class="text-muted"
+                  >Lote {{ lote.numeroLote }} · {{ lote.cantidadActual }} unidades</small
+                >
+              </span>
+              <p-tag [value]="(lote.fechaVencimiento | date: 'd MMM y') ?? ''" severity="danger" />
+            </li>
+          }
+        </ul>
+      }
+    }
+  </section>
+</div>

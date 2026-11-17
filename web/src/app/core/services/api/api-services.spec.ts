@@ -11,7 +11,10 @@ import { PerfilApiService } from './perfil-api.service';
 import { AdminApiService } from './admin-api.service';
 import { ClinicaApiService } from './clinica-api.service';
 import { NotificacionesApiService } from './notificaciones-api.service';
+import { AlmacenApiService } from './almacen-api.service';
 import { CalendarioApiService } from './calendario-api.service';
+import { FarmaciaApiService } from './farmacia-api.service';
+import { LaboratorioApiService } from './laboratorio-api.service';
 import { PagosApiService } from './pagos-api.service';
 
 interface Expected {
@@ -445,5 +448,94 @@ describe('servicios de la API', () => {
     });
     api.eliminar(4).subscribe();
     expectRequest({ method: 'DELETE', url: '/api/v1/calendario/eventos/4' });
+  });
+
+  it('AlmacenApiService cubre productos, ingresos, salidas y kardex', () => {
+    const api = TestBed.inject(AlmacenApiService);
+    api.resumen().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/almacen/resumen' });
+    api.alertas().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/almacen/alertas' });
+    api.listarProductos({ q: 'para', bajoStock: true }).subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/almacen/productos',
+      params: { q: 'para', bajoStock: 'true' },
+    });
+    api.listarLotes(4).subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/almacen/productos/4/lotes' });
+    api.registrarIngreso({ items: [] }).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/almacen/ingresos', body: { items: [] } });
+    api.registrarSalida({ productoId: 4, cantidad: 2, motivo: 'MERMA' }).subscribe();
+    expectRequest({
+      method: 'POST',
+      url: '/api/v1/almacen/salidas',
+      body: { productoId: 4, cantidad: 2, motivo: 'MERMA' },
+    });
+    api.listarMovimientos({ productoId: 4, tipo: 'SALIDA' }).subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/almacen/movimientos',
+      params: { productoId: '4', tipo: 'SALIDA' },
+    });
+    api.listarProveedores({ activo: true }).subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/almacen/proveedores',
+      params: { activo: 'true' },
+    });
+  });
+
+  it('FarmaciaApiService cubre recetas, dispensaciones y anulación', () => {
+    const api = TestBed.inject(FarmaciaApiService);
+    api.recetas('PENDIENTE', '1234').subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/farmacia/recetas',
+      params: { estado: 'PENDIENTE', q: '1234' },
+    });
+    api.catalogo('para').subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/farmacia/catalogo', params: { q: 'para' } });
+    const request = { items: [], metodoPago: 'YAPE' as const };
+    api.dispensar(request).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/farmacia/dispensaciones', body: request });
+    api.anular(9).subscribe();
+    expectRequest({ method: 'PUT', url: '/api/v1/farmacia/dispensaciones/9/anular' });
+    api.misDispensaciones().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/farmacia/mis-dispensaciones' });
+  });
+
+  it('LaboratorioApiService cubre exámenes, órdenes y resultados', () => {
+    const api = TestBed.inject(LaboratorioApiService);
+    api.listarExamenes({ categoria: 'BIOQUIMICA' }).subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/laboratorio/examenes',
+      params: { categoria: 'BIOQUIMICA' },
+    });
+    api.crearOrden({ pacienteId: 1, prioridad: 'URGENTE', examenIds: [2] }).subscribe();
+    expectRequest({
+      method: 'POST',
+      url: '/api/v1/laboratorio/ordenes',
+      body: { pacienteId: 1, prioridad: 'URGENTE', examenIds: [2] },
+    });
+    api.tomarMuestra(5).subscribe();
+    expectRequest({ method: 'PUT', url: '/api/v1/laboratorio/ordenes/5/muestra' });
+    api.registrarResultados(5, 8, { resultados: [{ parametroId: 3, valor: '90' }] }).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: '/api/v1/laboratorio/ordenes/5/items/8/resultados',
+      body: { resultados: [{ parametroId: 3, valor: '90' }] },
+    });
+    api.validar(5).subscribe();
+    expectRequest({ method: 'PUT', url: '/api/v1/laboratorio/ordenes/5/validar' });
+    api.cancelar(5, 'Error de registro').subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: '/api/v1/laboratorio/ordenes/5/cancelar',
+      body: { motivo: 'Error de registro' },
+    });
+    api.misOrdenes().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/laboratorio/mis-ordenes' });
   });
 });

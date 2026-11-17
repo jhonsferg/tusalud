@@ -7,6 +7,7 @@ import {
   EstadisticasResponse,
   PagoResponse,
   RangoFechas,
+  PersonalRequest,
   RolResumenResponse,
   UsuarioAdminResponse,
 } from '@tusalud/app/core/models';
@@ -60,6 +61,12 @@ export class AdminStore {
 
   cargarPagos(rango: RangoFechas = {}): void {
     this.pagos.load(this.api.listarPagos(rango));
+  }
+
+  crearPersonal(request: PersonalRequest): Observable<UsuarioAdminResponse> {
+    return this.api
+      .crearPersonal(request)
+      .pipe(tap((usuario) => this.usuarios.update((items) => [usuario, ...(items ?? [])])));
   }
 
   cargarRoles(): void {

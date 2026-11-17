@@ -1,0 +1,214 @@
+<app-page-header
+  [title]="orden()?.codigo ?? 'Orden de laboratorio'"
+  subtitle="Detalle, muestra y resultados"
+  icon="pi-filter"
+  backLink="/laboratorio"
+  backLabel="Volver a las órdenes"
+/>
+
+@if (store.orden.error(); as error) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar la orden"
+      [message]="error.message"
+    />
+  </div>
+} @else if (orden(); as o) {
+  <div class="cabecera panel">
+    <div>
+      <h2>{{ o.pacienteNombre }}</h2>
+      <p class="text-muted">
+        DNI {{ o.dni }} · Solicitó {{ o.medicoNombre }} · {{ o.fecha | date: 'd MMM y, HH:mm' }}
+      </p>
+      @if (o.indicaciones) {
+        <p class="indicaciones"><i class="pi pi-info-circle"></i> {{ o.indicaciones }}</p>
+      }
+    </div>
+    <div class="estado">
+      <p-tag
+        [value]="etiqueta[o.estado]"
+        [severity]="severidad[o.estado]"
+        [icon]="'pi ' + icono[o.estado]"
+      />
+      @if (o.prioridad === 'URGENTE') {
+        <p-tag value="Urgente" severity="danger" />
+      }
+      <strong>{{ o.total | currency: 'PEN' : 'symbol-narrow' }}</strong>
+    </div>
+  </div>
+
+  <div class="acciones-orden">
+    @if (puedeTomarMuestra()) {
+      <p-button
+        label="Registrar toma de muestra"
+        icon="pi pi-filter"
+        [loading]="trabajando()"
+        (onClick)="tomarMuestra()"
+      />
+    }
+    @if (puedeValidar()) {
+      <p-button
+        label="Validar y publicar"
+        icon="pi pi-verified"
+        severity="success"
+        [loading]="trabajando()"
+        (onClick)="validar()"
+      />
+    }
+    @if (o.estado === 'COMPLETADA') {
+      <p-button
+        label="Imprimir resultados"
+        icon="pi pi-print"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="imprimir()"
+      />
+    }
+    @if (puedeCancelar()) {
+      <p-button
+        label="Cancelar orden"
+        icon="pi pi-times"
+        [outlined]="true"
+        severity="danger"
+        (onClick)="cancelar()"
+      />
+    }
+  </div>
+
+  @for (item of o.items; track item.id) {
+    <section class="panel item">
+      <header>
+        <div>
+          <h3>{{ item.examenNombre }}</h3>
+          <small class="text-muted">{{ item.muestra }} · {{ item.categoria }}</small>
+        </div>
+        <div class="derecha">
+          <p-tag
+            [value]="
+              item.estado === 'PENDIENTE'
+                ? 'Pendiente'
+                : item.estado === 'CON_RESULTADO'
+                  ? 'Con resultado'
+                  : 'Validado'
+            "
+            [severity]="
+              item.estado === 'VALIDADO'
+                ? 'success'
+                : item.estado === 'CON_RESULTADO'
+                  ? 'info'
+                  : 'warn'
+            "
+          />
+          @if (puedeCapturar() && item.estado !== 'VALIDADO' && capturando() !== item.id) {
+            <p-button
+              [label]="item.resultados.length ? 'Editar resultados' : 'Capturar resultados'"
+              icon="pi pi-pencil"
+              size="small"
+              [outlined]="true"
+              (onClick)="abrirCaptura(item)"
+            />
+          }
+        </div>
+      </header>
+
+      @if (capturando() === item.id) {
+        <form
+          [formGroup]="formulario"
+          (submit)="$event.preventDefault(); guardarResultados(item)"
+          novalidate
+        >
+          @if (error(); as mensaje) {
+            <p-message severity="error" styleClass="w-full mb-2">{{ mensaje }}</p-message>
+          }
+          <table class="captura">
+            <thead>
+              <tr>
+                <th>Parámetro</th>
+                <th>Resultado</th>
+                <th>Referencia</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (parametro of parametros(item); track parametro.id) {
+                <tr>
+                  <td>{{ parametro.nombre }}</td>
+                  <td>
+                    <input
+                      pInputText
+                      [id]="'res-' + parametro.id"
+                      [formControlName]="'p' + parametro.id"
+                      [attr.inputmode]="parametro.tipo === 'NUMERICO' ? 'decimal' : 'text'"
+                      class="w-full"
+                    />
+                  </td>
+                  <td class="text-muted">
+                    {{ rango(parametro.valorMin, parametro.valorMax, parametro.unidad) }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <textarea
+            pTextarea
+            formControlName="observaciones"
+            rows="2"
+            class="w-full"
+            placeholder="Observaciones"
+          ></textarea>
+          <div class="botones">
+            <p-button
+              label="Cancelar"
+              severity="secondary"
+              [outlined]="true"
+              size="small"
+              (onClick)="capturando.set(null)"
+            />
+            <p-button
+              label="Guardar resultados"
+              icon="pi pi-check"
+              size="small"
+              [loading]="trabajando()"
+              (onClick)="guardarResultados(item)"
+            />
+          </div>
+        </form>
+      } @else if (item.resultados.length > 0) {
+        <table class="resultados">
+          <thead>
+            <tr>
+              <th>Parámetro</th>
+              <th>Resultado</th>
+              <th>Referencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (resultado of item.resultados; track resultado.parametroId) {
+              <tr [class.fuera]="resultado.fueraDeRango">
+                <td>{{ resultado.parametro }}</td>
+                <td>
+                  <strong>{{ resultado.valor }}</strong> {{ resultado.unidad }}
+                  @if (resultado.fueraDeRango) {
+                    <i class="pi pi-exclamation-triangle" title="Fuera del rango de referencia"></i>
+                  }
+                </td>
+                <td class="text-muted">
+                  {{ rango(resultado.valorMin, resultado.valorMax, resultado.unidad) }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        @if (item.observaciones) {
+          <p class="text-muted">{{ item.observaciones }}</p>
+        }
+        @if (item.validadoPor) {
+          <small class="text-muted">Validado por {{ item.validadoPor }}</small>
+        }
+      } @else {
+        <p class="text-muted">Aún sin resultados.</p>
+      }
+    </section>
+  }
+}

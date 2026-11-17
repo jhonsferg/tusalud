@@ -1,0 +1,111 @@
+<app-page-header
+  title="Mis resultados"
+  subtitle="Tus exámenes de laboratorio y su avance"
+  icon="pi-filter"
+/>
+
+@if (store.misOrdenes.value(); as ordenes) {
+  @if (ordenes.length === 0) {
+    <div class="panel">
+      <app-empty-state
+        icon="pi-filter"
+        title="Aún no tienes exámenes"
+        message="Cuando tu médico solicite un examen, podrás seguir su avance aquí."
+      />
+    </div>
+  } @else {
+    <div class="grid">
+      @for (orden of ordenes; track orden.id) {
+        <article class="panel orden">
+          <header>
+            <div>
+              <strong>{{ orden.codigo }}</strong>
+              <small class="text-muted block"
+                >{{ orden.fecha | date: 'd MMM y' }} · {{ orden.medicoNombre }}</small
+              >
+            </div>
+            <p-tag
+              [value]="etiqueta[orden.estado]"
+              [severity]="severidad[orden.estado]"
+              [icon]="'pi ' + icono[orden.estado]"
+            />
+          </header>
+          <ul>
+            @for (item of orden.items; track item.id) {
+              <li>{{ item.examenNombre }}</li>
+            }
+          </ul>
+          @if (orden.estado === 'COMPLETADA') {
+            @if (fuera(orden) > 0) {
+              <p class="aviso">
+                <i class="pi pi-exclamation-triangle"></i> {{ fuera(orden) }} valores fuera del
+                rango
+              </p>
+            }
+            <p-button
+              label="Ver resultados"
+              icon="pi pi-eye"
+              size="small"
+              (onClick)="seleccionada.set(orden)"
+            />
+          } @else {
+            <small class="text-muted">Te avisaremos cuando los resultados estén listos.</small>
+          }
+        </article>
+      }
+    </div>
+  }
+}
+
+<p-dialog
+  [header]="'Resultados ' + (seleccionada()?.codigo ?? '')"
+  [visible]="seleccionada() !== null"
+  (visibleChange)="$event ? null : seleccionada.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '44rem', maxWidth: '96vw' }"
+>
+  @if (seleccionada(); as orden) {
+    @for (item of orden.items; track item.id) {
+      <section class="examen">
+        <h4>{{ item.examenNombre }}</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Parámetro</th>
+              <th>Resultado</th>
+              <th>Referencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of item.resultados; track r.parametroId) {
+              <tr [class.fuera]="r.fueraDeRango">
+                <td>{{ r.parametro }}</td>
+                <td>
+                  <strong>{{ r.valor }}</strong> {{ r.unidad }}
+                  @if (r.fueraDeRango) {
+                    <i class="pi pi-exclamation-triangle" title="Fuera del rango de referencia"></i>
+                  }
+                </td>
+                <td class="text-muted">{{ rango(r.valorMin, r.valorMax, r.unidad) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        @if (item.observaciones) {
+          <p class="text-muted">{{ item.observaciones }}</p>
+        }
+      </section>
+    }
+  }
+  <ng-template #footer>
+    <p-button
+      label="Imprimir"
+      icon="pi pi-print"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="imprimir()"
+    />
+    <p-button label="Cerrar" (onClick)="seleccionada.set(null)" />
+  </ng-template>
+</p-dialog>

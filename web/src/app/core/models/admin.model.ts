@@ -43,3 +43,12 @@ export interface RolResumenResponse {
   descripcion: string;
   usuarios: number;
 }
+
+export interface PersonalRequest {
+  nombre: string;
+  apellido: string;
+  email: string;
+  password: string;
+  telefono?: string | null;
+  roles: string[];
+}

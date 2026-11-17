@@ -103,6 +103,18 @@ describe('rutas de la aplicación', () => {
     expect(await navigateAs(['ROLE_ADMIN'], '/citas/5', true)).toBe('/citas/5');
   });
 
+  it('lleva al personal nuevo a su módulo y le niega las demás secciones', async () => {
+    expect(await navigateAs(['ROLE_LABORATORIO'], '/', true)).toBe('/laboratorio');
+    expect(await navigateAs(['ROLE_FARMACIA'], '/', true)).toBe('/farmacia');
+    expect(await navigateAs(['ROLE_ALMACEN'], '/', true)).toBe('/almacen');
+    expect(await navigateAs(['ROLE_FARMACIA'], '/almacen/ingresos', true)).toBe('/farmacia');
+    expect(await navigateAs(['ROLE_ALMACEN'], '/farmacia/dispensar', true)).toBe('/almacen');
+    expect(await navigateAs(['ROLE_PACIENTE'], '/almacen/productos', true)).toBe('/citas');
+    expect(await navigateAs(['ROLE_MEDICO'], '/farmacia', true)).toBe('/agenda');
+    expect(await navigateAs(['ROLE_PACIENTE'], '/mis-resultados', true)).toBe('/mis-resultados');
+    expect(await navigateAs(['ROLE_MEDICO'], '/mis-medicamentos', true)).toBe('/agenda');
+  });
+
   it('muestra la página no encontrada para rutas desconocidas', async () => {
     expect(await navigateAs(['ROLE_PACIENTE'], '/no-existe', true)).toBe('/no-existe');
   });

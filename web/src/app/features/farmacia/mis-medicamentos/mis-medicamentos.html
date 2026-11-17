@@ -1,0 +1,46 @@
+<app-page-header
+  title="Mis medicamentos"
+  subtitle="Lo que la farmacia te entregó con tus recetas"
+  icon="pi-heart"
+/>
+
+@if (store.misDispensaciones.value(); as lista) {
+  @if (lista.length === 0) {
+    <div class="panel">
+      <app-empty-state
+        icon="pi-heart"
+        title="Aún no tienes entregas"
+        message="Cuando la farmacia dispense una receta tuya, aparecerá aquí."
+      />
+    </div>
+  } @else {
+    <div class="grid">
+      @for (d of lista; track d.id) {
+        <article class="panel entrega" [class.anulada]="d.estado === 'ANULADA'">
+          <header>
+            <div>
+              <strong>{{ d.comprobante }}</strong>
+              <small class="text-muted block">{{ d.fecha | date: 'd MMM y, HH:mm' }}</small>
+            </div>
+            <p-tag
+              [value]="d.estado === 'ANULADA' ? 'Anulada' : 'Entregada'"
+              [severity]="d.estado === 'ANULADA' ? 'secondary' : 'success'"
+            />
+          </header>
+          <ul>
+            @for (item of d.items; track $index) {
+              <li>
+                <span>{{ item.cantidad }} × {{ item.productoNombre }}</span>
+                <span>{{ item.subtotal | currency: 'PEN' : 'symbol-narrow' }}</span>
+              </li>
+            }
+          </ul>
+          <footer>
+            <small class="text-muted">{{ etiquetaMetodo[d.metodoPago] }}</small>
+            <strong>{{ d.total | currency: 'PEN' : 'symbol-narrow' }}</strong>
+          </footer>
+        </article>
+      }
+    </div>
+  }
+}

@@ -15,7 +15,7 @@ import { Drawer } from 'primeng/drawer';
 import { Popover } from 'primeng/popover';
 import { Tooltip } from 'primeng/tooltip';
 
-import { NotificacionResponse, Rol } from '@tusalud/app/core/models';
+import { ETIQUETA_ROL, NotificacionResponse, Rol } from '@tusalud/app/core/models';
 import { AuthService } from '@tusalud/app/core/services/auth.service';
 import { StorageService } from '@tusalud/app/core/services/storage.service';
 import { ThemeMode, ThemeService } from '@tusalud/app/core/services/theme.service';
@@ -40,7 +40,15 @@ interface NavGroup {
   readonly items: readonly NavItem[];
 }
 
-const TODOS: readonly Rol[] = ['ROLE_ADMIN', 'ROLE_MEDICO', 'ROLE_PACIENTE'];
+const TODOS: readonly Rol[] = [
+  'ROLE_ADMIN',
+  'ROLE_MEDICO',
+  'ROLE_PACIENTE',
+  'ROLE_LABORATORIO',
+  'ROLE_FARMACIA',
+  'ROLE_ALMACEN',
+];
+const GESTION_CLINICA: readonly Rol[] = ['ROLE_ADMIN', 'ROLE_LABORATORIO', 'ROLE_MEDICO'];
 
 const NAV_GROUPS: readonly NavGroup[] = [
   {
@@ -76,6 +84,18 @@ const NAV_GROUPS: readonly NavGroup[] = [
         roles: ['ROLE_PACIENTE'],
       },
       {
+        label: 'Mis resultados',
+        icon: 'pi-filter',
+        link: '/mis-resultados',
+        roles: ['ROLE_PACIENTE'],
+      },
+      {
+        label: 'Mis medicamentos',
+        icon: 'pi-heart',
+        link: '/mis-medicamentos',
+        roles: ['ROLE_PACIENTE'],
+      },
+      {
         label: 'Mis pagos',
         icon: 'pi-wallet',
         link: '/pagos',
@@ -87,6 +107,90 @@ const NAV_GROUPS: readonly NavGroup[] = [
         icon: 'pi-credit-card',
         link: '/pagos/metodos',
         roles: ['ROLE_PACIENTE'],
+      },
+    ],
+  },
+  {
+    title: 'Laboratorio',
+    items: [
+      {
+        label: 'Órdenes',
+        icon: 'pi-filter',
+        link: '/laboratorio',
+        roles: GESTION_CLINICA,
+        exact: true,
+      },
+      {
+        label: 'Solicitar exámenes',
+        icon: 'pi-send',
+        link: '/laboratorio/solicitar',
+        roles: ['ROLE_MEDICO'],
+      },
+      {
+        label: 'Catálogo de exámenes',
+        icon: 'pi-book',
+        link: '/laboratorio/examenes',
+        roles: GESTION_CLINICA,
+      },
+    ],
+  },
+  {
+    title: 'Farmacia',
+    items: [
+      {
+        label: 'Farmacia',
+        icon: 'pi-plus-circle',
+        link: '/farmacia',
+        roles: ['ROLE_ADMIN', 'ROLE_FARMACIA'],
+        exact: true,
+      },
+      {
+        label: 'Dispensar',
+        icon: 'pi-shopping-cart',
+        link: '/farmacia/dispensar',
+        roles: ['ROLE_ADMIN', 'ROLE_FARMACIA'],
+      },
+      {
+        label: 'Historial',
+        icon: 'pi-history',
+        link: '/farmacia/historial',
+        roles: ['ROLE_ADMIN', 'ROLE_FARMACIA'],
+      },
+    ],
+  },
+  {
+    title: 'Almacén',
+    items: [
+      {
+        label: 'Resumen',
+        icon: 'pi-box',
+        link: '/almacen',
+        roles: ['ROLE_ADMIN', 'ROLE_ALMACEN'],
+        exact: true,
+      },
+      {
+        label: 'Productos',
+        icon: 'pi-tags',
+        link: '/almacen/productos',
+        roles: ['ROLE_ADMIN', 'ROLE_ALMACEN', 'ROLE_FARMACIA'],
+      },
+      {
+        label: 'Ingresos',
+        icon: 'pi-download',
+        link: '/almacen/ingresos',
+        roles: ['ROLE_ADMIN', 'ROLE_ALMACEN'],
+      },
+      {
+        label: 'Proveedores',
+        icon: 'pi-truck',
+        link: '/almacen/proveedores',
+        roles: ['ROLE_ADMIN', 'ROLE_ALMACEN'],
+      },
+      {
+        label: 'Kardex',
+        icon: 'pi-arrows-v',
+        link: '/almacen/movimientos',
+        roles: ['ROLE_ADMIN', 'ROLE_ALMACEN', 'ROLE_FARMACIA'],
       },
     ],
   },
@@ -129,12 +233,6 @@ const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
 ];
-
-const ETIQUETA_ROL: Readonly<Record<Rol, string>> = {
-  ROLE_ADMIN: 'Administrador',
-  ROLE_MEDICO: 'Médico',
-  ROLE_PACIENTE: 'Paciente',
-};
 
 const COLLAPSE_KEY = 'tusalud.sidebar.collapsed';
 

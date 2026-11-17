@@ -1,0 +1,182 @@
+<app-page-header
+  title="Dispensar"
+  subtitle="Entrega de medicamentos con receta o venta sin receta"
+  icon="pi-shopping-cart"
+  backLink="/farmacia"
+  backLabel="Volver a farmacia"
+/>
+
+<div class="layout">
+  <section class="panel">
+    <h3>1. Receta del paciente</h3>
+    @if (receta(); as r) {
+      <div class="receta-activa">
+        <div>
+          <strong>{{ r.pacienteNombre }}</strong>
+          <small class="text-muted block"
+            >DNI {{ r.dni }} · {{ r.medicoNombre }} · {{ r.fecha | date: 'd MMM y' }}</small
+          >
+        </div>
+        <p-button label="Cambiar" [text]="true" size="small" (onClick)="elegirReceta(null)" />
+      </div>
+    } @else {
+      <input
+        pInputText
+        type="search"
+        class="w-full"
+        placeholder="Buscar por DNI o nombre del paciente"
+        aria-label="Buscar receta"
+        [ngModel]="busqueda()"
+        (ngModelChange)="busqueda.set($event)"
+      />
+      <ul class="recetas">
+        @for (item of recetasFiltradas(); track item.atencionId) {
+          <li>
+            <button type="button" (click)="elegirReceta(item)">
+              <span>
+                <strong>{{ item.pacienteNombre }}</strong>
+                <small class="text-muted"
+                  >DNI {{ item.dni }} · {{ item.items.length }} medicamentos</small
+                >
+              </span>
+              <small>{{ item.fecha | date: 'd MMM' }}</small>
+            </button>
+          </li>
+        } @empty {
+          <li class="vacio text-muted">
+            No hay recetas pendientes. Puedes registrar una venta sin receta.
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <section class="panel">
+    <h3>2. Productos a entregar</h3>
+    @if (error(); as mensaje) {
+      <p-message severity="error" styleClass="w-full mb-3">{{ mensaje }}</p-message>
+    }
+    <form [formGroup]="form" (submit)="$event.preventDefault(); confirmar()" novalidate>
+      <div class="filas" formArrayName="items">
+        @for (fila of items.controls; track fila; let i = $index) {
+          <div class="fila" [formGroupName]="i">
+            @if (fila.value.etiqueta) {
+              <small class="receta-item"
+                ><i class="pi pi-file-edit"></i> {{ fila.value.etiqueta }}</small
+              >
+            }
+            <div class="campos">
+              <p-select
+                [inputId]="'disp-producto-' + i"
+                formControlName="productoId"
+                [options]="opciones()"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Producto"
+                [filter]="true"
+                appendTo="body"
+                styleClass="w-full"
+              />
+              <p-inputnumber
+                [inputId]="'disp-cantidad-' + i"
+                formControlName="cantidad"
+                [min]="1"
+                [fluid]="true"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                [rounded]="true"
+                severity="danger"
+                ariaLabel="Quitar producto"
+                (onClick)="quitar(i)"
+              />
+            </div>
+          </div>
+        } @empty {
+          <app-empty-state
+            icon="pi-shopping-cart"
+            title="Sin productos"
+            message="Elige una receta o agrega productos de venta libre."
+          />
+        }
+      </div>
+      <p-button
+        label="Agregar producto"
+        icon="pi pi-plus"
+        [text]="true"
+        (onClick)="agregarLibre()"
+      />
+
+      <h3 class="mt-4">3. Pago</h3>
+      <div class="pago">
+        <p-select
+          inputId="disp-metodo"
+          formControlName="metodoPago"
+          [options]="metodos"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        />
+        <strong class="total">{{ total() | currency: 'PEN' : 'symbol-narrow' }}</strong>
+      </div>
+      <textarea
+        pTextarea
+        formControlName="observaciones"
+        rows="2"
+        class="w-full"
+        placeholder="Observaciones"
+      ></textarea>
+
+      <div class="acciones">
+        <p-button
+          label="Confirmar dispensación"
+          icon="pi pi-check"
+          [loading]="guardando()"
+          [disabled]="items.length === 0"
+          (onClick)="confirmar()"
+        />
+      </div>
+    </form>
+  </section>
+</div>
+
+<p-dialog
+  header="Comprobante"
+  [visible]="comprobante() !== null"
+  (visibleChange)="$event ? null : comprobante.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '30rem', maxWidth: '96vw' }"
+>
+  @if (comprobante(); as c) {
+    <div class="comprobante">
+      <h4>{{ c.comprobante }}</h4>
+      <p class="text-muted">{{ c.fecha | date: 'd MMM y, HH:mm' }} · {{ c.pacienteNombre }}</p>
+      <table>
+        @for (item of c.items; track $index) {
+          <tr>
+            <td>{{ item.cantidad }} × {{ item.productoNombre }}</td>
+            <td class="text-right">{{ item.subtotal | currency: 'PEN' : 'symbol-narrow' }}</td>
+          </tr>
+        }
+        <tr class="total-fila">
+          <td>Total</td>
+          <td class="text-right">{{ c.total | currency: 'PEN' : 'symbol-narrow' }}</td>
+        </tr>
+      </table>
+      <small class="text-muted">Atendió {{ c.farmaceuticoNombre }}</small>
+    </div>
+  }
+  <ng-template #footer>
+    <p-button
+      label="Imprimir"
+      icon="pi pi-print"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="imprimir()"
+    />
+    <p-button label="Listo" (onClick)="comprobante.set(null)" />
+  </ng-template>
+</p-dialog>

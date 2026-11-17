@@ -6,6 +6,9 @@ export const CUENTAS = {
   paciente: { email: 'juan.perez@correo.com', password: 'Paciente123!', home: /\/citas$/ },
   medico: { email: 'dr.garcia@tusalud.com', password: 'Medico123!', home: /\/agenda$/ },
   admin: { email: 'admin@tusalud.com', password: 'Admin123!', home: /\/admin\/panel$/ },
+  laboratorio: { email: 'lab@tusalud.com', password: 'Personal123!', home: /\/laboratorio$/ },
+  farmacia: { email: 'farmacia@tusalud.com', password: 'Personal123!', home: /\/farmacia$/ },
+  almacen: { email: 'almacen@tusalud.com', password: 'Personal123!', home: /\/almacen$/ },
 } as const;
 
 export async function omitirGuia(page: Page): Promise<void> {

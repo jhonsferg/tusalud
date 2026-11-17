@@ -2,7 +2,9 @@
   title="Usuarios"
   subtitle="Cuentas de pacientes, médicos y administradores, y los roles de cada persona"
   icon="pi-id-card"
-/>
+>
+  <p-button label="Nuevo personal" icon="pi pi-user-plus" (onClick)="abrirPersonal()" />
+</app-page-header>
 
 <div class="panel">
   <div class="flex flex-wrap gap-3 mb-3">
@@ -164,6 +166,83 @@
       [loading]="guardando()"
       [disabled]="seleccion().length === 0"
       (onClick)="guardarRoles()"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Registrar personal"
+  [visible]="personalVisible()"
+  (visibleChange)="personalVisible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '32rem', maxWidth: '96vw' }"
+>
+  <form
+    class="personal-form"
+    [formGroup]="personal"
+    (submit)="$event.preventDefault(); crearPersonal()"
+    novalidate
+  >
+    @if (errorPersonal(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    <div class="dos">
+      <label>
+        Nombre
+        <input pInputText id="per-nuevo-nombre" formControlName="nombre" class="w-full" />
+      </label>
+      <label>
+        Apellido
+        <input pInputText id="per-nuevo-apellido" formControlName="apellido" class="w-full" />
+      </label>
+    </div>
+    <label>
+      Correo
+      <input pInputText id="per-nuevo-email" type="email" formControlName="email" class="w-full" />
+    </label>
+    <label>
+      Teléfono
+      <input pInputText id="per-nuevo-telefono" formControlName="telefono" class="w-full" />
+    </label>
+    <label>
+      Contraseña inicial
+      <p-password
+        inputId="per-nuevo-password"
+        formControlName="password"
+        [feedback]="false"
+        [toggleMask]="true"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+      />
+    </label>
+    <label>
+      Roles
+      <p-multiselect
+        inputId="per-nuevo-roles"
+        formControlName="roles"
+        [options]="rolesPersonal"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Selecciona uno o más roles"
+        display="chip"
+        appendTo="body"
+        styleClass="w-full"
+      />
+    </label>
+  </form>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="personalVisible.set(false)"
+    />
+    <p-button
+      label="Registrar"
+      icon="pi pi-check"
+      [loading]="creandoPersonal()"
+      (onClick)="crearPersonal()"
     />
   </ng-template>
 </p-dialog>

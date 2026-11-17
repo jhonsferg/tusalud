@@ -31,7 +31,7 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { Tag } from 'primeng/tag';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 
-import { ApiError, SesionResponse } from '@tusalud/app/core/models';
+import { ApiError, ETIQUETA_ROL, SesionResponse } from '@tusalud/app/core/models';
 import { NotificationService } from '@tusalud/app/core/services/notification.service';
 import { PALETAS, ThemeMode, ThemeService } from '@tusalud/app/core/services/theme.service';
 import { PerfilStore } from '@tusalud/app/core/state/perfil.store';
@@ -43,12 +43,6 @@ import { FormField } from '@tusalud/app/shared/components/form-field/form-field'
 import { MfaPanel } from '@tusalud/app/features/perfil/mfa-panel/mfa-panel';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
 import { UserAvatar } from '@tusalud/app/shared/components/user-avatar/user-avatar';
-
-const ETIQUETA_ROL: Readonly<Record<string, string>> = {
-  ROLE_ADMIN: 'Administrador',
-  ROLE_MEDICO: 'Médico',
-  ROLE_PACIENTE: 'Paciente',
-};
 
 const AVATAR_LADO = 256;
 const AVATAR_MAX_ENTRADA = 8 * 1024 * 1024;

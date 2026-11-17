@@ -1,0 +1,63 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr));
+  gap: 1.1rem;
+}
+
+.orden {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+}
+
+.aviso {
+  margin: 0;
+  color: var(--p-red-600);
+  font-weight: 600;
+}
+
+.examen {
+  margin-bottom: 1.2rem;
+
+  h4 {
+    margin: 0 0 0.4rem;
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    padding: 0.4rem 0.5rem;
+    color: var(--p-text-muted-color);
+    font-size: 0.75rem;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  td {
+    padding: 0.45rem 0.5rem;
+    border-top: 1px solid var(--p-content-border-color);
+  }
+
+  tr.fuera td {
+    background: color-mix(in srgb, var(--p-red-500) 8%, transparent);
+    color: var(--p-red-600);
+
+    .text-muted {
+      color: var(--p-text-muted-color);
+    }
+  }
+}

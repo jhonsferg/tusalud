@@ -8,6 +8,7 @@ import {
   CuponResponse,
   EstadisticasResponse,
   PagoResponse,
+  PersonalRequest,
   RangoFechas,
   RolResumenResponse,
   UsuarioAdminResponse,
@@ -56,6 +57,10 @@ export class AdminApiService {
     estado: 'ACTIVO' | 'INACTIVO',
   ): Observable<UsuarioAdminResponse> {
     return this.http.put<UsuarioAdminResponse>(`${this.baseUrl}/usuarios/${id}/estado`, { estado });
+  }
+
+  crearPersonal(request: PersonalRequest): Observable<UsuarioAdminResponse> {
+    return this.http.post<UsuarioAdminResponse>(`${this.baseUrl}/personal`, request);
   }
 
   listarRoles(): Observable<RolResumenResponse[]> {
