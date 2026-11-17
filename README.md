@@ -21,6 +21,7 @@ TuSalud es el sistema de gestión de citas y consultas médicas. El repositorio 
   - [Médicos y horarios](#médicos-y-horarios)
   - [Citas](#citas)
   - [Auditoría](#auditoría)
+  - [Perfil](#perfil)
 - [Manejo de errores](#manejo-de-errores)
 - [Perfiles y configuración](#perfiles-y-configuración)
 - [Ejecución local](#ejecución-local)
@@ -199,6 +200,9 @@ La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y
 | `PUT`    | `/api/v1/citas/{id}/atender`                 | Médico de la cita              | 200       |
 | `GET`    | `/api/v1/admin/auditoria/citas-por-estado`   | Admin                          | 200       |
 | `GET`    | `/api/v1/admin/auditoria/citas?inicio=&fin=` | Admin                          | 200       |
+| `GET`    | `/api/v1/perfil`                             | Autenticado                    | 200       |
+| `PUT`    | `/api/v1/perfil`                             | Autenticado                    | 200       |
+| `PUT`    | `/api/v1/perfil/password`                    | Autenticado                    | 204       |
 
 Las fechas de los parámetros usan el formato `yyyy-MM-dd` y `fechaHora` usa `yyyy-MM-ddTHH:mm:ss`. Las rutas de creación responden con el header `Location` apuntando al recurso nuevo.
 
@@ -1013,6 +1017,16 @@ sequenceDiagram
     end
 ```
 
+### Perfil
+
+`PerfilController` permite a cualquier usuario autenticado consultar y mantener sus propios datos. La identidad sale siempre del token, de modo que nadie puede leer ni modificar el perfil de otra persona.
+
+| Endpoint                      | Comportamiento                                                                                                                                                                                                                     |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/v1/perfil`          | Devuelve nombre, apellido, email, teléfono, roles y fecha de alta, más el DNI, la fecha de nacimiento y la historia clínica si es paciente, o la colegiatura, el consultorio, la especialidad y el precio de consulta si es médico |
+| `PUT /api/v1/perfil`          | Actualiza nombre, apellido y teléfono. Un paciente puede cambiar además su fecha de nacimiento y un médico su consultorio. El email, el DNI y la colegiatura no se modifican                                                       |
+| `PUT /api/v1/perfil/password` | Verifica la contraseña actual y guarda la nueva cifrada con BCrypt. Responde 409 si la actual no coincide o si la nueva es igual a la actual, y 400 si la nueva no tiene entre 8 y 72 caracteres                                   |
+
 ## Manejo de errores
 
 `GlobalExceptionHandler` traduce cada excepción a una respuesta con el mismo formato. Los errores 401 y 403 que produce Spring Security antes de llegar a un controlador usan ese mismo formato.
@@ -1253,7 +1267,7 @@ El estado se maneja exclusivamente con signals de Angular. No se usa `zone.js`: 
 | Pieza                 | Responsabilidad                                                                                                                                                                                                                                                   |
 | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `AuthService`         | Guarda la sesión en un signal y expone `isAuthenticated`, `user`, `token`, `roles`, `isAdmin`, `isMedico`, `isPaciente` y `homeUrl` como signals derivados. Persiste la sesión en `localStorage`, la valida al restaurarla y la cierra sola cuando el JWT expira. |
-| Clientes de la API    | `AuthApiService`, `EspecialidadesApiService`, `MedicosApiService`, `CitasApiService` y `AuditoriaApiService` cubren los 23 endpoints del backend con tipos estrictos.                                                                                             |
+| Clientes de la API    | `AuthApiService`, `EspecialidadesApiService`, `MedicosApiService`, `CitasApiService`, `AuditoriaApiService` y `PerfilApiService` cubren los 26 endpoints del backend con tipos estrictos.                                                                         |
 | Stores                | `EspecialidadesStore`, `MedicosStore`, `CitasStore` y `AuditoriaStore` exponen los datos, el estado de carga y los errores como signals, y mantienen las listas sincronizadas después de cada alta, edición, eliminación o cambio de estado.                      |
 | `AsyncState`          | Base de los stores: agrupa los signals `value`, `loading`, `error` y `hasValue`, y cancela la carga anterior cuando empieza una nueva.                                                                                                                            |
 | `NotificationService` | Lista de notificaciones en un signal, con cierre automático.                                                                                                                                                                                                      |
@@ -1293,6 +1307,7 @@ Todas las pantallas se cargan de forma diferida. Los parámetros de ruta llegan 
 | `/citas/:id`                  | Paciente, médico, admin | Detalle de la cita              |
 | `/agenda`                     | Médico                  | Agenda del día                  |
 | `/admin/auditoria`            | Admin                   | Reportes de auditoría           |
+| `/perfil`                     | Con sesión              | Datos personales y contraseña   |
 | `/acceso-denegado`            | Todos                   | Aviso de permisos insuficientes |
 
 Al entrar a la raíz, el administrador va a la auditoría, el médico a su agenda y el paciente a sus citas. Quien no inició sesión va al login, y si intentaba abrir una ruta protegida, la URL viaja como `returnUrl`. Un usuario autenticado sin el rol necesario termina en `/acceso-denegado`.
@@ -1319,13 +1334,13 @@ Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrec
 
 ### Pruebas del frontend
 
-Las 62 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores y cada uno de los 23 endpoints de los clientes de la API.
+Las 63 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores y cada uno de los 26 endpoints de los clientes de la API.
 
 ```bash
 npm test
 ```
 
-Las 22 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, los filtros y los permisos por rol. Requieren el stack levantado con datos de prueba.
+Las 27 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil y el cambio de contraseña, los filtros y los permisos por rol. Requieren el stack levantado con datos de prueba.
 
 ```bash
 npm run e2e
