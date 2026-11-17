@@ -35,6 +35,11 @@ TuSalud es el sistema de gestión de citas y consultas médicas. El repositorio 
   - [Renovación del token](#renovación-del-token)
   - [Calendario de citas](#calendario-de-citas)
   - [Planificador de eventos](#planificador-de-eventos)
+  - [Personal de la institución](#personal-de-la-institución)
+  - [Almacén e inventario](#almacén-e-inventario)
+  - [Farmacia](#farmacia)
+  - [Laboratorio clínico](#laboratorio-clínico)
+  - [Reprogramación de citas](#reprogramación-de-citas)
 - [Manejo de errores](#manejo-de-errores)
 - [Perfiles y configuración](#perfiles-y-configuración)
 - [Migraciones con Flyway](#migraciones-con-flyway)
@@ -190,99 +195,141 @@ La API es completamente sin estado. Spring Security 7 trabaja con `SessionCreati
 
 La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y la especificación OpenAPI en `http://localhost:8080/v3/api-docs`. Para probar endpoints protegidos desde Swagger UI, obtén un token con el login y pégalo en el botón Authorize.
 
-| Método   | Ruta                                                     | Acceso                                | Respuesta |
-| -------- | -------------------------------------------------------- | ------------------------------------- | --------- |
-| `POST`   | `/api/v1/auth/login`                                     | Público                               | 200       |
-| `POST`   | `/api/v1/auth/register`                                  | Público, registra pacientes           | 201       |
-| `GET`    | `/api/v1/especialidades`                                 | Autenticado                           | 200       |
-| `GET`    | `/api/v1/especialidades/{id}`                            | Autenticado                           | 200       |
-| `POST`   | `/api/v1/especialidades`                                 | Admin                                 | 201       |
-| `PUT`    | `/api/v1/especialidades/{id}`                            | Admin                                 | 200       |
-| `DELETE` | `/api/v1/especialidades/{id}`                            | Admin                                 | 204       |
-| `GET`    | `/api/v1/medicos?especialidadId=`                        | Autenticado                           | 200       |
-| `GET`    | `/api/v1/medicos/{id}`                                   | Autenticado                           | 200       |
-| `POST`   | `/api/v1/medicos`                                        | Admin                                 | 201       |
-| `GET`    | `/api/v1/medicos/{id}/horarios`                          | Autenticado                           | 200       |
-| `POST`   | `/api/v1/medicos/{id}/horarios`                          | Admin                                 | 201       |
-| `DELETE` | `/api/v1/medicos/{id}/horarios/{horarioId}`              | Admin                                 | 204       |
-| `GET`    | `/api/v1/medicos/{id}/disponibilidad?fecha=`             | Autenticado                           | 200       |
-| `GET`    | `/api/v1/medicos/me/agenda?fecha=&inicio=&fin=`          | Médico                                | 200       |
-| `POST`   | `/api/v1/citas`                                          | Paciente                              | 201       |
-| `GET`    | `/api/v1/citas/mis-citas?inicio=&fin=`                   | Paciente                              | 200       |
-| `GET`    | `/api/v1/citas/{id}`                                     | Paciente dueño, médico o admin        | 200       |
-| `PUT`    | `/api/v1/citas/{id}/cancelar`                            | Paciente dueño o admin                | 200       |
-| `PUT`    | `/api/v1/citas/{id}/confirmar`                           | Médico de la cita o admin             | 200       |
-| `PUT`    | `/api/v1/citas/{id}/atender`                             | Médico de la cita                     | 200       |
-| `GET`    | `/api/v1/admin/auditoria/citas-por-estado`               | Admin                                 | 200       |
-| `GET`    | `/api/v1/admin/auditoria/citas?inicio=&fin=`             | Admin                                 | 200       |
-| `POST`   | `/api/v1/auth/logout`                                    | Autenticado                           | 204       |
-| `POST`   | `/api/v1/auth/refresh`                                   | Público                               | 200       |
-| `GET`    | `/api/v1/auth/mfa/estado`                                | Autenticado                           | 200       |
-| `POST`   | `/api/v1/auth/mfa/configurar`                            | Autenticado                           | 200       |
-| `POST`   | `/api/v1/auth/mfa/activar`                               | Autenticado                           | 200       |
-| `POST`   | `/api/v1/auth/mfa/desactivar`                            | Autenticado                           | 204       |
-| `POST`   | `/api/v1/auth/mfa/codigos-recuperacion/regenerar`        | Autenticado                           | 200       |
-| `POST`   | `/api/v1/auth/mfa/verificar`                             | Público con token de verificación     | 200       |
-| `PUT`    | `/api/v1/medicos/{id}/especialidades`                    | Admin                                 | 200       |
-| `GET`    | `/api/v1/medicos/{id}/disponibilidad/rango?inicio=&fin=` | Autenticado                           | 200       |
-| `GET`    | `/api/v1/calendario/eventos?inicio=&fin=`                | Autenticado, eventos propios          | 200       |
-| `POST`   | `/api/v1/calendario/eventos`                             | Autenticado                           | 201       |
-| `PUT`    | `/api/v1/calendario/eventos/{id}`                        | Dueño del evento                      | 200       |
-| `PUT`    | `/api/v1/calendario/eventos/{id}/mover`                  | Dueño del evento                      | 200       |
-| `PUT`    | `/api/v1/calendario/eventos/{id}/completado`             | Dueño del evento                      | 200       |
-| `DELETE` | `/api/v1/calendario/eventos/{id}`                        | Dueño del evento                      | 204       |
-| `GET`    | `/api/v1/admin/roles`                                    | Admin                                 | 200       |
-| `PUT`    | `/api/v1/admin/usuarios/{id}/roles`                      | Admin                                 | 200       |
-| `POST`   | `/api/v1/pacientes/{id}/compartir`                       | Médico que atiende al paciente        | 201       |
-| `DELETE` | `/api/v1/pacientes/{id}/compartir/{medicoId}`            | Médico de origen o admin              | 204       |
-| `GET`    | `/api/v1/pacientes/{id}/compartidos`                     | Médico con acceso o admin             | 200       |
-| `POST`   | `/api/v1/pagos/qr`                                       | Paciente                              | 201       |
-| `GET`    | `/api/v1/pagos/qr/{codigo}`                              | Paciente dueño                        | 200       |
-| `POST`   | `/api/v1/pagos/qr/{codigo}/simular-confirmacion`         | Paciente dueño                        | 200       |
-| `DELETE` | `/api/v1/pagos/qr/{codigo}`                              | Paciente dueño                        | 204       |
-| `PUT`    | `/api/v1/citas/{id}/reprogramar`                         | Paciente dueño o admin                | 200       |
-| `POST`   | `/api/v1/citas/{id}/pago`                                | Paciente dueño                        | 201       |
-| `POST`   | `/api/v1/citas/{id}/atencion`                            | Médico de la cita                     | 201       |
-| `PUT`    | `/api/v1/citas/{id}/atencion`                            | Médico de la cita                     | 200       |
-| `GET`    | `/api/v1/citas/{id}/atencion`                            | Paciente dueño, médico o admin        | 200       |
-| `POST`   | `/api/v1/citas/{id}/valoracion`                          | Paciente dueño                        | 201       |
-| `GET`    | `/api/v1/citas/{id}/valoracion`                          | Paciente dueño, médico o admin        | 200       |
-| `GET`    | `/api/v1/medicos/{id}/valoraciones`                      | Autenticado                           | 200       |
-| `GET`    | `/api/v1/medicos/me/pacientes`                           | Médico                                | 200       |
-| `GET`    | `/api/v1/pacientes/{id}/historia-clinica`                | Médico con citas del paciente o admin | 200       |
-| `GET`    | `/api/v1/historia-clinica`                               | Paciente                              | 200       |
-| `PUT`    | `/api/v1/historia-clinica/datos-medicos`                 | Paciente                              | 200       |
-| `GET`    | `/api/v1/notificaciones`                                 | Autenticado                           | 200       |
-| `GET`    | `/api/v1/notificaciones/resumen`                         | Autenticado                           | 200       |
-| `GET`    | `/api/v1/notificaciones/stream`                          | Autenticado                           | 200       |
-| `PUT`    | `/api/v1/notificaciones/{id}/leida`                      | Autenticado                           | 200       |
-| `PUT`    | `/api/v1/notificaciones/leidas`                          | Autenticado                           | 204       |
-| `DELETE` | `/api/v1/notificaciones/{id}`                            | Autenticado                           | 204       |
-| `GET`    | `/api/v1/metodos-pago`                                   | Paciente                              | 200       |
-| `POST`   | `/api/v1/metodos-pago`                                   | Paciente                              | 201       |
-| `PUT`    | `/api/v1/metodos-pago/{id}/predeterminado`               | Paciente                              | 200       |
-| `DELETE` | `/api/v1/metodos-pago/{id}`                              | Paciente                              | 204       |
-| `GET`    | `/api/v1/cupones/validar?codigo=&monto=`                 | Paciente                              | 200       |
-| `GET`    | `/api/v1/pagos`                                          | Paciente                              | 200       |
-| `GET`    | `/api/v1/pagos/{id}`                                     | Paciente dueño o admin                | 200       |
-| `GET`    | `/api/v1/admin/pagos?inicio=&fin=`                       | Admin                                 | 200       |
-| `GET`    | `/api/v1/admin/cupones`                                  | Admin                                 | 200       |
-| `POST`   | `/api/v1/admin/cupones`                                  | Admin                                 | 201       |
-| `PUT`    | `/api/v1/admin/cupones/{id}`                             | Admin                                 | 200       |
-| `DELETE` | `/api/v1/admin/cupones/{id}`                             | Admin                                 | 204       |
-| `GET`    | `/api/v1/admin/estadisticas`                             | Admin                                 | 200       |
-| `GET`    | `/api/v1/admin/usuarios?rol=&q=`                         | Admin                                 | 200       |
-| `PUT`    | `/api/v1/admin/usuarios/{id}/estado`                     | Admin                                 | 200       |
-| `GET`    | `/api/v1/perfil/preferencias`                            | Autenticado                           | 200       |
-| `PUT`    | `/api/v1/perfil/preferencias`                            | Autenticado                           | 200       |
-| `PUT`    | `/api/v1/perfil/avatar`                                  | Autenticado                           | 200       |
-| `DELETE` | `/api/v1/perfil/avatar`                                  | Autenticado                           | 204       |
-| `GET`    | `/api/v1/perfil/sesiones`                                | Autenticado                           | 200       |
-| `DELETE` | `/api/v1/perfil/sesiones/{id}`                           | Autenticado                           | 204       |
-| `DELETE` | `/api/v1/perfil/sesiones`                                | Autenticado                           | 204       |
-| `GET`    | `/api/v1/perfil`                                         | Autenticado                           | 200       |
-| `PUT`    | `/api/v1/perfil`                                         | Autenticado                           | 200       |
-| `PUT`    | `/api/v1/perfil/password`                                | Autenticado                           | 204       |
+| Método                     | Ruta                                                                                 | Acceso                                                 | Respuesta |
+| -------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------ | --------- |
+| `POST`                     | `/api/v1/auth/login`                                                                 | Público                                                | 200       |
+| `POST`                     | `/api/v1/auth/register`                                                              | Público, registra pacientes                            | 201       |
+| `GET`                      | `/api/v1/especialidades`                                                             | Autenticado                                            | 200       |
+| `GET`                      | `/api/v1/especialidades/{id}`                                                        | Autenticado                                            | 200       |
+| `POST`                     | `/api/v1/especialidades`                                                             | Admin                                                  | 201       |
+| `PUT`                      | `/api/v1/especialidades/{id}`                                                        | Admin                                                  | 200       |
+| `DELETE`                   | `/api/v1/especialidades/{id}`                                                        | Admin                                                  | 204       |
+| `GET`                      | `/api/v1/medicos?especialidadId=`                                                    | Autenticado                                            | 200       |
+| `GET`                      | `/api/v1/medicos/{id}`                                                               | Autenticado                                            | 200       |
+| `POST`                     | `/api/v1/medicos`                                                                    | Admin                                                  | 201       |
+| `GET`                      | `/api/v1/medicos/{id}/horarios`                                                      | Autenticado                                            | 200       |
+| `POST`                     | `/api/v1/medicos/{id}/horarios`                                                      | Admin                                                  | 201       |
+| `DELETE`                   | `/api/v1/medicos/{id}/horarios/{horarioId}`                                          | Admin                                                  | 204       |
+| `GET`                      | `/api/v1/medicos/{id}/disponibilidad?fecha=`                                         | Autenticado                                            | 200       |
+| `GET`                      | `/api/v1/medicos/me/agenda?fecha=&inicio=&fin=`                                      | Médico                                                 | 200       |
+| `POST`                     | `/api/v1/citas`                                                                      | Paciente                                               | 201       |
+| `GET`                      | `/api/v1/citas/mis-citas?inicio=&fin=`                                               | Paciente                                               | 200       |
+| `GET`                      | `/api/v1/citas/{id}`                                                                 | Paciente dueño, médico o admin                         | 200       |
+| `PUT`                      | `/api/v1/citas/{id}/cancelar`                                                        | Paciente dueño o admin                                 | 200       |
+| `PUT`                      | `/api/v1/citas/{id}/confirmar`                                                       | Médico de la cita o admin                              | 200       |
+| `PUT`                      | `/api/v1/citas/{id}/atender`                                                         | Médico de la cita                                      | 200       |
+| `GET`                      | `/api/v1/admin/auditoria/citas-por-estado`                                           | Admin                                                  | 200       |
+| `GET`                      | `/api/v1/admin/auditoria/citas?inicio=&fin=`                                         | Admin                                                  | 200       |
+| `POST`                     | `/api/v1/auth/logout`                                                                | Autenticado                                            | 204       |
+| `POST`                     | `/api/v1/auth/refresh`                                                               | Público                                                | 200       |
+| `GET`                      | `/api/v1/auth/mfa/estado`                                                            | Autenticado                                            | 200       |
+| `POST`                     | `/api/v1/auth/mfa/configurar`                                                        | Autenticado                                            | 200       |
+| `POST`                     | `/api/v1/auth/mfa/activar`                                                           | Autenticado                                            | 200       |
+| `POST`                     | `/api/v1/auth/mfa/desactivar`                                                        | Autenticado                                            | 204       |
+| `POST`                     | `/api/v1/auth/mfa/codigos-recuperacion/regenerar`                                    | Autenticado                                            | 200       |
+| `POST`                     | `/api/v1/auth/mfa/verificar`                                                         | Público con token de verificación                      | 200       |
+| `PUT`                      | `/api/v1/medicos/{id}/especialidades`                                                | Admin                                                  | 200       |
+| `GET`                      | `/api/v1/medicos/{id}/disponibilidad/rango?inicio=&fin=`                             | Autenticado                                            | 200       |
+| `/citas/:id/reprogramar`   | Paciente, admin                                                                      | Reprogramación con el calendario                       |
+| `/almacen`                 | Almacén, admin                                                                       | Resumen y alertas del almacén                          |
+| `/almacen/productos`       | Almacén, admin, farmacia                                                             | Productos y lotes                                      |
+| `/almacen/ingresos`        | Almacén, admin                                                                       | Ingresos de mercadería                                 |
+| `/almacen/proveedores`     | Almacén, admin                                                                       | Proveedores                                            |
+| `/almacen/movimientos`     | Almacén, admin, farmacia                                                             | Kardex                                                 |
+| `/farmacia`                | Farmacia, admin                                                                      | Recetas pendientes y ventas                            |
+| `/farmacia/dispensar`      | Farmacia, admin                                                                      | Dispensación y venta libre                             |
+| `/farmacia/historial`      | Farmacia, admin                                                                      | Comprobantes emitidos                                  |
+| `/mis-medicamentos`        | Paciente                                                                             | Entregas de la farmacia                                |
+| `/laboratorio`             | Laboratorio, médico, admin                                                           | Cola de órdenes                                        |
+| `/laboratorio/ordenes/:id` | Laboratorio, médico, admin                                                           | Detalle, muestra y resultados                          |
+| `/laboratorio/examenes`    | Laboratorio, médico, admin                                                           | Catálogo de exámenes                                   |
+| `/laboratorio/solicitar`   | Médico                                                                               | Solicitud de exámenes                                  |
+| `/mis-resultados`          | Paciente                                                                             | Resultados de laboratorio                              |
+| `GET`                      | `/api/v1/calendario/eventos?inicio=&fin=`                                            | Autenticado, eventos propios                           | 200       |
+| `POST`                     | `/api/v1/calendario/eventos`                                                         | Autenticado                                            | 201       |
+| `PUT`                      | `/api/v1/calendario/eventos/{id}`                                                    | Dueño del evento                                       | 200       |
+| `PUT`                      | `/api/v1/calendario/eventos/{id}/mover`                                              | Dueño del evento                                       | 200       |
+| `PUT`                      | `/api/v1/calendario/eventos/{id}/completado`                                         | Dueño del evento                                       | 200       |
+| `DELETE`                   | `/api/v1/calendario/eventos/{id}`                                                    | Dueño del evento                                       | 204       |
+| `POST`                     | `/api/v1/admin/personal`                                                             | Admin                                                  | 201       |
+| `GET`                      | `/api/v1/almacen/resumen`, `/almacen/alertas`                                        | Almacén, admin                                         | 200       |
+| `GET`                      | `/api/v1/almacen/productos`, `/productos/{id}`, `/productos/{id}/lotes`              | Almacén, admin, farmacia                               | 200       |
+| `POST`                     | `/api/v1/almacen/productos`                                                          | Almacén, admin                                         | 201       |
+| `PUT`                      | `/api/v1/almacen/productos/{id}`                                                     | Almacén, admin                                         | 200       |
+| `GET`                      | `/api/v1/almacen/proveedores`                                                        | Almacén, admin                                         | 200       |
+| `POST`                     | `/api/v1/almacen/proveedores`                                                        | Almacén, admin                                         | 201       |
+| `PUT`                      | `/api/v1/almacen/proveedores/{id}`                                                   | Almacén, admin                                         | 200       |
+| `GET`                      | `/api/v1/almacen/ingresos`                                                           | Almacén, admin                                         | 200       |
+| `POST`                     | `/api/v1/almacen/ingresos`                                                           | Almacén, admin                                         | 201       |
+| `POST`                     | `/api/v1/almacen/salidas`, `/almacen/ajustes`                                        | Almacén, admin                                         | 201       |
+| `GET`                      | `/api/v1/almacen/movimientos`                                                        | Almacén, admin                                         | 200       |
+| `GET`                      | `/api/v1/farmacia/catalogo`                                                          | Farmacia, médico, admin, almacén                       | 200       |
+| `GET`                      | `/api/v1/farmacia/recetas`                                                           | Farmacia, admin                                        | 200       |
+| `POST`                     | `/api/v1/farmacia/dispensaciones`                                                    | Farmacia, admin                                        | 201       |
+| `GET`                      | `/api/v1/farmacia/dispensaciones`, `/dispensaciones/{id}`, `/farmacia/resumen`       | Farmacia, admin                                        | 200       |
+| `PUT`                      | `/api/v1/farmacia/dispensaciones/{id}/anular`                                        | Farmacia, admin                                        | 200       |
+| `GET`                      | `/api/v1/farmacia/mis-dispensaciones`                                                | Paciente                                               | 200       |
+| `GET`                      | `/api/v1/laboratorio/examenes`, `/examenes/{id}`                                     | Laboratorio, médico, admin                             | 200       |
+| `POST`                     | `/api/v1/laboratorio/examenes`                                                       | Laboratorio, admin                                     | 201       |
+| `PUT`                      | `/api/v1/laboratorio/examenes/{id}`                                                  | Laboratorio, admin                                     | 200       |
+| `POST`                     | `/api/v1/laboratorio/ordenes`                                                        | Médico                                                 | 201       |
+| `GET`                      | `/api/v1/laboratorio/ordenes`, `/ordenes/{id}`                                       | Laboratorio, admin, médico solicitante, paciente dueño | 200       |
+| `PUT`                      | `/api/v1/laboratorio/ordenes/{id}/muestra`, `/items/{itemId}/resultados`, `/validar` | Laboratorio                                            | 200       |
+| `PUT`                      | `/api/v1/laboratorio/ordenes/{id}/cancelar`                                          | Médico solicitante, laboratorio, admin                 | 200       |
+| `GET`                      | `/api/v1/laboratorio/mis-ordenes`                                                    | Paciente                                               | 200       |
+| `GET`                      | `/api/v1/laboratorio/resumen`                                                        | Laboratorio, admin                                     | 200       |
+| `GET`                      | `/api/v1/admin/roles`                                                                | Admin                                                  | 200       |
+| `PUT`                      | `/api/v1/admin/usuarios/{id}/roles`                                                  | Admin                                                  | 200       |
+| `POST`                     | `/api/v1/pacientes/{id}/compartir`                                                   | Médico que atiende al paciente                         | 201       |
+| `DELETE`                   | `/api/v1/pacientes/{id}/compartir/{medicoId}`                                        | Médico de origen o admin                               | 204       |
+| `GET`                      | `/api/v1/pacientes/{id}/compartidos`                                                 | Médico con acceso o admin                              | 200       |
+| `POST`                     | `/api/v1/pagos/qr`                                                                   | Paciente                                               | 201       |
+| `GET`                      | `/api/v1/pagos/qr/{codigo}`                                                          | Paciente dueño                                         | 200       |
+| `POST`                     | `/api/v1/pagos/qr/{codigo}/simular-confirmacion`                                     | Paciente dueño                                         | 200       |
+| `DELETE`                   | `/api/v1/pagos/qr/{codigo}`                                                          | Paciente dueño                                         | 204       |
+| `PUT`                      | `/api/v1/citas/{id}/reprogramar`                                                     | Paciente dueño o admin                                 | 200       |
+| `POST`                     | `/api/v1/citas/{id}/pago`                                                            | Paciente dueño                                         | 201       |
+| `POST`                     | `/api/v1/citas/{id}/atencion`                                                        | Médico de la cita                                      | 201       |
+| `PUT`                      | `/api/v1/citas/{id}/atencion`                                                        | Médico de la cita                                      | 200       |
+| `GET`                      | `/api/v1/citas/{id}/atencion`                                                        | Paciente dueño, médico o admin                         | 200       |
+| `POST`                     | `/api/v1/citas/{id}/valoracion`                                                      | Paciente dueño                                         | 201       |
+| `GET`                      | `/api/v1/citas/{id}/valoracion`                                                      | Paciente dueño, médico o admin                         | 200       |
+| `GET`                      | `/api/v1/medicos/{id}/valoraciones`                                                  | Autenticado                                            | 200       |
+| `GET`                      | `/api/v1/medicos/me/pacientes`                                                       | Médico                                                 | 200       |
+| `GET`                      | `/api/v1/pacientes/{id}/historia-clinica`                                            | Médico con citas del paciente o admin                  | 200       |
+| `GET`                      | `/api/v1/historia-clinica`                                                           | Paciente                                               | 200       |
+| `PUT`                      | `/api/v1/historia-clinica/datos-medicos`                                             | Paciente                                               | 200       |
+| `GET`                      | `/api/v1/notificaciones`                                                             | Autenticado                                            | 200       |
+| `GET`                      | `/api/v1/notificaciones/resumen`                                                     | Autenticado                                            | 200       |
+| `GET`                      | `/api/v1/notificaciones/stream`                                                      | Autenticado                                            | 200       |
+| `PUT`                      | `/api/v1/notificaciones/{id}/leida`                                                  | Autenticado                                            | 200       |
+| `PUT`                      | `/api/v1/notificaciones/leidas`                                                      | Autenticado                                            | 204       |
+| `DELETE`                   | `/api/v1/notificaciones/{id}`                                                        | Autenticado                                            | 204       |
+| `GET`                      | `/api/v1/metodos-pago`                                                               | Paciente                                               | 200       |
+| `POST`                     | `/api/v1/metodos-pago`                                                               | Paciente                                               | 201       |
+| `PUT`                      | `/api/v1/metodos-pago/{id}/predeterminado`                                           | Paciente                                               | 200       |
+| `DELETE`                   | `/api/v1/metodos-pago/{id}`                                                          | Paciente                                               | 204       |
+| `GET`                      | `/api/v1/cupones/validar?codigo=&monto=`                                             | Paciente                                               | 200       |
+| `GET`                      | `/api/v1/pagos`                                                                      | Paciente                                               | 200       |
+| `GET`                      | `/api/v1/pagos/{id}`                                                                 | Paciente dueño o admin                                 | 200       |
+| `GET`                      | `/api/v1/admin/pagos?inicio=&fin=`                                                   | Admin                                                  | 200       |
+| `GET`                      | `/api/v1/admin/cupones`                                                              | Admin                                                  | 200       |
+| `POST`                     | `/api/v1/admin/cupones`                                                              | Admin                                                  | 201       |
+| `PUT`                      | `/api/v1/admin/cupones/{id}`                                                         | Admin                                                  | 200       |
+| `DELETE`                   | `/api/v1/admin/cupones/{id}`                                                         | Admin                                                  | 204       |
+| `GET`                      | `/api/v1/admin/estadisticas`                                                         | Admin                                                  | 200       |
+| `GET`                      | `/api/v1/admin/usuarios?rol=&q=`                                                     | Admin                                                  | 200       |
+| `PUT`                      | `/api/v1/admin/usuarios/{id}/estado`                                                 | Admin                                                  | 200       |
+| `GET`                      | `/api/v1/perfil/preferencias`                                                        | Autenticado                                            | 200       |
+| `PUT`                      | `/api/v1/perfil/preferencias`                                                        | Autenticado                                            | 200       |
+| `PUT`                      | `/api/v1/perfil/avatar`                                                              | Autenticado                                            | 200       |
+| `DELETE`                   | `/api/v1/perfil/avatar`                                                              | Autenticado                                            | 204       |
+| `GET`                      | `/api/v1/perfil/sesiones`                                                            | Autenticado                                            | 200       |
+| `DELETE`                   | `/api/v1/perfil/sesiones/{id}`                                                       | Autenticado                                            | 204       |
+| `DELETE`                   | `/api/v1/perfil/sesiones`                                                            | Autenticado                                            | 204       |
+| `GET`                      | `/api/v1/perfil`                                                                     | Autenticado                                            | 200       |
+| `PUT`                      | `/api/v1/perfil`                                                                     | Autenticado                                            | 200       |
+| `PUT`                      | `/api/v1/perfil/password`                                                            | Autenticado                                            | 204       |
 
 Las fechas de los parámetros usan el formato `yyyy-MM-dd` y `fechaHora` usa `yyyy-MM-ddTHH:mm:ss`. Las rutas de creación responden con el header `Location` apuntando al recurso nuevo.
 
@@ -1192,6 +1239,43 @@ Cada usuario tiene su propia agenda de eventos personales en la tabla `eventos_c
 
 Un bloqueo quita de la disponibilidad del médico los turnos que se solapan con él. Reservar o reprogramar sobre un bloqueo responde 409, y crear o mover un bloqueo sobre una cita pendiente o confirmada también responde 409. La tarea programada de recordatorios crea una notificación `RECORDATORIO_EVENTO` cuando faltan los minutos elegidos para el inicio, una sola vez, y mover el evento reinicia el aviso.
 
+### Personal de la institución
+
+Además de pacientes, médicos y administradores existen tres roles de personal: `ROLE_LABORATORIO`, `ROLE_FARMACIA` y `ROLE_ALMACEN`. El administrador los registra con `POST /api/v1/admin/personal` indicando uno o más de esos roles o el de administrador, y los asigna o cambia después desde la gestión de roles. Ese alta no admite roles de médico ni de paciente porque cada uno tiene su propio registro. Cada rol entra a su módulo al iniciar sesión, solo ve en el menú lo que le corresponde y puede agendar reuniones, tareas, recordatorios y eventos personales en el calendario.
+
+### Almacén e inventario
+
+El almacén controla productos de tipo medicamento, insumo, reactivo y material. Cada producto tiene código único, precio de venta, stock mínimo y la marca de si exige receta. El stock se calcula con la suma de sus lotes no vencidos y cada lote guarda número, vencimiento, cantidad, costo y proveedor.
+
+- Un ingreso registra una compra con varios ítems, crea un lote por ítem y deja un movimiento de entrada. Repetir el número de lote de un producto responde 409.
+- Las salidas descuentan por FEFO, es decir primero el lote que vence antes. Los lotes vencidos no se usan salvo en la baja por vencimiento, y un stock insuficiente responde 409 sin descontar nada.
+- El kardex lista los movimientos con filtros por producto, tipo y fechas, y los ajustes positivos suman stock a un lote existente.
+- Las alertas agrupan los productos bajo el mínimo, los lotes que vencen en 60 días y los vencidos. Una tarea diaria a las 7:00 avisa a los usuarios de almacén sin repetir el aviso en el mismo día.
+
+El almacén y el administrador gestionan todo. La farmacia consulta productos, lotes y alertas y el laboratorio solo ve insumos y reactivos. `InventarioService` expone el descuento por FEFO y la devolución de stock para que otros módulos lo reutilicen.
+
+### Farmacia
+
+La farmacia atiende las recetas que registran los médicos al atender una cita y también vende productos sin receta. `GET /api/v1/farmacia/recetas` lista las recetas de los últimos 90 días con su estado pendiente, parcial o dispensada, y `POST /api/v1/farmacia/dispensaciones` emite el comprobante con formato `F001-000001`.
+
+- Un producto que exige receta solo se vende con un ítem de receta del paciente que todavía no fue dispensado. La venta libre acepta únicamente productos sin receta y se registra a nombre de Cliente general.
+- El stock de toda la dispensación se valida antes de descontar, así que un fallo no deja descuentos parciales.
+- Anular una dispensación devuelve el stock a sus lotes, reabre los ítems de la receta y deja el comprobante anulado. Anularla dos veces responde 409.
+- Dispensar avisa al paciente, que ve sus entregas en Mis medicamentos con `GET /api/v1/farmacia/mis-dispensaciones`.
+
+### Laboratorio clínico
+
+El laboratorio mantiene un catálogo de exámenes con sus parámetros y valores de referencia. Un médico solicita una orden para un paciente que atiende o que le compartieron, y la orden avanza por los estados solicitada, muestra tomada, en proceso, completada o cancelada.
+
+- El personal de laboratorio registra la toma de muestra, captura los resultados de cada examen y los valida. Los parámetros numéricos deben ser números y el sistema marca cada valor que cae fuera de su rango de referencia.
+- Los resultados guardan una copia del nombre, la unidad y el rango del parámetro, de modo que editar el catálogo después no altera lo ya informado.
+- Validar completa la orden y avisa al paciente y al médico solicitante. El paciente solo accede a una orden cuando está completada y puede seguir el avance de las demás desde Mis resultados.
+- La cola ordena primero las órdenes urgentes pendientes. Cancelar es posible hasta antes de completar la orden y una orden completada responde 409.
+
+### Reprogramación de citas
+
+Reprogramar tiene su propia pantalla en `/citas/:id/reprogramar`. Muestra el calendario de planificación en modo de selección con los huecos libres del médico, la cita actual resaltada y las demás citas del paciente como horas bloqueadas, y confirma con `PUT /api/v1/citas/{id}/reprogramar`. Solo se reprograman citas pendientes o confirmadas que aún no ocurrieron.
+
 ## Manejo de errores
 
 `GlobalExceptionHandler` traduce cada excepción a una respuesta con el mismo formato. Los errores 401 y 403 que produce Spring Security antes de llegar a un controlador usan ese mismo formato.
@@ -1541,13 +1625,13 @@ Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrec
 
 ### Pruebas del frontend
 
-Las 107 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API.
+Las 112 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API.
 
 ```bash
 npm test
 ```
 
-Las 65 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre y la renovación de sesión. Requieren el stack levantado con datos de prueba.
+Las 77 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal y los flujos de almacén, farmacia y laboratorio. Requieren el stack levantado con datos de prueba.
 
 ```bash
 npm run e2e
@@ -1771,6 +1855,9 @@ Para usarla en Postman, importa el archivo y ejecuta la colección completa con 
 | `10 - Pagos con Yape y Plin`                            | Reserva, generación del QR, consulta y confirmación simulada                       |
 | `11 - Verificación en dos pasos y renovación del token` | Configuración del autenticador y errores del refresh token                         |
 | `12 - Calendario y eventos`                             | Eventos personales, arrastre, privacidad y límites del rango                       |
+| `13 - Personal y almacén`                               | Alta de personal, productos, proveedores, ingresos, salidas y alertas              |
+| `14 - Farmacia`                                         | Catálogo, venta libre, anulación y entregas del paciente                           |
+| `15 - Laboratorio`                                      | Orden del médico, muestra, resultados fuera de rango, validación y acceso          |
 
 Desde la línea de comandos:
 

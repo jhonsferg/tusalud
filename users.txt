@@ -96,3 +96,13 @@ CALENDARIO
 ----------
 Juan Pérez tiene una tarea y una reunión de ejemplo, el administrador un recordatorio y Luis García una reunión y un bloqueo de una hora en su primer día hábil libre de los próximos 14.
 Cada usuario crea sus propios eventos en Calendario, y los bloqueos de agenda solo los crean los médicos.
+
+PERSONAL DE LA INSTITUCION
+--------------------------
+Rol                Nombre         Correo                    Contraseña
+ROLE_LABORATORIO   Laura Quispe   lab@tusalud.com           Personal123!
+ROLE_FARMACIA      Rosa Medina    farmacia@tusalud.com      Personal123!
+ROLE_ALMACEN       Pedro Ramos    almacen@tusalud.com       Personal123!
+
+Cada uno entra a su módulo al iniciar sesión. El administrador registra más personal en Usuarios con el botón Nuevo personal.
+Datos de ejemplo: 19 productos con lotes vigentes, por vencer y vencidos, 5 recetas pendientes en farmacia y 5 órdenes de laboratorio en distintos estados.

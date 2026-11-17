@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "6b0d7c1e-3f5a-4e1b-9a7c-2d4e8f9a1c01",
     "name": "TuSalud API",
-    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 12, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
+    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 15, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -5480,6 +5480,1909 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "13 - Personal y almacén",
+      "description": "Alta de personal por el administrador, productos, proveedores, ingresos con lote, salidas FEFO y alertas.",
+      "item": [
+        {
+          "name": "Login almacén",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve el token del personal', () => pm.expect(j.token).to.be.a('string'));",
+                  "pm.collectionVariables.set('almacenToken', j.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión del personal de la institución.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"almacen@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login farmacia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve el token del personal', () => pm.expect(j.token).to.be.a('string'));",
+                  "pm.collectionVariables.set('farmaciaToken', j.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión del personal de la institución.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"farmacia@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login laboratorio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve el token del personal', () => pm.expect(j.token).to.be.a('string'));",
+                  "pm.collectionVariables.set('laboratorioToken', j.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión del personal de la institución.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"lab@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Administrador registra personal",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date(Date.now() + 400 * 86400000);",
+                  "const p2 = n => String(n).padStart(2, '0');",
+                  "pm.collectionVariables.set('fechaVence', d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()));",
+                  "const sufijo = String(Date.now());",
+                  "pm.collectionVariables.set('sufijoUnico', sufijo.slice(-9));",
+                  "pm.collectionVariables.set('rucUnico', '20' + sufijo.slice(-9));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Crea la cuenta con el rol de almacén', () => pm.expect(j.roles).to.include('ROLE_ALMACEN'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/personal",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "personal"]
+            },
+            "description": "Solo el administrador da de alta al personal.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Mario\",\n  \"apellido\": \"Rojas\",\n  \"email\": \"personal.{{sufijoUnico}}@tusalud.com\",\n  \"password\": \"Personal123!\",\n  \"roles\": [\"ROLE_ALMACEN\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Alta de personal con rol médico (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/personal",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "personal"]
+            },
+            "description": "Los médicos y pacientes tienen su propio registro.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Mario\",\n  \"apellido\": \"Rojas\",\n  \"email\": \"invalido.{{sufijoUnico}}@tusalud.com\",\n  \"password\": \"Personal123!\",\n  \"roles\": [\"ROLE_MEDICO\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente intenta registrar personal (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/personal",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "personal"]
+            },
+            "description": "Un paciente no gestiona personal.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"X\",\n  \"apellido\": \"Y\",\n  \"email\": \"x.{{sufijoUnico}}@tusalud.com\",\n  \"password\": \"Personal123!\",\n  \"roles\": [\"ROLE_ALMACEN\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resumen del almacén",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Informa los indicadores', () => {",
+                  "    pm.expect(j.totalProductos).to.be.a(\"number\");",
+                  "    pm.expect(j.valorInventario).to.be.a(\"number\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "resumen"]
+            },
+            "description": "Indicadores de existencias.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{almacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear proveedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('proveedorId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/proveedores",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "proveedores"]
+            },
+            "description": "El RUC tiene 11 dígitos y es único.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{almacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ruc\": \"{{rucUnico}}\",\n  \"razonSocial\": \"Distribuidora {{sufijoUnico}} SAC\",\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Nace sin stock y bajo el mínimo', () => {",
+                  "    pm.expect(j.stockActual).to.eql(0);",
+                  "    pm.expect(j.bajoStock).to.eql(true);",
+                  "});",
+                  "pm.collectionVariables.set('productoId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "productos"]
+            },
+            "description": "Un producto nuevo no tiene lotes.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{almacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"PM{{sufijoUnico}}\",\n  \"nombre\": \"Producto Postman {{sufijoUnico}}\",\n  \"tipo\": \"INSUMO\",\n  \"unidad\": \"unidad\",\n  \"precioVenta\": 5.5,\n  \"stockMinimo\": 10,\n  \"requiereReceta\": false,\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar ingreso con lote",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Calcula el total del ingreso', () => pm.expect(Number(j.total)).to.eql(100));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/ingresos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "ingresos"]
+            },
+            "description": "Cada ítem genera un lote y un movimiento de entrada.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{almacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": {{proveedorId}},\n  \"documento\": \"F001-{{sufijoUnico}}\",\n  \"items\": [\n    {\n      \"productoId\": {{productoId}},\n      \"numeroLote\": \"L-{{sufijoUnico}}\",\n      \"fechaVencimiento\": \"{{fechaVence}}\",\n      \"cantidad\": 40,\n      \"costoUnitario\": 2.5\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lote duplicado (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/ingresos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "ingresos"]
+            },
+            "description": "El número de lote no se repite para un producto.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{almacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productoId\": {{productoId}},\n      \"numeroLote\": \"L-{{sufijoUnico}}\",\n      \"fechaVencimiento\": \"{{fechaVence}}\",\n      \"cantidad\": 1,\n      \"costoUnitario\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar salida por FEFO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Devuelve los movimientos generados', () => pm.expect(pm.response.json()).to.be.an('array').that.is.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/salidas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "salidas"]
+            },
+            "description": "Descuenta primero el lote que vence antes.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{almacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productoId\": {{productoId}},\n  \"cantidad\": 15,\n  \"motivo\": \"CONSUMO_INTERNO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Salida con stock insuficiente (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/salidas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "salidas"]
+            },
+            "description": "No permite dejar el stock en negativo.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{almacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productoId\": {{productoId}},\n  \"cantidad\": 999,\n  \"motivo\": \"MERMA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Stock del producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Quedan 25 unidades', () => pm.expect(pm.response.json().stockActual).to.eql(25));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/productos/{{productoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "productos", "{{productoId}}"]
+            },
+            "description": "Stock tras ingreso y salida.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{almacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Kardex del producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Tiene la entrada y la salida', () => pm.expect(pm.response.json().length).to.be.at.least(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/movimientos?productoId={{productoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "movimientos"],
+              "query": [
+                {
+                  "key": "productoId",
+                  "value": "{{productoId}}"
+                }
+              ]
+            },
+            "description": "Historial de movimientos.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{almacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Alertas de inventario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Trae las tres listas', () => {",
+                  "    pm.expect(j.bajoStock).to.be.an(\"array\");",
+                  "    pm.expect(j.porVencer).to.be.an(\"array\");",
+                  "    pm.expect(j.vencidos).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "alertas"]
+            },
+            "description": "Productos bajo el mínimo y lotes por vencer o vencidos.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{almacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente no accede al almacén (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "productos"]
+            },
+            "description": "El almacén es del personal.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "14 - Farmacia",
+      "description": "Catálogo, recetas pendientes, venta libre, anulación y mis medicamentos.",
+      "item": [
+        {
+          "name": "Catálogo de farmacia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Hay medicamentos con stock', () => pm.expect(j.length).to.be.above(0));",
+                  "const libre = j.find(p => !p.requiereReceta && p.stockActual > 0);",
+                  "pm.test('Existe un producto de venta libre', () => pm.expect(libre).to.exist);",
+                  "pm.collectionVariables.set('productoLibreId', libre.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/farmacia/catalogo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "farmacia", "catalogo"]
+            },
+            "description": "Medicamentos activos con su precio y stock.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{farmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recetas pendientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve una lista de recetas', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/farmacia/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "farmacia", "recetas"]
+            },
+            "description": "Recetas por dispensar de los últimos 90 días.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{farmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Venta libre",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Emite el comprobante', () => {",
+                  "    pm.expect(j.comprobante).to.match(/^F001-\\d+$/);",
+                  "    pm.expect(j.estado).to.eql(\"EMITIDA\");",
+                  "    pm.expect(j.pacienteNombre).to.eql(\"Cliente general\");",
+                  "});",
+                  "pm.collectionVariables.set('dispensacionId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/farmacia/dispensaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "farmacia", "dispensaciones"]
+            },
+            "description": "Productos sin receta se venden sin paciente.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{farmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [{ \"productoId\": {{productoLibreId}}, \"cantidad\": 2 }],\n  \"metodoPago\": \"EFECTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Venta libre de un producto con receta (409)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.sendRequest({ url: pm.variables.replaceIn('{{baseUrl}}/api/v1/farmacia/catalogo'), method: 'GET', header: { Authorization: 'Bearer ' + pm.collectionVariables.get('farmaciaToken') } }, (err, res) => {",
+                  "    const conReceta = res.json().find(p => p.requiereReceta && p.stockActual > 0);",
+                  "    pm.collectionVariables.set('productoRecetaId', conReceta ? conReceta.id : 0);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/farmacia/dispensaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "farmacia", "dispensaciones"]
+            },
+            "description": "Los productos con receta exigen la receta del paciente.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{farmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [{ \"productoId\": {{productoRecetaId}}, \"cantidad\": 1 }],\n  \"metodoPago\": \"EFECTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar dispensaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye la venta libre', () => pm.expect(pm.response.json().map(d => d.id)).to.include(Number(pm.collectionVariables.get('dispensacionId'))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/farmacia/dispensaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "farmacia", "dispensaciones"]
+            },
+            "description": "Comprobantes emitidos.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{farmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Anular la dispensación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda anulada', () => pm.expect(pm.response.json().estado).to.eql('ANULADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/farmacia/dispensaciones/{{dispensacionId}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "farmacia",
+                "dispensaciones",
+                "{{dispensacionId}}",
+                "anular"
+              ]
+            },
+            "description": "Devuelve el stock a sus lotes.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{farmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Anular otra vez (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/farmacia/dispensaciones/{{dispensacionId}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "farmacia",
+                "dispensaciones",
+                "{{dispensacionId}}",
+                "anular"
+              ]
+            },
+            "description": "Una dispensación se anula una sola vez.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{farmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resumen de farmacia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Informa las ventas del día', () => pm.expect(pm.response.json().dispensacionesHoy).to.be.a('number'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/farmacia/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "farmacia", "resumen"]
+            },
+            "description": "Indicadores de la farmacia.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{farmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mis medicamentos del paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/farmacia/mis-dispensaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "farmacia", "mis-dispensaciones"]
+            },
+            "description": "Solo las entregas del propio paciente.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente no dispensa (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/farmacia/dispensaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "farmacia", "dispensaciones"]
+            },
+            "description": "La dispensación es de la farmacia.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [{ \"productoId\": 1, \"cantidad\": 1 }],\n  \"metodoPago\": \"EFECTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "15 - Laboratorio",
+      "description": "Catálogo de exámenes, orden del médico, muestra, resultados, validación y acceso del paciente.",
+      "item": [
+        {
+          "name": "Catálogo de exámenes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const glucosa = j.find(e => /glucosa/i.test(e.nombre));",
+                  "pm.test('Existe el examen de glucosa con parámetros', () => {",
+                  "    pm.expect(glucosa).to.exist;",
+                  "    pm.expect(glucosa.parametros).to.not.be.empty;",
+                  "});",
+                  "pm.collectionVariables.set('examenId', glucosa.id);",
+                  "pm.collectionVariables.set('parametroId', glucosa.parametros[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/examenes?activo=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "laboratorio", "examenes"],
+              "query": [
+                {
+                  "key": "activo",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Exámenes con parámetros y rangos de referencia.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{laboratorioToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médico lista sus pacientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Tiene pacientes', () => pm.expect(j.length).to.be.above(0));",
+                  "pm.collectionVariables.set('pacienteLabId', j[0].pacienteId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/me/pacientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos", "me", "pacientes"]
+            },
+            "description": "Se elige un paciente atendido.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médico solicita un examen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Nace solicitada con su código', () => {",
+                  "    pm.expect(j.estado).to.eql(\"SOLICITADA\");",
+                  "    pm.expect(j.codigo).to.match(/^LAB-\\d+$/);",
+                  "});",
+                  "pm.collectionVariables.set('ordenId', j.id);",
+                  "pm.collectionVariables.set('itemId', j.items[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/ordenes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "laboratorio", "ordenes"]
+            },
+            "description": "Solo los médicos solicitan exámenes.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": {{pacienteLabId}},\n  \"prioridad\": \"URGENTE\",\n  \"indicaciones\": \"Control desde Postman\",\n  \"examenIds\": [{{examenId}}]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente no solicita exámenes (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/ordenes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "laboratorio", "ordenes"]
+            },
+            "description": "La orden es clínica.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": 1,\n  \"prioridad\": \"NORMAL\",\n  \"examenIds\": [{{examenId}}]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Laboratorio ve la cola",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye la orden nueva', () => pm.expect(pm.response.json().map(o => o.id)).to.include(Number(pm.collectionVariables.get('ordenId'))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/ordenes?estado=SOLICITADA",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "laboratorio", "ordenes"],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "SOLICITADA"
+                }
+              ]
+            },
+            "description": "Cola de trabajo del laboratorio.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{laboratorioToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resultados sin toma de muestra (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/ordenes/{{ordenId}}/items/{{itemId}}/resultados",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "laboratorio",
+                "ordenes",
+                "{{ordenId}}",
+                "items",
+                "{{itemId}}",
+                "resultados"
+              ]
+            },
+            "description": "Primero se toma la muestra.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{laboratorioToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resultados\": [{ \"parametroId\": {{parametroId}}, \"valor\": \"90\" }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar toma de muestra",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Pasa a muestra tomada', () => pm.expect(pm.response.json().estado).to.eql('MUESTRA_TOMADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/ordenes/{{ordenId}}/muestra",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "laboratorio",
+                "ordenes",
+                "{{ordenId}}",
+                "muestra"
+              ]
+            },
+            "description": "Solo el laboratorio toma muestras.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{laboratorioToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar resultados fuera de rango",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Marca el valor fuera de rango', () => {",
+                  "    pm.expect(j.estado).to.eql(\"EN_PROCESO\");",
+                  "    pm.expect(j.items[0].resultados[0].fueraDeRango).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/ordenes/{{ordenId}}/items/{{itemId}}/resultados",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "laboratorio",
+                "ordenes",
+                "{{ordenId}}",
+                "items",
+                "{{itemId}}",
+                "resultados"
+              ]
+            },
+            "description": "Compara con los valores de referencia del parámetro.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{laboratorioToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resultados\": [{ \"parametroId\": {{parametroId}}, \"valor\": \"250\" }],\n  \"observaciones\": \"Valor elevado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resultado no numérico (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/ordenes/{{ordenId}}/items/{{itemId}}/resultados",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "laboratorio",
+                "ordenes",
+                "{{ordenId}}",
+                "items",
+                "{{itemId}}",
+                "resultados"
+              ]
+            },
+            "description": "Los parámetros numéricos exigen números.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{laboratorioToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resultados\": [{ \"parametroId\": {{parametroId}}, \"valor\": \"abc\" }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Validar y publicar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda completada', () => pm.expect(pm.response.json().estado).to.eql('COMPLETADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/ordenes/{{ordenId}}/validar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "laboratorio",
+                "ordenes",
+                "{{ordenId}}",
+                "validar"
+              ]
+            },
+            "description": "Notifica al paciente y al médico.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{laboratorioToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente ajeno no ve la orden (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/ordenes/{{ordenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "laboratorio", "ordenes", "{{ordenId}}"]
+            },
+            "description": "Solo el dueño de la orden consulta resultados.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar una orden completada (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/ordenes/{{ordenId}}/cancelar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "laboratorio",
+                "ordenes",
+                "{{ordenId}}",
+                "cancelar"
+              ]
+            },
+            "description": "Una orden completada no se cancela.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{laboratorioToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Intento tardío\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resumen del laboratorio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Informa la carga de trabajo', () => pm.expect(pm.response.json().completadasHoy).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "laboratorio", "resumen"]
+            },
+            "description": "Indicadores del laboratorio.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{laboratorioToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mis resultados del paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/mis-ordenes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "laboratorio", "mis-ordenes"]
+            },
+            "description": "El paciente ve sus órdenes y el avance.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -5685,6 +7588,86 @@
     },
     {
       "key": "fechaFinMovido",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "almacenToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "farmaciaToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "laboratorioToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sufijoUnico",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "rucUnico",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fechaVence",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "proveedorId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productoLibreId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productoRecetaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dispensacionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "examenId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "parametroId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pacienteLabId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ordenId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "itemId",
       "value": "",
       "type": "string"
     }
