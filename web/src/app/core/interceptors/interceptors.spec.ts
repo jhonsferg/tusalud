@@ -67,6 +67,7 @@ describe('interceptores', () => {
 
       vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
       TestBed.inject(AuthService).logout();
+      controller.expectOne('/api/v1/auth/logout').flush(null);
       http.get('/api/v1/medicos').subscribe();
       expect(controller.expectOne('/api/v1/medicos').request.headers.has('Authorization')).toBe(
         false,

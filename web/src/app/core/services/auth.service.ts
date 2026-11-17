@@ -24,7 +24,7 @@ export type LogoutReason = 'manual' | 'expired' | 'unauthorized';
 const MAX_TIMER_MS = 2_147_483_647;
 
 const HOME_BY_ROLE: readonly (readonly [Rol, string])[] = [
-  ['ROLE_ADMIN', '/admin/auditoria'],
+  ['ROLE_ADMIN', '/admin/panel'],
   ['ROLE_MEDICO', '/agenda'],
   ['ROLE_PACIENTE', '/citas'],
 ];
@@ -132,6 +132,9 @@ export class AuthService {
 
   logout(reason: LogoutReason = 'manual'): void {
     const wasAuthenticated = this.state() !== null;
+    if (wasAuthenticated && reason === 'manual') {
+      this.api.logout().subscribe({ error: () => undefined });
+    }
     this.state.set(null);
     if (!wasAuthenticated) {
       return;

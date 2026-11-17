@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { API_URL } from '@tusalud/app/core/config/api.config';
-import { publicRequest } from '@tusalud/app/core/config/http-context';
+import { SKIP_ERROR_NOTIFICATION, publicRequest } from '@tusalud/app/core/config/http-context';
 import { AuthResponse, LoginRequest, RegisterRequest } from '@tusalud/app/core/models';
 
 @Injectable({ providedIn: 'root' })
@@ -20,6 +20,12 @@ export class AuthApiService {
   register(request: RegisterRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/register`, request, {
       context: publicRequest(),
+    });
+  }
+
+  logout(): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/logout`, null, {
+      context: new HttpContext().set(SKIP_ERROR_NOTIFICATION, true),
     });
   }
 }

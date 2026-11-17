@@ -15,6 +15,7 @@ export interface PerfilResponse {
   consultorio?: string | null;
   especialidad?: string | null;
   precioConsulta?: number | null;
+  avatar?: string | null;
 }
 
 export interface PerfilUpdateRequest {

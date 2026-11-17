@@ -239,6 +239,7 @@ describe('stores', () => {
 
     TestBed.inject(AuthService).logout();
     TestBed.tick();
+    controller.expectOne('/api/v1/auth/logout').flush(null);
     expect(store.especialidades()).toEqual([]);
   });
 });

@@ -108,6 +108,7 @@ describe('AuthService', () => {
 
     auth.logout();
     TestBed.tick();
+    http.expectOne('/api/v1/auth/logout').flush(null);
 
     expect(auth.isAuthenticated()).toBe(false);
     expect(navigate).toHaveBeenCalledWith('/auth/login');

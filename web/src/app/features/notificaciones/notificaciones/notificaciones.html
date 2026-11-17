@@ -1,0 +1,84 @@
+<app-page-header
+  title="Notificaciones"
+  subtitle="Avisos sobre tus citas, pagos y la seguridad de tu cuenta"
+  icon="pi-bell"
+>
+  <p-button
+    label="Marcar todas como leídas"
+    icon="pi pi-check-circle"
+    [outlined]="true"
+    [disabled]="store.noLeidas() === 0"
+    (onClick)="marcarTodas()"
+  />
+</app-page-header>
+
+<div class="panel">
+  <div class="toolbar">
+    <p-selectbutton
+      [options]="opciones"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="filtro()"
+      (ngModelChange)="filtro.set($event ?? 'todas')"
+      [allowEmpty]="false"
+      ariaLabel="Filtrar notificaciones"
+    />
+    <span class="text-muted">{{ store.noLeidas() }} sin leer</span>
+  </div>
+
+  @if (store.lista.error(); as error) {
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar tus notificaciones"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="store.cargar()" />
+    </app-empty-state>
+  } @else if (store.lista.loading() && !store.lista.hasValue()) {
+    <p-skeleton height="12rem" />
+  } @else if (visibles().length === 0) {
+    <app-empty-state
+      icon="pi-bell-slash"
+      [title]="filtro() === 'noLeidas' ? 'Estás al día' : 'No tienes notificaciones'"
+      message="Cuando haya novedades sobre tus citas o tu cuenta las verás aquí."
+    />
+  } @else {
+    <ul class="lista">
+      @for (item of visibles(); track item.id) {
+        <li [class.unread]="!item.leida">
+          <button type="button" class="contenido" (click)="abrir(item)">
+            <span class="icono" [style.color]="color[item.tipo]">
+              <i [class]="'pi ' + icono[item.tipo]"></i>
+            </span>
+            <span class="texto">
+              <strong>{{ item.titulo }}</strong>
+              <span>{{ item.mensaje }}</span>
+              <small>{{ item.createdAt | date: 'full' }}</small>
+            </span>
+          </button>
+          <span class="acciones">
+            @if (!item.leida) {
+              <p-button
+                icon="pi pi-check"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                ariaLabel="Marcar como leída"
+                (onClick)="marcarLeida(item)"
+              />
+            }
+            <p-button
+              icon="pi pi-trash"
+              [text]="true"
+              [rounded]="true"
+              severity="danger"
+              ariaLabel="Eliminar notificación"
+              (onClick)="eliminar(item)"
+            />
+          </span>
+        </li>
+      }
+    </ul>
+  }
+</div>

@@ -1,6 +1,6 @@
 <app-page-header
   title="Mi perfil"
-  subtitle="Consulta y actualiza tus datos personales y tu contraseña"
+  subtitle="Administra tus datos, tu seguridad, tus avisos y la apariencia de la aplicación"
   icon="pi-user"
 />
 
@@ -18,7 +18,23 @@
 } @else if (store.perfil.value(); as perfil) {
   <div class="layout">
     <aside class="panel resumen">
-      <p-avatar [label]="iniciales()" size="xlarge" shape="circle" styleClass="avatar" />
+      <div class="avatar-box">
+        <app-user-avatar [nombre]="perfil.nombreCompleto" [imagen]="perfil.avatar" size="xlarge" />
+        <label class="avatar-edit" for="per-avatar" title="Cambiar foto">
+          <i [class]="subiendoAvatar() ? 'pi pi-spin pi-spinner' : 'pi pi-camera'"></i>
+        </label>
+        <input
+          id="per-avatar"
+          class="sr-only"
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          aria-label="Subir foto de perfil"
+          (change)="elegirAvatar($event)"
+        />
+      </div>
+      @if (perfil.avatar) {
+        <button type="button" class="link-button" (click)="quitarAvatar()">Quitar foto</button>
+      }
       <h2>{{ perfil.nombreCompleto }}</h2>
       <div class="roles">
         @for (rol of roles(); track rol) {
@@ -54,10 +70,12 @@
     </aside>
 
     <section class="panel">
-      <p-tabs value="datos">
+      <p-tabs [value]="tabActiva()" [scrollable]="true">
         <p-tablist>
           <p-tab value="datos"><i class="pi pi-id-card"></i> Datos personales</p-tab>
           <p-tab value="seguridad"><i class="pi pi-lock"></i> Seguridad</p-tab>
+          <p-tab value="preferencias"><i class="pi pi-bell"></i> Avisos</p-tab>
+          <p-tab value="apariencia"><i class="pi pi-palette"></i> Apariencia</p-tab>
         </p-tablist>
         <p-tabpanels>
           <p-tabpanel value="datos">
@@ -159,7 +177,7 @@
                   severity="secondary"
                   [outlined]="true"
                   [disabled]="!datos.dirty"
-                  (onClick)="descartar()"
+                  (onClick)="restablecer()"
                 />
                 <p-button
                   type="submit"
@@ -179,6 +197,7 @@
               class="seguridad"
               novalidate
             >
+              <h3>Cambiar contraseña</h3>
               @if (errorPassword(); as mensaje) {
                 <p-message severity="error" icon="pi pi-exclamation-circle">{{
                   mensaje
@@ -240,7 +259,7 @@
                 />
               </app-form-field>
 
-              <div class="acciones">
+              <div class="acciones inicio">
                 <p-button
                   type="submit"
                   label="Cambiar contraseña"
@@ -249,6 +268,162 @@
                 />
               </div>
             </form>
+
+            <div class="sesiones">
+              <div class="sesiones-head">
+                <div>
+                  <h3>Sesiones activas</h3>
+                  <p class="text-muted">
+                    Dispositivos desde los que tu cuenta tiene la sesión abierta.
+                  </p>
+                </div>
+                @if ((store.sesiones.value() ?? []).length > 1) {
+                  <p-button
+                    label="Cerrar las demás"
+                    icon="pi pi-sign-out"
+                    severity="danger"
+                    [outlined]="true"
+                    size="small"
+                    (onClick)="cerrarOtras()"
+                  />
+                }
+              </div>
+
+              @if (store.sesiones.loading() && !store.sesiones.hasValue()) {
+                <p-skeleton height="5rem" />
+              } @else {
+                <ul>
+                  @for (sesion of store.sesiones.value() ?? []; track sesion.id) {
+                    <li>
+                      <span class="sesion-icono"><i class="pi pi-desktop"></i></span>
+                      <span class="sesion-info">
+                        <strong>
+                          {{ sesion.dispositivo }}
+                          @if (sesion.actual) {
+                            <p-tag value="Este dispositivo" severity="success" [rounded]="true" />
+                          }
+                        </strong>
+                        <small class="text-muted">
+                          IP {{ sesion.ip }} · Último acceso
+                          {{ sesion.ultimoAcceso | date: 'd MMM y, HH:mm' }}
+                        </small>
+                      </span>
+                      @if (!sesion.actual) {
+                        <p-button
+                          icon="pi pi-sign-out"
+                          [text]="true"
+                          [rounded]="true"
+                          severity="danger"
+                          ariaLabel="Cerrar esta sesión"
+                          (onClick)="cerrarSesion(sesion)"
+                        />
+                      }
+                    </li>
+                  } @empty {
+                    <li class="text-muted">No hay sesiones activas registradas.</li>
+                  }
+                </ul>
+              }
+            </div>
+          </p-tabpanel>
+
+          <p-tabpanel value="preferencias">
+            <form
+              [formGroup]="preferencias"
+              (ngSubmit)="guardarPreferencias()"
+              class="preferencias"
+              novalidate
+            >
+              <div class="opcion">
+                <div>
+                  <strong>Recordatorios de citas</strong>
+                  <p class="text-muted">
+                    Recibe un aviso antes de cada cita pendiente o confirmada.
+                  </p>
+                </div>
+                <p-toggleswitch
+                  formControlName="recordatoriosActivos"
+                  ariaLabel="Recordatorios de citas"
+                />
+              </div>
+
+              <app-form-field
+                label="Anticipación del recordatorio"
+                [control]="preferencias.controls.horasAntelacionRecordatorio"
+                inputId="per-horas"
+                hint="Entre 1 y 72 horas antes de la cita"
+              >
+                <p-inputnumber
+                  inputId="per-horas"
+                  formControlName="horasAntelacionRecordatorio"
+                  suffix=" horas"
+                  [min]="1"
+                  [max]="72"
+                  [showButtons]="true"
+                  [fluid]="true"
+                />
+              </app-form-field>
+
+              <div class="opcion">
+                <div>
+                  <strong>Alertas de inicio de sesión</strong>
+                  <p class="text-muted">
+                    Te avisamos cuando tu cuenta se abre desde un dispositivo nuevo.
+                  </p>
+                </div>
+                <p-toggleswitch
+                  formControlName="alertasInicioSesion"
+                  ariaLabel="Alertas de inicio de sesión"
+                />
+              </div>
+
+              <div class="acciones inicio">
+                <p-button
+                  type="submit"
+                  label="Guardar preferencias"
+                  icon="pi pi-check"
+                  [loading]="guardandoPreferencias()"
+                  [disabled]="!preferencias.dirty"
+                />
+              </div>
+            </form>
+          </p-tabpanel>
+
+          <p-tabpanel value="apariencia">
+            <div class="apariencia">
+              <h3>Modo de color</h3>
+              <p-selectbutton
+                [options]="modos"
+                optionLabel="label"
+                optionValue="value"
+                [ngModel]="theme.mode()"
+                (ngModelChange)="theme.setMode($event ?? 'light')"
+                [allowEmpty]="false"
+                ariaLabel="Modo de color"
+              />
+
+              <h3>Color principal</h3>
+              <div class="paletas" role="radiogroup" aria-label="Color principal">
+                @for (paleta of paletas; track paleta.name) {
+                  <button
+                    type="button"
+                    role="radio"
+                    class="paleta"
+                    [class.activa]="theme.palette() === paleta.name"
+                    [attr.aria-checked]="theme.palette() === paleta.name"
+                    (click)="theme.setPalette(paleta.name)"
+                  >
+                    <span class="muestra" [style.background]="paleta.preview">
+                      @if (theme.palette() === paleta.name) {
+                        <i class="pi pi-check"></i>
+                      }
+                    </span>
+                    {{ paleta.label }}
+                  </button>
+                }
+              </div>
+              <small class="text-muted">La preferencia se guarda en este navegador.</small>
+            </div>
           </p-tabpanel>
         </p-tabpanels>
       </p-tabs>

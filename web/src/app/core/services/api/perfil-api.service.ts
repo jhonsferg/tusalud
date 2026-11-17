@@ -8,6 +8,8 @@ import {
   PasswordChangeRequest,
   PerfilResponse,
   PerfilUpdateRequest,
+  PreferenciasResponse,
+  SesionResponse,
 } from '@tusalud/app/core/models';
 
 @Injectable({ providedIn: 'root' })
@@ -27,5 +29,33 @@ export class PerfilApiService {
     return this.http.put<void>(`${this.baseUrl}/password`, request, {
       context: new HttpContext().set(SKIP_ERROR_NOTIFICATION, true),
     });
+  }
+
+  actualizarAvatar(imagen: string): Observable<PerfilResponse> {
+    return this.http.put<PerfilResponse>(`${this.baseUrl}/avatar`, { imagen });
+  }
+
+  eliminarAvatar(): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/avatar`);
+  }
+
+  obtenerPreferencias(): Observable<PreferenciasResponse> {
+    return this.http.get<PreferenciasResponse>(`${this.baseUrl}/preferencias`);
+  }
+
+  actualizarPreferencias(request: PreferenciasResponse): Observable<PreferenciasResponse> {
+    return this.http.put<PreferenciasResponse>(`${this.baseUrl}/preferencias`, request);
+  }
+
+  listarSesiones(): Observable<SesionResponse[]> {
+    return this.http.get<SesionResponse[]>(`${this.baseUrl}/sesiones`);
+  }
+
+  cerrarSesion(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/sesiones/${id}`);
+  }
+
+  cerrarOtrasSesiones(): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/sesiones`);
   }
 }
