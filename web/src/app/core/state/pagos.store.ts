@@ -42,7 +42,7 @@ export class PagosStore {
     return this.api.crearMetodo(request).pipe(tap(() => this.cargarMetodos()));
   }
 
-  marcarPredeterminado(id: number): Observable<MetodoPagoResponse> {
+  marcarPredeterminado(id: string): Observable<MetodoPagoResponse> {
     return this.api
       .marcarPredeterminado(id)
       .pipe(
@@ -54,7 +54,7 @@ export class PagosStore {
       );
   }
 
-  eliminarMetodo(id: number): Observable<void> {
+  eliminarMetodo(id: string): Observable<void> {
     return this.api.eliminarMetodo(id).pipe(tap(() => this.cargarMetodos()));
   }
 
@@ -62,7 +62,7 @@ export class PagosStore {
     this.pagos.load(this.api.listarPagos());
   }
 
-  pagarCita(citaId: number, request: PagoRequest): Observable<PagoResponse> {
+  pagarCita(citaId: string, request: PagoRequest): Observable<PagoResponse> {
     return this.api.pagarCita(citaId, request).pipe(
       tap((pago) => {
         this.pagos.update((items) => (items ? [pago, ...items] : items));
@@ -71,7 +71,7 @@ export class PagosStore {
     );
   }
 
-  registrarPagoConfirmado(pagoId: number, citaId: number): Observable<PagoResponse> {
+  registrarPagoConfirmado(pagoId: string, citaId: string): Observable<PagoResponse> {
     return this.api.obtenerPago(pagoId).pipe(
       tap((pago) => {
         this.pagos.update((items) => (items ? [pago, ...items] : items));

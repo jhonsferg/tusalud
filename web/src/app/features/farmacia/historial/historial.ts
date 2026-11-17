@@ -67,8 +67,8 @@ export class HistorialFarmacia implements OnInit {
 
   protected cambiarRango(valor: Date[] | null): void {
     this.rango.set(valor);
-    const [inicio, fin] = valor ?? [];
-    if (!valor || (inicio && fin)) {
+    const [inicio] = valor ?? [];
+    if (!valor || inicio) {
       this.cargar();
     }
   }
@@ -78,7 +78,7 @@ export class HistorialFarmacia implements OnInit {
     this.store.cargarDispensaciones({
       q: this.busqueda().trim() || null,
       desde: inicio ? toIsoDate(inicio) : null,
-      hasta: fin ? toIsoDate(fin) : null,
+      hasta: fin ? toIsoDate(fin) : inicio ? toIsoDate(inicio) : null,
     });
   }
 

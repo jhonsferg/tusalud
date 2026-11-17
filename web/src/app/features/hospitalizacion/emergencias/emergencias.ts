@@ -78,7 +78,7 @@ export class Emergencias implements OnInit {
   protected readonly error = signal<string | null>(null);
 
   protected readonly asignando = signal<IngresoHospResponse | null>(null);
-  protected readonly camaElegida = signal<number | null>(null);
+  protected readonly camaElegida = signal<string | null>(null);
   protected readonly camasLibres = computed(() =>
     (this.store.camas.value() ?? [])
       .filter(

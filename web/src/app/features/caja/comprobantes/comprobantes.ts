@@ -86,8 +86,8 @@ export class Comprobantes implements OnInit {
 
   protected cambiarRango(valor: Date[] | null): void {
     this.rango.set(valor);
-    const [inicio, fin] = valor ?? [];
-    if (!valor || (inicio && fin)) {
+    const [inicio] = valor ?? [];
+    if (!valor || inicio) {
       this.cargar();
     }
   }
@@ -98,7 +98,7 @@ export class Comprobantes implements OnInit {
       q: this.busqueda().trim() || null,
       estado: this.estado(),
       desde: inicio ? toIsoDate(inicio) : null,
-      hasta: fin ? toIsoDate(fin) : null,
+      hasta: fin ? toIsoDate(fin) : inicio ? toIsoDate(inicio) : null,
     });
   }
 

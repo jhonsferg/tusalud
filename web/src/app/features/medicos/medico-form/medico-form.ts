@@ -49,7 +49,7 @@ export class MedicoForm implements OnInit {
     telefono: ['', [AppValidators.telefono]],
     colegiatura: ['', [Validators.required, AppValidators.notBlank, Validators.maxLength(20)]],
     consultorio: ['', [Validators.maxLength(60)]],
-    especialidadIds: [[] as number[], [Validators.required, Validators.minLength(1)]],
+    especialidadIds: [[] as string[], [Validators.required, Validators.minLength(1)]],
   });
 
   ngOnInit(): void {

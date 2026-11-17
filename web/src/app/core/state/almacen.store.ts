@@ -62,7 +62,7 @@ export class AlmacenStore {
     this.productos.load(this.api.listarProductos(filtro));
   }
 
-  cargarLotes(productoId: number): void {
+  cargarLotes(productoId: string): void {
     this.lotes.load(this.api.listarLotes(productoId));
   }
 
@@ -72,7 +72,7 @@ export class AlmacenStore {
       .pipe(tap((producto) => this.productos.update((items) => [producto, ...(items ?? [])])));
   }
 
-  actualizarProducto(id: number, request: ProductoRequest): Observable<ProductoResponse> {
+  actualizarProducto(id: string, request: ProductoRequest): Observable<ProductoResponse> {
     return this.api
       .actualizarProducto(id, request)
       .pipe(
@@ -94,7 +94,7 @@ export class AlmacenStore {
       .pipe(tap((proveedor) => this.proveedores.update((items) => [proveedor, ...(items ?? [])])));
   }
 
-  actualizarProveedor(id: number, request: ProveedorRequest): Observable<ProveedorResponse> {
+  actualizarProveedor(id: string, request: ProveedorRequest): Observable<ProveedorResponse> {
     return this.api
       .actualizarProveedor(id, request)
       .pipe(

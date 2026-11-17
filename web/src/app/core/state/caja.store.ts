@@ -79,7 +79,7 @@ export class CajaStore {
     this.comprobantes.load(this.api.comprobantes(filtro));
   }
 
-  anular(id: number, motivo: string): Observable<ComprobanteResponse> {
+  anular(id: string, motivo: string): Observable<ComprobanteResponse> {
     return this.api
       .anular(id, motivo)
       .pipe(

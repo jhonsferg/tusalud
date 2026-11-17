@@ -39,7 +39,7 @@ export class LaboratorioApiService {
     return this.http.post<ExamenResponse>(`${this.baseUrl}/examenes`, request);
   }
 
-  actualizarExamen(id: number, request: ExamenRequest): Observable<ExamenResponse> {
+  actualizarExamen(id: string, request: ExamenRequest): Observable<ExamenResponse> {
     return this.http.put<ExamenResponse>(`${this.baseUrl}/examenes/${id}`, request);
   }
 
@@ -49,7 +49,7 @@ export class LaboratorioApiService {
     });
   }
 
-  obtenerOrden(id: number): Observable<OrdenResponse> {
+  obtenerOrden(id: string): Observable<OrdenResponse> {
     return this.http.get<OrdenResponse>(`${this.baseUrl}/ordenes/${id}`);
   }
 
@@ -57,13 +57,13 @@ export class LaboratorioApiService {
     return this.http.post<OrdenResponse>(`${this.baseUrl}/ordenes`, request);
   }
 
-  tomarMuestra(id: number): Observable<OrdenResponse> {
+  tomarMuestra(id: string): Observable<OrdenResponse> {
     return this.http.put<OrdenResponse>(`${this.baseUrl}/ordenes/${id}/muestra`, null);
   }
 
   registrarResultados(
-    id: number,
-    itemId: number,
+    id: string,
+    itemId: string,
     request: ResultadosRequest,
   ): Observable<OrdenResponse> {
     return this.http.put<OrdenResponse>(
@@ -72,11 +72,11 @@ export class LaboratorioApiService {
     );
   }
 
-  validar(id: number): Observable<OrdenResponse> {
+  validar(id: string): Observable<OrdenResponse> {
     return this.http.put<OrdenResponse>(`${this.baseUrl}/ordenes/${id}/validar`, null);
   }
 
-  cancelar(id: number, motivo?: string | null): Observable<OrdenResponse> {
+  cancelar(id: string, motivo?: string | null): Observable<OrdenResponse> {
     return this.http.put<OrdenResponse>(`${this.baseUrl}/ordenes/${id}/cancelar`, { motivo });
   }
 

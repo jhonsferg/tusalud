@@ -49,7 +49,7 @@ export class NotificacionesStore {
     });
   }
 
-  marcarLeida(id: number): Observable<NotificacionResponse> {
+  marcarLeida(id: string): Observable<NotificacionResponse> {
     return this.api.marcarLeida(id).pipe(
       tap((actualizada) => {
         const previa = this.items().find((item) => item.id === id);
@@ -70,7 +70,7 @@ export class NotificacionesStore {
     );
   }
 
-  eliminar(id: number): Observable<void> {
+  eliminar(id: string): Observable<void> {
     return this.api.eliminar(id).pipe(
       tap(() => {
         const previa = this.items().find((item) => item.id === id);

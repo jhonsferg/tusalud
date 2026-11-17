@@ -19,12 +19,12 @@ export interface AtencionRequest {
 }
 
 export interface AtencionResponse {
-  id: number;
-  citaId: number;
+  id: string;
+  citaId: string;
   fecha: string;
   medicoNombre: string;
   especialidad: string;
-  pacienteId: number;
+  pacienteId: string;
   pacienteNombre: string;
   diagnostico: string;
   tratamiento?: string | null;
@@ -39,7 +39,7 @@ export interface AtencionResponse {
 }
 
 export interface PacienteClinicoResponse {
-  pacienteId: number;
+  pacienteId: string;
   nombreCompleto: string;
   dni: string;
   historialClinicoNumero: string;
@@ -62,7 +62,7 @@ export interface DatosMedicosRequest {
 }
 
 export interface PacienteResumenResponse {
-  pacienteId: number;
+  pacienteId: string;
   nombreCompleto: string;
   dni: string;
   historialClinicoNumero: string;
@@ -72,7 +72,7 @@ export interface PacienteResumenResponse {
 }
 
 export interface CompartidoResponse {
-  medicoId: number;
+  medicoId: string;
   medicoNombre: string;
   especialidades: string[];
   nota?: string | null;
@@ -80,7 +80,7 @@ export interface CompartidoResponse {
 }
 
 export interface CompartirPacienteRequest {
-  medicoId: number;
+  medicoId: string;
   nota?: string | null;
 }
 
@@ -90,9 +90,9 @@ export interface ValoracionRequest {
 }
 
 export interface ValoracionResponse {
-  id: number;
-  citaId: number;
-  medicoId: number;
+  id: string;
+  citaId: string;
+  medicoId: string;
   pacienteNombre: string;
   puntuacion: number;
   comentario?: string | null;

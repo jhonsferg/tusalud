@@ -17,7 +17,7 @@ export const ETIQUETA_METODO_FARMACIA: Readonly<Record<MetodoPagoFarmacia, strin
 };
 
 export interface CatalogoProductoResponse {
-  id: number;
+  id: string;
   codigo: string;
   nombre: string;
   principioActivo?: string | null;
@@ -29,7 +29,7 @@ export interface CatalogoProductoResponse {
 }
 
 export interface RecetaItemFarmaciaResponse {
-  id: number;
+  id: string;
   medicamento: string;
   dosis?: string | null;
   frecuencia?: string | null;
@@ -39,10 +39,10 @@ export interface RecetaItemFarmaciaResponse {
 }
 
 export interface RecetaFarmaciaResponse {
-  atencionId: number;
-  citaId: number;
+  atencionId: string;
+  citaId: string;
   fecha: string;
-  pacienteId: number;
+  pacienteId: string;
   pacienteNombre: string;
   dni: string;
   medicoNombre: string;
@@ -51,34 +51,34 @@ export interface RecetaFarmaciaResponse {
 }
 
 export interface DispensacionItemRequest {
-  recetaItemId?: number | null;
-  productoId: number;
+  recetaItemId?: string | null;
+  productoId: string;
   cantidad: number;
 }
 
 export interface DispensacionRequest {
-  atencionId?: number | null;
-  pacienteId?: number | null;
+  atencionId?: string | null;
+  pacienteId?: string | null;
   items: DispensacionItemRequest[];
   metodoPago: MetodoPagoFarmacia;
   observaciones?: string | null;
 }
 
 export interface DispensacionItemResponse {
-  productoId: number;
+  productoId: string;
   productoNombre: string;
   cantidad: number;
   precioUnitario: number;
   subtotal: number;
-  recetaItemId?: number | null;
+  recetaItemId?: string | null;
 }
 
 export interface DispensacionResponse {
-  id: number;
+  id: string;
   fecha: string;
   comprobante: string;
   estado: EstadoDispensacion;
-  pacienteId?: number | null;
+  pacienteId?: string | null;
   pacienteNombre: string;
   farmaceuticoNombre: string;
   metodoPago: MetodoPagoFarmacia;

@@ -44,7 +44,7 @@ export class LaboratorioStore {
       .pipe(tap((examen) => this.examenes.update((items) => [examen, ...(items ?? [])])));
   }
 
-  actualizarExamen(id: number, request: ExamenRequest): Observable<ExamenResponse> {
+  actualizarExamen(id: string, request: ExamenRequest): Observable<ExamenResponse> {
     return this.api
       .actualizarExamen(id, request)
       .pipe(
@@ -58,7 +58,7 @@ export class LaboratorioStore {
     this.ordenes.load(this.api.listarOrdenes(filtro));
   }
 
-  cargarOrden(id: number): void {
+  cargarOrden(id: string): void {
     this.orden.load(this.api.obtenerOrden(id));
   }
 
@@ -66,13 +66,13 @@ export class LaboratorioStore {
     return this.api.crearOrden(request);
   }
 
-  tomarMuestra(id: number): Observable<OrdenResponse> {
+  tomarMuestra(id: string): Observable<OrdenResponse> {
     return this.api.tomarMuestra(id).pipe(tap((orden) => this.aplicar(orden)));
   }
 
   registrarResultados(
-    id: number,
-    itemId: number,
+    id: string,
+    itemId: string,
     request: ResultadosRequest,
   ): Observable<OrdenResponse> {
     return this.api
@@ -80,11 +80,11 @@ export class LaboratorioStore {
       .pipe(tap((orden) => this.aplicar(orden)));
   }
 
-  validar(id: number): Observable<OrdenResponse> {
+  validar(id: string): Observable<OrdenResponse> {
     return this.api.validar(id).pipe(tap((orden) => this.aplicar(orden)));
   }
 
-  cancelar(id: number, motivo?: string | null): Observable<OrdenResponse> {
+  cancelar(id: string, motivo?: string | null): Observable<OrdenResponse> {
     return this.api.cancelar(id, motivo).pipe(tap((orden) => this.aplicar(orden)));
   }
 

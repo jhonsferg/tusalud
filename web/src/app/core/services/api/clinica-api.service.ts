@@ -23,17 +23,17 @@ export class ClinicaApiService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = inject(API_URL);
 
-  obtenerAtencion(citaId: number): Observable<AtencionResponse> {
+  obtenerAtencion(citaId: string): Observable<AtencionResponse> {
     return this.http.get<AtencionResponse>(`${this.apiUrl}/citas/${citaId}/atencion`, {
       context: new HttpContext().set(SKIP_ERROR_NOTIFICATION, true),
     });
   }
 
-  registrarAtencion(citaId: number, request: AtencionRequest): Observable<AtencionResponse> {
+  registrarAtencion(citaId: string, request: AtencionRequest): Observable<AtencionResponse> {
     return this.http.post<AtencionResponse>(`${this.apiUrl}/citas/${citaId}/atencion`, request);
   }
 
-  actualizarAtencion(citaId: number, request: AtencionRequest): Observable<AtencionResponse> {
+  actualizarAtencion(citaId: string, request: AtencionRequest): Observable<AtencionResponse> {
     return this.http.put<AtencionResponse>(`${this.apiUrl}/citas/${citaId}/atencion`, request);
   }
 
@@ -48,20 +48,20 @@ export class ClinicaApiService {
     );
   }
 
-  historiaDePaciente(pacienteId: number): Observable<HistoriaClinicaResponse> {
+  historiaDePaciente(pacienteId: string): Observable<HistoriaClinicaResponse> {
     return this.http.get<HistoriaClinicaResponse>(
       `${this.apiUrl}/pacientes/${pacienteId}/historia-clinica`,
     );
   }
 
-  listarCompartidos(pacienteId: number): Observable<CompartidoResponse[]> {
+  listarCompartidos(pacienteId: string): Observable<CompartidoResponse[]> {
     return this.http.get<CompartidoResponse[]>(
       `${this.apiUrl}/pacientes/${pacienteId}/compartidos`,
     );
   }
 
   compartirPaciente(
-    pacienteId: number,
+    pacienteId: string,
     request: CompartirPacienteRequest,
   ): Observable<CompartidoResponse> {
     return this.http.post<CompartidoResponse>(
@@ -70,7 +70,7 @@ export class ClinicaApiService {
     );
   }
 
-  dejarDeCompartir(pacienteId: number, medicoId: number): Observable<void> {
+  dejarDeCompartir(pacienteId: string, medicoId: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/pacientes/${pacienteId}/compartir/${medicoId}`);
   }
 
@@ -78,17 +78,17 @@ export class ClinicaApiService {
     return this.http.get<PacienteResumenResponse[]>(`${this.apiUrl}/medicos/me/pacientes`);
   }
 
-  obtenerValoracion(citaId: number): Observable<ValoracionResponse> {
+  obtenerValoracion(citaId: string): Observable<ValoracionResponse> {
     return this.http.get<ValoracionResponse>(`${this.apiUrl}/citas/${citaId}/valoracion`, {
       context: new HttpContext().set(SKIP_ERROR_NOTIFICATION, true),
     });
   }
 
-  valorar(citaId: number, request: ValoracionRequest): Observable<ValoracionResponse> {
+  valorar(citaId: string, request: ValoracionRequest): Observable<ValoracionResponse> {
     return this.http.post<ValoracionResponse>(`${this.apiUrl}/citas/${citaId}/valoracion`, request);
   }
 
-  valoracionesDeMedico(medicoId: number): Observable<ValoracionesMedicoResponse> {
+  valoracionesDeMedico(medicoId: string): Observable<ValoracionesMedicoResponse> {
     return this.http.get<ValoracionesMedicoResponse>(
       `${this.apiUrl}/medicos/${medicoId}/valoraciones`,
     );

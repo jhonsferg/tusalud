@@ -74,7 +74,7 @@ export class CitasStore {
     this.agendaRango.load(this.medicosApi.miAgendaRango(inicio, fin));
   }
 
-  loadOne(id: number): void {
+  loadOne(id: string): void {
     this.selected.load(this.api.obtener(id));
   }
 
@@ -88,23 +88,23 @@ export class CitasStore {
     );
   }
 
-  cancelar(id: number): Observable<CitaResponse> {
+  cancelar(id: string): Observable<CitaResponse> {
     return this.api.cancelar(id).pipe(tap((cita) => this.sincronizar(cita)));
   }
 
-  confirmar(id: number): Observable<CitaResponse> {
+  confirmar(id: string): Observable<CitaResponse> {
     return this.api.confirmar(id).pipe(tap((cita) => this.sincronizar(cita)));
   }
 
-  atender(id: number): Observable<CitaResponse> {
+  atender(id: string): Observable<CitaResponse> {
     return this.api.atender(id).pipe(tap((cita) => this.sincronizar(cita)));
   }
 
-  reprogramar(id: number, fechaHora: string): Observable<CitaResponse> {
+  reprogramar(id: string, fechaHora: string): Observable<CitaResponse> {
     return this.api.reprogramar(id, fechaHora).pipe(tap((cita) => this.sincronizar(cita)));
   }
 
-  marcarPagada(id: number): void {
+  marcarPagada(id: string): void {
     const marcar = (items: CitaResponse[] | undefined) =>
       items?.map((item) => (item.id === id ? { ...item, pagado: true } : item));
     this.misCitas.update(marcar);

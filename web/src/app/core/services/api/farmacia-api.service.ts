@@ -49,11 +49,11 @@ export class FarmaciaApiService {
     });
   }
 
-  obtenerDispensacion(id: number): Observable<DispensacionResponse> {
+  obtenerDispensacion(id: string): Observable<DispensacionResponse> {
     return this.http.get<DispensacionResponse>(`${this.baseUrl}/dispensaciones/${id}`);
   }
 
-  anular(id: number): Observable<DispensacionResponse> {
+  anular(id: string): Observable<DispensacionResponse> {
     return this.http.put<DispensacionResponse>(`${this.baseUrl}/dispensaciones/${id}/anular`, null);
   }
 

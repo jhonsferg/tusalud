@@ -75,7 +75,7 @@ export class MedicoList implements OnInit {
     return Math.min(...medico.especialidades.map((especialidad) => especialidad.precioConsulta));
   }
 
-  protected filtrarPorEspecialidad(id: number | null): void {
+  protected filtrarPorEspecialidad(id: string | null): void {
     this.store.load(id);
   }
 

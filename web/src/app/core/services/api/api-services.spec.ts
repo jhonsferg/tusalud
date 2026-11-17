@@ -20,6 +20,10 @@ import { HospitalizacionApiService } from './hospitalizacion-api.service';
 import { PagosApiService } from './pagos-api.service';
 import { RecepcionApiService } from './recepcion-api.service';
 
+function u(n: number): string {
+  return `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+}
+
 interface Expected {
   method: string;
   url: string;
@@ -84,14 +88,14 @@ describe('servicios de la API', () => {
     const body = { nombre: 'Neurología', descripcion: 'Sistema nervioso', precioConsulta: 170 };
     api.listar().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/especialidades' });
-    api.obtener(3).subscribe();
-    expectRequest({ method: 'GET', url: '/api/v1/especialidades/3' });
+    api.obtener(u(3)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/especialidades/${u(3)}` });
     api.crear(body).subscribe();
     expectRequest({ method: 'POST', url: '/api/v1/especialidades', body });
-    api.actualizar(3, body).subscribe();
-    expectRequest({ method: 'PUT', url: '/api/v1/especialidades/3', body });
-    api.eliminar(3).subscribe();
-    expectRequest({ method: 'DELETE', url: '/api/v1/especialidades/3' });
+    api.actualizar(u(3), body).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/especialidades/${u(3)}`, body });
+    api.eliminar(u(3)).subscribe();
+    expectRequest({ method: 'DELETE', url: `/api/v1/especialidades/${u(3)}` });
   });
 
   it('MedicosApiService cubre médicos, horarios, disponibilidad y agenda', () => {
@@ -102,7 +106,7 @@ describe('servicios de la API', () => {
       email: 'ana.torres@tusalud.com',
       password: 'Medico123!',
       colegiatura: 'CMP-54321',
-      especialidadIds: [1, 3],
+      especialidadIds: [u(1), u(3)],
     };
     const horario = {
       diaSemana: 'MONDAY' as const,
@@ -113,22 +117,22 @@ describe('servicios de la API', () => {
 
     api.listar().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/medicos' });
-    api.listar(2).subscribe();
-    expectRequest({ method: 'GET', url: '/api/v1/medicos', params: { especialidadId: '2' } });
-    api.obtener(5).subscribe();
-    expectRequest({ method: 'GET', url: '/api/v1/medicos/5' });
+    api.listar(u(2)).subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/medicos', params: { especialidadId: u(2) } });
+    api.obtener(u(5)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/medicos/${u(5)}` });
     api.crear(medico).subscribe();
     expectRequest({ method: 'POST', url: '/api/v1/medicos', body: medico });
-    api.listarHorarios(5).subscribe();
-    expectRequest({ method: 'GET', url: '/api/v1/medicos/5/horarios' });
-    api.agregarHorario(5, horario).subscribe();
-    expectRequest({ method: 'POST', url: '/api/v1/medicos/5/horarios', body: horario });
-    api.eliminarHorario(5, 9).subscribe();
-    expectRequest({ method: 'DELETE', url: '/api/v1/medicos/5/horarios/9' });
-    api.disponibilidad(5, '2026-10-20').subscribe();
+    api.listarHorarios(u(5)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/medicos/${u(5)}/horarios` });
+    api.agregarHorario(u(5), horario).subscribe();
+    expectRequest({ method: 'POST', url: `/api/v1/medicos/${u(5)}/horarios`, body: horario });
+    api.eliminarHorario(u(5), u(9)).subscribe();
+    expectRequest({ method: 'DELETE', url: `/api/v1/medicos/${u(5)}/horarios/${u(9)}` });
+    api.disponibilidad(u(5), '2026-10-20').subscribe();
     expectRequest({
       method: 'GET',
-      url: '/api/v1/medicos/5/disponibilidad',
+      url: `/api/v1/medicos/${u(5)}/disponibilidad`,
       params: { fecha: '2026-10-20' },
     });
     api.miAgenda().subscribe();
@@ -144,8 +148,8 @@ describe('servicios de la API', () => {
   it('CitasApiService cubre la reserva y los cambios de estado', () => {
     const api = TestBed.inject(CitasApiService);
     const cita = {
-      medicoId: 1,
-      especialidadId: 1,
+      medicoId: u(1),
+      especialidadId: u(1),
       fechaHora: '2026-10-20T10:00:00',
       motivo: 'Control',
     };
@@ -160,14 +164,14 @@ describe('servicios de la API', () => {
       url: '/api/v1/citas/mis-citas',
       params: { inicio: '2026-10-01', fin: '2026-10-31' },
     });
-    api.obtener(7).subscribe();
-    expectRequest({ method: 'GET', url: '/api/v1/citas/7' });
-    api.cancelar(7).subscribe();
-    expectRequest({ method: 'PUT', url: '/api/v1/citas/7/cancelar' });
-    api.confirmar(7).subscribe();
-    expectRequest({ method: 'PUT', url: '/api/v1/citas/7/confirmar' });
-    api.atender(7).subscribe();
-    expectRequest({ method: 'PUT', url: '/api/v1/citas/7/atender' });
+    api.obtener(u(7)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/citas/${u(7)}` });
+    api.cancelar(u(7)).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/citas/${u(7)}/cancelar` });
+    api.confirmar(u(7)).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/citas/${u(7)}/confirmar` });
+    api.atender(u(7)).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/citas/${u(7)}/atender` });
   });
 
   it('AuditoriaApiService cubre los reportes', () => {
@@ -186,7 +190,7 @@ describe('servicios de la API', () => {
     const api = TestBed.inject(PerfilApiService);
     const preferencias = {
       recordatoriosActivos: true,
-      horasAntelacionRecordatorio: 24,
+      minutosAntelacionRecordatorio: 1440,
       alertasInicioSesion: true,
       tourCompletado: false,
     };
@@ -204,8 +208,8 @@ describe('servicios de la API', () => {
     expectRequest({ method: 'PUT', url: '/api/v1/perfil/preferencias', body: preferencias });
     api.listarSesiones().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/perfil/sesiones' });
-    api.cerrarSesion(4).subscribe();
-    expectRequest({ method: 'DELETE', url: '/api/v1/perfil/sesiones/4' });
+    api.cerrarSesion(u(4)).subscribe();
+    expectRequest({ method: 'DELETE', url: `/api/v1/perfil/sesiones/${u(4)}` });
     api.cerrarOtrasSesiones().subscribe();
     expectRequest({ method: 'DELETE', url: '/api/v1/perfil/sesiones' });
   });
@@ -220,12 +224,12 @@ describe('servicios de la API', () => {
     });
     api.resumen().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/notificaciones/resumen' });
-    api.marcarLeida(3).subscribe();
-    expectRequest({ method: 'PUT', url: '/api/v1/notificaciones/3/leida' });
+    api.marcarLeida(u(3)).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/notificaciones/${u(3)}/leida` });
     api.marcarTodasLeidas().subscribe();
     expectRequest({ method: 'PUT', url: '/api/v1/notificaciones/leidas' });
-    api.eliminar(3).subscribe();
-    expectRequest({ method: 'DELETE', url: '/api/v1/notificaciones/3' });
+    api.eliminar(u(3)).subscribe();
+    expectRequest({ method: 'DELETE', url: `/api/v1/notificaciones/${u(3)}` });
   });
 
   it('PagosApiService cubre métodos de pago, cupones y pagos', () => {
@@ -243,37 +247,37 @@ describe('servicios de la API', () => {
     expectRequest({ method: 'GET', url: '/api/v1/metodos-pago' });
     api.crearMetodo(metodo).subscribe();
     expectRequest({ method: 'POST', url: '/api/v1/metodos-pago', body: metodo });
-    api.marcarPredeterminado(2).subscribe();
-    expectRequest({ method: 'PUT', url: '/api/v1/metodos-pago/2/predeterminado' });
-    api.eliminarMetodo(2).subscribe();
-    expectRequest({ method: 'DELETE', url: '/api/v1/metodos-pago/2' });
+    api.marcarPredeterminado(u(2)).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/metodos-pago/${u(2)}/predeterminado` });
+    api.eliminarMetodo(u(2)).subscribe();
+    expectRequest({ method: 'DELETE', url: `/api/v1/metodos-pago/${u(2)}` });
     api.validarCupon('SALUD20', 150).subscribe();
     expectRequest({
       method: 'GET',
       url: '/api/v1/cupones/validar',
       params: { codigo: 'SALUD20', monto: '150' },
     });
-    api.pagarCita(9, { metodoPagoId: 2, codigoCupon: 'SALUD20' }).subscribe();
+    api.pagarCita(u(9), { metodoPagoId: u(2), codigoCupon: 'SALUD20' }).subscribe();
     expectRequest({
       method: 'POST',
-      url: '/api/v1/citas/9/pago',
-      body: { metodoPagoId: 2, codigoCupon: 'SALUD20' },
+      url: `/api/v1/citas/${u(9)}/pago`,
+      body: { metodoPagoId: u(2), codigoCupon: 'SALUD20' },
     });
     api.listarPagos().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/pagos' });
-    api.obtenerPago(5).subscribe();
-    expectRequest({ method: 'GET', url: '/api/v1/pagos/5' });
+    api.obtenerPago(u(5)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/pagos/${u(5)}` });
   });
 
   it('ClinicaApiService cubre atención, historia clínica y valoraciones', () => {
     const api = TestBed.inject(ClinicaApiService);
     const atencion = { diagnostico: 'Hipertensión leve', receta: [{ medicamento: 'Enalapril' }] };
-    api.obtenerAtencion(7).subscribe();
-    expectRequest({ method: 'GET', url: '/api/v1/citas/7/atencion' });
-    api.registrarAtencion(7, atencion).subscribe();
-    expectRequest({ method: 'POST', url: '/api/v1/citas/7/atencion', body: atencion });
-    api.actualizarAtencion(7, atencion).subscribe();
-    expectRequest({ method: 'PUT', url: '/api/v1/citas/7/atencion', body: atencion });
+    api.obtenerAtencion(u(7)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/citas/${u(7)}/atencion` });
+    api.registrarAtencion(u(7), atencion).subscribe();
+    expectRequest({ method: 'POST', url: `/api/v1/citas/${u(7)}/atencion`, body: atencion });
+    api.actualizarAtencion(u(7), atencion).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/citas/${u(7)}/atencion`, body: atencion });
     api.miHistoria().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/historia-clinica' });
     api.actualizarDatosMedicos({ grupoSanguineo: 'O+' }).subscribe();
@@ -282,16 +286,20 @@ describe('servicios de la API', () => {
       url: '/api/v1/historia-clinica/datos-medicos',
       body: { grupoSanguineo: 'O+' },
     });
-    api.historiaDePaciente(3).subscribe();
-    expectRequest({ method: 'GET', url: '/api/v1/pacientes/3/historia-clinica' });
+    api.historiaDePaciente(u(3)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/pacientes/${u(3)}/historia-clinica` });
     api.misPacientes().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/medicos/me/pacientes' });
-    api.obtenerValoracion(7).subscribe();
-    expectRequest({ method: 'GET', url: '/api/v1/citas/7/valoracion' });
-    api.valorar(7, { puntuacion: 5 }).subscribe();
-    expectRequest({ method: 'POST', url: '/api/v1/citas/7/valoracion', body: { puntuacion: 5 } });
-    api.valoracionesDeMedico(1).subscribe();
-    expectRequest({ method: 'GET', url: '/api/v1/medicos/1/valoraciones' });
+    api.obtenerValoracion(u(7)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/citas/${u(7)}/valoracion` });
+    api.valorar(u(7), { puntuacion: 5 }).subscribe();
+    expectRequest({
+      method: 'POST',
+      url: `/api/v1/citas/${u(7)}/valoracion`,
+      body: { puntuacion: 5 },
+    });
+    api.valoracionesDeMedico(u(1)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/medicos/${u(1)}/valoraciones` });
   });
 
   it('AdminApiService cubre estadísticas, cupones, pagos y usuarios', () => {
@@ -310,10 +318,10 @@ describe('servicios de la API', () => {
     expectRequest({ method: 'GET', url: '/api/v1/admin/cupones' });
     api.crearCupon(cupon).subscribe();
     expectRequest({ method: 'POST', url: '/api/v1/admin/cupones', body: cupon });
-    api.actualizarCupon(1, cupon).subscribe();
-    expectRequest({ method: 'PUT', url: '/api/v1/admin/cupones/1', body: cupon });
-    api.eliminarCupon(1).subscribe();
-    expectRequest({ method: 'DELETE', url: '/api/v1/admin/cupones/1' });
+    api.actualizarCupon(u(1), cupon).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/admin/cupones/${u(1)}`, body: cupon });
+    api.eliminarCupon(u(1)).subscribe();
+    expectRequest({ method: 'DELETE', url: `/api/v1/admin/cupones/${u(1)}` });
     api.listarPagos({ inicio: '2026-01-01', fin: '2026-01-31' }).subscribe();
     expectRequest({
       method: 'GET',
@@ -326,21 +334,21 @@ describe('servicios de la API', () => {
       url: '/api/v1/admin/usuarios',
       params: { rol: 'ROLE_MEDICO', q: 'garcia' },
     });
-    api.cambiarEstadoUsuario(4, 'INACTIVO').subscribe();
+    api.cambiarEstadoUsuario(u(4), 'INACTIVO').subscribe();
     expectRequest({
       method: 'PUT',
-      url: '/api/v1/admin/usuarios/4/estado',
+      url: `/api/v1/admin/usuarios/${u(4)}/estado`,
       body: { estado: 'INACTIVO' },
     });
   });
 
   it('MedicosApiService actualiza las especialidades de un médico', () => {
     const api = TestBed.inject(MedicosApiService);
-    api.actualizarEspecialidades(5, [1, 4]).subscribe();
+    api.actualizarEspecialidades(u(5), [u(1), u(4)]).subscribe();
     expectRequest({
       method: 'PUT',
-      url: '/api/v1/medicos/5/especialidades',
-      body: { especialidadIds: [1, 4] },
+      url: `/api/v1/medicos/${u(5)}/especialidades`,
+      body: { especialidadIds: [u(1), u(4)] },
     });
   });
 
@@ -348,35 +356,35 @@ describe('servicios de la API', () => {
     const api = TestBed.inject(AdminApiService);
     api.listarRoles().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/admin/roles' });
-    api.actualizarRoles(4, ['ROLE_ADMIN', 'ROLE_PACIENTE']).subscribe();
+    api.actualizarRoles(u(4), ['ROLE_ADMIN', 'ROLE_PACIENTE']).subscribe();
     expectRequest({
       method: 'PUT',
-      url: '/api/v1/admin/usuarios/4/roles',
+      url: `/api/v1/admin/usuarios/${u(4)}/roles`,
       body: { roles: ['ROLE_ADMIN', 'ROLE_PACIENTE'] },
     });
   });
 
   it('ClinicaApiService comparte pacientes entre médicos', () => {
     const api = TestBed.inject(ClinicaApiService);
-    api.listarCompartidos(3).subscribe();
-    expectRequest({ method: 'GET', url: '/api/v1/pacientes/3/compartidos' });
-    api.compartirPaciente(3, { medicoId: 2, nota: 'Interconsulta' }).subscribe();
+    api.listarCompartidos(u(3)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/pacientes/${u(3)}/compartidos` });
+    api.compartirPaciente(u(3), { medicoId: u(2), nota: 'Interconsulta' }).subscribe();
     expectRequest({
       method: 'POST',
-      url: '/api/v1/pacientes/3/compartir',
-      body: { medicoId: 2, nota: 'Interconsulta' },
+      url: `/api/v1/pacientes/${u(3)}/compartir`,
+      body: { medicoId: u(2), nota: 'Interconsulta' },
     });
-    api.dejarDeCompartir(3, 2).subscribe();
-    expectRequest({ method: 'DELETE', url: '/api/v1/pacientes/3/compartir/2' });
+    api.dejarDeCompartir(u(3), u(2)).subscribe();
+    expectRequest({ method: 'DELETE', url: `/api/v1/pacientes/${u(3)}/compartir/${u(2)}` });
   });
 
   it('PagosApiService cubre el flujo de pago con QR de Yape y Plin', () => {
     const api = TestBed.inject(PagosApiService);
-    api.crearPagoQr({ citaId: 8, billetera: 'YAPE', codigoCupon: 'SALUD20' }).subscribe();
+    api.crearPagoQr({ citaId: u(8), billetera: 'YAPE', codigoCupon: 'SALUD20' }).subscribe();
     expectRequest({
       method: 'POST',
       url: '/api/v1/pagos/qr',
-      body: { citaId: 8, billetera: 'YAPE', codigoCupon: 'SALUD20' },
+      body: { citaId: u(8), billetera: 'YAPE', codigoCupon: 'SALUD20' },
     });
     api.consultarPagoQr('abc').subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/pagos/qr/abc' });
@@ -410,10 +418,10 @@ describe('servicios de la API', () => {
 
   it('CitasApiService reprograma una cita', () => {
     const api = TestBed.inject(CitasApiService);
-    api.reprogramar(8, '2026-12-01T10:00:00').subscribe();
+    api.reprogramar(u(8), '2026-12-01T10:00:00').subscribe();
     expectRequest({
       method: 'PUT',
-      url: '/api/v1/citas/8/reprogramar',
+      url: `/api/v1/citas/${u(8)}/reprogramar`,
       body: { fechaHora: '2026-12-01T10:00:00' },
     });
   });
@@ -435,22 +443,22 @@ describe('servicios de la API', () => {
     });
     api.crear(evento).subscribe();
     expectRequest({ method: 'POST', url: '/api/v1/calendario/eventos', body: evento });
-    api.actualizar(4, evento).subscribe();
-    expectRequest({ method: 'PUT', url: '/api/v1/calendario/eventos/4', body: evento });
-    api.mover(4, { inicio: '2026-11-18T12:00:00', fin: '2026-11-18T13:00:00' }).subscribe();
+    api.actualizar(u(4), evento).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/calendario/eventos/${u(4)}`, body: evento });
+    api.mover(u(4), { inicio: '2026-11-18T12:00:00', fin: '2026-11-18T13:00:00' }).subscribe();
     expectRequest({
       method: 'PUT',
-      url: '/api/v1/calendario/eventos/4/mover',
+      url: `/api/v1/calendario/eventos/${u(4)}/mover`,
       body: { inicio: '2026-11-18T12:00:00', fin: '2026-11-18T13:00:00' },
     });
-    api.completar(4, true).subscribe();
+    api.completar(u(4), true).subscribe();
     expectRequest({
       method: 'PUT',
-      url: '/api/v1/calendario/eventos/4/completado',
+      url: `/api/v1/calendario/eventos/${u(4)}/completado`,
       body: { completado: true },
     });
-    api.eliminar(4).subscribe();
-    expectRequest({ method: 'DELETE', url: '/api/v1/calendario/eventos/4' });
+    api.eliminar(u(4)).subscribe();
+    expectRequest({ method: 'DELETE', url: `/api/v1/calendario/eventos/${u(4)}` });
   });
 
   it('AlmacenApiService cubre productos, ingresos, salidas y kardex', () => {
@@ -465,21 +473,21 @@ describe('servicios de la API', () => {
       url: '/api/v1/almacen/productos',
       params: { q: 'para', bajoStock: 'true' },
     });
-    api.listarLotes(4).subscribe();
-    expectRequest({ method: 'GET', url: '/api/v1/almacen/productos/4/lotes' });
+    api.listarLotes(u(4)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/almacen/productos/${u(4)}/lotes` });
     api.registrarIngreso({ items: [] }).subscribe();
     expectRequest({ method: 'POST', url: '/api/v1/almacen/ingresos', body: { items: [] } });
-    api.registrarSalida({ productoId: 4, cantidad: 2, motivo: 'MERMA' }).subscribe();
+    api.registrarSalida({ productoId: u(4), cantidad: 2, motivo: 'MERMA' }).subscribe();
     expectRequest({
       method: 'POST',
       url: '/api/v1/almacen/salidas',
-      body: { productoId: 4, cantidad: 2, motivo: 'MERMA' },
+      body: { productoId: u(4), cantidad: 2, motivo: 'MERMA' },
     });
-    api.listarMovimientos({ productoId: 4, tipo: 'SALIDA' }).subscribe();
+    api.listarMovimientos({ productoId: u(4), tipo: 'SALIDA' }).subscribe();
     expectRequest({
       method: 'GET',
       url: '/api/v1/almacen/movimientos',
-      params: { productoId: '4', tipo: 'SALIDA' },
+      params: { productoId: u(4), tipo: 'SALIDA' },
     });
     api.listarProveedores({ activo: true }).subscribe();
     expectRequest({
@@ -502,8 +510,8 @@ describe('servicios de la API', () => {
     const request = { items: [], metodoPago: 'YAPE' as const };
     api.dispensar(request).subscribe();
     expectRequest({ method: 'POST', url: '/api/v1/farmacia/dispensaciones', body: request });
-    api.anular(9).subscribe();
-    expectRequest({ method: 'PUT', url: '/api/v1/farmacia/dispensaciones/9/anular' });
+    api.anular(u(9)).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/farmacia/dispensaciones/${u(9)}/anular` });
     api.misDispensaciones().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/farmacia/mis-dispensaciones' });
   });
@@ -516,26 +524,28 @@ describe('servicios de la API', () => {
       url: '/api/v1/laboratorio/examenes',
       params: { categoria: 'BIOQUIMICA' },
     });
-    api.crearOrden({ pacienteId: 1, prioridad: 'URGENTE', examenIds: [2] }).subscribe();
+    api.crearOrden({ pacienteId: u(1), prioridad: 'URGENTE', examenIds: [u(2)] }).subscribe();
     expectRequest({
       method: 'POST',
       url: '/api/v1/laboratorio/ordenes',
-      body: { pacienteId: 1, prioridad: 'URGENTE', examenIds: [2] },
+      body: { pacienteId: u(1), prioridad: 'URGENTE', examenIds: [u(2)] },
     });
-    api.tomarMuestra(5).subscribe();
-    expectRequest({ method: 'PUT', url: '/api/v1/laboratorio/ordenes/5/muestra' });
-    api.registrarResultados(5, 8, { resultados: [{ parametroId: 3, valor: '90' }] }).subscribe();
+    api.tomarMuestra(u(5)).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/laboratorio/ordenes/${u(5)}/muestra` });
+    api
+      .registrarResultados(u(5), u(8), { resultados: [{ parametroId: u(3), valor: '90' }] })
+      .subscribe();
     expectRequest({
       method: 'PUT',
-      url: '/api/v1/laboratorio/ordenes/5/items/8/resultados',
-      body: { resultados: [{ parametroId: 3, valor: '90' }] },
+      url: `/api/v1/laboratorio/ordenes/${u(5)}/items/${u(8)}/resultados`,
+      body: { resultados: [{ parametroId: u(3), valor: '90' }] },
     });
-    api.validar(5).subscribe();
-    expectRequest({ method: 'PUT', url: '/api/v1/laboratorio/ordenes/5/validar' });
-    api.cancelar(5, 'Error de registro').subscribe();
+    api.validar(u(5)).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/laboratorio/ordenes/${u(5)}/validar` });
+    api.cancelar(u(5), 'Error de registro').subscribe();
     expectRequest({
       method: 'PUT',
-      url: '/api/v1/laboratorio/ordenes/5/cancelar',
+      url: `/api/v1/laboratorio/ordenes/${u(5)}/cancelar`,
       body: { motivo: 'Error de registro' },
     });
     api.misOrdenes().subscribe();
@@ -546,22 +556,22 @@ describe('servicios de la API', () => {
     const api = TestBed.inject(RecepcionApiService);
     api.citasHoy('1234').subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/recepcion/citas-hoy', params: { q: '1234' } });
-    api.registrarLlegada(9).subscribe();
-    expectRequest({ method: 'POST', url: '/api/v1/recepcion/citas/9/llegada' });
-    api.crearTurno({ pacienteId: 2, prioridad: 'URGENTE' }).subscribe();
+    api.registrarLlegada(u(9)).subscribe();
+    expectRequest({ method: 'POST', url: `/api/v1/recepcion/citas/${u(9)}/llegada` });
+    api.crearTurno({ pacienteId: u(2), prioridad: 'URGENTE' }).subscribe();
     expectRequest({
       method: 'POST',
       url: '/api/v1/recepcion/turnos',
-      body: { pacienteId: 2, prioridad: 'URGENTE' },
+      body: { pacienteId: u(2), prioridad: 'URGENTE' },
     });
-    api.cola('EN_ESPERA', 3).subscribe();
+    api.cola('EN_ESPERA', u(3)).subscribe();
     expectRequest({
       method: 'GET',
       url: '/api/v1/recepcion/cola',
-      params: { estado: 'EN_ESPERA', medicoId: '3' },
+      params: { estado: 'EN_ESPERA', medicoId: u(3) },
     });
-    api.cambiarTurno(5, 'llamar').subscribe();
-    expectRequest({ method: 'PUT', url: '/api/v1/recepcion/turnos/5/llamar' });
+    api.cambiarTurno(u(5), 'llamar').subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/recepcion/turnos/${u(5)}/llamar` });
     api.buscarPacientes('juan').subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/recepcion/pacientes', params: { q: 'juan' } });
     api.pantalla().subscribe();
@@ -578,7 +588,7 @@ describe('servicios de la API', () => {
     expectRequest({ method: 'GET', url: '/api/v1/caja/pendientes', params: { q: 'perez' } });
     const cobro = {
       origen: 'CITA' as const,
-      referenciaId: 4,
+      referenciaId: u(4),
       tipoComprobante: 'BOLETA' as const,
       clienteTipoDoc: 'DNI' as const,
       clienteNombre: 'Juan',
@@ -586,10 +596,10 @@ describe('servicios de la API', () => {
     };
     api.cobrar(cobro).subscribe();
     expectRequest({ method: 'POST', url: '/api/v1/caja/cobros', body: cobro });
-    api.anular(7, 'Error de digitación').subscribe();
+    api.anular(u(7), 'Error de digitación').subscribe();
     expectRequest({
       method: 'PUT',
-      url: '/api/v1/caja/comprobantes/7/anular',
+      url: `/api/v1/caja/comprobantes/${u(7)}/anular`,
       body: { motivo: 'Error de digitación' },
     });
     api.reporteIngresos('2026-11-01', '2026-11-30').subscribe();
@@ -610,45 +620,45 @@ describe('servicios de la API', () => {
       url: '/api/v1/hospitalizacion/camas',
       params: { area: 'UCI', estado: 'LIBRE' },
     });
-    api.estadoCama(3, 'LIMPIEZA').subscribe();
+    api.estadoCama(u(3), 'LIMPIEZA').subscribe();
     expectRequest({
       method: 'PUT',
-      url: '/api/v1/hospitalizacion/camas/3/estado',
+      url: `/api/v1/hospitalizacion/camas/${u(3)}/estado`,
       body: { estado: 'LIMPIEZA' },
     });
-    api.crearIngreso({ pacienteId: 1, camaId: 2, motivo: 'Neumonía' }).subscribe();
+    api.crearIngreso({ pacienteId: u(1), camaId: u(2), motivo: 'Neumonía' }).subscribe();
     expectRequest({
       method: 'POST',
       url: '/api/v1/hospitalizacion/ingresos',
-      body: { pacienteId: 1, camaId: 2, motivo: 'Neumonía' },
+      body: { pacienteId: u(1), camaId: u(2), motivo: 'Neumonía' },
     });
-    api.trasladar(8, 5).subscribe();
+    api.trasladar(u(8), u(5)).subscribe();
     expectRequest({
       method: 'PUT',
-      url: '/api/v1/hospitalizacion/ingresos/8/trasladar',
-      body: { camaId: 5 },
+      url: `/api/v1/hospitalizacion/ingresos/${u(8)}/trasladar`,
+      body: { camaId: u(5) },
     });
-    api.alta(8, { diagnosticoAlta: 'Recuperado', indicacionesAlta: 'Reposo' }).subscribe();
+    api.alta(u(8), { diagnosticoAlta: 'Recuperado', indicacionesAlta: 'Reposo' }).subscribe();
     expectRequest({
       method: 'PUT',
-      url: '/api/v1/hospitalizacion/ingresos/8/alta',
+      url: `/api/v1/hospitalizacion/ingresos/${u(8)}/alta`,
       body: { diagnosticoAlta: 'Recuperado', indicacionesAlta: 'Reposo' },
     });
     api
       .registrarEmergencia({
-        pacienteId: 2,
+        pacienteId: u(2),
         triaje: { nivel: 2, motivoConsulta: 'Dolor torácico' },
       })
       .subscribe();
     expectRequest({
       method: 'POST',
       url: '/api/v1/hospitalizacion/emergencias',
-      body: { pacienteId: 2, triaje: { nivel: 2, motivoConsulta: 'Dolor torácico' } },
+      body: { pacienteId: u(2), triaje: { nivel: 2, motivoConsulta: 'Dolor torácico' } },
     });
-    api.registrarEvolucion(8, { tipo: 'MEDICA', nota: 'Evoluciona favorablemente' }).subscribe();
+    api.registrarEvolucion(u(8), { tipo: 'MEDICA', nota: 'Evoluciona favorablemente' }).subscribe();
     expectRequest({
       method: 'POST',
-      url: '/api/v1/hospitalizacion/ingresos/8/evoluciones',
+      url: `/api/v1/hospitalizacion/ingresos/${u(8)}/evoluciones`,
       body: { tipo: 'MEDICA', nota: 'Evoluciona favorablemente' },
     });
     api.misIngresos().subscribe();

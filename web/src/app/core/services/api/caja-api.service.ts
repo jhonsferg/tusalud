@@ -65,7 +65,7 @@ export class CajaApiService {
     });
   }
 
-  anular(id: number, motivo: string): Observable<ComprobanteResponse> {
+  anular(id: string, motivo: string): Observable<ComprobanteResponse> {
     return this.http.put<ComprobanteResponse>(`${this.baseUrl}/comprobantes/${id}/anular`, {
       motivo,
     });

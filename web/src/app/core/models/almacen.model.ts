@@ -25,7 +25,7 @@ export const ETIQUETA_MOTIVO_SALIDA: Readonly<Record<MotivoSalida, string>> = {
 };
 
 export interface ProveedorResponse {
-  id: number;
+  id: string;
   ruc: string;
   razonSocial: string;
   contacto?: string | null;
@@ -46,7 +46,7 @@ export interface ProveedorRequest {
 }
 
 export interface ProductoResponse {
-  id: number;
+  id: string;
   codigo: string;
   nombre: string;
   descripcion?: string | null;
@@ -78,15 +78,15 @@ export interface ProductoRequest {
 }
 
 export interface LoteResponse {
-  id: number;
-  productoId: number;
+  id: string;
+  productoId: string;
   productoNombre: string;
   numeroLote: string;
   fechaVencimiento: string;
   cantidadInicial: number;
   cantidadActual: number;
   costoUnitario: number;
-  proveedorId?: number | null;
+  proveedorId?: string | null;
   proveedorNombre?: string | null;
   ubicacion?: string | null;
   estado: EstadoLote;
@@ -94,7 +94,7 @@ export interface LoteResponse {
 }
 
 export interface IngresoItemRequest {
-  productoId: number;
+  productoId: string;
   numeroLote: string;
   fechaVencimiento: string;
   cantidad: number;
@@ -103,14 +103,14 @@ export interface IngresoItemRequest {
 }
 
 export interface IngresoRequest {
-  proveedorId?: number | null;
+  proveedorId?: string | null;
   documento?: string | null;
   observaciones?: string | null;
   items: IngresoItemRequest[];
 }
 
 export interface IngresoResponse {
-  id: number;
+  id: string;
   fecha: string;
   documento?: string | null;
   proveedorNombre?: string | null;
@@ -121,26 +121,26 @@ export interface IngresoResponse {
 }
 
 export interface SalidaRequest {
-  productoId: number;
+  productoId: string;
   cantidad: number;
   motivo: MotivoSalida;
   observaciones?: string | null;
 }
 
 export interface AjusteRequest {
-  loteId: number;
+  loteId: string;
   cantidad: number;
   observaciones?: string | null;
 }
 
 export interface MovimientoResponse {
-  id: number;
+  id: string;
   fecha: string;
   tipo: TipoMovimiento;
   motivo: string;
-  productoId: number;
+  productoId: string;
   productoNombre: string;
-  loteId?: number | null;
+  loteId?: string | null;
   numeroLote?: string | null;
   cantidad: number;
   usuarioNombre: string;
@@ -162,7 +162,7 @@ export interface ResumenAlmacenResponse {
 }
 
 export interface FiltroMovimientos {
-  productoId?: number | null;
+  productoId?: string | null;
   tipo?: TipoMovimiento | null;
   desde?: string | null;
   hasta?: string | null;

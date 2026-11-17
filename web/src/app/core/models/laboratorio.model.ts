@@ -44,7 +44,7 @@ export const ETIQUETA_ESTADO_ORDEN: Readonly<Record<EstadoOrden, string>> = {
 };
 
 export interface ParametroExamen {
-  id?: number;
+  id?: string;
   nombre: string;
   unidad?: string | null;
   tipo: TipoParametro;
@@ -54,7 +54,7 @@ export interface ParametroExamen {
 }
 
 export interface ExamenResponse {
-  id: number;
+  id: string;
   codigo: string;
   nombre: string;
   categoria: CategoriaExamen;
@@ -79,7 +79,7 @@ export interface ExamenRequest {
 }
 
 export interface ResultadoParametro {
-  parametroId: number;
+  parametroId: string;
   parametro: string;
   unidad?: string | null;
   valor: string;
@@ -89,8 +89,8 @@ export interface ResultadoParametro {
 }
 
 export interface ItemOrdenResponse {
-  id: number;
-  examenId: number;
+  id: string;
+  examenId: string;
   examenNombre: string;
   categoria: CategoriaExamen;
   muestra: TipoMuestra;
@@ -102,17 +102,17 @@ export interface ItemOrdenResponse {
 }
 
 export interface OrdenResponse {
-  id: number;
+  id: string;
   codigo: string;
   fecha: string;
   estado: EstadoOrden;
   prioridad: PrioridadOrden;
-  pacienteId: number;
+  pacienteId: string;
   pacienteNombre: string;
   dni: string;
-  medicoId: number;
+  medicoId: string;
   medicoNombre: string;
-  atencionId?: number | null;
+  atencionId?: string | null;
   indicaciones?: string | null;
   total: number;
   tomaMuestraEn?: string | null;
@@ -121,15 +121,15 @@ export interface OrdenResponse {
 }
 
 export interface OrdenRequest {
-  pacienteId: number;
-  atencionId?: number | null;
+  pacienteId: string;
+  atencionId?: string | null;
   prioridad: PrioridadOrden;
   indicaciones?: string | null;
-  examenIds: number[];
+  examenIds: string[];
 }
 
 export interface ResultadosRequest {
-  resultados: { parametroId: number; valor: string }[];
+  resultados: { parametroId: string; valor: string }[];
   observaciones?: string | null;
 }
 

@@ -77,7 +77,7 @@ export class EventoDialog {
   readonly tiposPermitidos = input<readonly TipoEvento[]>(['PERSONAL', 'RECORDATORIO']);
 
   readonly guardado = output<EventoCalendarioResponse>();
-  readonly eliminado = output<number>();
+  readonly eliminado = output<string>();
 
   private readonly store = inject(CalendarioStore);
   private readonly notifications = inject(NotificationService);

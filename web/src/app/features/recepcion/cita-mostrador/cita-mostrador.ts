@@ -63,8 +63,8 @@ export class CitaMostrador implements OnInit {
   private readonly router = inject(Router);
 
   protected readonly paciente = signal<PacienteMostradorResponse | null>(null);
-  protected readonly especialidadId = signal<number | null>(null);
-  protected readonly medicoId = signal<number | null>(null);
+  protected readonly especialidadId = signal<string | null>(null);
+  protected readonly medicoId = signal<string | null>(null);
   protected readonly motivo = signal('');
   protected readonly elegido = signal<Date | null>(null);
   protected readonly vista = signal<VistaCalendario>('semana');
@@ -130,7 +130,7 @@ export class CitaMostrador implements OnInit {
     }
   }
 
-  protected cambioEspecialidad(valor: number | null): void {
+  protected cambioEspecialidad(valor: string | null): void {
     this.especialidadId.set(valor);
     const medico = this.medicos.medicosActivos().find((m) => m.id === this.medicoId());
     if (medico && valor && !medico.especialidades.some((e) => e.id === valor)) {
@@ -139,7 +139,7 @@ export class CitaMostrador implements OnInit {
     this.elegido.set(null);
   }
 
-  protected cambioMedico(valor: number | null): void {
+  protected cambioMedico(valor: string | null): void {
     this.medicoId.set(valor);
     this.elegido.set(null);
     const medico = this.medicos.medicosActivos().find((m) => m.id === valor);

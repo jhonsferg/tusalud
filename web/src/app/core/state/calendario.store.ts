@@ -30,19 +30,19 @@ export class CalendarioStore {
       .pipe(tap((evento) => this.eventos.update((items) => [...(items ?? []), evento])));
   }
 
-  actualizar(id: number, request: EventoCalendarioRequest): Observable<EventoCalendarioResponse> {
+  actualizar(id: string, request: EventoCalendarioRequest): Observable<EventoCalendarioResponse> {
     return this.api.actualizar(id, request).pipe(tap((evento) => this.reemplazar(evento)));
   }
 
-  mover(id: number, request: MoverEventoRequest): Observable<EventoCalendarioResponse> {
+  mover(id: string, request: MoverEventoRequest): Observable<EventoCalendarioResponse> {
     return this.api.mover(id, request).pipe(tap((evento) => this.reemplazar(evento)));
   }
 
-  completar(id: number, completado: boolean): Observable<EventoCalendarioResponse> {
+  completar(id: string, completado: boolean): Observable<EventoCalendarioResponse> {
     return this.api.completar(id, completado).pipe(tap((evento) => this.reemplazar(evento)));
   }
 
-  eliminar(id: number): Observable<void> {
+  eliminar(id: string): Observable<void> {
     return this.api
       .eliminar(id)
       .pipe(tap(() => this.eventos.update((items) => items?.filter((item) => item.id !== id))));

@@ -20,7 +20,7 @@ import { Textarea } from 'primeng/textarea';
 import { AuthService } from '@tusalud/app/core/services/auth.service';
 import { NotificationService } from '@tusalud/app/core/services/notification.service';
 import { ClinicaStore } from '@tusalud/app/core/state/clinica.store';
-import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
+import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
 import { FormField } from '@tusalud/app/shared/components/form-field/form-field';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
@@ -47,7 +47,7 @@ const GRUPOS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HistoriaClinica {
-  readonly id = input(undefined, { transform: optionalNumberAttribute });
+  readonly id = input(undefined, { transform: optionalIdAttribute });
 
   protected readonly store = inject(ClinicaStore);
   protected readonly auth = inject(AuthService);

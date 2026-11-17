@@ -2,7 +2,7 @@ import { CitaResponse } from '@tusalud/app/core/models';
 import { citaAEvento } from './cita-calendario';
 
 const cita = {
-  id: 7,
+  id: u(7),
   fechaHora: '2026-11-18T09:00:00',
   estado: 'PENDIENTE',
   medicoNombre: 'Luis García',
@@ -11,6 +11,10 @@ const cita = {
   especialidadNombre: 'Cardiología',
   duracionMinutos: 45,
 } as CitaResponse;
+
+function u(n: number): string {
+  return `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+}
 
 describe('citaAEvento', () => {
   it('usa la duración de la cita y el nombre según quién la mira', () => {

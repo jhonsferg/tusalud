@@ -22,7 +22,7 @@ import { Textarea } from 'primeng/textarea';
 import { AuthService } from '@tusalud/app/core/services/auth.service';
 import { NotificationService } from '@tusalud/app/core/services/notification.service';
 import { HospitalizacionStore } from '@tusalud/app/core/state/hospitalizacion.store';
-import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
+import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
 import { COLOR_TRIAJE } from '@tusalud/app/shared/utils/hospitalizacion';
@@ -49,7 +49,7 @@ import { COLOR_TRIAJE } from '@tusalud/app/shared/utils/hospitalizacion';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IngresoDetalle {
-  readonly id = input(undefined, { transform: optionalNumberAttribute });
+  readonly id = input(undefined, { transform: optionalIdAttribute });
 
   protected readonly store = inject(HospitalizacionStore);
   private readonly auth = inject(AuthService);
@@ -83,7 +83,7 @@ export class IngresoDetalle {
   protected readonly errorAlta = signal<string | null>(null);
 
   protected readonly trasladoVisible = signal(false);
-  protected readonly camaDestino = signal<number | null>(null);
+  protected readonly camaDestino = signal<string | null>(null);
   protected readonly camasLibres = computed(() =>
     (this.store.camas.value() ?? [])
       .filter((cama) => cama.estado === 'LIBRE' && cama.activa)

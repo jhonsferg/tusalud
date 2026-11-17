@@ -26,7 +26,7 @@ import {
 import { AuthService } from '@tusalud/app/core/services/auth.service';
 import { NotificationService } from '@tusalud/app/core/services/notification.service';
 import { LaboratorioStore } from '@tusalud/app/core/state/laboratorio.store';
-import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
+import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
 import {
@@ -54,7 +54,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrdenDetalle {
-  readonly id = input(undefined, { transform: optionalNumberAttribute });
+  readonly id = input(undefined, { transform: optionalIdAttribute });
 
   protected readonly store = inject(LaboratorioStore);
   private readonly auth = inject(AuthService);
@@ -69,7 +69,7 @@ export class OrdenDetalle {
   protected readonly icono: Readonly<Record<string, string>> = ICONO_ORDEN;
   protected readonly rango = rangoReferencia;
 
-  protected readonly capturando = signal<number | null>(null);
+  protected readonly capturando = signal<string | null>(null);
   protected readonly trabajando = signal(false);
   protected readonly error = signal<string | null>(null);
   protected formulario: FormGroup = this.fb.group({ observaciones: [''] });

@@ -73,8 +73,8 @@ export class Auditoria implements OnInit {
 
   protected cambiarRango(valor: Date[] | null): void {
     this.rango.set(valor);
-    const [inicio, fin] = valor ?? [];
-    if (!valor || (inicio && fin)) {
+    const [inicio] = valor ?? [];
+    if (!valor || inicio) {
       this.cargarCitas();
     }
   }
@@ -83,7 +83,7 @@ export class Auditoria implements OnInit {
     const [inicio, fin] = this.rango() ?? [];
     this.store.loadCitas({
       inicio: inicio ? toIsoDate(inicio) : null,
-      fin: fin ? toIsoDate(fin) : null,
+      fin: fin ? toIsoDate(fin) : inicio ? toIsoDate(inicio) : null,
     });
   }
 

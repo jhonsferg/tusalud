@@ -19,7 +19,7 @@ export const COLORES_EVENTO: readonly ColorEventoApi[] = [
 ];
 
 export interface EventoCalendarioResponse {
-  id: number;
+  id: string;
   titulo: string;
   descripcion?: string | null;
   ubicacion?: string | null;

@@ -1,5 +1,5 @@
 export interface TopMedicoResponse {
-  medicoId: number;
+  medicoId: string;
   nombre: string;
   citasAtendidas: number;
 }
@@ -28,7 +28,7 @@ export interface EstadisticasResponse {
 }
 
 export interface UsuarioAdminResponse {
-  id: number;
+  id: string;
   nombreCompleto: string;
   email: string;
   telefono?: string | null;

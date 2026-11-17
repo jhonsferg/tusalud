@@ -75,7 +75,10 @@ describe('AuthService', () => {
     TestBed.tick();
 
     expect(usuario).toEqual({
-      sesion: expect.objectContaining({ email: 'juan.perez@correo.com', id: 4 }),
+      sesion: expect.objectContaining({
+        email: 'juan.perez@correo.com',
+        id: '00000000-0000-4000-8000-000000000004',
+      }),
     });
     expect(auth.isAuthenticated()).toBe(true);
     expect(auth.isPaciente()).toBe(true);

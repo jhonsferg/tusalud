@@ -89,8 +89,8 @@ export class MisCitas implements OnInit {
 
   protected cambiarRango(valor: Date[] | null): void {
     this.rango.set(valor);
-    const [inicio, fin] = valor ?? [];
-    if (!valor || (inicio && fin)) {
+    const [inicio] = valor ?? [];
+    if (!valor || inicio) {
       this.cargar();
     }
   }
@@ -99,7 +99,7 @@ export class MisCitas implements OnInit {
     const [inicio, fin] = this.rango() ?? [];
     this.store.loadMisCitas({
       inicio: inicio ? toIsoDate(inicio) : null,
-      fin: fin ? toIsoDate(fin) : null,
+      fin: fin ? toIsoDate(fin) : inicio ? toIsoDate(inicio) : null,
     });
   }
 

@@ -25,7 +25,7 @@ export type TipoNotificacion =
   | 'SISTEMA';
 
 export interface NotificacionResponse {
-  id: number;
+  id: string;
   tipo: TipoNotificacion;
   titulo: string;
   mensaje: string;

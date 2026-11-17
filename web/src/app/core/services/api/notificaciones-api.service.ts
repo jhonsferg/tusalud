@@ -24,7 +24,7 @@ export class NotificacionesApiService {
     });
   }
 
-  marcarLeida(id: number): Observable<NotificacionResponse> {
+  marcarLeida(id: string): Observable<NotificacionResponse> {
     return this.http.put<NotificacionResponse>(`${this.baseUrl}/${id}/leida`, null);
   }
 
@@ -32,7 +32,7 @@ export class NotificacionesApiService {
     return this.http.put<void>(`${this.baseUrl}/leidas`, null);
   }
 
-  eliminar(id: number): Observable<void> {
+  eliminar(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

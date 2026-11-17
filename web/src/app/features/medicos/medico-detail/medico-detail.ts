@@ -16,7 +16,7 @@ import { NotificationService } from '@tusalud/app/core/services/notification.ser
 import { ClinicaStore } from '@tusalud/app/core/state/clinica.store';
 import { EspecialidadesStore } from '@tusalud/app/core/state/especialidades.store';
 import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
-import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
+import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
 
@@ -41,7 +41,7 @@ import { PageHeader } from '@tusalud/app/shared/components/page-header/page-head
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MedicoDetail {
-  readonly id = input(undefined, { transform: optionalNumberAttribute });
+  readonly id = input(undefined, { transform: optionalIdAttribute });
 
   protected readonly store = inject(MedicosStore);
   protected readonly clinica = inject(ClinicaStore);
@@ -52,7 +52,7 @@ export class MedicoDetail {
 
   protected readonly editando = signal(false);
   protected readonly guardando = signal(false);
-  protected readonly seleccion = signal<number[]>([]);
+  protected readonly seleccion = signal<string[]>([]);
 
   constructor() {
     effect(() => {

@@ -13,7 +13,7 @@ interface Accion {
   readonly severity: 'danger' | 'success' | 'primary';
   readonly icon: string;
   readonly success: string;
-  readonly run: (store: CitasStore, id: number) => Observable<CitaResponse>;
+  readonly run: (store: CitasStore, id: string) => Observable<CitaResponse>;
 }
 
 const ACCIONES = {

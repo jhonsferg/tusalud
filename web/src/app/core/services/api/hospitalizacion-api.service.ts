@@ -42,11 +42,11 @@ export class HospitalizacionApiService {
     return this.http.post<CamaResponse>(`${this.baseUrl}/camas`, request);
   }
 
-  actualizarCama(id: number, request: CamaRequest): Observable<CamaResponse> {
+  actualizarCama(id: string, request: CamaRequest): Observable<CamaResponse> {
     return this.http.put<CamaResponse>(`${this.baseUrl}/camas/${id}`, request);
   }
 
-  estadoCama(id: number, estado: string): Observable<CamaResponse> {
+  estadoCama(id: string, estado: string): Observable<CamaResponse> {
     return this.http.put<CamaResponse>(`${this.baseUrl}/camas/${id}/estado`, { estado });
   }
 
@@ -56,7 +56,7 @@ export class HospitalizacionApiService {
     });
   }
 
-  ingreso(id: number): Observable<IngresoHospResponse> {
+  ingreso(id: string): Observable<IngresoHospResponse> {
     return this.http.get<IngresoHospResponse>(`${this.baseUrl}/ingresos/${id}`);
   }
 
@@ -64,27 +64,27 @@ export class HospitalizacionApiService {
     return this.http.post<IngresoHospResponse>(`${this.baseUrl}/ingresos`, request);
   }
 
-  trasladar(id: number, camaId: number): Observable<IngresoHospResponse> {
+  trasladar(id: string, camaId: string): Observable<IngresoHospResponse> {
     return this.http.put<IngresoHospResponse>(`${this.baseUrl}/ingresos/${id}/trasladar`, {
       camaId,
     });
   }
 
-  asignarCama(id: number, camaId: number): Observable<IngresoHospResponse> {
+  asignarCama(id: string, camaId: string): Observable<IngresoHospResponse> {
     return this.http.put<IngresoHospResponse>(`${this.baseUrl}/ingresos/${id}/asignar-cama`, {
       camaId,
     });
   }
 
-  alta(id: number, request: AltaRequest): Observable<IngresoHospResponse> {
+  alta(id: string, request: AltaRequest): Observable<IngresoHospResponse> {
     return this.http.put<IngresoHospResponse>(`${this.baseUrl}/ingresos/${id}/alta`, request);
   }
 
-  evoluciones(id: number): Observable<EvolucionResponse[]> {
+  evoluciones(id: string): Observable<EvolucionResponse[]> {
     return this.http.get<EvolucionResponse[]>(`${this.baseUrl}/ingresos/${id}/evoluciones`);
   }
 
-  registrarEvolucion(id: number, request: EvolucionRequest): Observable<EvolucionResponse> {
+  registrarEvolucion(id: string, request: EvolucionRequest): Observable<EvolucionResponse> {
     return this.http.post<EvolucionResponse>(`${this.baseUrl}/ingresos/${id}/evoluciones`, request);
   }
 

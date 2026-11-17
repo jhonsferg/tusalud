@@ -10,19 +10,19 @@ export const ESTADOS_CITA: readonly EstadoCita[] = [
 export const ESTADOS_CITA_ACTIVOS: readonly EstadoCita[] = ['PENDIENTE', 'CONFIRMADA'];
 
 export interface CitaResponse {
-  id: number;
+  id: string;
   fechaHora: string;
   motivo: string;
   estado: EstadoCita;
   monto: number;
-  medicoId: number;
+  medicoId: string;
   medicoNombre: string;
   especialidad: string;
-  especialidadId: number;
+  especialidadId: string;
   especialidadNombre: string;
   precio: number;
   consultorio?: string | null;
-  pacienteId: number;
+  pacienteId: string;
   pacienteNombre: string;
   pacienteDni: string;
   createdAt: string;
@@ -32,8 +32,8 @@ export interface CitaResponse {
 }
 
 export interface CitaCreateRequest {
-  medicoId: number;
-  especialidadId: number;
+  medicoId: string;
+  especialidadId: string;
   fechaHora: string;
   motivo: string;
 }

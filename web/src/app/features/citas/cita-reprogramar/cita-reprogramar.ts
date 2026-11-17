@@ -20,7 +20,7 @@ import { NotificationService } from '@tusalud/app/core/services/notification.ser
 import { CitasStore, esCitaActiva } from '@tusalud/app/core/state/citas.store';
 import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
 import { toIsoDate, toIsoDateTime } from '@tusalud/app/core/utils/date';
-import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
+import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 import { Calendario } from '@tusalud/app/shared/components/calendario/calendario';
 import {
   CalEvento,
@@ -43,7 +43,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CitaReprogramar {
-  readonly id = input(undefined, { transform: optionalNumberAttribute });
+  readonly id = input(undefined, { transform: optionalIdAttribute });
 
   protected readonly citas = inject(CitasStore);
   protected readonly medicos = inject(MedicosStore);

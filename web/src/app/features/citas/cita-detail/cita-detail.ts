@@ -20,7 +20,7 @@ import { CitaResponse } from '@tusalud/app/core/models';
 import { AuthService } from '@tusalud/app/core/services/auth.service';
 import { CitasStore, esCitaActiva } from '@tusalud/app/core/state/citas.store';
 import { ClinicaStore } from '@tusalud/app/core/state/clinica.store';
-import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
+import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
 import { EstadoCitaTag } from '@tusalud/app/shared/components/estado-cita-tag/estado-cita-tag';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
@@ -50,7 +50,7 @@ import { CitaActions } from '@tusalud/app/shared/services/cita-actions.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CitaDetail {
-  readonly id = input(undefined, { transform: optionalNumberAttribute });
+  readonly id = input(undefined, { transform: optionalIdAttribute });
 
   protected readonly store = inject(CitasStore);
   protected readonly clinica = inject(ClinicaStore);

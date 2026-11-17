@@ -21,23 +21,23 @@ export class CitasApiService {
     });
   }
 
-  obtener(id: number): Observable<CitaResponse> {
+  obtener(id: string): Observable<CitaResponse> {
     return this.http.get<CitaResponse>(`${this.baseUrl}/${id}`);
   }
 
-  cancelar(id: number): Observable<CitaResponse> {
+  cancelar(id: string): Observable<CitaResponse> {
     return this.http.put<CitaResponse>(`${this.baseUrl}/${id}/cancelar`, null);
   }
 
-  confirmar(id: number): Observable<CitaResponse> {
+  confirmar(id: string): Observable<CitaResponse> {
     return this.http.put<CitaResponse>(`${this.baseUrl}/${id}/confirmar`, null);
   }
 
-  reprogramar(id: number, fechaHora: string): Observable<CitaResponse> {
+  reprogramar(id: string, fechaHora: string): Observable<CitaResponse> {
     return this.http.put<CitaResponse>(`${this.baseUrl}/${id}/reprogramar`, { fechaHora });
   }
 
-  atender(id: number): Observable<CitaResponse> {
+  atender(id: string): Observable<CitaResponse> {
     return this.http.put<CitaResponse>(`${this.baseUrl}/${id}/atender`, null);
   }
 }

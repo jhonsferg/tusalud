@@ -34,7 +34,7 @@ export const ETIQUETA_TRIAJE: Readonly<Record<number, string>> = {
 };
 
 export interface CamaResponse {
-  id: number;
+  id: string;
   codigo: string;
   area: AreaCama;
   piso?: string | null;
@@ -42,7 +42,7 @@ export interface CamaResponse {
   estado: EstadoCama;
   precioDia: number;
   activa: boolean;
-  ingresoActivoId?: number | null;
+  ingresoActivoId?: string | null;
   pacienteNombre?: string | null;
 }
 
@@ -73,16 +73,16 @@ export interface TriajeResponse extends TriajeRequest {
 }
 
 export interface IngresoHospResponse {
-  id: number;
+  id: string;
   codigo: string;
   tipo: TipoIngreso;
   estado: EstadoIngreso;
-  pacienteId: number;
+  pacienteId: string;
   pacienteNombre: string;
   dni: string;
-  camaId?: number | null;
+  camaId?: string | null;
   camaCodigo?: string | null;
-  medicoId?: number | null;
+  medicoId?: string | null;
   medicoNombre?: string | null;
   motivo: string;
   diagnosticoIngreso?: string | null;
@@ -97,11 +97,11 @@ export interface IngresoHospResponse {
 }
 
 export interface IngresoHospRequest {
-  pacienteId: number;
-  camaId: number;
+  pacienteId: string;
+  camaId: string;
   motivo: string;
   diagnosticoIngreso?: string | null;
-  medicoId?: number | null;
+  medicoId?: string | null;
 }
 
 export interface AltaRequest {
@@ -110,7 +110,7 @@ export interface AltaRequest {
 }
 
 export interface EmergenciaRequest {
-  pacienteId: number;
+  pacienteId: string;
   triaje: TriajeRequest;
 }
 
@@ -124,7 +124,7 @@ export interface EvolucionRequest {
 }
 
 export interface EvolucionResponse extends EvolucionRequest {
-  id: number;
+  id: string;
   fecha: string;
   autorNombre: string;
 }

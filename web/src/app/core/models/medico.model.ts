@@ -26,8 +26,8 @@ import { EspecialidadResponse } from './especialidad.model';
 export type EstadoUsuario = 'ACTIVO' | 'INACTIVO';
 
 export interface MedicoResponse {
-  id: number;
-  usuarioId: number;
+  id: string;
+  usuarioId: string;
   nombre: string;
   apellido: string;
   nombreCompleto: string;
@@ -47,7 +47,7 @@ export interface MedicoCreateRequest {
   telefono?: string | null;
   colegiatura: string;
   consultorio?: string | null;
-  especialidadIds: number[];
+  especialidadIds: string[];
 }
 
 export interface HorarioRequest {
@@ -58,12 +58,12 @@ export interface HorarioRequest {
 }
 
 export interface HorarioResponse extends HorarioRequest {
-  id: number;
-  medicoId: number;
+  id: string;
+  medicoId: string;
 }
 
 export interface DisponibilidadResponse {
-  medicoId: number;
+  medicoId: string;
   medicoNombre: string;
   fecha: string;
   horariosDisponibles: string[];

@@ -19,13 +19,13 @@ export class MedicosApiService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${inject(API_URL)}/medicos`;
 
-  listar(especialidadId?: number | null): Observable<MedicoResponse[]> {
+  listar(especialidadId?: string | null): Observable<MedicoResponse[]> {
     return this.http.get<MedicoResponse[]>(this.baseUrl, {
       params: toHttpParams({ especialidadId }),
     });
   }
 
-  obtener(id: number): Observable<MedicoResponse> {
+  obtener(id: string): Observable<MedicoResponse> {
     return this.http.get<MedicoResponse>(`${this.baseUrl}/${id}`);
   }
 
@@ -33,32 +33,32 @@ export class MedicosApiService {
     return this.http.post<MedicoResponse>(this.baseUrl, request);
   }
 
-  actualizarEspecialidades(id: number, especialidadIds: number[]): Observable<MedicoResponse> {
+  actualizarEspecialidades(id: string, especialidadIds: string[]): Observable<MedicoResponse> {
     return this.http.put<MedicoResponse>(`${this.baseUrl}/${id}/especialidades`, {
       especialidadIds,
     });
   }
 
-  listarHorarios(medicoId: number): Observable<HorarioResponse[]> {
+  listarHorarios(medicoId: string): Observable<HorarioResponse[]> {
     return this.http.get<HorarioResponse[]>(`${this.baseUrl}/${medicoId}/horarios`);
   }
 
-  agregarHorario(medicoId: number, request: HorarioRequest): Observable<HorarioResponse> {
+  agregarHorario(medicoId: string, request: HorarioRequest): Observable<HorarioResponse> {
     return this.http.post<HorarioResponse>(`${this.baseUrl}/${medicoId}/horarios`, request);
   }
 
-  eliminarHorario(medicoId: number, horarioId: number): Observable<void> {
+  eliminarHorario(medicoId: string, horarioId: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${medicoId}/horarios/${horarioId}`);
   }
 
-  disponibilidad(medicoId: number, fecha: string): Observable<DisponibilidadResponse> {
+  disponibilidad(medicoId: string, fecha: string): Observable<DisponibilidadResponse> {
     return this.http.get<DisponibilidadResponse>(`${this.baseUrl}/${medicoId}/disponibilidad`, {
       params: toHttpParams({ fecha }),
     });
   }
 
   disponibilidadRango(
-    medicoId: number,
+    medicoId: string,
     inicio: string,
     fin: string,
   ): Observable<DisponibilidadDiaResponse[]> {

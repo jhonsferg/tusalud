@@ -12,7 +12,7 @@ import {
 } from '@tusalud/app/core/utils/date';
 import { toHttpParams } from '@tusalud/app/core/utils/http-params';
 import { decodeJwt, jwtExpirationMs } from '@tusalud/app/core/utils/jwt';
-import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
+import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 
 describe('jwt', () => {
   it('decodifica el payload con caracteres UTF-8', () => {
@@ -110,12 +110,13 @@ describe('api-error', () => {
   });
 });
 
-describe('optionalNumberAttribute', () => {
-  it('convierte identificadores válidos y descarta el resto', () => {
-    expect(optionalNumberAttribute('7')).toBe(7);
-    expect(optionalNumberAttribute(undefined)).toBeUndefined();
-    expect(optionalNumberAttribute('')).toBeUndefined();
-    expect(optionalNumberAttribute('abc')).toBeUndefined();
-    expect(optionalNumberAttribute('-1')).toBeUndefined();
+describe('optionalIdAttribute', () => {
+  it('conserva el identificador como texto y descarta los vacíos', () => {
+    const uuid = '11111111-1111-4111-8111-111111111111';
+    expect(optionalIdAttribute(uuid)).toBe(uuid);
+    expect(optionalIdAttribute(undefined)).toBeUndefined();
+    expect(optionalIdAttribute('')).toBeUndefined();
+    expect(optionalIdAttribute('   ')).toBeUndefined();
+    expect(optionalIdAttribute('abc')).toBe('abc');
   });
 });

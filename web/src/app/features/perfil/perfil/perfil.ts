@@ -1,4 +1,5 @@
 import { DatePipe } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -21,17 +22,22 @@ import {
 import { ConfirmationService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
-import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
 import { Password } from 'primeng/password';
+import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
 import { Skeleton } from 'primeng/skeleton';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { Tag } from 'primeng/tag';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 
-import { ApiError, ETIQUETA_ROL, SesionResponse } from '@tusalud/app/core/models';
+import {
+  ANTICIPACIONES_RECORDATORIO,
+  ApiError,
+  ETIQUETA_ROL,
+  SesionResponse,
+} from '@tusalud/app/core/models';
 import { NotificationService } from '@tusalud/app/core/services/notification.service';
 import { PALETAS, ThemeMode, ThemeService } from '@tusalud/app/core/services/theme.service';
 import { PerfilStore } from '@tusalud/app/core/state/perfil.store';
@@ -108,10 +114,10 @@ function reducirImagen(archivo: File): Promise<string> {
     ReactiveFormsModule,
     Button,
     DatePicker,
-    InputNumber,
     InputText,
     Message,
     Password,
+    Select,
     SelectButton,
     Skeleton,
     Tab,
@@ -188,10 +194,22 @@ export class Perfil implements OnInit {
     { validators: [passwordsIguales] },
   );
 
+  protected readonly anticipaciones = ANTICIPACIONES_RECORDATORIO;
   protected readonly preferencias = this.fb.nonNullable.group({
     recordatoriosActivos: [true],
-    horasAntelacionRecordatorio: [24, [Validators.required, Validators.min(1), Validators.max(72)]],
+    minutosAntelacionRecordatorio: [1440, [Validators.required]],
     alertasInicioSesion: [true],
+  });
+
+  private readonly eventosDatos = toSignal(this.datos.events, { initialValue: null });
+  private readonly eventosPreferencias = toSignal(this.preferencias.events, { initialValue: null });
+  protected readonly datosModificados = computed(() => {
+    this.eventosDatos();
+    return this.datos.dirty;
+  });
+  protected readonly preferenciasModificadas = computed(() => {
+    this.eventosPreferencias();
+    return this.preferencias.dirty;
   });
 
   constructor() {
@@ -203,7 +221,7 @@ export class Perfil implements OnInit {
     });
     effect(() => {
       const prefs = this.store.preferencias.value();
-      if (prefs) {
+      if (prefs && !untracked(() => this.preferencias.dirty)) {
         this.preferencias.reset(prefs);
       }
     });

@@ -28,8 +28,8 @@ export const ETIQUETA_ORIGEN: Readonly<Record<string, string>> = {
 };
 
 export interface SesionCajaResponse {
-  id: number;
-  cajeroId: number;
+  id: string;
+  cajeroId: string;
   cajeroNombre: string;
   apertura: string;
   montoApertura: number;
@@ -60,7 +60,7 @@ export interface ComprobanteItem {
 }
 
 export interface ComprobanteResponse {
-  id: number;
+  id: string;
   tipo: TipoComprobante;
   serie: string;
   numero: number;
@@ -76,17 +76,17 @@ export interface ComprobanteResponse {
   estado: 'EMITIDO' | 'ANULADO';
   motivoAnulacion?: string | null;
   origen: OrigenCobro;
-  referenciaId?: number | null;
-  pacienteId?: number | null;
-  cajaId: number;
+  referenciaId?: string | null;
+  pacienteId?: string | null;
+  cajaId: string;
   cajeroNombre: string;
   items: ComprobanteItem[];
 }
 
 export interface CobroRequest {
   origen: OrigenCobro;
-  referenciaId?: number | null;
-  pacienteId?: number | null;
+  referenciaId?: string | null;
+  pacienteId?: string | null;
   tipoComprobante: TipoComprobante;
   clienteTipoDoc: TipoDocumento;
   clienteDoc?: string | null;
@@ -97,7 +97,7 @@ export interface CobroRequest {
 
 export interface PendienteCobroResponse {
   origen: OrigenCobro;
-  referenciaId: number;
+  referenciaId: string;
   paciente: string;
   dni: string;
   descripcion: string;

@@ -47,13 +47,13 @@ export class AdminStore {
     this.cupones.load(this.api.listarCupones());
   }
 
-  guardarCupon(request: CuponRequest, id?: number): Observable<CuponResponse> {
+  guardarCupon(request: CuponRequest, id?: string): Observable<CuponResponse> {
     const operacion =
       id === undefined ? this.api.crearCupon(request) : this.api.actualizarCupon(id, request);
     return operacion.pipe(tap(() => this.cargarCupones()));
   }
 
-  eliminarCupon(id: number): Observable<void> {
+  eliminarCupon(id: string): Observable<void> {
     return this.api
       .eliminarCupon(id)
       .pipe(tap(() => this.cupones.update((items) => items?.filter((item) => item.id !== id))));
@@ -73,7 +73,7 @@ export class AdminStore {
     this.roles.load(this.api.listarRoles());
   }
 
-  actualizarRoles(id: number, roles: string[]): Observable<UsuarioAdminResponse> {
+  actualizarRoles(id: string, roles: string[]): Observable<UsuarioAdminResponse> {
     return this.api.actualizarRoles(id, roles).pipe(
       tap((usuario) => {
         this.usuarios.update((items) => items?.map((item) => (item.id === id ? usuario : item)));
@@ -89,7 +89,7 @@ export class AdminStore {
   }
 
   cambiarEstadoUsuario(
-    id: number,
+    id: string,
     estado: 'ACTIVO' | 'INACTIVO',
   ): Observable<UsuarioAdminResponse> {
     return this.api

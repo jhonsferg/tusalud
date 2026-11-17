@@ -79,16 +79,16 @@ export class ReportesCaja implements OnInit {
 
   protected cambiar(valor: Date[] | null): void {
     this.rango.set(valor);
-    const [inicio, fin] = valor ?? [];
-    if (inicio && fin) {
+    const [inicio] = valor ?? [];
+    if (inicio) {
       this.cargar();
     }
   }
 
   protected cargar(): void {
     const [inicio, fin] = this.rango() ?? [];
-    if (inicio && fin) {
-      this.store.cargarReporte(toIsoDate(inicio), toIsoDate(fin));
+    if (inicio) {
+      this.store.cargarReporte(toIsoDate(inicio), toIsoDate(fin ?? inicio));
     }
   }
 }

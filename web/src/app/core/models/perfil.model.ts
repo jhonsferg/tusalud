@@ -1,5 +1,5 @@
 export interface PerfilResponse {
-  usuarioId: number;
+  usuarioId: string;
   nombre: string;
   apellido: string;
   nombreCompleto: string;
@@ -10,7 +10,7 @@ export interface PerfilResponse {
   dni?: string | null;
   fechaNacimiento?: string | null;
   historialClinicoNumero?: string | null;
-  medicoId?: number | null;
+  medicoId?: string | null;
   colegiatura?: string | null;
   consultorio?: string | null;
   especialidad?: string | null;

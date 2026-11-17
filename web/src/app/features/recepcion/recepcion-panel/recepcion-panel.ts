@@ -77,7 +77,7 @@ export class RecepcionPanel implements OnInit {
   protected readonly turnoVisible = signal(false);
   protected readonly pacienteTurno = signal<PacienteMostradorResponse | null>(null);
   protected readonly prioridadTurno = signal<PrioridadTurno>('NORMAL');
-  protected readonly medicoTurno = signal<number | null>(null);
+  protected readonly medicoTurno = signal<string | null>(null);
   protected readonly motivoTurno = signal('');
   protected readonly guardando = signal(false);
   protected readonly error = signal<string | null>(null);
@@ -138,7 +138,7 @@ export class RecepcionPanel implements OnInit {
     ejecutar();
   }
 
-  protected llegada(citaId: number, paciente: string): void {
+  protected llegada(citaId: string, paciente: string): void {
     this.store.registrarLlegada(citaId).subscribe({
       next: (turno) =>
         this.notifications.success(`${paciente} quedó en espera con el turno ${turno.numero}.`),
@@ -184,7 +184,7 @@ export class RecepcionPanel implements OnInit {
       });
   }
 
-  protected opcionesMedico(): { label: string; value: number }[] {
+  protected opcionesMedico(): { label: string; value: string }[] {
     return this.medicos.medicosActivos().map((medico) => ({
       label: `${medico.nombreCompleto} · ${medico.especialidades.map((e) => e.nombre).join(', ')}`,
       value: medico.id,

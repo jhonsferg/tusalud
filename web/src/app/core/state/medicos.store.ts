@@ -35,7 +35,7 @@ function porApellido(a: MedicoResponse, b: MedicoResponse): number {
 @Injectable({ providedIn: 'root' })
 export class MedicosStore {
   private readonly api = inject(MedicosApiService);
-  private readonly especialidadFiltro = signal<number | null>(null);
+  private readonly especialidadFiltro = signal<string | null>(null);
 
   readonly list = new AsyncState<MedicoResponse[]>();
   readonly selected = new AsyncState<MedicoResponse>();
@@ -62,12 +62,12 @@ export class MedicosStore {
     resetOnLogout(() => this.reset());
   }
 
-  load(especialidadId: number | null = null): void {
+  load(especialidadId: string | null = null): void {
     this.especialidadFiltro.set(especialidadId);
     this.list.load(this.api.listar(especialidadId));
   }
 
-  loadOne(id: number): void {
+  loadOne(id: string): void {
     this.selected.load(this.api.obtener(id));
   }
 
@@ -82,7 +82,7 @@ export class MedicosStore {
     );
   }
 
-  actualizarEspecialidades(id: number, especialidadIds: number[]): Observable<MedicoResponse> {
+  actualizarEspecialidades(id: string, especialidadIds: string[]): Observable<MedicoResponse> {
     return this.api.actualizarEspecialidades(id, especialidadIds).pipe(
       tap((actualizado) => {
         this.selected.set(actualizado);
@@ -91,17 +91,17 @@ export class MedicosStore {
     );
   }
 
-  loadHorarios(medicoId: number): void {
+  loadHorarios(medicoId: string): void {
     this.horarios.load(this.api.listarHorarios(medicoId));
   }
 
-  agregarHorario(medicoId: number, request: HorarioRequest): Observable<HorarioResponse> {
+  agregarHorario(medicoId: string, request: HorarioRequest): Observable<HorarioResponse> {
     return this.api
       .agregarHorario(medicoId, request)
       .pipe(tap((horario) => this.horarios.update((items) => [...(items ?? []), horario])));
   }
 
-  eliminarHorario(medicoId: number, horarioId: number): Observable<void> {
+  eliminarHorario(medicoId: string, horarioId: string): Observable<void> {
     return this.api
       .eliminarHorario(medicoId, horarioId)
       .pipe(
@@ -111,11 +111,11 @@ export class MedicosStore {
       );
   }
 
-  loadDisponibilidad(medicoId: number, fecha: string): void {
+  loadDisponibilidad(medicoId: string, fecha: string): void {
     this.disponibilidad.load(this.api.disponibilidad(medicoId, fecha));
   }
 
-  loadDisponibilidadRango(medicoId: number, inicio: string, fin: string): void {
+  loadDisponibilidadRango(medicoId: string, inicio: string, fin: string): void {
     this.disponibilidadRango.load(this.api.disponibilidadRango(medicoId, inicio, fin));
   }
 

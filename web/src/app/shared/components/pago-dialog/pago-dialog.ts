@@ -91,7 +91,7 @@ export class PagoDialog {
     return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
   });
 
-  protected readonly metodoId = signal<number | null>(null);
+  protected readonly metodoId = signal<string | null>(null);
   protected readonly codigo = signal('');
   protected readonly cupon = signal<CuponValidacionResponse | null>(null);
   protected readonly validando = signal(false);

@@ -50,11 +50,11 @@ export class HospitalizacionStore {
     return this.api.crearCama(request).pipe(tap(() => this.cargarCamas()));
   }
 
-  actualizarCama(id: number, request: CamaRequest): Observable<CamaResponse> {
+  actualizarCama(id: string, request: CamaRequest): Observable<CamaResponse> {
     return this.api.actualizarCama(id, request).pipe(tap(() => this.cargarCamas()));
   }
 
-  cambiarEstadoCama(id: number, estado: string): Observable<CamaResponse> {
+  cambiarEstadoCama(id: string, estado: string): Observable<CamaResponse> {
     return this.api.estadoCama(id, estado).pipe(
       tap((cama) => {
         this.camas.update((items) => items?.map((item) => (item.id === id ? cama : item)));
@@ -67,7 +67,7 @@ export class HospitalizacionStore {
     this.ingresos.load(this.api.ingresos(estado, q));
   }
 
-  cargarIngreso(id: number): void {
+  cargarIngreso(id: string): void {
     this.ingreso.load(this.api.ingreso(id));
     this.evoluciones.load(this.api.evoluciones(id));
   }
@@ -76,19 +76,19 @@ export class HospitalizacionStore {
     return this.api.crearIngreso(request).pipe(tap(() => this.refrescar()));
   }
 
-  trasladar(id: number, camaId: number): Observable<IngresoHospResponse> {
+  trasladar(id: string, camaId: string): Observable<IngresoHospResponse> {
     return this.api.trasladar(id, camaId).pipe(tap((ingreso) => this.ingreso.set(ingreso)));
   }
 
-  asignarCama(id: number, camaId: number): Observable<IngresoHospResponse> {
+  asignarCama(id: string, camaId: string): Observable<IngresoHospResponse> {
     return this.api.asignarCama(id, camaId).pipe(tap(() => this.refrescar()));
   }
 
-  alta(id: number, request: AltaRequest): Observable<IngresoHospResponse> {
+  alta(id: string, request: AltaRequest): Observable<IngresoHospResponse> {
     return this.api.alta(id, request).pipe(tap((ingreso) => this.ingreso.set(ingreso)));
   }
 
-  registrarEvolucion(id: number, request: EvolucionRequest): Observable<EvolucionResponse> {
+  registrarEvolucion(id: string, request: EvolucionRequest): Observable<EvolucionResponse> {
     return this.api
       .registrarEvolucion(id, request)
       .pipe(tap((evolucion) => this.evoluciones.update((items) => [evolucion, ...(items ?? [])])));

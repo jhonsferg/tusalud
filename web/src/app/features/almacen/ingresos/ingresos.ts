@@ -59,7 +59,7 @@ export class Ingresos implements OnInit {
   protected readonly manana = new Date(Date.now() + 86_400_000);
 
   protected readonly form = this.fb.group({
-    proveedorId: [null as number | null],
+    proveedorId: [null as string | null],
     documento: ['', [Validators.maxLength(40)]],
     observaciones: ['', [Validators.maxLength(300)]],
     items: this.fb.array([this.nuevoItem()]),
@@ -102,7 +102,7 @@ export class Ingresos implements OnInit {
 
   protected nuevoItem() {
     return this.fb.group({
-      productoId: [null as number | null, [Validators.required]],
+      productoId: [null as string | null, [Validators.required]],
       numeroLote: ['', [Validators.required, Validators.maxLength(40)]],
       fechaVencimiento: [null as Date | null, [Validators.required]],
       cantidad: [1, [Validators.required, Validators.min(1)]],
@@ -144,7 +144,7 @@ export class Ingresos implements OnInit {
         documento: valor.documento?.trim() || null,
         observaciones: valor.observaciones?.trim() || null,
         items: (valor.items as Record<string, unknown>[]).map((item) => ({
-          productoId: item['productoId'] as number,
+          productoId: item['productoId'] as string,
           numeroLote: String(item['numeroLote']).trim(),
           fechaVencimiento: toIsoDate(item['fechaVencimiento'] as Date),
           cantidad: Number(item['cantidad']),

@@ -37,7 +37,7 @@ export class ClinicaStore {
     this.historia.load(this.api.miHistoria());
   }
 
-  cargarHistoriaDePaciente(pacienteId: number): void {
+  cargarHistoriaDePaciente(pacienteId: string): void {
     this.historia.load(this.api.historiaDePaciente(pacienteId));
   }
 
@@ -51,12 +51,12 @@ export class ClinicaStore {
       );
   }
 
-  cargarCompartidos(pacienteId: number): void {
+  cargarCompartidos(pacienteId: string): void {
     this.compartidos.load(this.api.listarCompartidos(pacienteId));
   }
 
   compartirPaciente(
-    pacienteId: number,
+    pacienteId: string,
     request: CompartirPacienteRequest,
   ): Observable<CompartidoResponse> {
     return this.api
@@ -66,7 +66,7 @@ export class ClinicaStore {
       );
   }
 
-  dejarDeCompartir(pacienteId: number, medicoId: number): Observable<void> {
+  dejarDeCompartir(pacienteId: string, medicoId: string): Observable<void> {
     return this.api
       .dejarDeCompartir(pacienteId, medicoId)
       .pipe(
@@ -80,33 +80,33 @@ export class ClinicaStore {
     this.pacientes.load(this.api.misPacientes());
   }
 
-  cargarAtencion(citaId: number): void {
+  cargarAtencion(citaId: string): void {
     this.atencion.load(this.api.obtenerAtencion(citaId));
   }
 
-  registrarAtencion(citaId: number, request: AtencionRequest): Observable<AtencionResponse> {
+  registrarAtencion(citaId: string, request: AtencionRequest): Observable<AtencionResponse> {
     return this.api
       .registrarAtencion(citaId, request)
       .pipe(tap((atencion) => this.atencion.set(atencion)));
   }
 
-  actualizarAtencion(citaId: number, request: AtencionRequest): Observable<AtencionResponse> {
+  actualizarAtencion(citaId: string, request: AtencionRequest): Observable<AtencionResponse> {
     return this.api
       .actualizarAtencion(citaId, request)
       .pipe(tap((atencion) => this.atencion.set(atencion)));
   }
 
-  cargarValoracion(citaId: number): void {
+  cargarValoracion(citaId: string): void {
     this.valoracion.load(this.api.obtenerValoracion(citaId));
   }
 
-  valorar(citaId: number, request: ValoracionRequest): Observable<ValoracionResponse> {
+  valorar(citaId: string, request: ValoracionRequest): Observable<ValoracionResponse> {
     return this.api
       .valorar(citaId, request)
       .pipe(tap((valoracion) => this.valoracion.set(valoracion)));
   }
 
-  cargarValoracionesDeMedico(medicoId: number): void {
+  cargarValoracionesDeMedico(medicoId: string): void {
     this.valoraciones.load(this.api.valoracionesDeMedico(medicoId));
   }
 

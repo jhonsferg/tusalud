@@ -25,21 +25,21 @@ export class CalendarioApiService {
     return this.http.post<EventoCalendarioResponse>(this.baseUrl, request);
   }
 
-  actualizar(id: number, request: EventoCalendarioRequest): Observable<EventoCalendarioResponse> {
+  actualizar(id: string, request: EventoCalendarioRequest): Observable<EventoCalendarioResponse> {
     return this.http.put<EventoCalendarioResponse>(`${this.baseUrl}/${id}`, request);
   }
 
-  mover(id: number, request: MoverEventoRequest): Observable<EventoCalendarioResponse> {
+  mover(id: string, request: MoverEventoRequest): Observable<EventoCalendarioResponse> {
     return this.http.put<EventoCalendarioResponse>(`${this.baseUrl}/${id}/mover`, request);
   }
 
-  completar(id: number, completado: boolean): Observable<EventoCalendarioResponse> {
+  completar(id: string, completado: boolean): Observable<EventoCalendarioResponse> {
     return this.http.put<EventoCalendarioResponse>(`${this.baseUrl}/${id}/completado`, {
       completado,
     });
   }
 
-  eliminar(id: number): Observable<void> {
+  eliminar(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

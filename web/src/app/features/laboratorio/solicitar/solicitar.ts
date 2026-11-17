@@ -23,7 +23,7 @@ import { ETIQUETA_CATEGORIA, PrioridadOrden } from '@tusalud/app/core/models';
 import { NotificationService } from '@tusalud/app/core/services/notification.service';
 import { ClinicaStore } from '@tusalud/app/core/state/clinica.store';
 import { LaboratorioStore } from '@tusalud/app/core/state/laboratorio.store';
-import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
+import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
 
 @Component({
@@ -45,8 +45,8 @@ import { PageHeader } from '@tusalud/app/shared/components/page-header/page-head
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Solicitar implements OnInit {
-  readonly pacienteId = input(undefined, { transform: optionalNumberAttribute });
-  readonly atencionId = input(undefined, { transform: optionalNumberAttribute });
+  readonly pacienteId = input(undefined, { transform: optionalIdAttribute });
+  readonly atencionId = input(undefined, { transform: optionalIdAttribute });
 
   protected readonly store = inject(LaboratorioStore);
   protected readonly clinica = inject(ClinicaStore);
@@ -63,13 +63,13 @@ export class Solicitar implements OnInit {
   ];
 
   protected readonly form = this.fb.group({
-    pacienteId: [null as number | null, [Validators.required]],
+    pacienteId: [null as string | null, [Validators.required]],
     prioridad: ['NORMAL' as PrioridadOrden, [Validators.required]],
     indicaciones: ['', [Validators.maxLength(500)]],
-    examenIds: [[] as number[], [Validators.required, Validators.minLength(1)]],
+    examenIds: [[] as string[], [Validators.required, Validators.minLength(1)]],
   });
 
-  private readonly seleccion = signal<number[]>([]);
+  private readonly seleccion = signal<string[]>([]);
 
   protected readonly pacientes = computed(() =>
     (this.clinica.pacientes.value() ?? []).map((paciente) => ({

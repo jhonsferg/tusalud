@@ -21,7 +21,7 @@ import { ApiError, AtencionRequest } from '@tusalud/app/core/models';
 import { NotificationService } from '@tusalud/app/core/services/notification.service';
 import { CitasStore } from '@tusalud/app/core/state/citas.store';
 import { ClinicaStore } from '@tusalud/app/core/state/clinica.store';
-import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
+import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 import { AppValidators } from '@tusalud/app/core/validators/app.validators';
 import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
 import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
@@ -48,7 +48,7 @@ import { PageHeader } from '@tusalud/app/shared/components/page-header/page-head
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AtencionForm {
-  readonly id = input(undefined, { transform: optionalNumberAttribute });
+  readonly id = input(undefined, { transform: optionalIdAttribute });
 
   protected readonly citas = inject(CitasStore);
   protected readonly clinica = inject(ClinicaStore);

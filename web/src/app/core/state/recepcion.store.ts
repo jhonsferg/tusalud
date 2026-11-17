@@ -33,7 +33,7 @@ export class RecepcionStore {
     this.citasHoy.load(this.api.citasHoy(q));
   }
 
-  cargarCola(estado: string | null = null, medicoId: number | null = null): void {
+  cargarCola(estado: string | null = null, medicoId: string | null = null): void {
     this.cola.load(this.api.cola(estado, medicoId));
   }
 
@@ -41,7 +41,7 @@ export class RecepcionStore {
     this.pantalla.load(this.api.pantalla());
   }
 
-  registrarLlegada(citaId: number): Observable<TurnoResponse> {
+  registrarLlegada(citaId: string): Observable<TurnoResponse> {
     return this.api.registrarLlegada(citaId).pipe(tap(() => this.refrescar()));
   }
 
@@ -50,7 +50,7 @@ export class RecepcionStore {
   }
 
   cambiar(
-    id: number,
+    id: string,
     accion: 'llamar' | 'iniciar' | 'finalizar' | 'ausente' | 'cancelar',
   ): Observable<TurnoResponse> {
     return this.api.cambiarTurno(id, accion).pipe(

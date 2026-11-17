@@ -27,14 +27,14 @@ export class PagosApiService {
     return this.http.post<MetodoPagoResponse>(`${this.apiUrl}/metodos-pago`, request);
   }
 
-  marcarPredeterminado(id: number): Observable<MetodoPagoResponse> {
+  marcarPredeterminado(id: string): Observable<MetodoPagoResponse> {
     return this.http.put<MetodoPagoResponse>(
       `${this.apiUrl}/metodos-pago/${id}/predeterminado`,
       null,
     );
   }
 
-  eliminarMetodo(id: number): Observable<void> {
+  eliminarMetodo(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/metodos-pago/${id}`);
   }
 
@@ -44,7 +44,7 @@ export class PagosApiService {
     });
   }
 
-  pagarCita(citaId: number, request: PagoRequest): Observable<PagoResponse> {
+  pagarCita(citaId: string, request: PagoRequest): Observable<PagoResponse> {
     return this.http.post<PagoResponse>(`${this.apiUrl}/citas/${citaId}/pago`, request);
   }
 
@@ -52,7 +52,7 @@ export class PagosApiService {
     return this.http.get<PagoResponse[]>(`${this.apiUrl}/pagos`);
   }
 
-  obtenerPago(id: number): Observable<PagoResponse> {
+  obtenerPago(id: string): Observable<PagoResponse> {
     return this.http.get<PagoResponse>(`${this.apiUrl}/pagos/${id}`);
   }
 

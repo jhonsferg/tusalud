@@ -2,7 +2,7 @@ import { EventoCalendarioResponse } from '@tusalud/app/core/models';
 import { categoriasPara, eventoApiACalendario, tiposPermitidos } from './evento-calendario';
 
 const base: EventoCalendarioResponse = {
-  id: 3,
+  id: u(3),
   titulo: 'Revisión de resultados',
   tipo: 'REUNION',
   inicio: '2026-11-18T10:00:00',
@@ -10,6 +10,10 @@ const base: EventoCalendarioResponse = {
   todoElDia: false,
   completado: false,
 };
+
+function u(n: number): string {
+  return `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+}
 
 describe('eventoApiACalendario', () => {
   it('usa el color del tipo cuando el evento no define uno', () => {
@@ -19,7 +23,7 @@ describe('eventoApiACalendario', () => {
 
   it('conserva la categoría, la edición y las fechas', () => {
     const evento = eventoApiACalendario(base)!;
-    expect(evento.id).toBe('e-3');
+    expect(evento.id).toBe(`e-${u(3)}`);
     expect(evento.categoria).toBe('REUNION');
     expect(evento.editable).toBe(true);
     expect(evento.fin.getHours()).toBe(11);

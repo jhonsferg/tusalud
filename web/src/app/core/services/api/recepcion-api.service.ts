@@ -32,7 +32,7 @@ export class RecepcionApiService {
     });
   }
 
-  registrarLlegada(citaId: number): Observable<TurnoResponse> {
+  registrarLlegada(citaId: string): Observable<TurnoResponse> {
     return this.http.post<TurnoResponse>(`${this.baseUrl}/citas/${citaId}/llegada`, null);
   }
 
@@ -40,14 +40,14 @@ export class RecepcionApiService {
     return this.http.post<TurnoResponse>(`${this.baseUrl}/turnos`, request);
   }
 
-  cola(estado?: string | null, medicoId?: number | null): Observable<TurnoResponse[]> {
+  cola(estado?: string | null, medicoId?: string | null): Observable<TurnoResponse[]> {
     return this.http.get<TurnoResponse[]>(`${this.baseUrl}/cola`, {
       params: toHttpParams({ estado, medicoId }),
     });
   }
 
   cambiarTurno(
-    id: number,
+    id: string,
     accion: 'llamar' | 'iniciar' | 'finalizar' | 'ausente' | 'cancelar',
   ): Observable<TurnoResponse> {
     return this.http.put<TurnoResponse>(`${this.baseUrl}/turnos/${id}/${accion}`, null);

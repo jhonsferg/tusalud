@@ -59,7 +59,7 @@ export class MisPacientes implements OnInit {
   protected readonly busqueda = signal('');
 
   protected readonly compartiendo = signal<PacienteResumenResponse | null>(null);
-  protected readonly colegaId = signal<number | null>(null);
+  protected readonly colegaId = signal<string | null>(null);
   protected readonly nota = signal('');
   protected readonly enviando = signal(false);
 
@@ -119,7 +119,7 @@ export class MisPacientes implements OnInit {
       });
   }
 
-  protected dejarDeCompartir(medicoId: number): void {
+  protected dejarDeCompartir(medicoId: string): void {
     const paciente = this.compartiendo();
     if (paciente) {
       this.store.dejarDeCompartir(paciente.pacienteId, medicoId).subscribe({

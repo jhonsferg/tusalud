@@ -50,11 +50,11 @@ export class AlmacenApiService {
     return this.http.post<ProductoResponse>(`${this.baseUrl}/productos`, request);
   }
 
-  actualizarProducto(id: number, request: ProductoRequest): Observable<ProductoResponse> {
+  actualizarProducto(id: string, request: ProductoRequest): Observable<ProductoResponse> {
     return this.http.put<ProductoResponse>(`${this.baseUrl}/productos/${id}`, request);
   }
 
-  listarLotes(productoId: number): Observable<LoteResponse[]> {
+  listarLotes(productoId: string): Observable<LoteResponse[]> {
     return this.http.get<LoteResponse[]>(`${this.baseUrl}/productos/${productoId}/lotes`);
   }
 
@@ -70,7 +70,7 @@ export class AlmacenApiService {
     return this.http.post<ProveedorResponse>(`${this.baseUrl}/proveedores`, request);
   }
 
-  actualizarProveedor(id: number, request: ProveedorRequest): Observable<ProveedorResponse> {
+  actualizarProveedor(id: string, request: ProveedorRequest): Observable<ProveedorResponse> {
     return this.http.put<ProveedorResponse>(`${this.baseUrl}/proveedores/${id}`, request);
   }
 

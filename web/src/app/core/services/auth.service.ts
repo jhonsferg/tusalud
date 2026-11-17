@@ -56,7 +56,7 @@ function isSession(value: unknown): value is Session {
     (session.refreshExpiresAt === undefined || typeof session.refreshExpiresAt === 'number') &&
     typeof user === 'object' &&
     user !== null &&
-    typeof user.id === 'number' &&
+    typeof user.id === 'string' &&
     typeof user.email === 'string' &&
     typeof user.nombreCompleto === 'string' &&
     Array.isArray(user.roles) &&

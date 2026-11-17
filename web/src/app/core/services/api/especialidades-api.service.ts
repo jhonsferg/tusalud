@@ -14,7 +14,7 @@ export class EspecialidadesApiService {
     return this.http.get<EspecialidadResponse[]>(this.baseUrl);
   }
 
-  obtener(id: number): Observable<EspecialidadResponse> {
+  obtener(id: string): Observable<EspecialidadResponse> {
     return this.http.get<EspecialidadResponse>(`${this.baseUrl}/${id}`);
   }
 
@@ -22,11 +22,11 @@ export class EspecialidadesApiService {
     return this.http.post<EspecialidadResponse>(this.baseUrl, request);
   }
 
-  actualizar(id: number, request: EspecialidadRequest): Observable<EspecialidadResponse> {
+  actualizar(id: string, request: EspecialidadRequest): Observable<EspecialidadResponse> {
     return this.http.put<EspecialidadResponse>(`${this.baseUrl}/${id}`, request);
   }
 
-  eliminar(id: number): Observable<void> {
+  eliminar(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

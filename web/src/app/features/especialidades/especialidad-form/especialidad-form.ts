@@ -17,7 +17,7 @@ import { Textarea } from 'primeng/textarea';
 import { ApiError } from '@tusalud/app/core/models';
 import { NotificationService } from '@tusalud/app/core/services/notification.service';
 import { EspecialidadesStore } from '@tusalud/app/core/state/especialidades.store';
-import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
+import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 import { AppValidators } from '@tusalud/app/core/validators/app.validators';
 import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
 import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
@@ -41,7 +41,7 @@ import { PageHeader } from '@tusalud/app/shared/components/page-header/page-head
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EspecialidadForm {
-  readonly id = input(undefined, { transform: optionalNumberAttribute });
+  readonly id = input(undefined, { transform: optionalIdAttribute });
 
   protected readonly store = inject(EspecialidadesStore);
   private readonly notifications = inject(NotificationService);

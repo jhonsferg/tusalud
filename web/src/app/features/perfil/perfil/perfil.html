@@ -172,7 +172,7 @@
                   label="Descartar cambios"
                   severity="secondary"
                   [outlined]="true"
-                  [disabled]="!datos.dirty"
+                  [disabled]="!datosModificados()"
                   (onClick)="restablecer()"
                 />
                 <p-button
@@ -180,7 +180,7 @@
                   label="Guardar cambios"
                   icon="pi pi-check"
                   [loading]="guardando()"
-                  [disabled]="!datos.dirty"
+                  [disabled]="!datosModificados()"
                 />
               </div>
             </form>
@@ -346,18 +346,18 @@
 
               <app-form-field
                 label="Anticipación del recordatorio"
-                [control]="preferencias.controls.horasAntelacionRecordatorio"
-                inputId="per-horas"
-                hint="Entre 1 y 72 horas antes de la cita"
+                [control]="preferencias.controls.minutosAntelacionRecordatorio"
+                inputId="per-anticipacion"
+                hint="Cuánto antes de la cita te avisamos"
               >
-                <p-inputnumber
-                  inputId="per-horas"
-                  formControlName="horasAntelacionRecordatorio"
-                  suffix=" horas"
-                  [min]="1"
-                  [max]="72"
-                  [showButtons]="true"
-                  [fluid]="true"
+                <p-select
+                  inputId="per-anticipacion"
+                  formControlName="minutosAntelacionRecordatorio"
+                  [options]="anticipaciones"
+                  optionLabel="label"
+                  optionValue="value"
+                  appendTo="body"
+                  styleClass="w-full"
                 />
               </app-form-field>
 
@@ -380,7 +380,7 @@
                   label="Guardar preferencias"
                   icon="pi pi-check"
                   [loading]="guardandoPreferencias()"
-                  [disabled]="!preferencias.dirty"
+                  [disabled]="!preferenciasModificadas()"
                 />
               </div>
             </form>

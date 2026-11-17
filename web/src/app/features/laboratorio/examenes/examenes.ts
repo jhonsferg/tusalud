@@ -128,7 +128,7 @@ export class Examenes implements OnInit {
   }
 
   protected nuevoParametro(valor?: {
-    id?: number;
+    id?: string;
     nombre: string;
     unidad?: string | null;
     tipo: TipoParametro;
@@ -136,7 +136,7 @@ export class Examenes implements OnInit {
     valorMax?: number | null;
   }) {
     return this.fb.nonNullable.group({
-      id: [valor?.id ?? (null as number | null)],
+      id: [valor?.id ?? (null as string | null)],
       nombre: [valor?.nombre ?? '', [Validators.required, Validators.maxLength(100)]],
       unidad: [valor?.unidad ?? ''],
       tipo: [valor?.tipo ?? ('NUMERICO' as TipoParametro)],

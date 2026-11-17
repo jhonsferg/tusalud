@@ -1,5 +1,9 @@
 import { construirHuecos, horarioLaboral } from './disponibilidad-calendario';
 
+function u(n: number): string {
+  return `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+}
+
 describe('disponibilidad para el calendario', () => {
   it('convierte las horas libres en huecos con el paso mínimo del día', () => {
     const huecos = construirHuecos([
@@ -25,16 +29,16 @@ describe('disponibilidad para el calendario', () => {
     expect(
       horarioLaboral([
         {
-          id: 1,
-          medicoId: 1,
+          id: u(1),
+          medicoId: u(1),
           diaSemana: 'MONDAY',
           horaInicio: '08:00:00',
           horaFin: '13:00:00',
           duracionCitaMinutos: 30,
         },
         {
-          id: 2,
-          medicoId: 1,
+          id: u(2),
+          medicoId: u(1),
           diaSemana: 'SUNDAY',
           horaInicio: '09:00',
           horaFin: '10:00',

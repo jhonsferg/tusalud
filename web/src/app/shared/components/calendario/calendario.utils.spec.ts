@@ -13,8 +13,12 @@ import {
   solapan,
 } from './calendario.utils';
 
+function u(n: number): string {
+  return `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+}
+
 function evento(
-  id: number,
+  id: string,
   inicio: string,
   fin: string,
   extra: Partial<CalEvento> = {},
@@ -54,30 +58,30 @@ describe('calendario.utils', () => {
   });
 
   it('distingue solapes parciales, exactos y adyacentes', () => {
-    expect(solapan(evento(1, '09:00', '09:30'), evento(2, '09:00', '09:30'))).toBe(true);
-    expect(solapan(evento(1, '09:00', '09:30'), evento(2, '09:15', '09:45'))).toBe(true);
-    expect(solapan(evento(1, '09:00', '09:30'), evento(2, '09:30', '10:00'))).toBe(false);
+    expect(solapan(evento(u(1), '09:00', '09:30'), evento(u(2), '09:00', '09:30'))).toBe(true);
+    expect(solapan(evento(u(1), '09:00', '09:30'), evento(u(2), '09:15', '09:45'))).toBe(true);
+    expect(solapan(evento(u(1), '09:00', '09:30'), evento(u(2), '09:30', '10:00'))).toBe(false);
   });
 
   it('reparte columnas y marca los cruces', () => {
     const resultado = distribuir([
-      evento(1, '09:00', '09:30'),
-      evento(2, '09:15', '09:45'),
-      evento(3, '10:00', '10:30'),
+      evento(u(1), '09:00', '09:30'),
+      evento(u(2), '09:15', '09:45'),
+      evento(u(3), '10:00', '10:30'),
     ]);
     const porId = new Map(resultado.map((item) => [item.evento.id, item]));
-    expect(porId.get(1)).toMatchObject({ columna: 0, columnas: 2, conflicto: true });
-    expect(porId.get(2)).toMatchObject({ columna: 1, columnas: 2, conflicto: true });
-    expect(porId.get(3)).toMatchObject({ columna: 0, columnas: 1, conflicto: false });
+    expect(porId.get(u(1))).toMatchObject({ columna: 0, columnas: 2, conflicto: true });
+    expect(porId.get(u(2))).toMatchObject({ columna: 1, columnas: 2, conflicto: true });
+    expect(porId.get(u(3))).toMatchObject({ columna: 0, columnas: 1, conflicto: false });
   });
 
   it('ignora los eventos que no cuentan para el cruce', () => {
     const eventos = [
-      evento(1, '09:00', '09:30'),
-      evento(2, '09:00', '09:30', { ignoraCruce: true }),
+      evento(u(1), '09:00', '09:30'),
+      evento(u(2), '09:00', '09:30', { ignoraCruce: true }),
     ];
     expect(contarCruces(eventos)).toBe(0);
-    expect(contarCruces([evento(1, '09:00', '10:00'), evento(2, '09:30', '10:30')])).toBe(2);
+    expect(contarCruces([evento(u(1), '09:00', '10:00'), evento(u(2), '09:30', '10:30')])).toBe(2);
   });
 
   it('calcula el rango de la vista de agenda', () => {
@@ -89,7 +93,7 @@ describe('calendario.utils', () => {
 
   it('recorta los eventos que cruzan la medianoche', () => {
     const noche = {
-      ...evento(1, '22:00', '23:00'),
+      ...evento(u(1), '22:00', '23:00'),
       fin: new Date('2026-11-19T02:00:00'),
     };
     const primero = recortarAlDia(noche, new Date(2026, 10, 18))!;

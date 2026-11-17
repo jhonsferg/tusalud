@@ -29,7 +29,7 @@ import { PageHeader } from '@tusalud/app/shared/components/page-header/page-head
 export class Movimientos implements OnInit {
   protected readonly store = inject(AlmacenStore);
 
-  protected readonly productoId = signal<number | null>(null);
+  protected readonly productoId = signal<string | null>(null);
   protected readonly tipo = signal<TipoMovimiento | null>(null);
   protected readonly rango = signal<Date[] | null>(null);
 
@@ -52,8 +52,8 @@ export class Movimientos implements OnInit {
 
   protected cambiarRango(valor: Date[] | null): void {
     this.rango.set(valor);
-    const [inicio, fin] = valor ?? [];
-    if (!valor || (inicio && fin)) {
+    const [inicio] = valor ?? [];
+    if (!valor || inicio) {
       this.cargar();
     }
   }
@@ -64,7 +64,7 @@ export class Movimientos implements OnInit {
       productoId: this.productoId(),
       tipo: this.tipo(),
       desde: inicio ? toIsoDate(inicio) : null,
-      hasta: fin ? toIsoDate(fin) : null,
+      hasta: fin ? toIsoDate(fin) : inicio ? toIsoDate(inicio) : null,
     });
   }
 }

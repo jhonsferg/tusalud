@@ -31,7 +31,7 @@ export class EspecialidadesStore {
     this.list.load(this.api.listar());
   }
 
-  loadOne(id: number): void {
+  loadOne(id: string): void {
     this.selected.load(this.api.obtener(id));
   }
 
@@ -43,7 +43,7 @@ export class EspecialidadesStore {
       );
   }
 
-  actualizar(id: number, request: EspecialidadRequest): Observable<EspecialidadResponse> {
+  actualizar(id: string, request: EspecialidadRequest): Observable<EspecialidadResponse> {
     return this.api.actualizar(id, request).pipe(
       tap((actualizada) => {
         this.list.update((items) =>
@@ -56,7 +56,7 @@ export class EspecialidadesStore {
     );
   }
 
-  eliminar(id: number): Observable<void> {
+  eliminar(id: string): Observable<void> {
     return this.api.eliminar(id).pipe(
       tap(() => {
         this.list.update((items) => items?.filter((item) => item.id !== id));

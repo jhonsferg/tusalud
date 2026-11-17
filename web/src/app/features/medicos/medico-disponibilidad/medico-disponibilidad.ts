@@ -16,7 +16,7 @@ import { AuthService } from '@tusalud/app/core/services/auth.service';
 import { CitasStore } from '@tusalud/app/core/state/citas.store';
 import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
 import { toIsoDate } from '@tusalud/app/core/utils/date';
-import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
+import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 import { Calendario } from '@tusalud/app/shared/components/calendario/calendario';
 import {
   CalEvento,
@@ -38,7 +38,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MedicoDisponibilidad {
-  readonly id = input(undefined, { transform: optionalNumberAttribute });
+  readonly id = input(undefined, { transform: optionalIdAttribute });
 
   protected readonly store = inject(MedicosStore);
   protected readonly auth = inject(AuthService);

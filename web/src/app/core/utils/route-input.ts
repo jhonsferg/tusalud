@@ -1,7 +1,7 @@
-export function optionalNumberAttribute(value: unknown): number | undefined {
-  if (value === null || value === undefined || value === '') {
+export function optionalIdAttribute(value: unknown): string | undefined {
+  if (typeof value !== 'string') {
     return undefined;
   }
-  const parsed = Number(value);
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
+  const id = value.trim();
+  return id === '' ? undefined : id;
 }

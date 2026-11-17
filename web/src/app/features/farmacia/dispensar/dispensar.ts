@@ -36,7 +36,7 @@ import {
 } from '@tusalud/app/core/models';
 import { NotificationService } from '@tusalud/app/core/services/notification.service';
 import { FarmaciaStore } from '@tusalud/app/core/state/farmacia.store';
-import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
+import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
 
@@ -69,7 +69,7 @@ function normalizar(texto: string): string {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Dispensar implements OnInit {
-  readonly atencionId = input(undefined, { transform: optionalNumberAttribute });
+  readonly atencionId = input(undefined, { transform: optionalIdAttribute });
 
   protected readonly store = inject(FarmaciaStore);
   private readonly notifications = inject(NotificationService);
@@ -111,7 +111,7 @@ export class Dispensar implements OnInit {
   protected readonly total = computed(() => {
     const catalogo = new Map((this.store.catalogo.value() ?? []).map((p) => [p.id, p]));
     return (this.valores().items ?? []).reduce((suma, item) => {
-      const producto = catalogo.get(Number(item?.['productoId']));
+      const producto = catalogo.get(String(item?.['productoId']));
       return suma + (producto ? producto.precioVenta * (Number(item?.['cantidad']) || 0) : 0);
     }, 0);
   });
@@ -144,11 +144,11 @@ export class Dispensar implements OnInit {
     this.store.cargarRecetas();
   }
 
-  protected nuevoItem(recetaItemId: number | null = null, productoId: number | null = null) {
+  protected nuevoItem(recetaItemId: string | null = null, productoId: string | null = null) {
     return this.fb.group({
       recetaItemId: [recetaItemId],
       etiqueta: [''],
-      productoId: [productoId as number | null, [Validators.required]],
+      productoId: [productoId as string | null, [Validators.required]],
       cantidad: [1, [Validators.required, Validators.min(1)]],
     });
   }
@@ -201,8 +201,8 @@ export class Dispensar implements OnInit {
         metodoPago: valor.metodoPago ?? 'EFECTIVO',
         observaciones: valor.observaciones?.trim() || null,
         items: (valor.items as Record<string, unknown>[]).map((item) => ({
-          recetaItemId: (item['recetaItemId'] as number | null) ?? null,
-          productoId: item['productoId'] as number,
+          recetaItemId: (item['recetaItemId'] as string | null) ?? null,
+          productoId: item['productoId'] as string,
           cantidad: Number(item['cantidad']),
         })),
       })

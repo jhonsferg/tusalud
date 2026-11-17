@@ -23,7 +23,7 @@ import { CitasStore } from '@tusalud/app/core/state/citas.store';
 import { EspecialidadesStore } from '@tusalud/app/core/state/especialidades.store';
 import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
 import { combineDateAndTime, parseIsoDate, toIsoDate } from '@tusalud/app/core/utils/date';
-import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
+import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 import { AppValidators } from '@tusalud/app/core/validators/app.validators';
 import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
 import { Calendario } from '@tusalud/app/shared/components/calendario/calendario';
@@ -62,8 +62,8 @@ const MOTIVO_MAX = 500;
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CitaForm {
-  readonly medicoId = input(undefined, { transform: optionalNumberAttribute });
-  readonly especialidadId = input(undefined, { transform: optionalNumberAttribute });
+  readonly medicoId = input(undefined, { transform: optionalIdAttribute });
+  readonly especialidadId = input(undefined, { transform: optionalIdAttribute });
   readonly fecha = input<string>();
   readonly hora = input<string>();
 
@@ -78,8 +78,8 @@ export class CitaForm {
   protected readonly motivoMax = MOTIVO_MAX;
 
   protected readonly form = inject(FormBuilder).group({
-    especialidadId: [null as number | null, [Validators.required]],
-    medicoId: [null as number | null, [Validators.required]],
+    especialidadId: [null as string | null, [Validators.required]],
+    medicoId: [null as string | null, [Validators.required]],
     fecha: [null as Date | null, [Validators.required]],
     hora: [null as string | null, [Validators.required]],
     motivo: ['', [Validators.required, AppValidators.notBlank, Validators.maxLength(MOTIVO_MAX)]],

@@ -75,7 +75,7 @@ export interface AuthResponse {
   token: string;
   tokenType: string;
   expiresIn: number;
-  usuarioId: number;
+  usuarioId: string;
   email: string;
   nombreCompleto: string;
   roles: string[];
@@ -88,13 +88,13 @@ export interface JwtPayload {
   iss?: string;
   iat?: number;
   exp?: number;
-  uid?: number;
+  uid?: string;
   nombre?: string;
   roles?: string[];
 }
 
 export interface SessionUser {
-  id: number;
+  id: string;
   email: string;
   nombreCompleto: string;
   roles: Rol[];

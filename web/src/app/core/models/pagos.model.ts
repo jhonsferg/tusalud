@@ -3,7 +3,7 @@ export type TipoMetodoPago = 'TARJETA_CREDITO' | 'TARJETA_DEBITO';
 export type EstadoPago = 'PAGADO' | 'REEMBOLSADO';
 
 export interface CuponResponse {
-  id: number;
+  id: string;
   codigo: string;
   descripcion?: string | null;
   tipo: TipoCupon;
@@ -36,7 +36,7 @@ export interface CuponValidacionResponse {
 }
 
 export interface MetodoPagoResponse {
-  id: number;
+  id: string;
   tipo: TipoMetodoPago;
   titular: string;
   marca: string;
@@ -58,13 +58,13 @@ export interface MetodoPagoRequest {
 }
 
 export interface PagoRequest {
-  metodoPagoId: number;
+  metodoPagoId: string;
   codigoCupon?: string | null;
 }
 
 export interface PagoResponse {
-  id: number;
-  citaId: number;
+  id: string;
+  citaId: string;
   pacienteNombre: string;
   medicoNombre: string;
   especialidad: string;
@@ -83,7 +83,7 @@ export type Billetera = 'YAPE' | 'PLIN';
 export type EstadoPagoQr = 'PENDIENTE' | 'CONFIRMADO' | 'EXPIRADO' | 'CANCELADO';
 
 export interface PagoQrRequest {
-  citaId: number;
+  citaId: string;
   billetera: Billetera;
   codigoCupon?: string | null;
 }
@@ -98,5 +98,5 @@ export interface PagoQrResponse {
   qrPayload: string;
   estado: EstadoPagoQr;
   expiraEn: string;
-  pagoId?: number | null;
+  pagoId?: string | null;
 }

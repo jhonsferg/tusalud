@@ -32,11 +32,11 @@ export class AdminApiService {
     return this.http.post<CuponResponse>(`${this.baseUrl}/cupones`, request);
   }
 
-  actualizarCupon(id: number, request: CuponRequest): Observable<CuponResponse> {
+  actualizarCupon(id: string, request: CuponRequest): Observable<CuponResponse> {
     return this.http.put<CuponResponse>(`${this.baseUrl}/cupones/${id}`, request);
   }
 
-  eliminarCupon(id: number): Observable<void> {
+  eliminarCupon(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/cupones/${id}`);
   }
 
@@ -53,7 +53,7 @@ export class AdminApiService {
   }
 
   cambiarEstadoUsuario(
-    id: number,
+    id: string,
     estado: 'ACTIVO' | 'INACTIVO',
   ): Observable<UsuarioAdminResponse> {
     return this.http.put<UsuarioAdminResponse>(`${this.baseUrl}/usuarios/${id}/estado`, { estado });
@@ -67,7 +67,7 @@ export class AdminApiService {
     return this.http.get<RolResumenResponse[]>(`${this.baseUrl}/roles`);
   }
 
-  actualizarRoles(id: number, roles: string[]): Observable<UsuarioAdminResponse> {
+  actualizarRoles(id: string, roles: string[]): Observable<UsuarioAdminResponse> {
     return this.http.put<UsuarioAdminResponse>(`${this.baseUrl}/usuarios/${id}/roles`, { roles });
   }
 }

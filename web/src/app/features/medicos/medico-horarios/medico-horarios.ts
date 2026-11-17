@@ -10,7 +10,7 @@ import { TableModule } from 'primeng/table';
 import { ApiError, DIAS_SEMANA, HorarioResponse, NOMBRE_DIA } from '@tusalud/app/core/models';
 import { NotificationService } from '@tusalud/app/core/services/notification.service';
 import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
-import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
+import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 import {
   AppValidators,
   DURACION_MAX,
@@ -40,7 +40,7 @@ import { PageHeader } from '@tusalud/app/shared/components/page-header/page-head
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MedicoHorarios {
-  readonly id = input(undefined, { transform: optionalNumberAttribute });
+  readonly id = input(undefined, { transform: optionalIdAttribute });
 
   protected readonly store = inject(MedicosStore);
   private readonly confirmation = inject(ConfirmationService);

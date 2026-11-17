@@ -51,7 +51,7 @@ export class PerfilApiService {
     return this.http.get<SesionResponse[]>(`${this.baseUrl}/sesiones`);
   }
 
-  cerrarSesion(id: number): Observable<void> {
+  cerrarSesion(id: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/sesiones/${id}`);
   }
 

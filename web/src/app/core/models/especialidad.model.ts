@@ -1,5 +1,5 @@
 export interface EspecialidadResponse {
-  id: number;
+  id: string;
   nombre: string;
   descripcion?: string | null;
   precioConsulta: number;

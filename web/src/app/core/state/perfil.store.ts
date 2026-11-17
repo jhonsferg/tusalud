@@ -68,7 +68,7 @@ export class PerfilStore {
     return this.api
       .actualizarPreferencias({
         recordatoriosActivos: actual?.recordatoriosActivos ?? true,
-        horasAntelacionRecordatorio: actual?.horasAntelacionRecordatorio ?? 24,
+        minutosAntelacionRecordatorio: actual?.minutosAntelacionRecordatorio ?? 1440,
         alertasInicioSesion: actual?.alertasInicioSesion ?? true,
         tourCompletado: completado,
       })
@@ -79,7 +79,7 @@ export class PerfilStore {
     this.sesiones.load(this.api.listarSesiones());
   }
 
-  cerrarSesion(id: number): Observable<void> {
+  cerrarSesion(id: string): Observable<void> {
     return this.api
       .cerrarSesion(id)
       .pipe(tap(() => this.sesiones.update((items) => items?.filter((item) => item.id !== id))));

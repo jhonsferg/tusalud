@@ -18,14 +18,14 @@ export const ETIQUETA_ESTADO_TURNO: Readonly<Record<string, string>> = {
 };
 
 export interface TurnoResponse {
-  id: number;
+  id: string;
   numero: string;
   fecha: string;
-  pacienteId: number;
+  pacienteId: string;
   pacienteNombre: string;
   dni: string;
-  citaId?: number | null;
-  medicoId?: number | null;
+  citaId?: string | null;
+  medicoId?: string | null;
   medicoNombre?: string | null;
   prioridad: PrioridadTurno;
   estado: EstadoTurno;
@@ -39,17 +39,17 @@ export interface TurnoResponse {
 }
 
 export interface TurnoRequest {
-  pacienteId: number;
-  medicoId?: number | null;
+  pacienteId: string;
+  medicoId?: string | null;
   prioridad: PrioridadTurno;
   motivo?: string | null;
 }
 
 export interface CitaHoyResponse {
-  id: number;
+  id: string;
   fechaHora: string;
   estado: string;
-  pacienteId: number;
+  pacienteId: string;
   pacienteNombre: string;
   pacienteDni: string;
   medicoNombre: string;
@@ -75,7 +75,7 @@ export interface ResumenRecepcionResponse {
 }
 
 export interface PacienteMostradorResponse {
-  pacienteId: number;
+  pacienteId: string;
   nombreCompleto: string;
   dni: string;
   telefono?: string | null;
@@ -99,9 +99,9 @@ export interface PacienteRegistradoResponse {
 }
 
 export interface CitaMostradorRequest {
-  pacienteId: number;
-  medicoId: number;
-  especialidadId: number;
+  pacienteId: string;
+  medicoId: string;
+  especialidadId: string;
   fechaHora: string;
   motivo: string;
 }

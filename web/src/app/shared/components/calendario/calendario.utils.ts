@@ -3,7 +3,7 @@ export type VistaCalendario = 'mes' | 'semana' | 'dia' | 'agenda';
 export type ColorEvento = 'info' | 'success' | 'warn' | 'danger' | 'secondary' | 'purple';
 
 export interface CalEvento {
-  readonly id: string | number;
+  readonly id: string;
   readonly inicio: Date;
   readonly fin: Date;
   readonly titulo: string;

@@ -58,7 +58,7 @@ export class Cupones implements OnInit {
 
   protected readonly dialogo = signal(false);
   protected readonly guardando = signal(false);
-  protected readonly editandoId = signal<number | undefined>(undefined);
+  protected readonly editandoId = signal<string | undefined>(undefined);
   protected readonly tipos = [
     { label: 'Porcentaje', value: 'PORCENTAJE' },
     { label: 'Monto fijo', value: 'MONTO_FIJO' },
