@@ -1,0 +1,124 @@
+<app-page-header
+  title="Hospitalización"
+  subtitle="Mapa de camas y ocupación en tiempo real"
+  icon="pi-building"
+>
+  <p-button
+    label="Emergencias"
+    icon="pi pi-exclamation-circle"
+    severity="danger"
+    [outlined]="true"
+    routerLink="/hospitalizacion/emergencias"
+  />
+  <p-button
+    label="Ingresos"
+    icon="pi pi-list"
+    [outlined]="true"
+    routerLink="/hospitalizacion/ingresos"
+  />
+</app-page-header>
+
+@if (store.resumen.value(); as resumen) {
+  <div class="kpis">
+    <app-kpi
+      etiqueta="Camas libres"
+      [valor]="resumen.camasLibres"
+      icono="pi-check-circle"
+      tono="exito"
+    />
+    <app-kpi etiqueta="Camas ocupadas" [valor]="resumen.camasOcupadas" icono="pi-user" />
+    <app-kpi etiqueta="En limpieza" [valor]="resumen.camasLimpieza" icono="pi-sparkles" />
+    <app-kpi etiqueta="Ingresos activos" [valor]="resumen.ingresosActivos" icono="pi-building" />
+    <app-kpi
+      etiqueta="Emergencias en espera"
+      [valor]="resumen.emergenciasEnEspera"
+      icono="pi-exclamation-circle"
+      [tono]="resumen.emergenciasEnEspera > 0 ? 'peligro' : 'exito'"
+    />
+    <app-kpi
+      etiqueta="Ocupación"
+      [valor]="resumen.ocupacionPorcentaje + '%'"
+      icono="pi-chart-pie"
+    />
+  </div>
+}
+
+<div class="leyenda">
+  <span class="libre"><i></i> Libre</span>
+  <span class="ocupada"><i></i> Ocupada</span>
+  <span class="limpieza"><i></i> Limpieza</span>
+  <span class="mant"><i></i> Mantenimiento</span>
+</div>
+
+@for (grupo of store.mapa.value() ?? []; track grupo.area) {
+  <section class="panel area">
+    <h3>{{ etiquetaArea[grupo.area] }}</h3>
+    <div class="camas">
+      @for (cama of grupo.camas; track cama.id) {
+        <button
+          type="button"
+          class="cama"
+          [style.--color-cama]="color(cama.estado)"
+          [attr.aria-label]="'Cama ' + cama.codigo + ' ' + etiquetaEstado[cama.estado]"
+          (click)="abrirCama(cama)"
+        >
+          <strong>{{ cama.codigo }}</strong>
+          <small>{{ cama.pacienteNombre || etiquetaEstado[cama.estado] }}</small>
+        </button>
+      }
+    </div>
+  </section>
+} @empty {
+  <div class="panel">
+    <app-empty-state
+      icon="pi-building"
+      title="Sin camas configuradas"
+      message="El administrador registra las camas del hospital."
+    />
+  </div>
+}
+
+<p-dialog
+  [header]="'Ingresar paciente a la cama ' + (cama()?.codigo ?? '')"
+  [visible]="cama() !== null"
+  (visibleChange)="$event ? null : cama.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '34rem', maxWidth: '96vw' }"
+>
+  <div class="form">
+    @if (error(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    <label>Paciente <app-paciente-buscador inputId="hos-paciente" [(paciente)]="paciente" /></label>
+    <label
+      >Motivo del ingreso
+      <input
+        pInputText
+        id="hos-motivo"
+        class="w-full"
+        [ngModel]="motivo()"
+        (ngModelChange)="motivo.set($event)"
+    /></label>
+    <label>
+      Diagnóstico de ingreso
+      <textarea
+        pTextarea
+        id="hos-diagnostico"
+        rows="2"
+        class="w-full"
+        [ngModel]="diagnostico()"
+        (ngModelChange)="diagnostico.set($event)"
+      ></textarea>
+    </label>
+  </div>
+  <ng-template #footer>
+    <p-button label="Cancelar" severity="secondary" [outlined]="true" (onClick)="cama.set(null)" />
+    <p-button
+      label="Registrar ingreso"
+      icon="pi pi-check"
+      [loading]="guardando()"
+      (onClick)="ingresar()"
+    />
+  </ng-template>
+</p-dialog>

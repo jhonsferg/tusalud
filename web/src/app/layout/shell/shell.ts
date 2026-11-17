@@ -47,6 +47,9 @@ const TODOS: readonly Rol[] = [
   'ROLE_LABORATORIO',
   'ROLE_FARMACIA',
   'ROLE_ALMACEN',
+  'ROLE_RECEPCION',
+  'ROLE_CAJA',
+  'ROLE_ENFERMERIA',
 ];
 const GESTION_CLINICA: readonly Rol[] = ['ROLE_ADMIN', 'ROLE_LABORATORIO', 'ROLE_MEDICO'];
 
@@ -57,6 +60,7 @@ const NAV_GROUPS: readonly NavGroup[] = [
       { label: 'Panel', icon: 'pi-th-large', link: '/admin/panel', roles: ['ROLE_ADMIN'] },
       { label: 'Auditoría', icon: 'pi-chart-bar', link: '/admin/auditoria', roles: ['ROLE_ADMIN'] },
       { label: 'Mi agenda', icon: 'pi-calendar', link: '/agenda', roles: ['ROLE_MEDICO'] },
+      { label: 'Cola de pacientes', icon: 'pi-users', link: '/cola', roles: ['ROLE_MEDICO'] },
       { label: 'Calendario', icon: 'pi-calendar-plus', link: '/calendario', roles: TODOS },
       { label: 'Mis pacientes', icon: 'pi-users', link: '/pacientes', roles: ['ROLE_MEDICO'] },
       {
@@ -90,6 +94,12 @@ const NAV_GROUPS: readonly NavGroup[] = [
         roles: ['ROLE_PACIENTE'],
       },
       {
+        label: 'Mis hospitalizaciones',
+        icon: 'pi-building',
+        link: '/mis-ingresos',
+        roles: ['ROLE_PACIENTE'],
+      },
+      {
         label: 'Mis medicamentos',
         icon: 'pi-heart',
         link: '/mis-medicamentos',
@@ -107,6 +117,91 @@ const NAV_GROUPS: readonly NavGroup[] = [
         icon: 'pi-credit-card',
         link: '/pagos/metodos',
         roles: ['ROLE_PACIENTE'],
+      },
+    ],
+  },
+  {
+    title: 'Recepción',
+    items: [
+      {
+        label: 'Recepción',
+        icon: 'pi-users',
+        link: '/recepcion',
+        roles: ['ROLE_ADMIN', 'ROLE_RECEPCION'],
+        exact: true,
+      },
+      {
+        label: 'Pacientes',
+        icon: 'pi-id-card',
+        link: '/recepcion/pacientes',
+        roles: ['ROLE_ADMIN', 'ROLE_RECEPCION'],
+      },
+      {
+        label: 'Reservar en mostrador',
+        icon: 'pi-calendar-plus',
+        link: '/recepcion/citas/nueva',
+        roles: ['ROLE_ADMIN', 'ROLE_RECEPCION'],
+      },
+      {
+        label: 'Sala de espera',
+        icon: 'pi-desktop',
+        link: '/recepcion/pantalla',
+        roles: ['ROLE_ADMIN', 'ROLE_RECEPCION'],
+      },
+    ],
+  },
+  {
+    title: 'Caja',
+    items: [
+      { label: 'Caja', icon: 'pi-wallet', link: '/caja', roles: ['ROLE_CAJA'], exact: true },
+      { label: 'Cobrar', icon: 'pi-dollar', link: '/caja/cobrar', roles: ['ROLE_CAJA'] },
+      {
+        label: 'Comprobantes',
+        icon: 'pi-receipt',
+        link: '/caja/comprobantes',
+        roles: ['ROLE_CAJA', 'ROLE_ADMIN'],
+      },
+      {
+        label: 'Historial de caja',
+        icon: 'pi-history',
+        link: '/caja/historial',
+        roles: ['ROLE_CAJA', 'ROLE_ADMIN'],
+      },
+      {
+        label: 'Reporte de ingresos',
+        icon: 'pi-chart-bar',
+        link: '/caja/reportes',
+        roles: ['ROLE_CAJA', 'ROLE_ADMIN'],
+      },
+    ],
+  },
+  {
+    title: 'Hospitalización',
+    items: [
+      {
+        label: 'Mapa de camas',
+        icon: 'pi-building',
+        link: '/hospitalizacion',
+        roles: ['ROLE_ENFERMERIA', 'ROLE_MEDICO', 'ROLE_ADMIN', 'ROLE_RECEPCION'],
+        exact: true,
+      },
+      {
+        label: 'Emergencias',
+        icon: 'pi-exclamation-circle',
+        link: '/hospitalizacion/emergencias',
+        roles: ['ROLE_ENFERMERIA', 'ROLE_MEDICO', 'ROLE_ADMIN', 'ROLE_RECEPCION'],
+      },
+      {
+        label: 'Ingresos',
+        icon: 'pi-list',
+        link: '/hospitalizacion/ingresos',
+        roles: ['ROLE_ENFERMERIA', 'ROLE_MEDICO', 'ROLE_ADMIN', 'ROLE_RECEPCION'],
+      },
+      {
+        label: 'Camas',
+        icon: 'pi-th-large',
+        link: '/hospitalizacion/camas',
+        roles: ['ROLE_ENFERMERIA', 'ROLE_MEDICO', 'ROLE_ADMIN'],
       },
     ],
   },

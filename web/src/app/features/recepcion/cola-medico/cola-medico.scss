@@ -1,0 +1,50 @@
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.turno {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1.25rem;
+  border-left: 5px solid var(--p-orange-500);
+
+  &.urgente {
+    border-left-color: var(--p-red-500);
+  }
+
+  &.atencion {
+    border-left-color: var(--p-green-500);
+  }
+
+  @media (max-width: 760px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.numero {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--app-primary-text);
+}
+
+.datos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.etiquetas {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

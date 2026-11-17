@@ -1,0 +1,151 @@
+<app-page-header
+  title="Pacientes"
+  subtitle="Busca un paciente o regístralo en el mostrador"
+  icon="pi-id-card"
+  backLink="/recepcion"
+  backLabel="Volver a recepción"
+>
+  <p-button label="Registrar paciente" icon="pi pi-user-plus" (onClick)="abrir()" />
+</app-page-header>
+
+<div class="panel">
+  <input
+    pInputText
+    type="search"
+    class="w-full mb-3"
+    placeholder="Buscar por DNI o nombre"
+    aria-label="Buscar paciente"
+    [ngModel]="termino()"
+    (ngModelChange)="buscar($event)"
+  />
+  <p-table
+    [value]="resultados()"
+    [loading]="buscando()"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+  >
+    <ng-template #header>
+      <tr>
+        <th>Paciente</th>
+        <th>DNI</th>
+        <th>Contacto</th>
+        <th>Historia</th>
+        <th style="width: 9rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-p>
+      <tr>
+        <td class="font-semibold">{{ p.nombreCompleto }}</td>
+        <td>{{ p.dni }}</td>
+        <td>
+          {{ p.telefono || '—' }}
+          @if (p.email) {
+            <small class="text-muted block">{{ p.email }}</small>
+          }
+        </td>
+        <td>{{ p.historialClinicoNumero || '—' }}</td>
+        <td class="text-right">
+          <p-button label="Reservar cita" size="small" [outlined]="true" (onClick)="irACita(p)" />
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="5">
+          <app-empty-state
+            icon="pi-search"
+            [title]="buscado() ? 'Sin coincidencias' : 'Busca un paciente'"
+            [message]="
+              buscado()
+                ? 'Prueba con otro DNI o nombre, o registra al paciente.'
+                : 'Escribe al menos dos caracteres del DNI o del nombre.'
+            "
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  header="Registrar paciente"
+  [visible]="formVisible()"
+  (visibleChange)="formVisible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '34rem', maxWidth: '96vw' }"
+>
+  <form class="form" [formGroup]="form" (submit)="$event.preventDefault(); guardar()" novalidate>
+    @if (error(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    <div class="dos">
+      <label
+        >Nombre <input pInputText id="pac-nombre" formControlName="nombre" class="w-full"
+      /></label>
+      <label
+        >Apellido <input pInputText id="pac-apellido" formControlName="apellido" class="w-full"
+      /></label>
+    </div>
+    <div class="dos">
+      <label
+        >DNI <input pInputText id="pac-dni" formControlName="dni" maxlength="8" class="w-full"
+      /></label>
+      <label>
+        Fecha de nacimiento
+        <p-datepicker
+          inputId="pac-nacimiento"
+          formControlName="fechaNacimiento"
+          [maxDate]="ayer"
+          dateFormat="dd/mm/yy"
+          [showIcon]="true"
+          [fluid]="true"
+          appendTo="body"
+        />
+      </label>
+    </div>
+    <div class="dos">
+      <label
+        >Teléfono <input pInputText id="pac-telefono" formControlName="telefono" class="w-full"
+      /></label>
+      <label
+        >Correo
+        <input pInputText id="pac-email" type="email" formControlName="email" class="w-full"
+      /></label>
+    </div>
+  </form>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="formVisible.set(false)"
+    />
+    <p-button label="Registrar" icon="pi pi-check" [loading]="guardando()" (onClick)="guardar()" />
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Paciente registrado"
+  [visible]="registrado() !== null"
+  (visibleChange)="$event ? null : registrado.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '30rem', maxWidth: '96vw' }"
+>
+  @if (registrado(); as r) {
+    <p>
+      <strong>{{ r.paciente.nombreCompleto }}</strong> ya tiene su cuenta. Entrega esta contraseña
+      temporal al paciente: solo se muestra ahora.
+    </p>
+    <div class="clave">
+      <small>Usuario</small>
+      <strong>{{ r.paciente.email }}</strong>
+      <small>Contraseña temporal</small>
+      <code id="pac-clave">{{ r.passwordTemporal }}</code>
+    </div>
+  }
+  <ng-template #footer>
+    <p-button label="Listo" (onClick)="registrado.set(null)" />
+  </ng-template>
+</p-dialog>

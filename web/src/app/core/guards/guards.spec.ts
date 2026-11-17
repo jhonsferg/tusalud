@@ -115,6 +115,19 @@ describe('rutas de la aplicación', () => {
     expect(await navigateAs(['ROLE_MEDICO'], '/mis-medicamentos', true)).toBe('/agenda');
   });
 
+  it('lleva a recepción, caja y enfermería a su módulo y les niega los demás', async () => {
+    expect(await navigateAs(['ROLE_RECEPCION'], '/', true)).toBe('/recepcion');
+    expect(await navigateAs(['ROLE_CAJA'], '/', true)).toBe('/caja');
+    expect(await navigateAs(['ROLE_ENFERMERIA'], '/', true)).toBe('/hospitalizacion');
+    expect(await navigateAs(['ROLE_CAJA'], '/recepcion', true)).toBe('/caja');
+    expect(await navigateAs(['ROLE_RECEPCION'], '/caja/cobrar', true)).toBe('/recepcion');
+    expect(await navigateAs(['ROLE_ENFERMERIA'], '/caja', true)).toBe('/hospitalizacion');
+    expect(await navigateAs(['ROLE_PACIENTE'], '/hospitalizacion', true)).toBe('/citas');
+    expect(await navigateAs(['ROLE_MEDICO'], '/cola', true)).toBe('/cola');
+    expect(await navigateAs(['ROLE_PACIENTE'], '/cola', true)).toBe('/citas');
+    expect(await navigateAs(['ROLE_PACIENTE'], '/mis-ingresos', true)).toBe('/mis-ingresos');
+  });
+
   it('muestra la página no encontrada para rutas desconocidas', async () => {
     expect(await navigateAs(['ROLE_PACIENTE'], '/no-existe', true)).toBe('/no-existe');
   });

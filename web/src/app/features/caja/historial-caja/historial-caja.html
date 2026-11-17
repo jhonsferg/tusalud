@@ -1,0 +1,67 @@
+<app-page-header
+  title="Historial de caja"
+  subtitle="Aperturas y cierres con su diferencia"
+  icon="pi-history"
+  backLink="/caja"
+  backLabel="Volver a caja"
+/>
+
+<div class="panel">
+  <p-table
+    [value]="store.historial.value() ?? []"
+    [loading]="store.historial.loading()"
+    [paginator]="(store.historial.value() ?? []).length > 12"
+    [rows]="12"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+  >
+    <ng-template #header>
+      <tr>
+        <th>Cajero</th>
+        <th>Apertura</th>
+        <th>Cierre</th>
+        <th class="text-right">Fondo</th>
+        <th class="text-right">Esperado</th>
+        <th class="text-right">Contado</th>
+        <th>Diferencia</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-s>
+      <tr>
+        <td class="font-semibold">{{ s.cajeroNombre }}</td>
+        <td>{{ s.apertura | date: 'd MMM y, HH:mm' }}</td>
+        <td>{{ s.cierre ? (s.cierre | date: 'd MMM y, HH:mm') : 'Abierta' }}</td>
+        <td class="text-right">{{ s.montoApertura | currency: 'PEN' : 'symbol-narrow' }}</td>
+        <td class="text-right">
+          {{
+            s.montoEsperado != null ? (s.montoEsperado | currency: 'PEN' : 'symbol-narrow') : '—'
+          }}
+        </td>
+        <td class="text-right">
+          {{ s.montoContado != null ? (s.montoContado | currency: 'PEN' : 'symbol-narrow') : '—' }}
+        </td>
+        <td>
+          @if (s.diferencia == null) {
+            <p-tag value="En curso" severity="info" />
+          } @else {
+            <p-tag
+              [value]="(s.diferencia | currency: 'PEN' : 'symbol-narrow') ?? ''"
+              [severity]="s.diferencia === 0 ? 'success' : s.diferencia < 0 ? 'danger' : 'warn'"
+            />
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="7">
+          <app-empty-state
+            icon="pi-history"
+            title="Sin cierres de caja"
+            message="Aún no hay sesiones registradas."
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

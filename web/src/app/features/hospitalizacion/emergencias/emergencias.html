@@ -1,0 +1,221 @@
+<app-page-header
+  title="Emergencias"
+  subtitle="Cola de atención ordenada por nivel de triaje"
+  icon="pi-exclamation-circle"
+  backLink="/hospitalizacion"
+  backLabel="Volver a hospitalización"
+>
+  <p-button label="Registrar triaje" icon="pi pi-plus" severity="danger" (onClick)="abrir()" />
+</app-page-header>
+
+<div class="cola">
+  @for (ingreso of store.emergencias.value() ?? []; track ingreso.id) {
+    <article
+      class="panel emergencia"
+      [style.--color-triaje]="colores[ingreso.triaje?.clasificacion ?? 'AZUL']"
+    >
+      <div class="nivel">
+        <strong>{{ ingreso.triaje?.nivel }}</strong>
+        <small>{{ ingreso.triaje?.clasificacion }}</small>
+      </div>
+      <div class="datos">
+        <strong>{{ ingreso.pacienteNombre }}</strong>
+        <small class="text-muted"
+          >DNI {{ ingreso.dni }} · espera {{ ingreso.esperaMinutos }} min</small
+        >
+        <span>{{ ingreso.triaje?.motivoConsulta }}</span>
+        <small class="vitales">
+          @if (ingreso.triaje?.presionArterial) {
+            PA {{ ingreso.triaje?.presionArterial }} ·
+          }
+          @if (ingreso.triaje?.frecuenciaCardiaca) {
+            FC {{ ingreso.triaje?.frecuenciaCardiaca }} ·
+          }
+          @if (ingreso.triaje?.saturacionO2) {
+            SpO₂ {{ ingreso.triaje?.saturacionO2 }}% ·
+          }
+          @if (ingreso.triaje?.temperatura) {
+            {{ ingreso.triaje?.temperatura }} °C
+          }
+        </small>
+      </div>
+      <div class="acciones">
+        <p-button
+          label="Ver ingreso"
+          icon="pi pi-eye"
+          [outlined]="true"
+          size="small"
+          [routerLink]="['/hospitalizacion/ingresos', ingreso.id]"
+        />
+        @if (puedeAsignar() && !ingreso.camaId) {
+          <p-button
+            label="Asignar cama"
+            icon="pi pi-building"
+            size="small"
+            (onClick)="abrirAsignacion(ingreso)"
+          />
+        }
+      </div>
+    </article>
+  } @empty {
+    <div class="panel">
+      <app-empty-state
+        icon="pi-check-circle"
+        title="Sin emergencias en espera"
+        message="La cola de emergencia está vacía."
+      />
+    </div>
+  }
+</div>
+
+<p-dialog
+  header="Registrar triaje"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '40rem', maxWidth: '96vw' }"
+>
+  <div class="form">
+    @if (error(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    <label>Paciente <app-paciente-buscador inputId="tri-paciente" [(paciente)]="paciente" /></label>
+    <div class="niveles" role="radiogroup" aria-label="Nivel de triaje">
+      @for (n of niveles; track n.nivel) {
+        <button
+          type="button"
+          role="radio"
+          [attr.aria-checked]="nivel() === n.nivel"
+          [class.activo]="nivel() === n.nivel"
+          [style.--color-triaje]="colores[n.clasificacion]"
+          (click)="nivel.set(n.nivel)"
+        >
+          <strong>{{ n.nivel }}</strong>
+          <small>{{ n.nombre }}</small>
+        </button>
+      }
+    </div>
+    <div class="vitales-form">
+      <label
+        >Presión arterial
+        <input
+          pInputText
+          id="tri-pa"
+          class="w-full"
+          placeholder="120/80"
+          [ngModel]="presion()"
+          (ngModelChange)="presion.set($event)"
+      /></label>
+      <label
+        >FC
+        <p-inputnumber
+          inputId="tri-fc"
+          [ngModel]="fc()"
+          (ngModelChange)="fc.set($event)"
+          [min]="0"
+          [fluid]="true"
+      /></label>
+      <label
+        >FR
+        <p-inputnumber
+          inputId="tri-fr"
+          [ngModel]="fr()"
+          (ngModelChange)="fr.set($event)"
+          [min]="0"
+          [fluid]="true"
+      /></label>
+      <label
+        >Temp. °C
+        <p-inputnumber
+          inputId="tri-temp"
+          [ngModel]="temperatura()"
+          (ngModelChange)="temperatura.set($event)"
+          [minFractionDigits]="0"
+          [maxFractionDigits]="1"
+          [fluid]="true"
+      /></label>
+      <label
+        >SpO₂ %
+        <p-inputnumber
+          inputId="tri-sat"
+          [ngModel]="saturacion()"
+          (ngModelChange)="saturacion.set($event)"
+          [min]="0"
+          [max]="100"
+          [fluid]="true"
+      /></label>
+      <label
+        >Glasgow
+        <p-inputnumber
+          inputId="tri-glasgow"
+          [ngModel]="glasgow()"
+          (ngModelChange)="glasgow.set($event)"
+          [min]="3"
+          [max]="15"
+          [fluid]="true"
+      /></label>
+    </div>
+    <label
+      >Motivo de consulta
+      <input
+        pInputText
+        id="tri-motivo"
+        class="w-full"
+        [ngModel]="motivo()"
+        (ngModelChange)="motivo.set($event)"
+    /></label>
+  </div>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="visible.set(false)"
+    />
+    <p-button
+      label="Registrar"
+      icon="pi pi-check"
+      [loading]="guardando()"
+      (onClick)="registrar()"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Asignar cama"
+  [visible]="asignando() !== null"
+  (visibleChange)="$event ? null : asignando.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '26rem', maxWidth: '96vw' }"
+>
+  <label class="form">
+    Cama disponible
+    <p-select
+      inputId="asig-cama"
+      [options]="camasLibres()"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="camaElegida()"
+      (ngModelChange)="camaElegida.set($event)"
+      placeholder="Selecciona una cama"
+      appendTo="body"
+      styleClass="w-full"
+    />
+  </label>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="asignando.set(null)"
+    />
+    <p-button
+      label="Asignar"
+      icon="pi pi-check"
+      [disabled]="camaElegida() === null"
+      (onClick)="asignar()"
+    />
+  </ng-template>
+</p-dialog>

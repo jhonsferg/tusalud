@@ -1,0 +1,283 @@
+<app-page-header
+  [title]="ingreso()?.codigo ?? 'Ingreso hospitalario'"
+  subtitle="Ficha, evoluciones y alta"
+  icon="pi-building"
+  backLink="/hospitalizacion/ingresos"
+  backLabel="Volver a ingresos"
+/>
+
+@if (ingreso(); as i) {
+  <div class="cabecera panel">
+    <div>
+      <h2>{{ i.pacienteNombre }}</h2>
+      <p class="text-muted">
+        DNI {{ i.dni }} · Ingresó {{ i.fechaIngreso | date: 'd MMM y, HH:mm' }}
+      </p>
+      <p><strong>Motivo:</strong> {{ i.motivo }}</p>
+      @if (i.diagnosticoIngreso) {
+        <p><strong>Diagnóstico de ingreso:</strong> {{ i.diagnosticoIngreso }}</p>
+      }
+      @if (i.estado === 'ALTA') {
+        <p class="alta">
+          <strong>Alta {{ i.fechaAlta | date: 'd MMM y, HH:mm' }}:</strong> {{ i.diagnosticoAlta }}
+        </p>
+        @if (i.indicacionesAlta) {
+          <p><strong>Indicaciones:</strong> {{ i.indicacionesAlta }}</p>
+        }
+      }
+    </div>
+    <dl class="datos">
+      <div>
+        <dt>Cama</dt>
+        <dd>{{ i.camaCodigo || 'Sin cama' }}</dd>
+      </div>
+      <div>
+        <dt>Médico</dt>
+        <dd>{{ i.medicoNombre || '—' }}</dd>
+      </div>
+      <div>
+        <dt>Estancia</dt>
+        <dd>{{ i.diasEstancia }} días</dd>
+      </div>
+      <div>
+        <dt>Cargo de cama</dt>
+        <dd>{{ i.cargoCama | currency: 'PEN' : 'symbol-narrow' }}</dd>
+      </div>
+      <div>
+        <dt>Estado</dt>
+        <dd>
+          <p-tag
+            [value]="i.estado === 'ACTIVO' ? 'Activo' : i.estado === 'ALTA' ? 'Alta' : 'Cancelado'"
+            [severity]="i.estado === 'ACTIVO' ? 'info' : 'success'"
+          />
+        </dd>
+      </div>
+    </dl>
+  </div>
+
+  @if (i.triaje; as t) {
+    <section class="panel triaje" [style.--color-triaje]="colores[t.clasificacion]">
+      <span class="nivel">{{ t.nivel }}</span>
+      <div>
+        <strong>Triaje {{ t.clasificacion }}</strong>
+        <small class="text-muted block"
+          >{{ t.motivoConsulta }} · registrado por {{ t.registradoPor }}</small
+        >
+        <small class="vitales">
+          @if (t.presionArterial) {
+            PA {{ t.presionArterial }} ·
+          }
+          @if (t.frecuenciaCardiaca) {
+            FC {{ t.frecuenciaCardiaca }} ·
+          }
+          @if (t.saturacionO2) {
+            SpO₂ {{ t.saturacionO2 }}% ·
+          }
+          @if (t.temperatura) {
+            {{ t.temperatura }} °C
+          }
+        </small>
+      </div>
+    </section>
+  }
+
+  <div class="acciones">
+    @if (puedeTrasladar()) {
+      <p-button
+        label="Trasladar de cama"
+        icon="pi pi-arrows-h"
+        [outlined]="true"
+        (onClick)="abrirTraslado()"
+      />
+    }
+    @if (puedeAlta()) {
+      <p-button
+        label="Dar de alta"
+        icon="pi pi-sign-out"
+        severity="success"
+        (onClick)="abrirAlta()"
+      />
+    }
+  </div>
+
+  <section class="panel">
+    <h3>Evoluciones</h3>
+    @if (activo() && tipoEvolucion(); as tipo) {
+      <div class="nueva">
+        @if (errorEvolucion(); as mensaje) {
+          <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+        }
+        <textarea
+          pTextarea
+          id="evo-nota"
+          rows="3"
+          class="w-full"
+          [placeholder]="tipo === 'MEDICA' ? 'Nota de evolución médica' : 'Nota de enfermería'"
+          [ngModel]="nota()"
+          (ngModelChange)="nota.set($event)"
+        ></textarea>
+        <div class="vitales-form">
+          <input
+            pInputText
+            class="w-full"
+            placeholder="PA 120/80"
+            [ngModel]="pa()"
+            (ngModelChange)="pa.set($event)"
+          />
+          <p-inputnumber
+            placeholder="FC"
+            [ngModel]="fc()"
+            (ngModelChange)="fc.set($event)"
+            [min]="0"
+            [fluid]="true"
+          />
+          <p-inputnumber
+            placeholder="Temp. °C"
+            [ngModel]="temp()"
+            (ngModelChange)="temp.set($event)"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="1"
+            [fluid]="true"
+          />
+          <p-inputnumber
+            placeholder="SpO₂ %"
+            [ngModel]="sat()"
+            (ngModelChange)="sat.set($event)"
+            [min]="0"
+            [max]="100"
+            [fluid]="true"
+          />
+          <p-button
+            label="Registrar"
+            icon="pi pi-plus"
+            [loading]="enviando()"
+            (onClick)="registrarEvolucion()"
+          />
+        </div>
+      </div>
+    }
+
+    <ul class="linea">
+      @for (e of store.evoluciones.value() ?? []; track e.id) {
+        <li [class.medica]="e.tipo === 'MEDICA'">
+          <header>
+            <p-tag
+              [value]="e.tipo === 'MEDICA' ? 'Médica' : 'Enfermería'"
+              [severity]="e.tipo === 'MEDICA' ? 'info' : 'success'"
+            />
+            <strong>{{ e.autorNombre }}</strong>
+            <small class="text-muted">{{ e.fecha | date: 'd MMM y, HH:mm' }}</small>
+          </header>
+          <p>{{ e.nota }}</p>
+          <small class="vitales">
+            @if (e.presionArterial) {
+              PA {{ e.presionArterial }} ·
+            }
+            @if (e.frecuenciaCardiaca) {
+              FC {{ e.frecuenciaCardiaca }} ·
+            }
+            @if (e.saturacionO2) {
+              SpO₂ {{ e.saturacionO2 }}% ·
+            }
+            @if (e.temperatura) {
+              {{ e.temperatura }} °C
+            }
+          </small>
+        </li>
+      } @empty {
+        <li class="vacio text-muted">Aún no hay evoluciones registradas.</li>
+      }
+    </ul>
+  </section>
+} @else if (store.ingreso.error(); as problema) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar el ingreso"
+      [message]="problema.message"
+    />
+  </div>
+}
+
+<p-dialog
+  header="Dar de alta"
+  [visible]="altaVisible()"
+  (visibleChange)="altaVisible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '32rem', maxWidth: '96vw' }"
+>
+  <div class="form">
+    @if (errorAlta(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    <label
+      >Diagnóstico de alta
+      <input
+        pInputText
+        id="alta-dx"
+        class="w-full"
+        [ngModel]="diagnosticoAlta()"
+        (ngModelChange)="diagnosticoAlta.set($event)"
+    /></label>
+    <label>
+      Indicaciones
+      <textarea
+        pTextarea
+        id="alta-indicaciones"
+        rows="3"
+        class="w-full"
+        [ngModel]="indicaciones()"
+        (ngModelChange)="indicaciones.set($event)"
+      ></textarea>
+    </label>
+  </div>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="altaVisible.set(false)"
+    />
+    <p-button label="Confirmar alta" icon="pi pi-check" severity="success" (onClick)="darAlta()" />
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Trasladar de cama"
+  [visible]="trasladoVisible()"
+  (visibleChange)="trasladoVisible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '26rem', maxWidth: '96vw' }"
+>
+  <label class="form">
+    Cama destino
+    <p-select
+      inputId="tras-cama"
+      [options]="camasLibres()"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="camaDestino()"
+      (ngModelChange)="camaDestino.set($event)"
+      placeholder="Selecciona una cama libre"
+      appendTo="body"
+      styleClass="w-full"
+    />
+  </label>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="trasladoVisible.set(false)"
+    />
+    <p-button
+      label="Trasladar"
+      icon="pi pi-check"
+      [disabled]="camaDestino() === null"
+      (onClick)="trasladar()"
+    />
+  </ng-template>
+</p-dialog>

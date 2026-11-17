@@ -1,0 +1,90 @@
+<app-page-header
+  title="Cola de pacientes"
+  subtitle="Pacientes que ya llegaron y esperan tu atención"
+  icon="pi-users"
+/>
+
+<div class="lista">
+  @for (turno of activos(); track turno.id) {
+    <article
+      class="panel turno"
+      [class.urgente]="turno.prioridad === 'URGENTE'"
+      [class.atencion]="turno.estado === 'EN_ATENCION'"
+    >
+      <div class="numero">{{ turno.numero }}</div>
+      <div class="datos">
+        <strong>{{ turno.pacienteNombre }}</strong>
+        <small class="text-muted">DNI {{ turno.dni }} · espera {{ turno.esperaMinutos }} min</small>
+        @if (turno.motivo) {
+          <span>{{ turno.motivo }}</span>
+        }
+        <div class="etiquetas">
+          <p-tag
+            [value]="etiquetaEstado[turno.estado]"
+            [severity]="
+              turno.estado === 'EN_ATENCION'
+                ? 'success'
+                : turno.estado === 'LLAMADO'
+                  ? 'info'
+                  : 'warn'
+            "
+          />
+          @if (turno.prioridad !== 'NORMAL') {
+            <p-tag
+              [value]="etiquetaPrioridad[turno.prioridad]"
+              [severity]="turno.prioridad === 'URGENTE' ? 'danger' : 'info'"
+            />
+          }
+        </div>
+      </div>
+      <div class="acciones">
+        @if (turno.estado === 'EN_ESPERA') {
+          <p-button
+            label="Llamar"
+            icon="pi pi-megaphone"
+            (onClick)="cambiar(turno, 'llamar', 'Llamaste al turno ' + turno.numero + '.')"
+          />
+        }
+        @if (turno.estado === 'LLAMADO') {
+          <p-button
+            label="Iniciar atención"
+            icon="pi pi-play"
+            severity="success"
+            (onClick)="cambiar(turno, 'iniciar', 'Atención iniciada.')"
+          />
+          <p-button
+            label="Ausente"
+            icon="pi pi-user-minus"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="cambiar(turno, 'ausente', 'El turno quedó como ausente.')"
+          />
+        }
+        @if (turno.estado === 'EN_ATENCION') {
+          @if (turno.citaId) {
+            <p-button
+              label="Ver cita"
+              icon="pi pi-calendar"
+              [outlined]="true"
+              [routerLink]="['/citas', turno.citaId]"
+            />
+          }
+          <p-button
+            label="Finalizar"
+            icon="pi pi-check"
+            severity="success"
+            (onClick)="cambiar(turno, 'finalizar', 'Atención finalizada.')"
+          />
+        }
+      </div>
+    </article>
+  } @empty {
+    <div class="panel">
+      <app-empty-state
+        icon="pi-users"
+        title="Sin pacientes en espera"
+        message="Cuando recepción registre una llegada aparecerá aquí."
+      />
+    </div>
+  }
+</div>

@@ -1,0 +1,53 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .dos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .monto {
+    margin: 0;
+    font-size: 1.1rem;
+
+    strong {
+      color: var(--app-primary-text);
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.comprobante {
+  h4 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+
+  table {
+    width: 100%;
+    margin: 0.8rem 0;
+    border-collapse: collapse;
+  }
+
+  td {
+    padding: 0.35rem 0;
+    border-bottom: 1px dashed var(--p-content-border-color);
+  }
+
+  .total-fila td {
+    border-bottom: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+}

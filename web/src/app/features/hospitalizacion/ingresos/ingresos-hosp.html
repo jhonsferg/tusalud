@@ -1,0 +1,104 @@
+<app-page-header
+  title="Ingresos hospitalarios"
+  subtitle="Pacientes hospitalizados y su historial"
+  icon="pi-list"
+  backLink="/hospitalizacion"
+  backLabel="Volver a hospitalización"
+/>
+
+<div class="panel">
+  <div class="filtros flex flex-wrap gap-3 mb-3">
+    <p-iconfield class="w-full md:w-20rem">
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        type="search"
+        class="w-full"
+        placeholder="Buscar por paciente, DNI o código"
+        aria-label="Buscar ingreso"
+        [ngModel]="busqueda()"
+        (ngModelChange)="buscar($event)"
+      />
+    </p-iconfield>
+    <p-select
+      [options]="estados"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="estado()"
+      (ngModelChange)="estado.set($event); cargar()"
+      placeholder="Todos"
+      [showClear]="true"
+      ariaLabel="Filtrar por estado"
+      appendTo="body"
+      styleClass="w-full md:w-12rem"
+    />
+  </div>
+
+  <p-table
+    [value]="store.ingresos.value() ?? []"
+    [loading]="store.ingresos.loading()"
+    [paginator]="(store.ingresos.value() ?? []).length > 12"
+    [rows]="12"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+  >
+    <ng-template #header>
+      <tr>
+        <th>Ingreso</th>
+        <th>Paciente</th>
+        <th>Cama</th>
+        <th>Médico</th>
+        <th class="text-right">Días</th>
+        <th class="text-right">Cargo de cama</th>
+        <th>Estado</th>
+        <th style="width: 7rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-i>
+      <tr>
+        <td>
+          <div class="font-semibold">{{ i.codigo }}</div>
+          <small class="text-muted">{{ i.fechaIngreso | date: 'd MMM y, HH:mm' }}</small>
+          @if (i.tipo === 'EMERGENCIA') {
+            <p-tag value="Emergencia" severity="danger" styleClass="ml-2" />
+          }
+        </td>
+        <td>
+          {{ i.pacienteNombre }}
+          <small class="text-muted block">DNI {{ i.dni }}</small>
+        </td>
+        <td>{{ i.camaCodigo || '—' }}</td>
+        <td>{{ i.medicoNombre || '—' }}</td>
+        <td class="text-right">{{ i.diasEstancia }}</td>
+        <td class="text-right">{{ i.cargoCama | currency: 'PEN' : 'symbol-narrow' }}</td>
+        <td>
+          <p-tag
+            [value]="i.estado === 'ACTIVO' ? 'Activo' : i.estado === 'ALTA' ? 'Alta' : 'Cancelado'"
+            [severity]="
+              i.estado === 'ACTIVO' ? 'info' : i.estado === 'ALTA' ? 'success' : 'secondary'
+            "
+          />
+        </td>
+        <td class="text-right">
+          <p-button
+            label="Abrir"
+            size="small"
+            [outlined]="true"
+            [routerLink]="['/hospitalizacion/ingresos', i.id]"
+          />
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="8">
+          <app-empty-state
+            icon="pi-building"
+            title="Sin ingresos"
+            message="No hay ingresos con esos filtros."
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

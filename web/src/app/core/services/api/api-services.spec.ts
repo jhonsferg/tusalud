@@ -15,7 +15,10 @@ import { AlmacenApiService } from './almacen-api.service';
 import { CalendarioApiService } from './calendario-api.service';
 import { FarmaciaApiService } from './farmacia-api.service';
 import { LaboratorioApiService } from './laboratorio-api.service';
+import { CajaApiService } from './caja-api.service';
+import { HospitalizacionApiService } from './hospitalizacion-api.service';
 import { PagosApiService } from './pagos-api.service';
+import { RecepcionApiService } from './recepcion-api.service';
 
 interface Expected {
   method: string;
@@ -537,5 +540,118 @@ describe('servicios de la API', () => {
     });
     api.misOrdenes().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/laboratorio/mis-ordenes' });
+  });
+
+  it('RecepcionApiService cubre llegadas, turnos y pacientes de mostrador', () => {
+    const api = TestBed.inject(RecepcionApiService);
+    api.citasHoy('1234').subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/recepcion/citas-hoy', params: { q: '1234' } });
+    api.registrarLlegada(9).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/recepcion/citas/9/llegada' });
+    api.crearTurno({ pacienteId: 2, prioridad: 'URGENTE' }).subscribe();
+    expectRequest({
+      method: 'POST',
+      url: '/api/v1/recepcion/turnos',
+      body: { pacienteId: 2, prioridad: 'URGENTE' },
+    });
+    api.cola('EN_ESPERA', 3).subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/recepcion/cola',
+      params: { estado: 'EN_ESPERA', medicoId: '3' },
+    });
+    api.cambiarTurno(5, 'llamar').subscribe();
+    expectRequest({ method: 'PUT', url: '/api/v1/recepcion/turnos/5/llamar' });
+    api.buscarPacientes('juan').subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/recepcion/pacientes', params: { q: 'juan' } });
+    api.pantalla().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/recepcion/pantalla' });
+  });
+
+  it('CajaApiService cubre apertura, cobros, anulación y reportes', () => {
+    const api = TestBed.inject(CajaApiService);
+    api.abrir(100).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/caja/aperturas', body: { montoApertura: 100 } });
+    api.cerrar({ montoContado: 180 }).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/caja/cierre', body: { montoContado: 180 } });
+    api.pendientes('perez').subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/caja/pendientes', params: { q: 'perez' } });
+    const cobro = {
+      origen: 'CITA' as const,
+      referenciaId: 4,
+      tipoComprobante: 'BOLETA' as const,
+      clienteTipoDoc: 'DNI' as const,
+      clienteNombre: 'Juan',
+      metodoPago: 'YAPE' as const,
+    };
+    api.cobrar(cobro).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/caja/cobros', body: cobro });
+    api.anular(7, 'Error de digitación').subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: '/api/v1/caja/comprobantes/7/anular',
+      body: { motivo: 'Error de digitación' },
+    });
+    api.reporteIngresos('2026-11-01', '2026-11-30').subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/caja/reportes/ingresos',
+      params: { desde: '2026-11-01', hasta: '2026-11-30' },
+    });
+  });
+
+  it('HospitalizacionApiService cubre camas, ingresos, emergencias y altas', () => {
+    const api = TestBed.inject(HospitalizacionApiService);
+    api.mapa().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/hospitalizacion/mapa' });
+    api.camas('UCI', 'LIBRE').subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/hospitalizacion/camas',
+      params: { area: 'UCI', estado: 'LIBRE' },
+    });
+    api.estadoCama(3, 'LIMPIEZA').subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: '/api/v1/hospitalizacion/camas/3/estado',
+      body: { estado: 'LIMPIEZA' },
+    });
+    api.crearIngreso({ pacienteId: 1, camaId: 2, motivo: 'Neumonía' }).subscribe();
+    expectRequest({
+      method: 'POST',
+      url: '/api/v1/hospitalizacion/ingresos',
+      body: { pacienteId: 1, camaId: 2, motivo: 'Neumonía' },
+    });
+    api.trasladar(8, 5).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: '/api/v1/hospitalizacion/ingresos/8/trasladar',
+      body: { camaId: 5 },
+    });
+    api.alta(8, { diagnosticoAlta: 'Recuperado', indicacionesAlta: 'Reposo' }).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: '/api/v1/hospitalizacion/ingresos/8/alta',
+      body: { diagnosticoAlta: 'Recuperado', indicacionesAlta: 'Reposo' },
+    });
+    api
+      .registrarEmergencia({
+        pacienteId: 2,
+        triaje: { nivel: 2, motivoConsulta: 'Dolor torácico' },
+      })
+      .subscribe();
+    expectRequest({
+      method: 'POST',
+      url: '/api/v1/hospitalizacion/emergencias',
+      body: { pacienteId: 2, triaje: { nivel: 2, motivoConsulta: 'Dolor torácico' } },
+    });
+    api.registrarEvolucion(8, { tipo: 'MEDICA', nota: 'Evoluciona favorablemente' }).subscribe();
+    expectRequest({
+      method: 'POST',
+      url: '/api/v1/hospitalizacion/ingresos/8/evoluciones',
+      body: { tipo: 'MEDICA', nota: 'Evoluciona favorablemente' },
+    });
+    api.misIngresos().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/hospitalizacion/mis-ingresos' });
   });
 });

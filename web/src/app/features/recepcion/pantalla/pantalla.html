@@ -1,0 +1,19 @@
+<app-page-header
+  title="Sala de espera"
+  subtitle="Pantalla de turnos llamados, se actualiza sola"
+  icon="pi-desktop"
+  backLink="/recepcion"
+  backLabel="Volver a recepción"
+/>
+
+<div class="tablero">
+  @for (turno of store.pantalla.value() ?? []; track turno.numero) {
+    <article class="turno" [class.atencion]="turno.estado === 'EN_ATENCION'">
+      <small>{{ turno.estado === 'EN_ATENCION' ? 'En atención' : 'Pase a' }}</small>
+      <strong class="numero">{{ turno.numero }}</strong>
+      <span class="consultorio">{{ turno.consultorio || 'Consultorio por asignar' }}</span>
+    </article>
+  } @empty {
+    <p class="vacio text-muted">Aún no hay turnos llamados.</p>
+  }
+</div>

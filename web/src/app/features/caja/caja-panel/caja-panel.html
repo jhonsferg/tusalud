@@ -1,0 +1,162 @@
+<app-page-header title="Caja" subtitle="Apertura, cobros y cierre del turno" icon="pi-wallet">
+  @if (abierta()) {
+    <p-button label="Cobrar" icon="pi pi-dollar" routerLink="/caja/cobrar" />
+    <p-button
+      label="Cerrar caja"
+      icon="pi pi-lock"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="abrirCierre()"
+    />
+  }
+</app-page-header>
+
+@if (cargando()) {
+  <div class="panel"><p>Consultando la caja…</p></div>
+} @else if (abierta()) {
+  @if (store.sesion.value(); as sesion) {
+    <div class="kpis">
+      <app-kpi
+        etiqueta="Apertura"
+        [valor]="(sesion.apertura | date: 'd MMM, HH:mm') ?? ''"
+        icono="pi-clock"
+      />
+      <app-kpi
+        etiqueta="Fondo inicial"
+        [valor]="(sesion.montoApertura | currency: 'PEN' : 'symbol-narrow') ?? ''"
+        icono="pi-wallet"
+      />
+      @if (store.resumen.value(); as resumen) {
+        <app-kpi
+          etiqueta="Cobrado en el turno"
+          [valor]="(resumen.total | currency: 'PEN' : 'symbol-narrow') ?? ''"
+          icono="pi-dollar"
+          tono="exito"
+        />
+        <app-kpi etiqueta="Comprobantes" [valor]="resumen.comprobantes" icono="pi-receipt" />
+      }
+    </div>
+  }
+  <section class="panel">
+    <h3>Cobrado por método de pago</h3>
+    @if (store.resumen.value()?.porMetodo; as metodos) {
+      @if (metodos.length === 0) {
+        <p class="text-muted">Aún no hay cobros en este turno.</p>
+      } @else {
+        <ul class="metodos">
+          @for (item of metodos; track item.metodo) {
+            <li>
+              <span>{{ etiquetaMetodo[item.metodo] }}</span>
+              <strong>{{ item.total | currency: 'PEN' : 'symbol-narrow' }}</strong>
+            </li>
+          }
+        </ul>
+      }
+    }
+  </section>
+} @else {
+  <section class="panel apertura">
+    <i class="pi pi-lock"></i>
+    <h2>La caja está cerrada</h2>
+    <p class="text-muted">Registra el fondo inicial para empezar a cobrar.</p>
+    @if (errorApertura(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    <label>
+      Fondo inicial
+      <p-inputnumber
+        inputId="caja-apertura"
+        mode="currency"
+        currency="PEN"
+        locale="es-PE"
+        [min]="0"
+        [ngModel]="montoApertura()"
+        (ngModelChange)="montoApertura.set($event ?? 0)"
+      />
+    </label>
+    <p-button
+      label="Abrir caja"
+      icon="pi pi-lock-open"
+      [loading]="abriendo()"
+      (onClick)="abrir()"
+    />
+  </section>
+}
+
+<p-dialog
+  header="Cerrar caja"
+  [visible]="cierreVisible()"
+  (visibleChange)="cierreVisible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '30rem', maxWidth: '96vw' }"
+>
+  <div class="cierre">
+    @if (errorCierre(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    <p class="text-muted">
+      Cuenta el efectivo que hay en la caja e ingrésalo. El sistema calcula la diferencia.
+    </p>
+    <label>
+      Efectivo contado
+      <p-inputnumber
+        inputId="caja-contado"
+        mode="currency"
+        currency="PEN"
+        locale="es-PE"
+        [min]="0"
+        [ngModel]="montoContado()"
+        (ngModelChange)="montoContado.set($event ?? 0)"
+      />
+    </label>
+    <label>
+      Observaciones
+      <textarea
+        pTextarea
+        rows="2"
+        class="w-full"
+        [ngModel]="observaciones()"
+        (ngModelChange)="observaciones.set($event)"
+      ></textarea>
+    </label>
+  </div>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="cierreVisible.set(false)"
+    />
+    <p-button label="Cerrar caja" icon="pi pi-lock" [loading]="cerrando()" (onClick)="cerrar()" />
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Caja cerrada"
+  [visible]="cerrada() !== null"
+  (visibleChange)="$event ? null : cerrada.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '28rem', maxWidth: '96vw' }"
+>
+  @if (cerrada(); as c) {
+    <dl class="resultado">
+      <div>
+        <dt>Esperado</dt>
+        <dd>{{ c.montoEsperado | currency: 'PEN' : 'symbol-narrow' }}</dd>
+      </div>
+      <div>
+        <dt>Contado</dt>
+        <dd>{{ c.montoContado | currency: 'PEN' : 'symbol-narrow' }}</dd>
+      </div>
+      <div [class.faltante]="(c.diferencia ?? 0) < 0" [class.sobrante]="(c.diferencia ?? 0) > 0">
+        <dt>Diferencia</dt>
+        <dd>{{ c.diferencia | currency: 'PEN' : 'symbol-narrow' }}</dd>
+      </div>
+    </dl>
+  }
+  <ng-template #footer>
+    <p-button label="Listo" (onClick)="cerrada.set(null)" />
+  </ng-template>
+</p-dialog>

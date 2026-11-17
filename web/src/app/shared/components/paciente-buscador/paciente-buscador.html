@@ -1,0 +1,51 @@
+@if (paciente(); as elegido) {
+  <div class="elegido">
+    <span class="avatar"><i class="pi pi-user"></i></span>
+    <span class="datos">
+      <strong>{{ elegido.nombreCompleto }}</strong>
+      <small
+        >DNI {{ elegido.dni }}
+        @if (elegido.historialClinicoNumero) {
+          · {{ elegido.historialClinicoNumero }}
+        }
+      </small>
+    </span>
+    <button type="button" class="cambiar" aria-label="Cambiar paciente" (click)="limpiar()">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+} @else {
+  <div class="buscador">
+    <input
+      pInputText
+      type="search"
+      class="w-full"
+      autocomplete="off"
+      [id]="inputId()"
+      [placeholder]="etiqueta()"
+      [attr.aria-label]="etiqueta()"
+      [ngModel]="termino()"
+      (ngModelChange)="escribir($event)"
+      (focus)="abierto.set(true)"
+    />
+    @if (buscando()) {
+      <i class="pi pi-spin pi-spinner cargando"></i>
+    }
+    @if (abierto() && termino().trim().length >= 2) {
+      <ul class="lista" role="listbox">
+        @for (item of resultados(); track item.pacienteId) {
+          <li role="option">
+            <button type="button" (click)="elegir(item)">
+              <strong>{{ item.nombreCompleto }}</strong>
+              <small>DNI {{ item.dni }}</small>
+            </button>
+          </li>
+        } @empty {
+          @if (!buscando()) {
+            <li class="vacio">Sin coincidencias</li>
+          }
+        }
+      </ul>
+    }
+  </div>
+}

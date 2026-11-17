@@ -1,0 +1,217 @@
+<app-page-header
+  title="Cobrar"
+  subtitle="Cuentas por cobrar y cobros de mostrador"
+  icon="pi-dollar"
+  backLink="/caja"
+  backLabel="Volver a caja"
+>
+  <p-button label="Cobro libre" icon="pi pi-plus" [outlined]="true" (onClick)="abrir(null)" />
+</app-page-header>
+
+<div class="panel">
+  <input
+    pInputText
+    type="search"
+    class="w-full mb-3"
+    placeholder="Buscar por DNI o paciente"
+    aria-label="Buscar cuenta por cobrar"
+    [ngModel]="busqueda()"
+    (ngModelChange)="buscar($event)"
+  />
+  <p-table
+    [value]="store.pendientes.value() ?? []"
+    [loading]="store.pendientes.loading()"
+    [paginator]="(store.pendientes.value() ?? []).length > 10"
+    [rows]="10"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+  >
+    <ng-template #header>
+      <tr>
+        <th>Paciente</th>
+        <th>Concepto</th>
+        <th>Origen</th>
+        <th>Fecha</th>
+        <th class="text-right">Monto</th>
+        <th style="width: 8rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-p>
+      <tr>
+        <td>
+          {{ p.paciente }}
+          <small class="text-muted block">DNI {{ p.dni }}</small>
+        </td>
+        <td>{{ p.descripcion }}</td>
+        <td>{{ etiquetaOrigen[p.origen] }}</td>
+        <td>{{ p.fecha | date: 'd MMM y' }}</td>
+        <td class="text-right font-semibold">{{ p.monto | currency: 'PEN' : 'symbol-narrow' }}</td>
+        <td class="text-right">
+          <p-button
+            label="Cobrar"
+            icon="pi pi-dollar"
+            size="small"
+            [ariaLabel]="'Cobrar ' + p.descripcion + ' de ' + p.paciente"
+            (onClick)="abrir(p)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="6">
+          <app-empty-state
+            icon="pi-check-circle"
+            title="Sin cuentas por cobrar"
+            message="No hay cobros pendientes con ese criterio."
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [header]="libre() ? 'Cobro libre' : 'Cobrar ' + (pendiente()?.descripcion ?? '')"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '34rem', maxWidth: '96vw' }"
+>
+  <form class="form" [formGroup]="form" (submit)="$event.preventDefault(); cobrar()" novalidate>
+    @if (error(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    @if (libre()) {
+      <label
+        >Concepto
+        <input pInputText id="cob-descripcion" formControlName="descripcion" class="w-full"
+      /></label>
+      <div class="dos">
+        <label
+          >Cantidad
+          <p-inputnumber inputId="cob-cantidad" formControlName="cantidad" [min]="1" [fluid]="true"
+        /></label>
+        <label>
+          Precio unitario
+          <p-inputnumber
+            inputId="cob-precio"
+            formControlName="precioUnitario"
+            mode="currency"
+            currency="PEN"
+            locale="es-PE"
+            [min]="0"
+            [fluid]="true"
+          />
+        </label>
+      </div>
+    } @else {
+      <p class="monto">
+        Total a cobrar <strong>{{ total() | currency: 'PEN' : 'symbol-narrow' }}</strong>
+      </p>
+    }
+
+    <p-selectbutton
+      [options]="tiposComprobante"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="form.controls.tipoComprobante.value"
+      [ngModelOptions]="{ standalone: true }"
+      (ngModelChange)="cambiarTipo($event)"
+      [allowEmpty]="false"
+      ariaLabel="Tipo de comprobante"
+    />
+    <div class="dos">
+      <label>
+        Documento
+        <p-select
+          formControlName="clienteTipoDoc"
+          [options]="tiposDocumento"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </label>
+      <label
+        >Número <input pInputText id="cob-doc" formControlName="clienteDoc" class="w-full"
+      /></label>
+    </div>
+    <label
+      >Cliente <input pInputText id="cob-cliente" formControlName="clienteNombre" class="w-full"
+    /></label>
+    <label>
+      Método de pago
+      <p-select
+        inputId="cob-metodo"
+        formControlName="metodoPago"
+        [options]="metodos"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+      />
+    </label>
+  </form>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="visible.set(false)"
+    />
+    <p-button
+      label="Emitir comprobante"
+      icon="pi pi-check"
+      [loading]="cobrando()"
+      (onClick)="cobrar()"
+    />
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Comprobante emitido"
+  [visible]="emitido() !== null"
+  (visibleChange)="$event ? null : emitido.set(null)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '30rem', maxWidth: '96vw' }"
+>
+  @if (emitido(); as c) {
+    <div class="comprobante">
+      <h4>{{ c.tipo === 'BOLETA' ? 'Boleta' : 'Factura' }} {{ c.codigo }}</h4>
+      <p class="text-muted">{{ c.fecha | date: 'd MMM y, HH:mm' }} · {{ c.clienteNombre }}</p>
+      <table>
+        @for (item of c.items; track $index) {
+          <tr>
+            <td>{{ item.cantidad }} × {{ item.descripcion }}</td>
+            <td class="text-right">{{ item.subtotal | currency: 'PEN' : 'symbol-narrow' }}</td>
+          </tr>
+        }
+        <tr>
+          <td>Subtotal</td>
+          <td class="text-right">{{ c.subtotal | currency: 'PEN' : 'symbol-narrow' }}</td>
+        </tr>
+        <tr>
+          <td>IGV 18%</td>
+          <td class="text-right">{{ c.igv | currency: 'PEN' : 'symbol-narrow' }}</td>
+        </tr>
+        <tr class="total-fila">
+          <td>Total</td>
+          <td class="text-right">{{ c.total | currency: 'PEN' : 'symbol-narrow' }}</td>
+        </tr>
+      </table>
+    </div>
+  }
+  <ng-template #footer>
+    <p-button
+      label="Imprimir"
+      icon="pi pi-print"
+      [outlined]="true"
+      severity="secondary"
+      (onClick)="imprimir()"
+    />
+    <p-button label="Listo" (onClick)="emitido.set(null)" />
+  </ng-template>
+</p-dialog>

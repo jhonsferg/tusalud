@@ -1,0 +1,73 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
+
+import { API_URL } from '@tusalud/app/core/config/api.config';
+import {
+  CitaHoyResponse,
+  CitaMostradorRequest,
+  CitaResponse,
+  PacienteMostradorRequest,
+  PacienteMostradorResponse,
+  PacienteRegistradoResponse,
+  PantallaTurno,
+  ResumenRecepcionResponse,
+  TurnoRequest,
+  TurnoResponse,
+} from '@tusalud/app/core/models';
+import { toHttpParams } from '@tusalud/app/core/utils/http-params';
+
+@Injectable({ providedIn: 'root' })
+export class RecepcionApiService {
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = `${inject(API_URL)}/recepcion`;
+
+  resumen(): Observable<ResumenRecepcionResponse> {
+    return this.http.get<ResumenRecepcionResponse>(`${this.baseUrl}/resumen`);
+  }
+
+  citasHoy(q?: string | null): Observable<CitaHoyResponse[]> {
+    return this.http.get<CitaHoyResponse[]>(`${this.baseUrl}/citas-hoy`, {
+      params: toHttpParams({ q }),
+    });
+  }
+
+  registrarLlegada(citaId: number): Observable<TurnoResponse> {
+    return this.http.post<TurnoResponse>(`${this.baseUrl}/citas/${citaId}/llegada`, null);
+  }
+
+  crearTurno(request: TurnoRequest): Observable<TurnoResponse> {
+    return this.http.post<TurnoResponse>(`${this.baseUrl}/turnos`, request);
+  }
+
+  cola(estado?: string | null, medicoId?: number | null): Observable<TurnoResponse[]> {
+    return this.http.get<TurnoResponse[]>(`${this.baseUrl}/cola`, {
+      params: toHttpParams({ estado, medicoId }),
+    });
+  }
+
+  cambiarTurno(
+    id: number,
+    accion: 'llamar' | 'iniciar' | 'finalizar' | 'ausente' | 'cancelar',
+  ): Observable<TurnoResponse> {
+    return this.http.put<TurnoResponse>(`${this.baseUrl}/turnos/${id}/${accion}`, null);
+  }
+
+  pantalla(): Observable<PantallaTurno[]> {
+    return this.http.get<PantallaTurno[]>(`${this.baseUrl}/pantalla`);
+  }
+
+  buscarPacientes(q: string): Observable<PacienteMostradorResponse[]> {
+    return this.http.get<PacienteMostradorResponse[]>(`${this.baseUrl}/pacientes`, {
+      params: toHttpParams({ q }),
+    });
+  }
+
+  registrarPaciente(request: PacienteMostradorRequest): Observable<PacienteRegistradoResponse> {
+    return this.http.post<PacienteRegistradoResponse>(`${this.baseUrl}/pacientes`, request);
+  }
+
+  reservarCita(request: CitaMostradorRequest): Observable<CitaResponse> {
+    return this.http.post<CitaResponse>(`${this.baseUrl}/citas`, request);
+  }
+}

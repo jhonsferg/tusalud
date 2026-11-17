@@ -1,0 +1,143 @@
+<app-page-header
+  title="Camas"
+  subtitle="Inventario de camas y su estado"
+  icon="pi-th-large"
+  backLink="/hospitalizacion"
+  backLabel="Volver a hospitalización"
+>
+  @if (gestiona()) {
+    <p-button label="Nueva cama" icon="pi pi-plus" (onClick)="abrir(null)" />
+  }
+</app-page-header>
+
+<div class="panel">
+  <p-table
+    [value]="store.camas.value() ?? []"
+    [loading]="store.camas.loading()"
+    [paginator]="(store.camas.value() ?? []).length > 12"
+    [rows]="12"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+  >
+    <ng-template #header>
+      <tr>
+        <th>Cama</th>
+        <th>Área</th>
+        <th>Ocupante</th>
+        <th class="text-right">Precio por día</th>
+        <th>Estado</th>
+        <th style="width: 6rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-c>
+      <tr>
+        <td>
+          <div class="font-semibold">{{ c.codigo }}</div>
+          <small class="text-muted">{{ c.piso || '' }} {{ c.descripcion || '' }}</small>
+          @if (!c.activa) {
+            <p-tag value="Inactiva" severity="secondary" styleClass="ml-2" />
+          }
+        </td>
+        <td>{{ etiquetaArea[c.area] }}</td>
+        <td>{{ c.pacienteNombre || '—' }}</td>
+        <td class="text-right">{{ c.precioDia | currency: 'PEN' : 'symbol-narrow' }}</td>
+        <td>
+          @if (c.estado === 'OCUPADA') {
+            <p-tag value="Ocupada" severity="danger" />
+          } @else {
+            <p-select
+              [options]="estados"
+              optionLabel="label"
+              optionValue="value"
+              [ngModel]="c.estado"
+              (ngModelChange)="cambiarEstado(c, $event)"
+              [ariaLabel]="'Estado de la cama ' + c.codigo"
+              appendTo="body"
+              styleClass="w-10rem"
+            />
+          }
+        </td>
+        <td class="text-right">
+          @if (gestiona()) {
+            <p-button
+              icon="pi pi-pencil"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              [ariaLabel]="'Editar ' + c.codigo"
+              (onClick)="abrir(c)"
+            />
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="6">
+          <app-empty-state
+            icon="pi-th-large"
+            title="Sin camas"
+            message="Registra las camas del hospital."
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [header]="editando() ? 'Editar cama' : 'Nueva cama'"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '30rem', maxWidth: '96vw' }"
+>
+  <form class="form" [formGroup]="form" (submit)="$event.preventDefault(); guardar()" novalidate>
+    @if (error(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    <div class="dos">
+      <label
+        >Código <input pInputText id="cama-codigo" formControlName="codigo" class="w-full"
+      /></label>
+      <label>
+        Área
+        <p-select
+          formControlName="area"
+          [options]="areas"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </label>
+    </div>
+    <div class="dos">
+      <label>Piso <input pInputText formControlName="piso" class="w-full" /></label>
+      <label>
+        Precio por día
+        <p-inputnumber
+          inputId="cama-precio"
+          formControlName="precioDia"
+          mode="currency"
+          currency="PEN"
+          locale="es-PE"
+          [min]="0"
+          [fluid]="true"
+        />
+      </label>
+    </div>
+    <label>Descripción <input pInputText formControlName="descripcion" class="w-full" /></label>
+    <label class="check"><p-toggleswitch formControlName="activa" /> Cama activa</label>
+  </form>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="visible.set(false)"
+    />
+    <p-button label="Guardar" icon="pi pi-check" [loading]="guardando()" (onClick)="guardar()" />
+  </ng-template>
+</p-dialog>

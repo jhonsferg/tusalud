@@ -1,0 +1,22 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  gap: 1.1rem;
+}
+
+.ingreso {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  header,
+  footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  p {
+    margin: 0;
+  }
+}

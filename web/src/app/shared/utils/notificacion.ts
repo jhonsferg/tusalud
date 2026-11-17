@@ -17,6 +17,13 @@ export const ICONO_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   ROLES_ACTUALIZADOS: 'pi-id-card',
   SESION_SOSPECHOSA: 'pi-exclamation-triangle',
   RECORDATORIO_EVENTO: 'pi-bell',
+  PACIENTE_EN_ESPERA: 'pi-user-plus',
+  TURNO_LLAMADO: 'pi-megaphone',
+  COMPROBANTE_EMITIDO: 'pi-receipt',
+  INGRESO_HOSPITALARIO: 'pi-building',
+  ALTA_HOSPITALARIA: 'pi-sign-out',
+  EMERGENCIA_TRIAJE: 'pi-exclamation-circle',
+  CAJA_DIFERENCIA: 'pi-calculator',
   SISTEMA: 'pi-info-circle',
 };
 
@@ -37,5 +44,12 @@ export const COLOR_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   ROLES_ACTUALIZADOS: '#8b5cf6',
   SESION_SOSPECHOSA: '#ef4444',
   RECORDATORIO_EVENTO: '#8b5cf6',
+  PACIENTE_EN_ESPERA: '#3b82f6',
+  TURNO_LLAMADO: '#10b981',
+  COMPROBANTE_EMITIDO: '#10b981',
+  INGRESO_HOSPITALARIO: '#8b5cf6',
+  ALTA_HOSPITALARIA: '#0ea5e9',
+  EMERGENCIA_TRIAJE: '#ef4444',
+  CAJA_DIFERENCIA: '#f59e0b',
   SISTEMA: '#64748b',
 };

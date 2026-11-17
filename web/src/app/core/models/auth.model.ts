@@ -4,7 +4,10 @@ export type Rol =
   | 'ROLE_PACIENTE'
   | 'ROLE_LABORATORIO'
   | 'ROLE_FARMACIA'
-  | 'ROLE_ALMACEN';
+  | 'ROLE_ALMACEN'
+  | 'ROLE_RECEPCION'
+  | 'ROLE_CAJA'
+  | 'ROLE_ENFERMERIA';
 
 export const ROLES: readonly Rol[] = [
   'ROLE_ADMIN',
@@ -13,6 +16,9 @@ export const ROLES: readonly Rol[] = [
   'ROLE_LABORATORIO',
   'ROLE_FARMACIA',
   'ROLE_ALMACEN',
+  'ROLE_RECEPCION',
+  'ROLE_CAJA',
+  'ROLE_ENFERMERIA',
 ];
 
 export const ROLES_PERSONAL: readonly Rol[] = [
@@ -20,6 +26,9 @@ export const ROLES_PERSONAL: readonly Rol[] = [
   'ROLE_LABORATORIO',
   'ROLE_FARMACIA',
   'ROLE_ALMACEN',
+  'ROLE_RECEPCION',
+  'ROLE_CAJA',
+  'ROLE_ENFERMERIA',
 ];
 
 export const ETIQUETA_ROL: Readonly<Record<string, string>> = {
@@ -29,6 +38,9 @@ export const ETIQUETA_ROL: Readonly<Record<string, string>> = {
   ROLE_LABORATORIO: 'Laboratorio',
   ROLE_FARMACIA: 'Farmacia',
   ROLE_ALMACEN: 'Almacén',
+  ROLE_RECEPCION: 'Recepción',
+  ROLE_CAJA: 'Caja',
+  ROLE_ENFERMERIA: 'Enfermería',
 };
 
 export const DESCRIPCION_ROL: Readonly<Record<string, string>> = {
@@ -38,6 +50,10 @@ export const DESCRIPCION_ROL: Readonly<Record<string, string>> = {
   ROLE_LABORATORIO: 'Procesa órdenes de laboratorio y registra resultados.',
   ROLE_FARMACIA: 'Dispensa recetas y vende productos de farmacia.',
   ROLE_ALMACEN: 'Controla el inventario, los lotes y los proveedores.',
+  ROLE_RECEPCION:
+    'Registra la llegada de pacientes, administra la cola y reserva citas en mostrador.',
+  ROLE_CAJA: 'Abre y cierra la caja, cobra y emite comprobantes.',
+  ROLE_ENFERMERIA: 'Atiende el triaje, las camas y las evoluciones de enfermería.',
 };
 
 export interface LoginRequest {

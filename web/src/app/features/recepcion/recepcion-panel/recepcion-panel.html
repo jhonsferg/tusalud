@@ -1,0 +1,272 @@
+<app-page-header
+  title="Recepción"
+  subtitle="Llegadas, cola de turnos y citas del día"
+  icon="pi-users"
+>
+  <p-button label="Nuevo turno" icon="pi pi-ticket" (onClick)="abrirTurno()" />
+  <p-button
+    label="Reservar cita"
+    icon="pi pi-calendar-plus"
+    [outlined]="true"
+    routerLink="/recepcion/citas/nueva"
+  />
+  <p-button
+    label="Pacientes"
+    icon="pi pi-id-card"
+    [outlined]="true"
+    severity="secondary"
+    routerLink="/recepcion/pacientes"
+  />
+  <p-button
+    label="Pantalla"
+    icon="pi pi-desktop"
+    [text]="true"
+    severity="secondary"
+    routerLink="/recepcion/pantalla"
+  />
+</app-page-header>
+
+@if (store.resumen.value(); as resumen) {
+  <div class="kpis">
+    <app-kpi
+      etiqueta="En espera"
+      [valor]="resumen.enEspera"
+      icono="pi-clock"
+      [tono]="resumen.enEspera > 5 ? 'alerta' : 'normal'"
+    />
+    <app-kpi etiqueta="Llamados" [valor]="resumen.llamados" icono="pi-megaphone" />
+    <app-kpi
+      etiqueta="Atendidos hoy"
+      [valor]="resumen.atendidosHoy"
+      icono="pi-check-circle"
+      tono="exito"
+    />
+    <app-kpi etiqueta="Ausentes hoy" [valor]="resumen.ausentesHoy" icono="pi-user-minus" />
+    <app-kpi
+      etiqueta="Espera promedio"
+      [valor]="resumen.esperaPromedioMinutos + ' min'"
+      icono="pi-stopwatch"
+    />
+    <app-kpi
+      etiqueta="Citas sin llegada"
+      [valor]="resumen.citasPendientesDeLlegada"
+      icono="pi-calendar"
+    />
+  </div>
+}
+
+<div class="columnas">
+  <section class="panel">
+    <h3>Cola de turnos</h3>
+    <p-table
+      [value]="store.cola.value() ?? []"
+      [loading]="store.cola.loading() && !store.cola.hasValue()"
+      [rowHover]="true"
+      responsiveLayout="scroll"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Turno</th>
+          <th>Paciente</th>
+          <th>Médico</th>
+          <th>Estado</th>
+          <th style="width: 9rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-turno>
+        <tr>
+          <td>
+            <strong class="numero">{{ turno.numero }}</strong>
+            @if (turno.prioridad !== 'NORMAL') {
+              <p-tag
+                [value]="etiquetaPrioridad[turno.prioridad]"
+                [severity]="turno.prioridad === 'URGENTE' ? 'danger' : 'info'"
+                styleClass="ml-2"
+              />
+            }
+          </td>
+          <td>
+            {{ turno.pacienteNombre }}
+            <small class="text-muted block"
+              >DNI {{ turno.dni }} · {{ turno.esperaMinutos }} min</small
+            >
+          </td>
+          <td>{{ turno.medicoNombre || 'Sin asignar' }}</td>
+          <td><p-tag [value]="etiquetaEstado[turno.estado]" [severity]="severidad(turno)" /></td>
+          <td class="text-right acciones">
+            @if (turno.estado === 'EN_ESPERA' || turno.estado === 'LLAMADO') {
+              <p-button
+                icon="pi pi-megaphone"
+                [text]="true"
+                [rounded]="true"
+                [ariaLabel]="'Llamar turno ' + turno.numero"
+                (onClick)="accion(turno, 'llamar')"
+              />
+              <p-button
+                icon="pi pi-user-minus"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                [ariaLabel]="'Marcar ausente el turno ' + turno.numero"
+                (onClick)="accion(turno, 'ausente')"
+              />
+              <p-button
+                icon="pi pi-times"
+                [text]="true"
+                [rounded]="true"
+                severity="danger"
+                [ariaLabel]="'Cancelar turno ' + turno.numero"
+                (onClick)="accion(turno, 'cancelar')"
+              />
+            }
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="5">
+            <app-empty-state
+              icon="pi-ticket"
+              title="Sin turnos"
+              message="Cuando un paciente llegue aparecerá en la cola."
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </section>
+
+  <section class="panel">
+    <h3>Citas de hoy</h3>
+    <input
+      pInputText
+      type="search"
+      class="w-full mb-3"
+      placeholder="Buscar por DNI o paciente"
+      aria-label="Buscar cita de hoy"
+      [ngModel]="busquedaCitas()"
+      (ngModelChange)="busquedaCitas.set($event); cargar()"
+    />
+    <p-table
+      [value]="store.citasHoy.value() ?? []"
+      [loading]="store.citasHoy.loading() && !store.citasHoy.hasValue()"
+      [rowHover]="true"
+      responsiveLayout="scroll"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Hora</th>
+          <th>Paciente</th>
+          <th>Médico</th>
+          <th style="width: 8rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-cita>
+        <tr>
+          <td>{{ cita.fechaHora | date: 'HH:mm' }}</td>
+          <td>
+            {{ cita.pacienteNombre }}
+            <small class="text-muted block">DNI {{ cita.pacienteDni }}</small>
+          </td>
+          <td>{{ cita.medicoNombre }}</td>
+          <td class="text-right">
+            @if (cita.llego) {
+              <p-tag [value]="'Turno ' + cita.turnoNumero" severity="success" />
+            } @else {
+              <p-button
+                label="Llegó"
+                icon="pi pi-sign-in"
+                size="small"
+                [ariaLabel]="'Registrar llegada de ' + cita.pacienteNombre"
+                (onClick)="llegada(cita.id, cita.pacienteNombre)"
+              />
+            }
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="4">
+            <app-empty-state
+              icon="pi-calendar"
+              title="Sin citas hoy"
+              message="No hay citas para el día con ese criterio."
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </section>
+</div>
+
+<p-dialog
+  header="Nuevo turno"
+  [visible]="turnoVisible()"
+  (visibleChange)="turnoVisible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '32rem', maxWidth: '96vw' }"
+>
+  <div class="form">
+    @if (error(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    <label>
+      Paciente
+      <app-paciente-buscador inputId="turno-paciente" [(paciente)]="pacienteTurno" />
+    </label>
+    <label>
+      Prioridad
+      <p-select
+        inputId="turno-prioridad"
+        [options]="prioridades"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="prioridadTurno()"
+        (ngModelChange)="prioridadTurno.set($event)"
+        appendTo="body"
+        styleClass="w-full"
+      />
+    </label>
+    <label>
+      Médico (opcional)
+      <p-select
+        inputId="turno-medico"
+        [options]="opcionesMedico()"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="medicoTurno()"
+        (ngModelChange)="medicoTurno.set($event)"
+        placeholder="Sin asignar"
+        [showClear]="true"
+        [filter]="true"
+        appendTo="body"
+        styleClass="w-full"
+      />
+    </label>
+    <label>
+      Motivo
+      <input
+        pInputText
+        id="turno-motivo"
+        class="w-full"
+        [ngModel]="motivoTurno()"
+        (ngModelChange)="motivoTurno.set($event)"
+      />
+    </label>
+  </div>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="turnoVisible.set(false)"
+    />
+    <p-button
+      label="Generar turno"
+      icon="pi pi-ticket"
+      [loading]="guardando()"
+      (onClick)="crearTurno()"
+    />
+  </ng-template>
+</p-dialog>

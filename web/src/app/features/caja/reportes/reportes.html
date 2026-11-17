@@ -1,0 +1,70 @@
+<app-page-header
+  title="Reporte de ingresos"
+  subtitle="Lo cobrado por día, método y origen"
+  icon="pi-chart-bar"
+  backLink="/caja"
+  backLabel="Volver a caja"
+/>
+
+<div class="panel filtro">
+  <p-datepicker
+    selectionMode="range"
+    [ngModel]="rango()"
+    (ngModelChange)="cambiar($event)"
+    [showIcon]="true"
+    dateFormat="dd/mm/yy"
+    placeholder="Rango de fechas"
+    [readonlyInput]="true"
+    appendTo="body"
+  />
+</div>
+
+@if (store.reporte.value(); as reporte) {
+  <div class="kpis">
+    <app-kpi
+      etiqueta="Total del periodo"
+      [valor]="(reporte.total | currency: 'PEN' : 'symbol-narrow') ?? ''"
+      icono="pi-dollar"
+      tono="exito"
+    />
+    @for (origen of reporte.porOrigen; track origen.origen) {
+      <app-kpi
+        [etiqueta]="etiquetaOrigen[origen.origen]"
+        [valor]="(origen.total | currency: 'PEN' : 'symbol-narrow') ?? ''"
+        icono="pi-tag"
+      />
+    }
+  </div>
+
+  <div class="graficos">
+    <section class="panel">
+      <h3>Ingresos por día</h3>
+      @if (reporte.porDia.length === 0) {
+        <app-empty-state
+          icon="pi-chart-bar"
+          title="Sin ingresos"
+          message="No hay comprobantes emitidos en el periodo."
+        />
+      } @else {
+        <div class="grafico">
+          <p-chart type="bar" [data]="graficoDias()" [options]="opcionesBarras" height="280px" />
+        </div>
+      }
+    </section>
+    <section class="panel">
+      <h3>Por método de pago</h3>
+      @if (reporte.porMetodo.length === 0) {
+        <app-empty-state icon="pi-chart-pie" title="Sin datos" />
+      } @else {
+        <div class="grafico">
+          <p-chart
+            type="doughnut"
+            [data]="graficoMetodos()"
+            [options]="opcionesDona"
+            height="280px"
+          />
+        </div>
+      }
+    </section>
+  </div>
+}

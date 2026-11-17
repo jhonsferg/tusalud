@@ -32,6 +32,9 @@ const HOME_BY_ROLE: readonly (readonly [Rol, string])[] = [
   ['ROLE_LABORATORIO', '/laboratorio'],
   ['ROLE_FARMACIA', '/farmacia'],
   ['ROLE_ALMACEN', '/almacen'],
+  ['ROLE_RECEPCION', '/recepcion'],
+  ['ROLE_CAJA', '/caja'],
+  ['ROLE_ENFERMERIA', '/hospitalizacion'],
 ];
 
 const DEFAULT_HOME = '/perfil';
@@ -101,6 +104,9 @@ export class AuthService {
   readonly isLaboratorio = computed(() => this.roles().includes('ROLE_LABORATORIO'));
   readonly isFarmacia = computed(() => this.roles().includes('ROLE_FARMACIA'));
   readonly isAlmacen = computed(() => this.roles().includes('ROLE_ALMACEN'));
+  readonly isRecepcion = computed(() => this.roles().includes('ROLE_RECEPCION'));
+  readonly isCaja = computed(() => this.roles().includes('ROLE_CAJA'));
+  readonly isEnfermeria = computed(() => this.roles().includes('ROLE_ENFERMERIA'));
   readonly homeUrl = computed(() => {
     const roles = this.roles();
     return HOME_BY_ROLE.find(([rol]) => roles.includes(rol))?.[1] ?? DEFAULT_HOME;

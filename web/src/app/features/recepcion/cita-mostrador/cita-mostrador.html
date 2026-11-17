@@ -1,0 +1,108 @@
+<app-page-header
+  title="Reservar cita en mostrador"
+  subtitle="Agenda a nombre de un paciente presencial o por teléfono"
+  icon="pi-calendar-plus"
+  backLink="/recepcion"
+  backLabel="Volver a recepción"
+/>
+
+<div class="layout">
+  <section class="panel">
+    @if (error(); as mensaje) {
+      <p-message severity="error" styleClass="w-full mb-3">{{ mensaje }}</p-message>
+    }
+    <div class="campos">
+      <label>
+        Paciente
+        <app-paciente-buscador inputId="mos-paciente" [(paciente)]="paciente" />
+      </label>
+      <label>
+        Especialidad
+        <p-select
+          inputId="mos-especialidad"
+          [options]="opcionesEspecialidad()"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="especialidadId()"
+          (ngModelChange)="cambioEspecialidad($event)"
+          placeholder="Selecciona una especialidad"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </label>
+      <label>
+        Médico
+        <p-select
+          inputId="mos-medico"
+          [options]="opcionesMedico()"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="medicoId()"
+          (ngModelChange)="cambioMedico($event)"
+          placeholder="Selecciona un médico"
+          [filter]="true"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </label>
+    </div>
+
+    @if (medicoId()) {
+      <small class="text-muted">Los bloques verdes son horas libres del médico.</small>
+      <app-calendario
+        [huecos]="huecos()"
+        [horarioLaboral]="laboral()"
+        [(seleccion)]="elegido"
+        [cargando]="medicos.disponibilidadRango.loading()"
+        [(vista)]="vista"
+        [(fecha)]="fecha"
+        (rangoCambiado)="cargarRango($event)"
+      />
+    } @else {
+      <p class="text-muted">Elige un médico para ver sus horas libres.</p>
+    }
+
+    <label class="motivo">
+      Motivo de la consulta
+      <textarea
+        pTextarea
+        id="mos-motivo"
+        rows="3"
+        class="w-full"
+        [ngModel]="motivo()"
+        (ngModelChange)="motivo.set($event)"
+      ></textarea>
+    </label>
+  </section>
+
+  <aside class="panel resumen">
+    <h3>Resumen</h3>
+    <dl>
+      <div>
+        <dt>Paciente</dt>
+        <dd>{{ paciente()?.nombreCompleto ?? 'Por elegir' }}</dd>
+      </div>
+      <div>
+        <dt>Fecha y hora</dt>
+        <dd>
+          @if (elegido(); as e) {
+            {{ e | date: 'EEE d MMM y, HH:mm' }}
+          } @else {
+            Por elegir
+          }
+        </dd>
+      </div>
+      <div class="total">
+        <dt>Consulta</dt>
+        <dd>{{ precio() | currency: 'PEN' : 'symbol-narrow' }}</dd>
+      </div>
+    </dl>
+    <p-button
+      label="Confirmar reserva"
+      icon="pi pi-check"
+      styleClass="w-full"
+      [loading]="guardando()"
+      (onClick)="reservar()"
+    />
+  </aside>
+</div>

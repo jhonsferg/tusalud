@@ -1,0 +1,54 @@
+<app-page-header
+  title="Mis hospitalizaciones"
+  subtitle="Tus ingresos, estancias y altas"
+  icon="pi-building"
+/>
+
+@if (store.misIngresos.value(); as lista) {
+  @if (lista.length === 0) {
+    <div class="panel">
+      <app-empty-state
+        icon="pi-building"
+        title="Sin hospitalizaciones"
+        message="Aquí verás tus ingresos y altas si alguna vez te hospitalizan."
+      />
+    </div>
+  } @else {
+    <div class="grid">
+      @for (i of lista; track i.id) {
+        <article class="panel ingreso">
+          <header>
+            <div>
+              <strong>{{ i.codigo }}</strong>
+              <small class="text-muted block"
+                >{{ i.fechaIngreso | date: 'd MMM y' }}
+                @if (i.fechaAlta) {
+                  al {{ i.fechaAlta | date: 'd MMM y' }}
+                }
+              </small>
+            </div>
+            <p-tag
+              [value]="
+                i.estado === 'ACTIVO' ? 'Hospitalizado' : i.estado === 'ALTA' ? 'Alta' : 'Cancelado'
+              "
+              [severity]="i.estado === 'ACTIVO' ? 'info' : 'success'"
+            />
+          </header>
+          <p><strong>Motivo:</strong> {{ i.motivo }}</p>
+          @if (i.diagnosticoAlta) {
+            <p><strong>Diagnóstico de alta:</strong> {{ i.diagnosticoAlta }}</p>
+          }
+          @if (i.indicacionesAlta) {
+            <p><strong>Indicaciones:</strong> {{ i.indicacionesAlta }}</p>
+          }
+          <footer>
+            <small class="text-muted"
+              >{{ i.diasEstancia }} días · médico {{ i.medicoNombre || '—' }}</small
+            >
+            <strong>{{ i.cargoCama | currency: 'PEN' : 'symbol-narrow' }}</strong>
+          </footer>
+        </article>
+      }
+    </div>
+  }
+}

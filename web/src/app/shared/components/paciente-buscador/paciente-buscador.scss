@@ -1,0 +1,96 @@
+:host {
+  display: block;
+}
+
+.buscador {
+  position: relative;
+}
+
+.cargando {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  color: var(--p-text-muted-color);
+}
+
+.lista {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  z-index: 30;
+  max-height: 16rem;
+  margin: 0;
+  padding: 0.3rem;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 12px;
+  background: var(--p-content-background);
+  box-shadow: 0 12px 30px rgb(15 23 42 / 16%);
+
+  button {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--p-content-hover-background);
+    }
+
+    small {
+      color: var(--p-text-muted-color);
+    }
+  }
+
+  .vacio {
+    padding: 0.7rem;
+    color: var(--p-text-muted-color);
+  }
+}
+
+.elegido {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  background: var(--app-primary-soft);
+
+  .avatar {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    background: var(--p-primary-color);
+    color: #ffffff;
+  }
+
+  .datos {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+
+    small {
+      color: var(--p-text-muted-color);
+    }
+  }
+
+  .cambiar {
+    border: 0;
+    background: transparent;
+    color: var(--p-text-muted-color);
+    cursor: pointer;
+  }
+}

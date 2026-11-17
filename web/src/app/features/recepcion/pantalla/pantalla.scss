@@ -1,0 +1,46 @@
+.tablero {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 1.25rem;
+}
+
+.turno {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1.8rem 1rem;
+  border: 2px solid var(--p-primary-color);
+  border-radius: 20px;
+  background: var(--app-primary-soft);
+  text-align: center;
+
+  &.atencion {
+    border-color: var(--p-green-500);
+    background: color-mix(in srgb, var(--p-green-500) 12%, transparent);
+  }
+
+  small {
+    color: var(--p-text-muted-color);
+    font-size: 1rem;
+    text-transform: uppercase;
+  }
+
+  .numero {
+    font-size: 3.6rem;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  .consultorio {
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+}
+
+.vacio {
+  grid-column: 1 / -1;
+  padding: 3rem 0;
+  font-size: 1.2rem;
+  text-align: center;
+}

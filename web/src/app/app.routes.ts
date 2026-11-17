@@ -114,6 +114,37 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'recepcion',
+        loadChildren: () =>
+          import('@tusalud/app/features/recepcion/recepcion.routes').then(
+            (m) => m.RECEPCION_ROUTES,
+          ),
+      },
+      {
+        path: 'cola',
+        loadChildren: () =>
+          import('@tusalud/app/features/recepcion/recepcion.routes').then((m) => m.COLA_ROUTES),
+      },
+      {
+        path: 'caja',
+        loadChildren: () =>
+          import('@tusalud/app/features/caja/caja.routes').then((m) => m.CAJA_ROUTES),
+      },
+      {
+        path: 'hospitalizacion',
+        loadChildren: () =>
+          import('@tusalud/app/features/hospitalizacion/hospitalizacion.routes').then(
+            (m) => m.HOSPITALIZACION_ROUTES,
+          ),
+      },
+      {
+        path: 'mis-ingresos',
+        loadChildren: () =>
+          import('@tusalud/app/features/hospitalizacion/hospitalizacion.routes').then(
+            (m) => m.MIS_INGRESOS_ROUTES,
+          ),
+      },
+      {
         path: 'notificaciones',
         loadChildren: () =>
           import('@tusalud/app/features/notificaciones/notificaciones.routes').then(

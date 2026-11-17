@@ -1,0 +1,112 @@
+.cola {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.emergencia {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1.25rem;
+  border-left: 6px solid var(--color-triaje);
+
+  @media (max-width: 760px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nivel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 4.5rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  background: var(--color-triaje);
+  color: #ffffff;
+
+  strong {
+    font-size: 1.8rem;
+    line-height: 1;
+  }
+
+  small {
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+  }
+}
+
+.datos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.vitales {
+  color: var(--p-text-muted-color);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+}
+
+.niveles {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+
+  button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.6rem 0.3rem;
+    border: 2px solid color-mix(in srgb, var(--color-triaje) 40%, transparent);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--p-text-color);
+    font: inherit;
+    cursor: pointer;
+
+    strong {
+      font-size: 1.3rem;
+    }
+
+    small {
+      font-size: 0.68rem;
+      text-align: center;
+    }
+
+    &.activo {
+      border-color: var(--color-triaje);
+      background: var(--color-triaje);
+      color: #ffffff;
+    }
+  }
+}
+
+.vitales-form {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}

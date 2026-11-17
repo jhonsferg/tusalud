@@ -1,0 +1,30 @@
+.filtro {
+  margin-bottom: 1.25rem;
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.graficos {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1.25rem;
+
+  h3 {
+    margin-bottom: 0.9rem;
+    font-size: 1rem;
+  }
+
+  @media (max-width: 1000px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grafico {
+  position: relative;
+  height: 280px;
+}

@@ -15,6 +15,13 @@ export type TipoNotificacion =
   | 'ROLES_ACTUALIZADOS'
   | 'SESION_SOSPECHOSA'
   | 'RECORDATORIO_EVENTO'
+  | 'PACIENTE_EN_ESPERA'
+  | 'TURNO_LLAMADO'
+  | 'COMPROBANTE_EMITIDO'
+  | 'INGRESO_HOSPITALARIO'
+  | 'ALTA_HOSPITALARIA'
+  | 'EMERGENCIA_TRIAJE'
+  | 'CAJA_DIFERENCIA'
   | 'SISTEMA';
 
 export interface NotificacionResponse {
