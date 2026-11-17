@@ -185,6 +185,7 @@ La API es completamente sin estado. Spring Security 7 trabaja con `SessionCreati
 - Los tokens se firman con HMAC-SHA usando la clave `JWT_SECRET`, que debe estar codificada en Base64 y tener al menos 256 bits. Cada token incluye el email como sujeto, el emisor, la expiración, el id del usuario, su nombre y sus roles. El token de acceso dura 15 minutos y se renueva con un refresh token rotativo.
 - Un usuario inactivo no puede iniciar sesión y su token deja de ser válido aunque no haya expirado.
 - Las contraseñas se almacenan con BCrypt.
+- Todas las entidades y tablas usan UUID versión 4 como identificador, generado en la aplicación y con `gen_random_uuid()` como valor por defecto en la base. Así los ids no se pueden adivinar ni recorrer en orden. Un id con formato inválido en la ruta responde 400 y uno inexistente responde 404. Los códigos legibles de negocio, como los comprobantes, los turnos y los ingresos, siguen siendo correlativos.
 - CORS permite peticiones desde `http://localhost:4200` con los métodos GET, POST, PUT, DELETE y OPTIONS. El origen se configura con `CORS_ALLOWED_ORIGINS`.
 - La autorización combina reglas por URL en `SecurityConfig` con `@PreAuthorize` en cada método de los controladores.
 
@@ -435,7 +436,7 @@ erDiagram
     PACIENTES ||--o{ CITAS : reserva
 
     USUARIOS {
-        bigint id PK
+        uuid id PK
         varchar nombre
         varchar apellido
         varchar email UK
@@ -445,53 +446,53 @@ erDiagram
         timestamp created_at
     }
     ROLES {
-        bigint id PK
+        uuid id PK
         varchar nombre UK
     }
     USUARIO_ROLES {
-        bigint usuario_id FK
-        bigint rol_id FK
+        uuid usuario_id FK
+        uuid rol_id FK
     }
     ESPECIALIDADES {
-        bigint id PK
+        uuid id PK
         varchar nombre UK
         varchar descripcion
         numeric precio_consulta
     }
     MEDICO_ESPECIALIDADES {
-        bigint medico_id FK
-        bigint especialidad_id FK
+        uuid medico_id FK
+        uuid especialidad_id FK
     }
     MEDICOS {
-        bigint id PK
+        uuid id PK
         varchar colegiatura UK
         varchar consultorio
-        bigint usuario_id FK
+        uuid usuario_id FK
     }
     PACIENTES {
-        bigint id PK
+        uuid id PK
         varchar dni UK
         varchar historial_clinico_numero UK
         date fecha_nacimiento
-        bigint usuario_id FK
+        uuid usuario_id FK
     }
     HORARIOS_ATENCION {
-        bigint id PK
+        uuid id PK
         varchar dia_semana
         time hora_inicio
         time hora_fin
         int duracion_cita_minutos
-        bigint medico_id FK
+        uuid medico_id FK
     }
     CITAS {
-        bigint id PK
+        uuid id PK
         timestamp fecha_hora
         varchar motivo
         varchar estado
         numeric monto
-        bigint medico_id FK
-        bigint paciente_id FK
-        bigint especialidad_id FK
+        uuid medico_id FK
+        uuid paciente_id FK
+        uuid especialidad_id FK
         bigint version
     }
 ```
@@ -1216,7 +1217,7 @@ Los avisos se guardan en la tabla `notificaciones` y se entregan al navegador po
 
 El navegador no puede enviar cabeceras con `EventSource`, así que el frontend abre el flujo con `fetch` y el token en la cabecera `Authorization`. Si la conexión se cae, reconecta con espera exponencial de 1 a 30 segundos, y solo consulta el contador cada 2 minutos mientras el flujo esté caído. El filtro de telemetría HTTP excluye este endpoint porque buffereaba el cuerpo de la respuesta, y nginx lo atiende sin buffering y con un timeout de una hora.
 
-Los avisos se generan al crear, confirmar, cancelar, atender y reprogramar una cita, al registrar o reembolsar un pago, al cambiar la contraseña y al iniciar sesión desde un dispositivo nuevo. Una tarea programada cada 15 minutos crea los recordatorios según la antelación que eligió cada usuario en sus preferencias.
+Los avisos se generan al crear, confirmar, cancelar, atender y reprogramar una cita, al registrar o reembolsar un pago, al cambiar la contraseña y al iniciar sesión desde un dispositivo nuevo. Una tarea programada cada 15 minutos crea los recordatorios según la antelación que eligió cada usuario en sus preferencias, que se elige de una lista de 15 minutos a 3 días y se guarda en minutos.
 
 ### Sesiones y alertas de inicio de sesión
 
@@ -1704,7 +1705,7 @@ Las 118 pruebas unitarias corren con Vitest y cubren las utilidades, los validad
 npm test
 ```
 
-Las 83 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal los flujos de almacén, farmacia y laboratorio, y los de recepción, caja y hospitalización. Requieren el stack levantado con datos de prueba.
+Las 85 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal los flujos de almacén, farmacia y laboratorio, y los de recepción, caja y hospitalización. Requieren el stack levantado con datos de prueba.
 
 ```bash
 npm run e2e
