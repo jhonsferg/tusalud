@@ -12,6 +12,7 @@ import {
   Session,
   SessionUser,
 } from '../models';
+import { APP_ACTUAL, NAVEGADOR_EXTERNO, destinoLogin, rolesDeApp } from '../config/modulos';
 import { jwtExpirationMs } from '../utils/jwt';
 import { AuthApiService } from './api/auth-api.service';
 import { NotificationService } from './notification.service';
@@ -89,6 +90,8 @@ export class AuthService {
   private readonly storage = inject(StorageService);
   private readonly router = inject(Router);
   private readonly notifications = inject(NotificationService);
+  private readonly app = inject(APP_ACTUAL, { optional: true });
+  private readonly navegador = inject(NAVEGADOR_EXTERNO, { optional: true });
 
   private readonly state = signal<Session | null>(this.restoreSession());
   private renovando: Observable<string> | null = null;
@@ -109,7 +112,11 @@ export class AuthService {
   readonly isEnfermeria = computed(() => this.roles().includes('ROLE_ENFERMERIA'));
   readonly homeUrl = computed(() => {
     const roles = this.roles();
-    return HOME_BY_ROLE.find(([rol]) => roles.includes(rol))?.[1] ?? DEFAULT_HOME;
+    const delApp = this.app ? rolesDeApp(this.app) : null;
+    return (
+      HOME_BY_ROLE.find(([rol]) => roles.includes(rol) && (!delApp || delApp.includes(rol)))?.[1] ??
+      DEFAULT_HOME
+    );
   });
 
   constructor() {
@@ -209,11 +216,21 @@ export class AuthService {
       this.api.logout().subscribe({ error: () => undefined });
     }
     this.state.set(null);
+    this.storage.remove(SESSION_STORAGE_KEY);
     if (!wasAuthenticated) {
       return;
     }
     if (reason === 'manual') {
-      void this.router.navigateByUrl(LOGIN_URL);
+      if (this.navegador) {
+        this.navegador(destinoLogin(null));
+      } else {
+        void this.router.navigateByUrl(LOGIN_URL);
+      }
+      return;
+    }
+    if (this.navegador) {
+      const actual = `${globalThis.location.pathname}${globalThis.location.search}`;
+      this.navegador(destinoLogin(actual, reason));
       return;
     }
     this.notifications.warning(

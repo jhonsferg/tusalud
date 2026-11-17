@@ -2,7 +2,8 @@ import { inject } from '@angular/core';
 import { CanMatchFn, Router } from '@angular/router';
 
 import { Rol } from '../models';
-import { AuthService, LOGIN_URL } from '../services/auth.service';
+import { AuthService } from '../services/auth.service';
+import { irAlLogin } from './auth.guard';
 
 export const FORBIDDEN_URL = '/acceso-denegado';
 
@@ -15,7 +16,7 @@ export function roleGuard(...roles: readonly Rol[]): CanMatchFn {
       const returnUrl =
         router.currentNavigation()?.extractedUrl.toString() ??
         `/${segments.map((segment) => segment.path).join('/')}`;
-      return router.createUrlTree([LOGIN_URL], { queryParams: { returnUrl } });
+      return irAlLogin(returnUrl);
     }
     if (auth.hasAnyRole(roles)) {
       return true;

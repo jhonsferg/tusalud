@@ -154,6 +154,14 @@
           </a>
         </li>
       }
+      @for (modulo of otrosModulos(); track modulo.app) {
+        <li>
+          <a [href]="modulo.base" (click)="panelUsuario.hide()">
+            <i [class]="'pi ' + modulo.icono"></i>
+            <span>Cambiar a {{ modulo.etiqueta }}</span>
+          </a>
+        </li>
+      }
       <li>
         <button type="button" (click)="iniciarTour(panelUsuario)">
           <i class="pi pi-compass"></i>

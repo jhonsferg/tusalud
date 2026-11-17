@@ -16,8 +16,10 @@ import { Popover } from 'primeng/popover';
 import { Tooltip } from 'primeng/tooltip';
 
 import {
+  APP_ACTUAL,
   AuthService,
   ETIQUETA_ROL,
+  modulosDe,
   NotificacionesStore,
   NotificacionResponse,
   PerfilStore,
@@ -60,6 +62,7 @@ export class AppShell implements OnInit {
   private readonly perfil = inject(PerfilStore);
   private readonly router = inject(Router);
   private readonly config = inject(APP_SHELL_CONFIG);
+  private readonly app = inject(APP_ACTUAL, { optional: true });
   private readonly storage = inject(StorageService);
   protected readonly tour = inject(TourService);
   private tourOfrecido = false;
@@ -90,6 +93,10 @@ export class AppShell implements OnInit {
     { label: 'Apariencia', icon: 'pi-palette', link: '/perfil', tab: 'apariencia' },
     { label: 'Notificaciones', icon: 'pi-bell', link: '/notificaciones', tab: null },
   ];
+
+  protected readonly otrosModulos = computed(() =>
+    modulosDe(this.auth.roles()).filter((modulo) => modulo.app !== this.app),
+  );
 
   protected readonly modos: readonly { valor: ThemeMode; label: string; icon: string }[] = [
     { valor: 'light', label: 'Claro', icon: 'pi-sun' },

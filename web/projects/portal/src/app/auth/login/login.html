@@ -1,0 +1,108 @@
+@if (mfaToken()) {
+  <h1 class="title">Verificación en dos pasos</h1>
+  <p class="subtitle">
+    @if (usarRecuperacion()) {
+      Ingresa uno de tus códigos de recuperación.
+    } @else {
+      Ingresa el código de 6 dígitos de tu aplicación autenticadora.
+    }
+  </p>
+
+  @if (errorMessage(); as message) {
+    <p-message severity="error" icon="pi pi-exclamation-circle" styleClass="mb-3 w-full">{{
+      message
+    }}</p-message>
+  }
+
+  <form (submit)="$event.preventDefault(); verificar()" class="flex flex-column gap-3" novalidate>
+    <input
+      pInputText
+      id="login-codigo"
+      type="text"
+      [formControl]="codigo"
+      [attr.inputmode]="usarRecuperacion() ? 'text' : 'numeric'"
+      autocomplete="one-time-code"
+      maxlength="20"
+      [placeholder]="usarRecuperacion() ? 'Código de recuperación' : '000000'"
+      class="w-full codigo-mfa"
+      aria-label="Código de verificación"
+    />
+    <p-button
+      type="submit"
+      label="Verificar y entrar"
+      icon="pi pi-shield"
+      [loading]="submitting()"
+      styleClass="w-full"
+    />
+    <div class="flex justify-content-between">
+      <button type="button" class="link-button" (click)="alternarRecuperacion()">
+        {{ usarRecuperacion() ? 'Usar mi aplicación' : 'Usar un código de recuperación' }}
+      </button>
+      <button type="button" class="link-button" (click)="volver()">Volver</button>
+    </div>
+  </form>
+} @else {
+  <h1 class="title">Bienvenido de nuevo</h1>
+  <p class="subtitle">Ingresa con tu cuenta para gestionar tus citas.</p>
+
+  @if (avisoSesion(); as aviso) {
+    <p-message severity="warn" icon="pi pi-info-circle" styleClass="mb-3 w-full">{{
+      aviso
+    }}</p-message>
+  }
+
+  @if (errorMessage(); as message) {
+    <p-message severity="error" icon="pi pi-exclamation-circle" styleClass="mb-3 w-full">{{
+      message
+    }}</p-message>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-column gap-3" novalidate>
+    <app-form-field
+      label="Email"
+      [control]="form.controls.email"
+      inputId="login-email"
+      [required]="true"
+    >
+      <input
+        pInputText
+        id="login-email"
+        type="email"
+        formControlName="email"
+        autocomplete="username"
+        placeholder="tu@correo.com"
+        class="w-full"
+      />
+    </app-form-field>
+
+    <app-form-field
+      label="Contraseña"
+      [control]="form.controls.password"
+      inputId="login-password"
+      [required]="true"
+    >
+      <p-password
+        inputId="login-password"
+        formControlName="password"
+        [feedback]="false"
+        [toggleMask]="true"
+        autocomplete="current-password"
+        placeholder="Tu contraseña"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+      />
+    </app-form-field>
+
+    <p-button
+      type="submit"
+      label="Iniciar sesión"
+      icon="pi pi-sign-in"
+      [loading]="submitting()"
+      styleClass="w-full"
+    />
+  </form>
+
+  <p class="footer">
+    ¿No tienes cuenta? <a routerLink="/auth/registro">Regístrate como paciente</a>
+  </p>
+}
