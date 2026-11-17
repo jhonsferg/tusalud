@@ -9,6 +9,13 @@ export const CUENTAS = {
   laboratorio: { email: 'lab@tusalud.com', password: 'Personal123!', home: /\/laboratorio$/ },
   farmacia: { email: 'farmacia@tusalud.com', password: 'Personal123!', home: /\/farmacia$/ },
   almacen: { email: 'almacen@tusalud.com', password: 'Personal123!', home: /\/almacen$/ },
+  recepcion: { email: 'recepcion@tusalud.com', password: 'Personal123!', home: /\/recepcion$/ },
+  caja: { email: 'caja@tusalud.com', password: 'Personal123!', home: /\/caja$/ },
+  enfermeria: {
+    email: 'enfermeria@tusalud.com',
+    password: 'Personal123!',
+    home: /\/hospitalizacion$/,
+  },
 } as const;
 
 export async function omitirGuia(page: Page): Promise<void> {
