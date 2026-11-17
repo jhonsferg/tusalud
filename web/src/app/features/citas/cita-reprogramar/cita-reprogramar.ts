@@ -14,26 +14,21 @@ import { Button } from 'primeng/button';
 import { Message } from 'primeng/message';
 import { Skeleton } from 'primeng/skeleton';
 
-import { ApiError } from '@tusalud/app/core/models';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { CitasStore, esCitaActiva } from '@tusalud/app/core/state/citas.store';
-import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
-import { toIsoDate, toIsoDateTime } from '@tusalud/app/core/utils/date';
-import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
-import { Calendario } from '@tusalud/app/shared/components/calendario/calendario';
 import {
-  CalEvento,
-  RangoVisible,
-  VistaCalendario,
-} from '@tusalud/app/shared/components/calendario/calendario.utils';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { citaAEvento } from '@tusalud/app/shared/utils/cita-calendario';
-import {
-  construirHuecos,
-  horarioLaboral,
-} from '@tusalud/app/shared/utils/disponibilidad-calendario';
+  ApiError,
+  AuthService,
+  CitasStore,
+  esCitaActiva,
+  MedicosStore,
+  NotificationService,
+  optionalIdAttribute,
+  toIsoDate,
+  toIsoDateTime,
+} from '@tusalud/core';
+import { Calendario, CalEvento, RangoVisible, VistaCalendario } from '@tusalud/ui/calendario';
+import { citaAEvento, construirHuecos, horarioLaboral } from '@tusalud/ui/utils';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-cita-reprogramar',

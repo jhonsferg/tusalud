@@ -11,12 +11,10 @@ import { FormsModule } from '@angular/forms';
 import { DatePicker } from 'primeng/datepicker';
 import { UIChart } from 'primeng/chart';
 
-import { ETIQUETA_METODO_CAJA, ETIQUETA_ORIGEN } from '@tusalud/app/core/models';
-import { CajaStore } from '@tusalud/app/core/state/caja.store';
-import { toIsoDate } from '@tusalud/app/core/utils/date';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { Kpi } from '@tusalud/app/shared/components/kpi/kpi';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import { CajaStore, ETIQUETA_METODO_CAJA, ETIQUETA_ORIGEN, toIsoDate } from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { Kpi } from '@tusalud/ui/kpi';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-reportes-caja',

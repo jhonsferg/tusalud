@@ -19,17 +19,17 @@ import { Tag } from 'primeng/tag';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 
 import {
-  AREAS_CAMA,
   AreaCama,
+  AREAS_CAMA,
+  AuthService,
   CamaResponse,
   ETIQUETA_AREA,
   ETIQUETA_ESTADO_CAMA,
-} from '@tusalud/app/core/models';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { HospitalizacionStore } from '@tusalud/app/core/state/hospitalizacion.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+  HospitalizacionStore,
+  NotificationService,
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-camas',

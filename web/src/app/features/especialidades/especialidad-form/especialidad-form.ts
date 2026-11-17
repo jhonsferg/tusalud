@@ -14,15 +14,17 @@ import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 
-import { ApiError } from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { EspecialidadesStore } from '@tusalud/app/core/state/especialidades.store';
-import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
-import { AppValidators } from '@tusalud/app/core/validators/app.validators';
-import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { FormField } from '@tusalud/app/shared/components/form-field/form-field';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import {
+  ApiError,
+  applyServerErrors,
+  AppValidators,
+  EspecialidadesStore,
+  NotificationService,
+  optionalIdAttribute,
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { FormField } from '@tusalud/ui/form-field';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-especialidad-form',

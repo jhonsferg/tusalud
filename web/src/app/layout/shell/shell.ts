@@ -15,16 +15,21 @@ import { Drawer } from 'primeng/drawer';
 import { Popover } from 'primeng/popover';
 import { Tooltip } from 'primeng/tooltip';
 
-import { ETIQUETA_ROL, NotificacionResponse, Rol } from '@tusalud/app/core/models';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { StorageService } from '@tusalud/app/core/services/storage.service';
-import { ThemeMode, ThemeService } from '@tusalud/app/core/services/theme.service';
-import { TourService } from '@tusalud/app/core/services/tour.service';
-import { NotificacionesStore } from '@tusalud/app/core/state/notificaciones.store';
-import { PerfilStore } from '@tusalud/app/core/state/perfil.store';
-import { Tour } from '@tusalud/app/shared/components/tour/tour';
-import { UserAvatar } from '@tusalud/app/shared/components/user-avatar/user-avatar';
-import { COLOR_NOTIFICACION, ICONO_NOTIFICACION } from '@tusalud/app/shared/utils/notificacion';
+import {
+  AuthService,
+  ETIQUETA_ROL,
+  NotificacionesStore,
+  NotificacionResponse,
+  PerfilStore,
+  Rol,
+  StorageService,
+  ThemeMode,
+  ThemeService,
+  TourService,
+} from '@tusalud/core';
+import { COLOR_NOTIFICACION, ICONO_NOTIFICACION } from '@tusalud/ui/utils';
+import { Tour } from '@tusalud/ui/tour';
+import { UserAvatar } from '@tusalud/ui/user-avatar';
 
 interface NavItem {
   readonly label: string;

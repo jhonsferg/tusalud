@@ -19,13 +19,15 @@ import { Select } from 'primeng/select';
 import { Tag } from 'primeng/tag';
 import { Textarea } from 'primeng/textarea';
 
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { HospitalizacionStore } from '@tusalud/app/core/state/hospitalizacion.store';
-import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { COLOR_TRIAJE } from '@tusalud/app/shared/utils/hospitalizacion';
+import {
+  AuthService,
+  HospitalizacionStore,
+  NotificationService,
+  optionalIdAttribute,
+} from '@tusalud/core';
+import { COLOR_TRIAJE } from '@tusalud/ui/utils';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-ingreso-detalle',

@@ -4,15 +4,10 @@ import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
 import { Tag } from 'primeng/tag';
 
-import { ETIQUETA_ESTADO_ORDEN, OrdenResponse } from '@tusalud/app/core/models';
-import { LaboratorioStore } from '@tusalud/app/core/state/laboratorio.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import {
-  ICONO_ORDEN,
-  SEVERIDAD_ORDEN,
-  rangoReferencia,
-} from '@tusalud/app/shared/utils/laboratorio';
+import { ETIQUETA_ESTADO_ORDEN, LaboratorioStore, OrdenResponse } from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { ICONO_ORDEN, rangoReferencia, SEVERIDAD_ORDEN } from '@tusalud/ui/utils';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-mis-resultados',

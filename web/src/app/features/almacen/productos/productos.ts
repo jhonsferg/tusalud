@@ -24,18 +24,18 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Subject, debounceTime } from 'rxjs';
 
 import {
+  AlmacenStore,
+  AuthService,
   ETIQUETA_MOTIVO_SALIDA,
   ETIQUETA_TIPO_PRODUCTO,
   MotivoSalida,
+  NotificationService,
   ProductoResponse,
-  TIPOS_PRODUCTO,
   TipoProducto,
-} from '@tusalud/app/core/models';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { AlmacenStore } from '@tusalud/app/core/state/almacen.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+  TIPOS_PRODUCTO,
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-productos',

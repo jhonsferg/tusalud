@@ -6,14 +6,17 @@ import { InputText } from 'primeng/inputtext';
 import { MultiSelect } from 'primeng/multiselect';
 import { Password } from 'primeng/password';
 
-import { ApiError } from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { EspecialidadesStore } from '@tusalud/app/core/state/especialidades.store';
-import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
-import { AppValidators, PASSWORD_MAX } from '@tusalud/app/core/validators/app.validators';
-import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
-import { FormField } from '@tusalud/app/shared/components/form-field/form-field';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import {
+  ApiError,
+  applyServerErrors,
+  AppValidators,
+  EspecialidadesStore,
+  MedicosStore,
+  NotificationService,
+  PASSWORD_MAX,
+} from '@tusalud/core';
+import { FormField } from '@tusalud/ui/form-field';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-medico-form',

@@ -19,13 +19,11 @@ import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { Subject, debounceTime } from 'rxjs';
 
-import { ETIQUETA_ESTADO_ORDEN, EstadoOrden } from '@tusalud/app/core/models';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { LaboratorioStore } from '@tusalud/app/core/state/laboratorio.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { Kpi } from '@tusalud/app/shared/components/kpi/kpi';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { ICONO_ORDEN, SEVERIDAD_ORDEN } from '@tusalud/app/shared/utils/laboratorio';
+import { AuthService, EstadoOrden, ETIQUETA_ESTADO_ORDEN, LaboratorioStore } from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { ICONO_ORDEN, SEVERIDAD_ORDEN } from '@tusalud/ui/utils';
+import { Kpi } from '@tusalud/ui/kpi';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-ordenes',

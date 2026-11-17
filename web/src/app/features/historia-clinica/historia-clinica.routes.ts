@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { roleGuard } from '@tusalud/app/core/guards/role.guard';
+import { roleGuard } from '@tusalud/core';
 
 export const HISTORIA_CLINICA_ROUTES: Routes = [
   {
@@ -8,9 +8,7 @@ export const HISTORIA_CLINICA_ROUTES: Routes = [
     title: 'Mi historia clínica',
     canMatch: [roleGuard('ROLE_PACIENTE')],
     loadComponent: () =>
-      import('@tusalud/app/features/historia-clinica/historia-clinica/historia-clinica').then(
-        (m) => m.HistoriaClinica,
-      ),
+      import('./historia-clinica/historia-clinica').then((m) => m.HistoriaClinica),
   },
 ];
 
@@ -20,18 +18,13 @@ export const PACIENTES_ROUTES: Routes = [
     pathMatch: 'full',
     title: 'Mis pacientes',
     canMatch: [roleGuard('ROLE_MEDICO')],
-    loadComponent: () =>
-      import('@tusalud/app/features/historia-clinica/mis-pacientes/mis-pacientes').then(
-        (m) => m.MisPacientes,
-      ),
+    loadComponent: () => import('./mis-pacientes/mis-pacientes').then((m) => m.MisPacientes),
   },
   {
     path: ':id/historia-clinica',
     title: 'Historia clínica del paciente',
     canMatch: [roleGuard('ROLE_MEDICO')],
     loadComponent: () =>
-      import('@tusalud/app/features/historia-clinica/historia-clinica/historia-clinica').then(
-        (m) => m.HistoriaClinica,
-      ),
+      import('./historia-clinica/historia-clinica').then((m) => m.HistoriaClinica),
   },
 ];

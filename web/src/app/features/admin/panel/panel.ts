@@ -5,10 +5,10 @@ import { Button } from 'primeng/button';
 import { UIChart } from 'primeng/chart';
 import { Skeleton } from 'primeng/skeleton';
 
-import { AdminStore } from '@tusalud/app/core/state/admin.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { UserAvatar } from '@tusalud/app/shared/components/user-avatar/user-avatar';
+import { AdminStore } from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
+import { UserAvatar } from '@tusalud/ui/user-avatar';
 
 const COLORES = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#ec4899'];
 const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];

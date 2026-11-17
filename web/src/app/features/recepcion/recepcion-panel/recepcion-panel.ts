@@ -21,17 +21,17 @@ import { InputText } from 'primeng/inputtext';
 import {
   ETIQUETA_ESTADO_TURNO,
   ETIQUETA_PRIORIDAD,
+  MedicosStore,
+  NotificationService,
   PacienteMostradorResponse,
   PrioridadTurno,
+  RecepcionStore,
   TurnoResponse,
-} from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
-import { RecepcionStore } from '@tusalud/app/core/state/recepcion.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { Kpi } from '@tusalud/app/shared/components/kpi/kpi';
-import { PacienteBuscador } from '@tusalud/app/shared/components/paciente-buscador/paciente-buscador';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { Kpi } from '@tusalud/ui/kpi';
+import { PacienteBuscador } from '@tusalud/ui/paciente-buscador';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 const REFRESCO_MS = 15_000;
 

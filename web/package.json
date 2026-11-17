@@ -11,12 +11,16 @@
     "build:qa": "ng build --configuration qa",
     "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration local",
-    "test": "ng test --watch=false",
+    "test": "ng test tusalud --watch=false",
     "test:watch": "ng test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "e2e": "playwright test",
-    "e2e:ui": "playwright test --ui"
+    "e2e:ui": "playwright test --ui",
+    "test:core": "ng test core --watch=false",
+    "test:ui": "ng test ui --watch=false",
+    "test:all": "ng test core --watch=false && ng test ui --watch=false && ng test tusalud --watch=false",
+    "build:libs": "ng build core && ng build ui"
   },
   "private": true,
   "packageManager": "npm@11.19.0",
@@ -44,6 +48,7 @@
     "@playwright/test": "^1.65.1",
     "@types/qrcode": "^1.5.6",
     "jsdom": "^28.0.0",
+    "ng-packagr": "^21.2.7",
     "prettier": "^3.8.1",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"

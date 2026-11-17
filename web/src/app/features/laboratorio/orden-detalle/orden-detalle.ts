@@ -18,22 +18,18 @@ import { Tag } from 'primeng/tag';
 import { Textarea } from 'primeng/textarea';
 
 import {
+  AuthService,
   ETIQUETA_ESTADO_ORDEN,
   ExamenResponse,
   ItemOrdenResponse,
+  LaboratorioStore,
+  NotificationService,
+  optionalIdAttribute,
   ParametroExamen,
-} from '@tusalud/app/core/models';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { LaboratorioStore } from '@tusalud/app/core/state/laboratorio.store';
-import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import {
-  ICONO_ORDEN,
-  SEVERIDAD_ORDEN,
-  rangoReferencia,
-} from '@tusalud/app/shared/utils/laboratorio';
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { ICONO_ORDEN, rangoReferencia, SEVERIDAD_ORDEN } from '@tusalud/ui/utils';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-orden-detalle',

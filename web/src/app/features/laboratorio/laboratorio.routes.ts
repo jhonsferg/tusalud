@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { roleGuard } from '@tusalud/app/core/guards/role.guard';
+import { roleGuard } from '@tusalud/core';
 
 export const LABORATORIO_ROUTES: Routes = [
   {
@@ -8,31 +8,25 @@ export const LABORATORIO_ROUTES: Routes = [
     pathMatch: 'full',
     title: 'Laboratorio',
     canMatch: [roleGuard('ROLE_LABORATORIO', 'ROLE_ADMIN', 'ROLE_MEDICO')],
-    loadComponent: () =>
-      import('@tusalud/app/features/laboratorio/ordenes/ordenes').then((m) => m.Ordenes),
+    loadComponent: () => import('./ordenes/ordenes').then((m) => m.Ordenes),
   },
   {
     path: 'ordenes/:id',
     title: 'Orden de laboratorio',
     canMatch: [roleGuard('ROLE_LABORATORIO', 'ROLE_MEDICO')],
-    loadComponent: () =>
-      import('@tusalud/app/features/laboratorio/orden-detalle/orden-detalle').then(
-        (m) => m.OrdenDetalle,
-      ),
+    loadComponent: () => import('./orden-detalle/orden-detalle').then((m) => m.OrdenDetalle),
   },
   {
     path: 'examenes',
     title: 'Catálogo de exámenes',
     canMatch: [roleGuard('ROLE_LABORATORIO', 'ROLE_ADMIN', 'ROLE_MEDICO')],
-    loadComponent: () =>
-      import('@tusalud/app/features/laboratorio/examenes/examenes').then((m) => m.Examenes),
+    loadComponent: () => import('./examenes/examenes').then((m) => m.Examenes),
   },
   {
     path: 'solicitar',
     title: 'Solicitar exámenes',
     canMatch: [roleGuard('ROLE_MEDICO')],
-    loadComponent: () =>
-      import('@tusalud/app/features/laboratorio/solicitar/solicitar').then((m) => m.Solicitar),
+    loadComponent: () => import('./solicitar/solicitar').then((m) => m.Solicitar),
   },
 ];
 
@@ -41,9 +35,6 @@ export const RESULTADOS_ROUTES: Routes = [
     path: '',
     title: 'Mis resultados',
     canMatch: [roleGuard('ROLE_PACIENTE')],
-    loadComponent: () =>
-      import('@tusalud/app/features/laboratorio/mis-resultados/mis-resultados').then(
-        (m) => m.MisResultados,
-      ),
+    loadComponent: () => import('./mis-resultados/mis-resultados').then((m) => m.MisResultados),
   },
 ];

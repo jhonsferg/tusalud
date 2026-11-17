@@ -14,17 +14,13 @@ import { DatePicker } from 'primeng/datepicker';
 import { SelectButton } from 'primeng/selectbutton';
 import { TableModule } from 'primeng/table';
 
-import { CitaResponse, ESTADOS_CITA } from '@tusalud/app/core/models';
-import { CitasStore, esCitaActiva } from '@tusalud/app/core/state/citas.store';
-import { toIsoDate } from '@tusalud/app/core/utils/date';
-import { Calendario } from '@tusalud/app/shared/components/calendario/calendario';
-import { CalEvento } from '@tusalud/app/shared/components/calendario/calendario.utils';
-import { citaAEvento } from '@tusalud/app/shared/utils/cita-calendario';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { EstadoCitaTag } from '@tusalud/app/shared/components/estado-cita-tag/estado-cita-tag';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { CitaActions } from '@tusalud/app/shared/services/cita-actions.service';
-import { ETIQUETA_ESTADO } from '@tusalud/app/shared/utils/cita-estado';
+import { CitaResponse, CitasStore, esCitaActiva, ESTADOS_CITA, toIsoDate } from '@tusalud/core';
+import { Calendario, CalEvento } from '@tusalud/ui/calendario';
+import { CitaActions } from '@tusalud/ui/services';
+import { citaAEvento, ETIQUETA_ESTADO } from '@tusalud/ui/utils';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { EstadoCitaTag } from '@tusalud/ui/estado-cita-tag';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 type Vista = 'proximas' | 'historial' | 'todas';
 

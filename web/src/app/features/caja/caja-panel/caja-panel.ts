@@ -15,11 +15,14 @@ import { InputNumber } from 'primeng/inputnumber';
 import { Message } from 'primeng/message';
 import { Textarea } from 'primeng/textarea';
 
-import { ETIQUETA_METODO_CAJA, SesionCajaResponse } from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { CajaStore } from '@tusalud/app/core/state/caja.store';
-import { Kpi } from '@tusalud/app/shared/components/kpi/kpi';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import {
+  CajaStore,
+  ETIQUETA_METODO_CAJA,
+  NotificationService,
+  SesionCajaResponse,
+} from '@tusalud/core';
+import { Kpi } from '@tusalud/ui/kpi';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-caja-panel',

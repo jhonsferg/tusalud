@@ -17,23 +17,20 @@ import { Message } from 'primeng/message';
 import { Select } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
 
-import { ApiError, PacienteMostradorResponse } from '@tusalud/app/core/models';
-import { RecepcionApiService } from '@tusalud/app/core/services/api/recepcion-api.service';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { EspecialidadesStore } from '@tusalud/app/core/state/especialidades.store';
-import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
-import { toIsoDate, toIsoDateTime } from '@tusalud/app/core/utils/date';
-import { Calendario } from '@tusalud/app/shared/components/calendario/calendario';
 import {
-  RangoVisible,
-  VistaCalendario,
-} from '@tusalud/app/shared/components/calendario/calendario.utils';
-import { PacienteBuscador } from '@tusalud/app/shared/components/paciente-buscador/paciente-buscador';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import {
-  construirHuecos,
-  horarioLaboral,
-} from '@tusalud/app/shared/utils/disponibilidad-calendario';
+  ApiError,
+  EspecialidadesStore,
+  MedicosStore,
+  NotificationService,
+  PacienteMostradorResponse,
+  RecepcionApiService,
+  toIsoDate,
+  toIsoDateTime,
+} from '@tusalud/core';
+import { Calendario, RangoVisible, VistaCalendario } from '@tusalud/ui/calendario';
+import { construirHuecos, horarioLaboral } from '@tusalud/ui/utils';
+import { PacienteBuscador } from '@tusalud/ui/paciente-buscador';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-cita-mostrador',

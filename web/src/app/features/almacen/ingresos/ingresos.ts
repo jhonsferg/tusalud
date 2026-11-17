@@ -19,12 +19,9 @@ import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { startWith } from 'rxjs';
 
-import { IngresoResponse } from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { AlmacenStore } from '@tusalud/app/core/state/almacen.store';
-import { toIsoDate } from '@tusalud/app/core/utils/date';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import { AlmacenStore, IngresoResponse, NotificationService, toIsoDate } from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-ingresos',

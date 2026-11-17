@@ -3,11 +3,15 @@ import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { Tag } from 'primeng/tag';
 
-import { ETIQUETA_ESTADO_TURNO, ETIQUETA_PRIORIDAD, TurnoResponse } from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { RecepcionStore } from '@tusalud/app/core/state/recepcion.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import {
+  ETIQUETA_ESTADO_TURNO,
+  ETIQUETA_PRIORIDAD,
+  NotificationService,
+  RecepcionStore,
+  TurnoResponse,
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 const REFRESCO_MS = 10_000;
 

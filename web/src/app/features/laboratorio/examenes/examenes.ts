@@ -30,21 +30,21 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Subject, debounceTime } from 'rxjs';
 
 import {
-  CATEGORIAS_EXAMEN,
+  AuthService,
   CategoriaExamen,
+  CATEGORIAS_EXAMEN,
   ETIQUETA_CATEGORIA,
   ETIQUETA_MUESTRA,
   ExamenResponse,
-  TIPOS_MUESTRA,
+  LaboratorioStore,
+  NotificationService,
   TipoMuestra,
   TipoParametro,
-} from '@tusalud/app/core/models';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { LaboratorioStore } from '@tusalud/app/core/state/laboratorio.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { rangoReferencia } from '@tusalud/app/shared/utils/laboratorio';
+  TIPOS_MUESTRA,
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
+import { rangoReferencia } from '@tusalud/ui/utils';
 
 @Component({
   selector: 'app-examenes',

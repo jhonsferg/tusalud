@@ -17,18 +17,18 @@ import { Message } from 'primeng/message';
 import { Select } from 'primeng/select';
 
 import {
+  AuthService,
   CamaResponse,
   ETIQUETA_TRIAJE,
+  HospitalizacionStore,
   IngresoHospResponse,
+  NotificationService,
   PacienteMostradorResponse,
-} from '@tusalud/app/core/models';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { HospitalizacionStore } from '@tusalud/app/core/state/hospitalizacion.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PacienteBuscador } from '@tusalud/app/shared/components/paciente-buscador/paciente-buscador';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { COLOR_TRIAJE, NIVELES_TRIAJE } from '@tusalud/app/shared/utils/hospitalizacion';
+} from '@tusalud/core';
+import { COLOR_TRIAJE, NIVELES_TRIAJE } from '@tusalud/ui/utils';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PacienteBuscador } from '@tusalud/ui/paciente-buscador';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 const REFRESCO_MS = 15_000;
 

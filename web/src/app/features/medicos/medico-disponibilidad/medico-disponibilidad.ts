@@ -12,23 +12,16 @@ import {
 import { Router } from '@angular/router';
 import { Button } from 'primeng/button';
 
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { CitasStore } from '@tusalud/app/core/state/citas.store';
-import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
-import { toIsoDate } from '@tusalud/app/core/utils/date';
-import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
-import { Calendario } from '@tusalud/app/shared/components/calendario/calendario';
 import {
-  CalEvento,
-  RangoVisible,
-  VistaCalendario,
-} from '@tusalud/app/shared/components/calendario/calendario.utils';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { citaAEvento } from '@tusalud/app/shared/utils/cita-calendario';
-import {
-  construirHuecos,
-  horarioLaboral,
-} from '@tusalud/app/shared/utils/disponibilidad-calendario';
+  AuthService,
+  CitasStore,
+  MedicosStore,
+  optionalIdAttribute,
+  toIsoDate,
+} from '@tusalud/core';
+import { Calendario, CalEvento, RangoVisible, VistaCalendario } from '@tusalud/ui/calendario';
+import { citaAEvento, construirHuecos, horarioLaboral } from '@tusalud/ui/utils';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-medico-disponibilidad',

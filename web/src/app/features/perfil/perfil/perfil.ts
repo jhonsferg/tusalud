@@ -35,20 +35,24 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import {
   ANTICIPACIONES_RECORDATORIO,
   ApiError,
+  applyServerErrors,
+  AppValidators,
   ETIQUETA_ROL,
+  NotificationService,
+  PALETAS,
+  parseIsoDate,
+  PASSWORD_MAX,
+  PerfilStore,
   SesionResponse,
-} from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { PALETAS, ThemeMode, ThemeService } from '@tusalud/app/core/services/theme.service';
-import { PerfilStore } from '@tusalud/app/core/state/perfil.store';
-import { parseIsoDate, toIsoDate } from '@tusalud/app/core/utils/date';
-import { AppValidators, PASSWORD_MAX } from '@tusalud/app/core/validators/app.validators';
-import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { FormField } from '@tusalud/app/shared/components/form-field/form-field';
-import { MfaPanel } from '@tusalud/app/features/perfil/mfa-panel/mfa-panel';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { UserAvatar } from '@tusalud/app/shared/components/user-avatar/user-avatar';
+  ThemeMode,
+  ThemeService,
+  toIsoDate,
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { FormField } from '@tusalud/ui/form-field';
+import { PageHeader } from '@tusalud/ui/page-header';
+import { UserAvatar } from '@tusalud/ui/user-avatar';
+import { MfaPanel } from '../mfa-panel/mfa-panel';
 
 const AVATAR_LADO = 256;
 const AVATAR_MAX_ENTRADA = 8 * 1024 * 1024;

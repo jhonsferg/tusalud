@@ -13,11 +13,10 @@ import { Button } from 'primeng/button';
 import { SelectButton } from 'primeng/selectbutton';
 import { Skeleton } from 'primeng/skeleton';
 
-import { NotificacionResponse } from '@tusalud/app/core/models';
-import { NotificacionesStore } from '@tusalud/app/core/state/notificaciones.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { COLOR_NOTIFICACION, ICONO_NOTIFICACION } from '@tusalud/app/shared/utils/notificacion';
+import { NotificacionesStore, NotificacionResponse } from '@tusalud/core';
+import { COLOR_NOTIFICACION, ICONO_NOTIFICACION } from '@tusalud/ui/utils';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 type Filtro = 'todas' | 'noLeidas';
 

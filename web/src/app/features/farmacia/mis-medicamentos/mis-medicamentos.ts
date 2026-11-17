@@ -2,10 +2,9 @@ import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { Tag } from 'primeng/tag';
 
-import { ETIQUETA_METODO_FARMACIA } from '@tusalud/app/core/models';
-import { FarmaciaStore } from '@tusalud/app/core/state/farmacia.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import { ETIQUETA_METODO_FARMACIA, FarmaciaStore } from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-mis-medicamentos',

@@ -14,7 +14,9 @@
     "target": "ES2022",
     "module": "preserve",
     "paths": {
-      "@tusalud/*": ["src/*"]
+      "@tusalud/core/testing": ["projects/core/src/testing/index.ts"],
+      "@tusalud/core": ["projects/core/src/public-api.ts"],
+      "@tusalud/ui/*": ["projects/ui/*/src/public-api.ts"]
     }
   },
   "angularCompilerOptions": {
@@ -30,6 +32,18 @@
     },
     {
       "path": "./tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/core/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/core/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/ui/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/ui/tsconfig.spec.json"
     }
   ]
 }

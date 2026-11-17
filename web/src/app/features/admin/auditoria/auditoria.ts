@@ -14,13 +14,11 @@ import { UIChart } from 'primeng/chart';
 import { DatePicker } from 'primeng/datepicker';
 import { TableModule } from 'primeng/table';
 
-import { ESTADOS_CITA } from '@tusalud/app/core/models';
-import { AuditoriaStore } from '@tusalud/app/core/state/auditoria.store';
-import { toIsoDate } from '@tusalud/app/core/utils/date';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { EstadoCitaTag } from '@tusalud/app/shared/components/estado-cita-tag/estado-cita-tag';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { COLOR_ESTADO, ETIQUETA_ESTADO, ICONO_ESTADO } from '@tusalud/app/shared/utils/cita-estado';
+import { AuditoriaStore, ESTADOS_CITA, toIsoDate } from '@tusalud/core';
+import { COLOR_ESTADO, ETIQUETA_ESTADO, ICONO_ESTADO } from '@tusalud/ui/utils';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { EstadoCitaTag } from '@tusalud/ui/estado-cita-tag';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-auditoria',

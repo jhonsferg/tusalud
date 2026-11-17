@@ -10,15 +10,18 @@ import { Button } from 'primeng/button';
 import { Skeleton } from 'primeng/skeleton';
 import { Tag } from 'primeng/tag';
 
-import { MedicoResponse, NOMBRE_DIA } from '@tusalud/app/core/models';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { ClinicaStore } from '@tusalud/app/core/state/clinica.store';
-import { EspecialidadesStore } from '@tusalud/app/core/state/especialidades.store';
-import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
-import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import {
+  AuthService,
+  ClinicaStore,
+  EspecialidadesStore,
+  MedicoResponse,
+  MedicosStore,
+  NOMBRE_DIA,
+  NotificationService,
+  optionalIdAttribute,
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-medico-detail',

@@ -11,12 +11,15 @@ import { Message } from 'primeng/message';
 import { TableModule } from 'primeng/table';
 import { Subject, debounceTime, switchMap, of } from 'rxjs';
 
-import { PacienteMostradorResponse, PacienteRegistradoResponse } from '@tusalud/app/core/models';
-import { RecepcionApiService } from '@tusalud/app/core/services/api/recepcion-api.service';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { toIsoDate } from '@tusalud/app/core/utils/date';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import {
+  NotificationService,
+  PacienteMostradorResponse,
+  PacienteRegistradoResponse,
+  RecepcionApiService,
+  toIsoDate,
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-pacientes-mostrador',

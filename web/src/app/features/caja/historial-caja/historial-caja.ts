@@ -3,9 +3,9 @@ import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/cor
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 
-import { CajaStore } from '@tusalud/app/core/state/caja.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import { CajaStore } from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-historial-caja',

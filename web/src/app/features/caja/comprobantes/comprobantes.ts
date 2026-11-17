@@ -16,15 +16,15 @@ import { Textarea } from 'primeng/textarea';
 import { Subject, debounceTime } from 'rxjs';
 
 import {
+  CajaStore,
   ComprobanteResponse,
   ETIQUETA_METODO_CAJA,
   ETIQUETA_ORIGEN,
-} from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { CajaStore } from '@tusalud/app/core/state/caja.store';
-import { toIsoDate } from '@tusalud/app/core/utils/date';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+  NotificationService,
+  toIsoDate,
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-comprobantes',

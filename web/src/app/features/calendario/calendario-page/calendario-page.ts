@@ -11,31 +11,35 @@ import {
 import { Router } from '@angular/router';
 import { Button } from 'primeng/button';
 
-import { CitaResponse, EventoCalendarioResponse } from '@tusalud/app/core/models';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { CalendarioStore } from '@tusalud/app/core/state/calendario.store';
-import { CitasStore } from '@tusalud/app/core/state/citas.store';
-import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
-import { PerfilStore } from '@tusalud/app/core/state/perfil.store';
-import { toIsoDate, toIsoDateTime } from '@tusalud/app/core/utils/date';
-import { Calendario } from '@tusalud/app/shared/components/calendario/calendario';
 import {
+  AuthService,
+  CalendarioStore,
+  CitaResponse,
+  CitasStore,
+  EventoCalendarioResponse,
+  MedicosStore,
+  PerfilStore,
+  toIsoDate,
+  toIsoDateTime,
+} from '@tusalud/core';
+import {
+  Calendario,
   CalEvento,
   CambioEvento,
   CrearEvento,
   RangoVisible,
   VistaCalendario,
-} from '@tusalud/app/shared/components/calendario/calendario.utils';
-import { EventoDialog } from '@tusalud/app/shared/components/evento-dialog/evento-dialog';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { citaAEvento } from '@tusalud/app/shared/utils/cita-calendario';
-import { horarioLaboral } from '@tusalud/app/shared/utils/disponibilidad-calendario';
+} from '@tusalud/ui/calendario';
 import {
-  DatosEvento,
   categoriasPara,
+  citaAEvento,
+  DatosEvento,
   eventoApiACalendario,
+  horarioLaboral,
   tiposPermitidos,
-} from '@tusalud/app/shared/utils/evento-calendario';
+} from '@tusalud/ui/utils';
+import { EventoDialog } from '@tusalud/ui/evento-dialog';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 interface DatosCita {
   readonly origen: 'cita';

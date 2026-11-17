@@ -9,9 +9,12 @@ import { Skeleton } from 'primeng/skeleton';
 import { Tag } from 'primeng/tag';
 import QRCode from 'qrcode';
 
-import { MfaConfiguracionResponse, MfaEstadoResponse } from '@tusalud/app/core/models';
-import { AuthApiService } from '@tusalud/app/core/services/api/auth-api.service';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
+import {
+  AuthApiService,
+  MfaConfiguracionResponse,
+  MfaEstadoResponse,
+  NotificationService,
+} from '@tusalud/core';
 
 type Modo = 'activar' | 'desactivar' | 'regenerar' | null;
 

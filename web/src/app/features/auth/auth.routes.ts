@@ -5,12 +5,11 @@ export const AUTH_ROUTES: Routes = [
   {
     path: 'login',
     title: 'Iniciar sesión',
-    loadComponent: () => import('@tusalud/app/features/auth/login/login').then((m) => m.Login),
+    loadComponent: () => import('./login/login').then((m) => m.Login),
   },
   {
     path: 'registro',
     title: 'Crear cuenta',
-    loadComponent: () =>
-      import('@tusalud/app/features/auth/register/register').then((m) => m.Register),
+    loadComponent: () => import('./register/register').then((m) => m.Register),
   },
 ];

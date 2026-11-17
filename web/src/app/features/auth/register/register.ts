@@ -7,12 +7,15 @@ import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
 import { Password } from 'primeng/password';
 
-import { ApiError } from '@tusalud/app/core/models';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { toIsoDate } from '@tusalud/app/core/utils/date';
-import { AppValidators, PASSWORD_MAX } from '@tusalud/app/core/validators/app.validators';
-import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
-import { FormField } from '@tusalud/app/shared/components/form-field/form-field';
+import {
+  ApiError,
+  applyServerErrors,
+  AppValidators,
+  AuthService,
+  PASSWORD_MAX,
+  toIsoDate,
+} from '@tusalud/core';
+import { FormField } from '@tusalud/ui/form-field';
 
 @Component({
   selector: 'app-register',

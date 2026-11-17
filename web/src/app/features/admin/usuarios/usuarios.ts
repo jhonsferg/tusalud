@@ -19,18 +19,18 @@ import { Subject, debounceTime } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import {
+  AdminStore,
+  AuthService,
   DESCRIPCION_ROL,
   ETIQUETA_ROL,
+  NotificationService,
   ROLES,
   ROLES_PERSONAL,
   UsuarioAdminResponse,
-} from '@tusalud/app/core/models';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { AdminStore } from '@tusalud/app/core/state/admin.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { UserAvatar } from '@tusalud/app/shared/components/user-avatar/user-avatar';
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
+import { UserAvatar } from '@tusalud/ui/user-avatar';
 
 @Component({
   selector: 'app-usuarios',

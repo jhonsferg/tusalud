@@ -17,13 +17,10 @@ import { Skeleton } from 'primeng/skeleton';
 import { Tag } from 'primeng/tag';
 import { Textarea } from 'primeng/textarea';
 
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { ClinicaStore } from '@tusalud/app/core/state/clinica.store';
-import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { FormField } from '@tusalud/app/shared/components/form-field/form-field';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import { AuthService, ClinicaStore, NotificationService, optionalIdAttribute } from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { FormField } from '@tusalud/ui/form-field';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 const GRUPOS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 

@@ -19,14 +19,16 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
 
-import { PacienteResumenResponse } from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
-import { ClinicaStore } from '@tusalud/app/core/state/clinica.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { UserAvatar } from '@tusalud/app/shared/components/user-avatar/user-avatar';
+import {
+  AuthService,
+  ClinicaStore,
+  MedicosStore,
+  NotificationService,
+  PacienteResumenResponse,
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
+import { UserAvatar } from '@tusalud/ui/user-avatar';
 
 @Component({
   selector: 'app-mis-pacientes',

@@ -20,19 +20,19 @@ import { TableModule } from 'primeng/table';
 import { Subject, debounceTime } from 'rxjs';
 
 import {
+  CajaStore,
   ComprobanteResponse,
   ETIQUETA_METODO_CAJA,
   ETIQUETA_ORIGEN,
-  METODOS_CAJA,
   MetodoPagoCaja,
+  METODOS_CAJA,
+  NotificationService,
   PendienteCobroResponse,
   TipoComprobante,
   TipoDocumento,
-} from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { CajaStore } from '@tusalud/app/core/state/caja.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-cobrar',

@@ -6,10 +6,9 @@ import { Dialog } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 
-import { PagoResponse } from '@tusalud/app/core/models';
-import { PagosStore } from '@tusalud/app/core/state/pagos.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import { PagoResponse, PagosStore } from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-mis-pagos',

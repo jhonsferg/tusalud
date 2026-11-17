@@ -4,10 +4,10 @@ import { RouterLink } from '@angular/router';
 import { Button } from 'primeng/button';
 import { Tag } from 'primeng/tag';
 
-import { AlmacenStore } from '@tusalud/app/core/state/almacen.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { Kpi } from '@tusalud/app/shared/components/kpi/kpi';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import { AlmacenStore } from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { Kpi } from '@tusalud/ui/kpi';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-almacen-panel',

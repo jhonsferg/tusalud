@@ -17,16 +17,19 @@ import { InputText } from 'primeng/inputtext';
 import { Skeleton } from 'primeng/skeleton';
 import { Textarea } from 'primeng/textarea';
 
-import { ApiError, AtencionRequest } from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { CitasStore } from '@tusalud/app/core/state/citas.store';
-import { ClinicaStore } from '@tusalud/app/core/state/clinica.store';
-import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
-import { AppValidators } from '@tusalud/app/core/validators/app.validators';
-import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { FormField } from '@tusalud/app/shared/components/form-field/form-field';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import {
+  ApiError,
+  applyServerErrors,
+  AppValidators,
+  AtencionRequest,
+  CitasStore,
+  ClinicaStore,
+  NotificationService,
+  optionalIdAttribute,
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { FormField } from '@tusalud/ui/form-field';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-atencion-form',

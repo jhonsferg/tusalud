@@ -13,11 +13,9 @@ import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 
-import { TipoMovimiento } from '@tusalud/app/core/models';
-import { AlmacenStore } from '@tusalud/app/core/state/almacen.store';
-import { toIsoDate } from '@tusalud/app/core/utils/date';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import { AlmacenStore, TipoMovimiento, toIsoDate } from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-movimientos',

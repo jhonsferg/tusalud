@@ -13,12 +13,15 @@ import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 import { Subject, debounceTime } from 'rxjs';
 
-import { DispensacionResponse, ETIQUETA_METODO_FARMACIA } from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { FarmaciaStore } from '@tusalud/app/core/state/farmacia.store';
-import { toIsoDate } from '@tusalud/app/core/utils/date';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import {
+  DispensacionResponse,
+  ETIQUETA_METODO_FARMACIA,
+  FarmaciaStore,
+  NotificationService,
+  toIsoDate,
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-historial-farmacia',

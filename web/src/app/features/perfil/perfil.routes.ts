@@ -4,6 +4,6 @@ export const PERFIL_ROUTES: Routes = [
   {
     path: '',
     title: 'Mi perfil',
-    loadComponent: () => import('@tusalud/app/features/perfil/perfil/perfil').then((m) => m.Perfil),
+    loadComponent: () => import('./perfil/perfil').then((m) => m.Perfil),
   },
 ];

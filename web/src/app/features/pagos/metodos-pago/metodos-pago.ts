@@ -16,14 +16,17 @@ import { Skeleton } from 'primeng/skeleton';
 import { Tag } from 'primeng/tag';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 
-import { ApiError, MetodoPagoResponse } from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { PagosStore } from '@tusalud/app/core/state/pagos.store';
-import { AppValidators } from '@tusalud/app/core/validators/app.validators';
-import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { FormField } from '@tusalud/app/shared/components/form-field/form-field';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import {
+  ApiError,
+  applyServerErrors,
+  AppValidators,
+  MetodoPagoResponse,
+  NotificationService,
+  PagosStore,
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { FormField } from '@tusalud/ui/form-field';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-metodos-pago',

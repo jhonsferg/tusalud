@@ -16,17 +16,20 @@ import { Skeleton } from 'primeng/skeleton';
 import { Tag } from 'primeng/tag';
 import { FormsModule } from '@angular/forms';
 
-import { CitaResponse } from '@tusalud/app/core/models';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { CitasStore, esCitaActiva } from '@tusalud/app/core/state/citas.store';
-import { ClinicaStore } from '@tusalud/app/core/state/clinica.store';
-import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { EstadoCitaTag } from '@tusalud/app/shared/components/estado-cita-tag/estado-cita-tag';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { PagoDialog } from '@tusalud/app/shared/components/pago-dialog/pago-dialog';
-import { ValoracionDialog } from '@tusalud/app/shared/components/valoracion-dialog/valoracion-dialog';
-import { CitaActions } from '@tusalud/app/shared/services/cita-actions.service';
+import {
+  AuthService,
+  CitaResponse,
+  CitasStore,
+  ClinicaStore,
+  esCitaActiva,
+  optionalIdAttribute,
+} from '@tusalud/core';
+import { CitaActions } from '@tusalud/ui/services';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { EstadoCitaTag } from '@tusalud/ui/estado-cita-tag';
+import { PageHeader } from '@tusalud/ui/page-header';
+import { PagoDialog } from '@tusalud/ui/pago-dialog';
+import { ValoracionDialog } from '@tusalud/ui/valoracion-dialog';
 
 @Component({
   selector: 'app-cita-detail',

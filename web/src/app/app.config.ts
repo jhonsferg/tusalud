@@ -13,11 +13,16 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
 
 import { routes } from './app.routes';
-import { AppTitleStrategy } from '@tusalud/app/core/config/app-title.strategy';
-import { PRIMENG_TRANSLATION_ES, TusaludPreset } from '@tusalud/app/core/config/theme';
-import { authInterceptor } from '@tusalud/app/core/interceptors/auth.interceptor';
-import { errorInterceptor } from '@tusalud/app/core/interceptors/error.interceptor';
-import { loadingInterceptor } from '@tusalud/app/core/interceptors/loading.interceptor';
+import {
+  API_URL,
+  AppTitleStrategy,
+  authInterceptor,
+  errorInterceptor,
+  loadingInterceptor,
+  PRIMENG_TRANSLATION_ES,
+  TusaludPreset,
+} from '@tusalud/core';
+import { environment } from '../environments/environment';
 
 registerLocaleData(localeEsPe);
 
@@ -32,6 +37,7 @@ export const appConfig: ApplicationConfig = {
     ),
     { provide: TitleStrategy, useClass: AppTitleStrategy },
     { provide: LOCALE_ID, useValue: 'es-PE' },
+    { provide: API_URL, useValue: environment.apiUrl },
     provideHttpClient(
       withFetch(),
       withInterceptors([loadingInterceptor, errorInterceptor, authInterceptor]),

@@ -18,12 +18,9 @@ import { Select } from 'primeng/select';
 import { Skeleton } from 'primeng/skeleton';
 import { Tag } from 'primeng/tag';
 
-import { MedicoResponse } from '@tusalud/app/core/models';
-import { AuthService } from '@tusalud/app/core/services/auth.service';
-import { EspecialidadesStore } from '@tusalud/app/core/state/especialidades.store';
-import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import { AuthService, EspecialidadesStore, MedicoResponse, MedicosStore } from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-medico-list',

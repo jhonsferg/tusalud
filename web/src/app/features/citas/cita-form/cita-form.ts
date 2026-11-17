@@ -17,29 +17,29 @@ import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';
 import { Textarea } from 'primeng/textarea';
 
-import { ApiError } from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { CitasStore } from '@tusalud/app/core/state/citas.store';
-import { EspecialidadesStore } from '@tusalud/app/core/state/especialidades.store';
-import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
-import { combineDateAndTime, parseIsoDate, toIsoDate } from '@tusalud/app/core/utils/date';
-import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
-import { AppValidators } from '@tusalud/app/core/validators/app.validators';
-import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
-import { Calendario } from '@tusalud/app/shared/components/calendario/calendario';
 import {
+  ApiError,
+  applyServerErrors,
+  AppValidators,
+  CitasStore,
+  combineDateAndTime,
+  EspecialidadesStore,
+  MedicosStore,
+  NotificationService,
+  optionalIdAttribute,
+  parseIsoDate,
+  toIsoDate,
+} from '@tusalud/core';
+import {
+  Calendario,
   CalEvento,
   CalHueco,
   RangoVisible,
   VistaCalendario,
-} from '@tusalud/app/shared/components/calendario/calendario.utils';
-import { citaAEvento } from '@tusalud/app/shared/utils/cita-calendario';
-import {
-  construirHuecos,
-  horarioLaboral,
-} from '@tusalud/app/shared/utils/disponibilidad-calendario';
-import { FormField } from '@tusalud/app/shared/components/form-field/form-field';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+} from '@tusalud/ui/calendario';
+import { citaAEvento, construirHuecos, horarioLaboral } from '@tusalud/ui/utils';
+import { FormField } from '@tusalud/ui/form-field';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 const MOTIVO_MAX = 500;
 

@@ -5,10 +5,10 @@ import { Button } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
 
-import { FarmaciaStore } from '@tusalud/app/core/state/farmacia.store';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { Kpi } from '@tusalud/app/shared/components/kpi/kpi';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import { FarmaciaStore } from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { Kpi } from '@tusalud/ui/kpi';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-farmacia-panel',

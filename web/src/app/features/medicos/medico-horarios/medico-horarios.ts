@@ -7,20 +7,23 @@ import { Select } from 'primeng/select';
 import { Skeleton } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 
-import { ApiError, DIAS_SEMANA, HorarioResponse, NOMBRE_DIA } from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
-import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
 import {
+  ApiError,
+  applyServerErrors,
   AppValidators,
+  DIAS_SEMANA,
   DURACION_MAX,
   DURACION_MIN,
-} from '@tusalud/app/core/validators/app.validators';
-import { applyServerErrors } from '@tusalud/app/core/validators/server-errors';
-import { firstErrorMessage } from '@tusalud/app/core/validators/validation-messages';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { FormField } from '@tusalud/app/shared/components/form-field/form-field';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+  firstErrorMessage,
+  HorarioResponse,
+  MedicosStore,
+  NOMBRE_DIA,
+  NotificationService,
+  optionalIdAttribute,
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { FormField } from '@tusalud/ui/form-field';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-medico-horarios',

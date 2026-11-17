@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
 
-import { RecepcionStore } from '@tusalud/app/core/state/recepcion.store';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import { RecepcionStore } from '@tusalud/core';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 const REFRESCO_MS = 5000;
 

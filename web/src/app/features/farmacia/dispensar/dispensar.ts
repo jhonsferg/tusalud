@@ -30,15 +30,15 @@ import { startWith } from 'rxjs';
 import {
   DispensacionResponse,
   ETIQUETA_METODO_FARMACIA,
-  METODOS_PAGO_FARMACIA,
+  FarmaciaStore,
   MetodoPagoFarmacia,
+  METODOS_PAGO_FARMACIA,
+  NotificationService,
+  optionalIdAttribute,
   RecetaFarmaciaResponse,
-} from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { FarmaciaStore } from '@tusalud/app/core/state/farmacia.store';
-import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+} from '@tusalud/core';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 function normalizar(texto: string): string {
   return texto

@@ -19,12 +19,15 @@ import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
 import { Textarea } from 'primeng/textarea';
 
-import { ETIQUETA_CATEGORIA, PrioridadOrden } from '@tusalud/app/core/models';
-import { NotificationService } from '@tusalud/app/core/services/notification.service';
-import { ClinicaStore } from '@tusalud/app/core/state/clinica.store';
-import { LaboratorioStore } from '@tusalud/app/core/state/laboratorio.store';
-import { optionalIdAttribute } from '@tusalud/app/core/utils/route-input';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import {
+  ClinicaStore,
+  ETIQUETA_CATEGORIA,
+  LaboratorioStore,
+  NotificationService,
+  optionalIdAttribute,
+  PrioridadOrden,
+} from '@tusalud/core';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-solicitar',

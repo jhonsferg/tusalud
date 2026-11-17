@@ -14,19 +14,21 @@ import { DatePicker } from 'primeng/datepicker';
 import { SelectButton } from 'primeng/selectbutton';
 import { Skeleton } from 'primeng/skeleton';
 
-import { CitaResponse } from '@tusalud/app/core/models';
-import { CitasStore, esCitaActiva } from '@tusalud/app/core/state/citas.store';
-import { addDays, parseIsoDate, today, toIsoDate } from '@tusalud/app/core/utils/date';
-import { Calendario } from '@tusalud/app/shared/components/calendario/calendario';
 import {
-  CalEvento,
-  RangoVisible,
-} from '@tusalud/app/shared/components/calendario/calendario.utils';
-import { citaAEvento } from '@tusalud/app/shared/utils/cita-calendario';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
-import { EstadoCitaTag } from '@tusalud/app/shared/components/estado-cita-tag/estado-cita-tag';
-import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
-import { CitaActions } from '@tusalud/app/shared/services/cita-actions.service';
+  addDays,
+  CitaResponse,
+  CitasStore,
+  esCitaActiva,
+  parseIsoDate,
+  today,
+  toIsoDate,
+} from '@tusalud/core';
+import { Calendario, CalEvento, RangoVisible } from '@tusalud/ui/calendario';
+import { CitaActions } from '@tusalud/ui/services';
+import { citaAEvento } from '@tusalud/ui/utils';
+import { EmptyState } from '@tusalud/ui/empty-state';
+import { EstadoCitaTag } from '@tusalud/ui/estado-cita-tag';
+import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-agenda',
