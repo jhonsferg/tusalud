@@ -1,1 +1,138 @@
-<p>register works!</p>
+<h1 class="title">Crea tu cuenta</h1>
+<p class="subtitle">Regístrate como paciente para reservar tus citas.</p>
+
+@if (errorMessage(); as message) {
+  <p-message severity="error" icon="pi pi-exclamation-circle" styleClass="mb-3 w-full">{{
+    message
+  }}</p-message>
+}
+
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="form-grid">
+    <app-form-field
+      label="Nombre"
+      [control]="form.controls.nombre"
+      inputId="reg-nombre"
+      [required]="true"
+    >
+      <input
+        pInputText
+        id="reg-nombre"
+        formControlName="nombre"
+        autocomplete="given-name"
+        class="w-full"
+      />
+    </app-form-field>
+
+    <app-form-field
+      label="Apellido"
+      [control]="form.controls.apellido"
+      inputId="reg-apellido"
+      [required]="true"
+    >
+      <input
+        pInputText
+        id="reg-apellido"
+        formControlName="apellido"
+        autocomplete="family-name"
+        class="w-full"
+      />
+    </app-form-field>
+
+    <app-form-field label="DNI" [control]="form.controls.dni" inputId="reg-dni" [required]="true">
+      <input
+        pInputText
+        id="reg-dni"
+        formControlName="dni"
+        inputmode="numeric"
+        maxlength="8"
+        class="w-full"
+      />
+    </app-form-field>
+
+    <app-form-field
+      label="Teléfono"
+      [control]="form.controls.telefono"
+      inputId="reg-telefono"
+      hint="Opcional, 9 dígitos"
+    >
+      <input
+        pInputText
+        id="reg-telefono"
+        formControlName="telefono"
+        inputmode="tel"
+        maxlength="9"
+        class="w-full"
+      />
+    </app-form-field>
+
+    <app-form-field
+      class="full"
+      label="Fecha de nacimiento"
+      [control]="form.controls.fechaNacimiento"
+      inputId="reg-nacimiento"
+      [required]="true"
+    >
+      <p-datepicker
+        inputId="reg-nacimiento"
+        formControlName="fechaNacimiento"
+        dateFormat="dd/mm/yy"
+        [maxDate]="ayer"
+        [showIcon]="true"
+        [showButtonBar]="true"
+        yearRange="1920:2030"
+        [fluid]="true"
+        placeholder="dd/mm/aaaa"
+      />
+    </app-form-field>
+
+    <app-form-field
+      class="full"
+      label="Email"
+      [control]="form.controls.email"
+      inputId="reg-email"
+      [required]="true"
+    >
+      <input
+        pInputText
+        id="reg-email"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        class="w-full"
+      />
+    </app-form-field>
+
+    <app-form-field
+      class="full"
+      label="Contraseña"
+      [control]="form.controls.password"
+      inputId="reg-password"
+      hint="Entre 8 y 72 caracteres"
+      [required]="true"
+    >
+      <p-password
+        inputId="reg-password"
+        formControlName="password"
+        [toggleMask]="true"
+        autocomplete="new-password"
+        promptLabel="Ingresa una contraseña"
+        weakLabel="Débil"
+        mediumLabel="Media"
+        strongLabel="Fuerte"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+      />
+    </app-form-field>
+  </div>
+
+  <p-button
+    type="submit"
+    label="Crear cuenta"
+    icon="pi pi-user-plus"
+    [loading]="submitting()"
+    styleClass="w-full mt-4"
+  />
+</form>
+
+<p class="footer">¿Ya tienes cuenta? <a routerLink="/auth/login">Inicia sesión</a></p>

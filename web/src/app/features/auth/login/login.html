@@ -1,1 +1,72 @@
-<p>login works!</p>
+<h1 class="title">Bienvenido de nuevo</h1>
+<p class="subtitle">Ingresa con tu cuenta para gestionar tus citas.</p>
+
+@if (errorMessage(); as message) {
+  <p-message severity="error" icon="pi pi-exclamation-circle" styleClass="mb-3 w-full">{{
+    message
+  }}</p-message>
+}
+
+<form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-column gap-3" novalidate>
+  <app-form-field
+    label="Email"
+    [control]="form.controls.email"
+    inputId="login-email"
+    [required]="true"
+  >
+    <input
+      pInputText
+      id="login-email"
+      type="email"
+      formControlName="email"
+      autocomplete="username"
+      placeholder="tu@correo.com"
+      class="w-full"
+    />
+  </app-form-field>
+
+  <app-form-field
+    label="Contraseña"
+    [control]="form.controls.password"
+    inputId="login-password"
+    [required]="true"
+  >
+    <p-password
+      inputId="login-password"
+      formControlName="password"
+      [feedback]="false"
+      [toggleMask]="true"
+      autocomplete="current-password"
+      placeholder="Tu contraseña"
+      styleClass="w-full"
+      inputStyleClass="w-full"
+    />
+  </app-form-field>
+
+  <p-button
+    type="submit"
+    label="Iniciar sesión"
+    icon="pi pi-sign-in"
+    [loading]="submitting()"
+    styleClass="w-full"
+  />
+</form>
+
+<p class="footer">¿No tienes cuenta? <a routerLink="/auth/registro">Regístrate como paciente</a></p>
+
+@if (cuentasDemo.length > 0) {
+  <div class="demo">
+    <small>Cuentas de prueba</small>
+    <div class="demo-actions">
+      @for (cuenta of cuentasDemo; track cuenta.email) {
+        <p-button
+          [label]="cuenta.rol"
+          size="small"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="usarCuenta(cuenta)"
+        />
+      }
+    </div>
+  </div>
+}
