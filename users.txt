@@ -14,16 +14,25 @@ Administrador G.  admin@tusalud.com           Admin123!
 MEDICOS
 -------
 Rol: ROLE_MEDICO
-Nombre              Correo                      Contraseña    Especialidad      Colegiatura  Consultorio      Precio   Horario
-Luis García         dr.garcia@tusalud.com       Medico123!    Cardiología       CMP-12345    Consultorio 101  S/150    Lun a Vie 08:00-13:00
-Carmen López        dra.lopez@tusalud.com       Medico123!    Pediatría         CMP-67890    Consultorio 205  S/120    Lun a Vie 14:00-19:00, Sáb 08:00-12:00
-Ricardo Salazar     dr.salazar@tusalud.com      Medico123!    Medicina General  CMP-23456    Consultorio 102  S/90     Lun a Vie 08:00-12:00 y 15:00-18:00
-Patricia Vega       dra.vega@tusalud.com        Medico123!    Dermatología      CMP-34567    Consultorio 310  S/130    Mar y Jue 09:00-14:00
-Andrés Quispe       dr.quispe@tusalud.com       Medico123!    Traumatología     CMP-45678    Consultorio 215  S/160    Lun, Mié y Vie 10:00-16:00
-Lucía Fernández     dra.fernandez@tusalud.com   Medico123!    Ginecología       CMP-56789    Consultorio 402  S/140    Lun a Vie 14:00-19:00
-Marcos Delgado      dr.delgado@tusalud.com      Medico123!    Oftalmología      CMP-67801    Consultorio 118  S/110    Mié a Sáb 08:00-13:00
+Nombre              Correo                      Contraseña    Especialidades                    Colegiatura  Consultorio      Horario
+Luis García         dr.garcia@tusalud.com       Medico123!    Cardiología, Medicina General     CMP-12345    Consultorio 101  Lun a Vie 08:00-13:00
+Carmen López        dra.lopez@tusalud.com       Medico123!    Pediatría                         CMP-67890    Consultorio 205  Lun a Vie 14:00-19:00, Sáb 08:00-12:00
+Ricardo Salazar     dr.salazar@tusalud.com      Medico123!    Medicina General                  CMP-23456    Consultorio 102  Lun a Vie 08:00-12:00 y 15:00-18:00
+Patricia Vega       dra.vega@tusalud.com        Medico123!    Dermatología                      CMP-34567    Consultorio 310  Mar y Jue 09:00-14:00
+Andrés Quispe       dr.quispe@tusalud.com       Medico123!    Traumatología                     CMP-45678    Consultorio 215  Lun, Mié y Vie 10:00-16:00
+Lucía Fernández     dra.fernandez@tusalud.com   Medico123!    Ginecología                       CMP-56789    Consultorio 402  Lun a Vie 14:00-19:00
+Marcos Delgado      dr.delgado@tusalud.com      Medico123!    Oftalmología, Medicina General    CMP-67801    Consultorio 118  Mié a Sáb 08:00-13:00
 
 Todas las citas duran 30 minutos.
+
+TARIFAS POR ESPECIALIDAD
+------------------------
+El precio de la consulta lo define la especialidad y lo edita el administrador en Especialidades.
+Cardiología S/150, Pediatría S/120, Medicina General S/90, Dermatología S/130, Traumatología S/160, Ginecología S/140 y Oftalmología S/110.
+
+PACIENTE COMPARTIDO
+-------------------
+Camila Torres está compartida por Luis García con Ricardo Salazar, así que aparece en la lista de ambos.
 
 PACIENTES
 ---------
@@ -74,3 +83,11 @@ PENDIENTE    en 8 días        Juan Pérez            R. Salazar       Dolor de 
 CONFIRMADA   en 9 días        María Rodríguez       P. Vega          Dermatitis en las manos
 
 Cuando el día indicado no es de atención del médico, la cita se mueve al día de atención más cercano.
+
+PAGOS Y SEGURIDAD
+-----------------
+Tarjetas de prueba: 4242 4242 4242 4242 es válida con cualquier vencimiento futuro y cualquier CVV de 3 dígitos.
+Yape y Plin: el pago genera un QR que vence a los 5 minutos y el botón Simular pago desde la app lo confirma. La simulación está activa fuera de producción.
+Cupones de ejemplo: SALUD20 y BIENVENIDA10.
+Verificación en dos pasos: ningún usuario la tiene activa. Cada usuario puede activarla en Mi perfil, pestaña Seguridad, con cualquier aplicación autenticadora.
+El token de acceso dura 15 minutos y se renueva solo con el refresh token, sin volver a pedir la contraseña.

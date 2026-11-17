@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "6b0d7c1e-3f5a-4e1b-9a7c-2d4e8f9a1c01",
     "name": "TuSalud API",
-    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 08, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
+    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 11, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -962,7 +962,7 @@
             "description": "Crea una especialidad con nombre único (generado en el pre-request) y guarda su id en `especialidadId`.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"{{especialidadNombre}}\",\n  \"descripcion\": \"Especialidad creada desde Postman\"\n}",
+              "raw": "{\n  \"nombre\": \"{{especialidadNombre}}\",\n  \"descripcion\": \"Especialidad creada desde Postman\",\n  \"precioConsulta\": 100.00\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1110,7 +1110,7 @@
             "description": "Actualiza nombre y descripción. El nuevo nombre se guarda en `especialidadNombre`.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"{{especialidadNombre}}\",\n  \"descripcion\": \"Descripción actualizada desde Postman\"\n}",
+              "raw": "{\n  \"nombre\": \"{{especialidadNombre}}\",\n  \"descripcion\": \"Descripción actualizada desde Postman\",\n  \"precioConsulta\": 100.00\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1192,7 +1192,7 @@
             "description": "Intenta crear otra especialidad con el mismo nombre: debe responder 409.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"{{especialidadNombre}}\",\n  \"descripcion\": \"Duplicada\"\n}",
+              "raw": "{\n  \"nombre\": \"{{especialidadNombre}}\",\n  \"descripcion\": \"Duplicada\",\n  \"precioConsulta\": 100.00\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1284,7 +1284,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"No permitida\",\n  \"descripcion\": \"Debe fallar\"\n}",
+              "raw": "{\n  \"nombre\": \"No permitida\",\n  \"descripcion\": \"Debe fallar\",\n  \"precioConsulta\": 100.00\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1510,7 +1510,7 @@
                   "const lista = asList(pm.response.json());",
                   "pm.test('Todos son de Cardiología', () => {",
                   "    pm.expect(lista.length).to.be.above(0);",
-                  "    lista.forEach(m => pm.expect(String(m.especialidadId)).to.eql(String(pm.variables.get('especialidadCardiologiaId'))));",
+                  "    lista.forEach(m => pm.expect(m.especialidades.map(e => String(e.id))).to.include(String(pm.variables.get('especialidadCardiologiaId'))));",
                   "});",
                   "pm.test('Incluye al Dr. García', () => pm.expect(lista.map(m => m.email)).to.include('dr.garcia@tusalud.com'));"
                 ]
@@ -1562,7 +1562,7 @@
                   "pm.test('Datos del Dr. García', () => {",
                   "    const j = pm.response.json();",
                   "    pm.expect(j.colegiatura).to.eql('CMP-12345');",
-                  "    pm.expect(norm(j.especialidadNombre)).to.eql('cardiologia');",
+                  "    pm.expect(j.especialidades.map(e => norm(e.nombre))).to.include('cardiologia');",
                   "    pm.expect(j.nombreCompleto).to.include('Garc');",
                   "});"
                 ]
@@ -1642,7 +1642,7 @@
             "description": "Crea una especialidad nueva (nombre único) que se asignará al médico. Guarda el id en `especialidadMedicoId`.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"{{especialidadMedicoNombre}}\",\n  \"descripcion\": \"Especialidad para pruebas de médicos\"\n}",
+              "raw": "{\n  \"nombre\": \"{{especialidadMedicoNombre}}\",\n  \"descripcion\": \"Especialidad para pruebas de médicos\",\n  \"precioConsulta\": 100.00\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1688,9 +1688,8 @@
                   "    pm.expect(j.usuarioId).to.be.a('number');",
                   "    pm.expect(j.email).to.eql(pm.variables.get('medicoEmail'));",
                   "    pm.expect(j.colegiatura).to.eql(pm.variables.get('medicoColegiatura'));",
-                  "    pm.expect(String(j.especialidadId)).to.eql(String(pm.variables.get('especialidadMedicoId')));",
+                  "    pm.expect(j.especialidades.map(e => String(e.id))).to.eql([String(pm.variables.get('especialidadMedicoId'))]);",
                   "    pm.expect(j.nombreCompleto).to.eql('Ana Torres');",
-                  "    pm.expect(Number(j.precioConsulta)).to.eql(180);",
                   "    pm.expect(j).to.have.property('estado');",
                   "});",
                   "setVar('medicoId', j.id);"
@@ -1714,7 +1713,7 @@
             "description": "Alta de un médico (crea también su usuario con ROLE_MEDICO). Email y colegiatura únicos generados en el pre-request. Guarda el id en `medicoId`.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Ana\",\n  \"apellido\": \"Torres\",\n  \"email\": \"{{medicoEmail}}\",\n  \"password\": \"Medico123!\",\n  \"telefono\": \"912345678\",\n  \"colegiatura\": \"{{medicoColegiatura}}\",\n  \"consultorio\": \"Consultorio 204\",\n  \"precioConsulta\": 180.00,\n  \"especialidadId\": {{especialidadMedicoId}}\n}",
+              "raw": "{\n  \"nombre\": \"Ana\",\n  \"apellido\": \"Torres\",\n  \"email\": \"{{medicoEmail}}\",\n  \"password\": \"Medico123!\",\n  \"telefono\": \"912345678\",\n  \"colegiatura\": \"{{medicoColegiatura}}\",\n  \"consultorio\": \"Consultorio 204\",\n  \"especialidadIds\": [{{especialidadMedicoId}}]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1842,7 +1841,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nombre\": \"No\",\n  \"apellido\": \"Permitido\",\n  \"email\": \"no.permitido@tusalud.com\",\n  \"password\": \"Medico123!\",\n  \"telefono\": \"912345678\",\n  \"colegiatura\": \"CMP-00000\",\n  \"consultorio\": \"X\",\n  \"precioConsulta\": 100.00,\n  \"especialidadId\": {{especialidadMedicoId}}\n}",
+              "raw": "{\n  \"nombre\": \"No\",\n  \"apellido\": \"Permitido\",\n  \"email\": \"no.permitido@tusalud.com\",\n  \"password\": \"Medico123!\",\n  \"telefono\": \"912345678\",\n  \"colegiatura\": \"CMP-00000\",\n  \"consultorio\": \"X\",\n  \"especialidadIds\": [{{especialidadMedicoId}}]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2499,7 +2498,7 @@
             "description": "Reserva la cita en `fechaHoraCita`. Debe quedar PENDIENTE con el monto de la consulta. Guarda el id en `citaId`.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"fechaHora\": \"{{fechaHoraCita}}\",\n  \"motivo\": \"Control cardiológico de rutina\"\n}",
+              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"especialidadId\": {{especialidadCardiologiaId}},\n  \"fechaHora\": \"{{fechaHoraCita}}\",\n  \"motivo\": \"Control cardiológico de rutina\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2591,7 +2590,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"fechaHora\": \"{{fechaHoraCita}}\",\n  \"motivo\": \"Intento de doble reserva\"\n}",
+              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"especialidadId\": {{especialidadCardiologiaId}},\n  \"fechaHora\": \"{{fechaHoraCita}}\",\n  \"motivo\": \"Intento de doble reserva\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2690,7 +2689,7 @@
             "description": "El Dr. García no atiende domingos: 409.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"fechaHora\": \"{{fechaHoraDomingo}}\",\n  \"motivo\": \"Cita en domingo\"\n}",
+              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"especialidadId\": {{especialidadCardiologiaId}},\n  \"fechaHora\": \"{{fechaHoraDomingo}}\",\n  \"motivo\": \"Cita en domingo\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2749,7 +2748,7 @@
             "description": "Día hábil pero a las 16:00, fuera del bloque 08:00-13:00 del Dr. García: 409.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"fechaHora\": \"{{fechaHoraFueraBloque}}\",\n  \"motivo\": \"Cita fuera de horario\"\n}",
+              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"especialidadId\": {{especialidadCardiologiaId}},\n  \"fechaHora\": \"{{fechaHoraFueraBloque}}\",\n  \"motivo\": \"Cita fuera de horario\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2795,7 +2794,7 @@
             "description": "La fecha y hora debe ser futura: 400 con `validationErrors.fechaHora`.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"fechaHora\": \"2020-01-06T09:00:00\",\n  \"motivo\": \"Fecha pasada\"\n}",
+              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"especialidadId\": {{especialidadCardiologiaId}},\n  \"fechaHora\": \"2020-01-06T09:00:00\",\n  \"motivo\": \"Fecha pasada\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -3512,7 +3511,7 @@
             "description": "Reserva la segunda cita y guarda su id en `cita2Id`.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"fechaHora\": \"{{fechaHoraCita2}}\",\n  \"motivo\": \"Consulta de seguimiento\"\n}",
+              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"especialidadId\": {{especialidadCardiologiaId}},\n  \"fechaHora\": \"{{fechaHoraCita2}}\",\n  \"motivo\": \"Consulta de seguimiento\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -4241,6 +4240,880 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "09 - Tarifas, roles y pacientes compartidos",
+      "description": "El precio lo define la especialidad, el administrador gestiona los roles y los médicos comparten pacientes.",
+      "item": [
+        {
+          "name": "Cambiar la tarifa de una especialidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve el precio de la especialidad', () => pm.expect(j.precioConsulta).to.eql(150));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/especialidades/{{especialidadCardiologiaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "especialidades",
+                "{{especialidadCardiologiaId}}"
+              ]
+            },
+            "description": "Solo el administrador cambia la tarifa de una especialidad.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Cardiología\",\n  \"descripcion\": \"Diagnóstico y tratamiento de enfermedades del corazón\",\n  \"precioConsulta\": 150\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Leer las especialidades actuales del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('especialidadIdsGarcia', JSON.stringify(j.especialidades.map(e => e.id)));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/{{medicoGarciaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos", "{{medicoGarciaId}}"]
+            },
+            "description": "Guarda las especialidades actuales para restaurarlas.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cambiar las especialidades de un médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('El médico tiene especialidades con precio', () => {",
+                  "    pm.expect(j.especialidades).to.be.an(\"array\").that.is.not.empty;",
+                  "    pm.expect(j.especialidades[0]).to.have.property(\"precioConsulta\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/{{medicoGarciaId}}/especialidades",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "medicos",
+                "{{medicoGarciaId}}",
+                "especialidades"
+              ]
+            },
+            "description": "Reasigna las mismas especialidades del médico para no alterar los datos.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"especialidadIds\": {{especialidadIdsGarcia}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar roles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Lista los tres roles con su cantidad de usuarios', () => {",
+                  "    pm.expect(j.map(r => r.nombre)).to.include.members([\"ROLE_ADMIN\", \"ROLE_MEDICO\", \"ROLE_PACIENTE\"]);",
+                  "    j.forEach(r => pm.expect(r.usuarios).to.be.a(\"number\"));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "roles"]
+            },
+            "description": "Roles con el número de usuarios de cada uno.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente intenta listar roles (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "roles"]
+            },
+            "description": "Solo el administrador gestiona los roles.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Elegir un paciente del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const propio = j.find(p => !p.compartidoPor);",
+                  "pm.test('El médico tiene pacientes propios', () => pm.expect(propio).to.exist);",
+                  "pm.collectionVariables.set('pacienteCompartirId', propio.pacienteId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/me/pacientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos", "me", "pacientes"]
+            },
+            "description": "Guarda el id de un paciente atendido por el médico.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Compartir un paciente con otro médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 201 o 409 si ya estaba compartido\", () => pm.expect(pm.response.code).to.be.oneOf([201, 409]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteCompartirId}}/compartir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteCompartirId}}",
+                "compartir"
+              ]
+            },
+            "description": "Requiere la variable pacienteCompartirId con el id de un paciente atendido por el médico.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": \"{{medicoLopezId}}\",\n  \"nota\": \"Interconsulta desde Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar los médicos con acceso al paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteCompartirId}}/compartidos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteCompartirId}}",
+                "compartidos"
+              ]
+            },
+            "description": "Médicos con los que se compartió el paciente.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dejar de compartir el paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código de estado 204 o 404 si ya no estaba compartido\", () => pm.expect(pm.response.code).to.be.oneOf([204, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pacientes/{{pacienteCompartirId}}/compartir/{{medicoLopezId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pacientes",
+                "{{pacienteCompartirId}}",
+                "compartir",
+                "{{medicoLopezId}}"
+              ]
+            },
+            "description": "Quien compartió o un administrador revoca el acceso.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10 - Pagos con Yape y Plin",
+      "description": "Flujo de pago con QR simulado sobre una cita recién reservada.",
+      "item": [
+        {
+          "name": "Reservar una cita para pagar",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date();",
+                  "do {",
+                  "    d.setTime(Date.now() + (20 + Math.floor(Math.random() * 300)) * 86400000);",
+                  "} while (d.getDay() === 0 || d.getDay() === 6);",
+                  "const pad = n => String(n).padStart(2, '0');",
+                  "const minutos = Math.floor(Math.random() * 10) * 30;",
+                  "const hora = 8 * 60 + minutos;",
+                  "pm.collectionVariables.set('fechaHoraPago', d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(Math.floor(hora / 60)) + ':' + pad(hora % 60) + ':00');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('La cita queda pendiente y sin pagar', () => {",
+                  "    pm.expect(j.estado).to.eql(\"PENDIENTE\");",
+                  "    pm.expect(j.pagado).to.eql(false);",
+                  "    pm.expect(Number(j.precio)).to.be.above(0);",
+                  "});",
+                  "pm.collectionVariables.set('citaPagoId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": {{medicoGarciaId}},\n  \"especialidadId\": {{especialidadCardiologiaId}},\n  \"fechaHora\": \"{{fechaHoraPago}}\",\n  \"motivo\": \"Cita para probar el pago con QR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas"]
+            },
+            "description": "Reserva una cita en una fecha futura aleatoria para pagarla con QR."
+          },
+          "response": []
+        },
+        {
+          "name": "Generar QR de Yape",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve el QR pendiente con su vencimiento', () => {",
+                  "    pm.expect(j.estado).to.eql(\"PENDIENTE\");",
+                  "    pm.expect(j.qrPayload).to.be.a(\"string\").and.not.empty;",
+                  "    pm.expect(j.codigo).to.be.a(\"string\");",
+                  "});",
+                  "pm.collectionVariables.set('codigoQr', j.codigo);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pagos/qr",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "pagos", "qr"]
+            },
+            "description": "La intención de pago vence a los 5 minutos.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"citaId\": \"{{citaPagoId}}\",\n  \"billetera\": \"YAPE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar el estado del QR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Sigue pendiente', () => pm.expect(pm.response.json().estado).to.eql('PENDIENTE'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pagos/qr/{{codigoQr}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "pagos", "qr", "{{codigoQr}}"]
+            },
+            "description": "El frontend consulta este endpoint cada 3 segundos.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Simular la confirmación desde la app",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('El pago queda confirmado', () => {",
+                  "    pm.expect(j.estado).to.eql(\"CONFIRMADO\");",
+                  "    pm.expect(j.pagoId).to.be.a(\"number\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pagos/qr/{{codigoQr}}/simular-confirmacion",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "pagos",
+                "qr",
+                "{{codigoQr}}",
+                "simular-confirmacion"
+              ]
+            },
+            "description": "Solo disponible con app.pagos.simulacion-habilitada. En producción responde 403.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar un QR confirmado (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"No se puede cancelar un pago ya confirmado\", () => pm.expect(pm.response.code).to.be.oneOf([400, 409]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/pagos/qr/{{codigoQr}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "pagos", "qr", "{{codigoQr}}"]
+            },
+            "description": "Solo se cancelan los QR pendientes.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "11 - Verificación en dos pasos y renovación del token",
+      "description": "Configuración del segundo factor y rotación del refresh token.",
+      "item": [
+        {
+          "name": "Estado de la verificación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Informa si está activa', () => pm.expect(j.activo).to.be.a('boolean'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/mfa/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "mfa", "estado"]
+            },
+            "description": "Cualquier usuario autenticado.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Configurar el autenticador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Entrega el secreto y la URI otpauth', () => {",
+                  "    pm.expect(j.secreto).to.match(/^[A-Z2-7]+$/);",
+                  "    pm.expect(j.otpauthUri).to.include(\"otpauth://totp/\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/mfa/configurar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "mfa", "configurar"]
+            },
+            "description": "Escanea la URI con una aplicación autenticadora y activa con un código de 6 dígitos.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Activar con un código inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/mfa/activar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "mfa", "activar"]
+            },
+            "description": "Un código incorrecto no activa el segundo factor.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verificar con un token de verificación inválido (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/mfa/verificar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "mfa", "verificar"]
+            },
+            "description": "Endpoint público que cambia un mfaToken y un código por la sesión.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mfaToken\": \"token.invalido\",\n  \"codigo\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Renovar con un refresh token inválido (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "refresh"]
+            },
+            "description": "Un refresh token desconocido, vencido o ya rotado responde 401.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"inexistente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -4391,6 +5264,31 @@
     },
     {
       "key": "cita2Id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pacienteCompartirId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "codigoQr",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "especialidadIdsGarcia",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fechaHoraPago",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "citaPagoId",
       "value": "",
       "type": "string"
     }

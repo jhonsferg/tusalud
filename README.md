@@ -27,6 +27,13 @@ TuSalud es el sistema de gestión de citas y consultas médicas. El repositorio 
   - [Pagos, tarjetas y cupones](#pagos-tarjetas-y-cupones)
   - [Historia clínica](#historia-clínica)
   - [Reprogramación y valoraciones](#reprogramación-y-valoraciones)
+  - [Tarifas por especialidad](#tarifas-por-especialidad)
+  - [Roles de usuario](#roles-de-usuario)
+  - [Pacientes compartidos](#pacientes-compartidos)
+  - [Pagos con Yape y Plin](#pagos-con-yape-y-plin)
+  - [Verificación en dos pasos](#verificación-en-dos-pasos)
+  - [Renovación del token](#renovación-del-token)
+  - [Calendario de citas](#calendario-de-citas)
 - [Manejo de errores](#manejo-de-errores)
 - [Perfiles y configuración](#perfiles-y-configuración)
 - [Migraciones con Flyway](#migraciones-con-flyway)
@@ -116,15 +123,15 @@ Las entidades nunca se serializan directamente. Cada respuesta se construye con 
 
 ## Modelo de datos
 
-| Entidad           | Atributos principales                                                                                         | Relaciones                                                                                   |
-| ----------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `Usuario`         | `nombre`, `apellido`, `email` único e indexado, `password` con hash BCrypt, `telefono`, `estado`, `createdAt` | Muchos a muchos con `Rol`                                                                    |
-| `Rol`             | `nombre`: `ROLE_ADMIN`, `ROLE_MEDICO` o `ROLE_PACIENTE`                                                       | Asignado a usuarios                                                                          |
-| `Especialidad`    | `nombre` único, `descripcion`                                                                                 | Una especialidad agrupa médicos                                                              |
-| `Medico`          | `colegiatura` CMP única, `consultorio`, `precioConsulta`                                                      | Uno a uno con `Usuario`, muchos a uno con `Especialidad`, uno a muchos con `HorarioAtencion` |
-| `Paciente`        | `dni` único, `historialClinicoNumero` único, `fechaNacimiento`                                                | Uno a uno con `Usuario`                                                                      |
-| `HorarioAtencion` | `diaSemana`, `horaInicio`, `horaFin`, `duracionCitaMinutos`                                                   | Muchos a uno con `Medico`                                                                    |
-| `Cita`            | `fechaHora`, `motivo`, `estado`, `monto`, `createdAt`, `updatedAt`, `version`                                 | Muchos a uno con `Medico` y con `Paciente`                                                   |
+| Entidad           | Atributos principales                                                                                         | Relaciones                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `Usuario`         | `nombre`, `apellido`, `email` único e indexado, `password` con hash BCrypt, `telefono`, `estado`, `createdAt` | Muchos a muchos con `Rol`                                                                       |
+| `Rol`             | `nombre`: `ROLE_ADMIN`, `ROLE_MEDICO` o `ROLE_PACIENTE`                                                       | Asignado a usuarios                                                                             |
+| `Especialidad`    | `nombre` único, `descripcion`, `precioConsulta`                                                               | Muchos a muchos con `Medico`                                                                    |
+| `Medico`          | `colegiatura` CMP única, `consultorio`                                                                        | Uno a uno con `Usuario`, muchos a muchos con `Especialidad`, uno a muchos con `HorarioAtencion` |
+| `Paciente`        | `dni` único, `historialClinicoNumero` único, `fechaNacimiento`                                                | Uno a uno con `Usuario`                                                                         |
+| `HorarioAtencion` | `diaSemana`, `horaInicio`, `horaFin`, `duracionCitaMinutos`                                                   | Muchos a uno con `Medico`                                                                       |
+| `Cita`            | `fechaHora`, `motivo`, `estado`, `monto`, `createdAt`, `updatedAt`, `version`                                 | Muchos a uno con `Medico`, con `Paciente` y con `Especialidad`                                  |
 
 Todas las relaciones usan carga perezosa. La tabla `citas` tiene índices por médico y fecha y por paciente y fecha, y el campo `version` aplica bloqueo optimista para que dos operaciones concurrentes no sobrescriban la misma cita.
 
@@ -139,7 +146,7 @@ Todas las relaciones usan carga perezosa. La tabla `citas` tiene índices por m�
 3. La fecha y hora se normaliza al minuto y debe ser futura.
 4. El médico debe tener un bloque de atención ese día de la semana, la cita debe caber completa dentro del bloque y debe empezar en un turno exacto según la duración configurada.
 5. No puede existir otra cita activa del médico ni del paciente que se cruce con esa franja. Las citas canceladas no ocupan horario.
-6. La cita se guarda en estado `PENDIENTE` con el precio de consulta vigente del médico.
+6. La especialidad elegida debe pertenecer al médico y la cita se guarda en estado `PENDIENTE` con el precio vigente de esa especialidad, que queda fijado en la cita.
 
 Cualquier conflicto lanza una excepción de negocio, la transacción hace rollback y la API responde 409.
 
@@ -166,91 +173,109 @@ Un paciente no puede cancelar una cita cuya fecha ya pasó, mientras que un admi
 
 La API es completamente sin estado. Spring Security 7 trabaja con `SessionCreationPolicy.STATELESS`, CSRF desactivado y un filtro `JwtAuthenticationFilter` que valida el header `Authorization: Bearer <token>` en cada petición.
 
-- Los tokens se firman con HMAC-SHA usando la clave `JWT_SECRET`, que debe estar codificada en Base64 y tener al menos 256 bits. Cada token incluye el email como sujeto, el emisor, la expiración, el id del usuario, su nombre y sus roles.
+- Los tokens se firman con HMAC-SHA usando la clave `JWT_SECRET`, que debe estar codificada en Base64 y tener al menos 256 bits. Cada token incluye el email como sujeto, el emisor, la expiración, el id del usuario, su nombre y sus roles. El token de acceso dura 15 minutos y se renueva con un refresh token rotativo.
 - Un usuario inactivo no puede iniciar sesión y su token deja de ser válido aunque no haya expirado.
 - Las contraseñas se almacenan con BCrypt.
 - CORS permite peticiones desde `http://localhost:4200` con los métodos GET, POST, PUT, DELETE y OPTIONS. El origen se configura con `CORS_ALLOWED_ORIGINS`.
 - La autorización combina reglas por URL en `SecurityConfig` con `@PreAuthorize` en cada método de los controladores.
 
-| Rol             | Permisos                                                                                                              |
-| --------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `ROLE_ADMIN`    | Gestiona especialidades, da de alta médicos y sus horarios, consulta la auditoría y cancela o confirma cualquier cita |
-| `ROLE_MEDICO`   | Consulta su agenda, confirma y marca como atendidas sus citas                                                         |
-| `ROLE_PACIENTE` | Consulta disponibilidad, agenda citas y consulta o cancela las suyas                                                  |
+| Rol             | Permisos                                                                                                                                               |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ROLE_ADMIN`    | Gestiona especialidades y sus tarifas, médicos, horarios, roles de usuario, cupones y pagos, consulta la auditoría y cancela o confirma cualquier cita |
+| `ROLE_MEDICO`   | Consulta su agenda, confirma y atiende sus citas, y comparte pacientes con otros médicos                                                               |
+| `ROLE_PACIENTE` | Consulta disponibilidad, agenda citas y consulta o cancela las suyas                                                                                   |
 
 ## API REST
 
 La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y la especificación OpenAPI en `http://localhost:8080/v3/api-docs`. Para probar endpoints protegidos desde Swagger UI, obtén un token con el login y pégalo en el botón Authorize.
 
-| Método   | Ruta                                         | Acceso                                | Respuesta |
-| -------- | -------------------------------------------- | ------------------------------------- | --------- |
-| `POST`   | `/api/v1/auth/login`                         | Público                               | 200       |
-| `POST`   | `/api/v1/auth/register`                      | Público, registra pacientes           | 201       |
-| `GET`    | `/api/v1/especialidades`                     | Autenticado                           | 200       |
-| `GET`    | `/api/v1/especialidades/{id}`                | Autenticado                           | 200       |
-| `POST`   | `/api/v1/especialidades`                     | Admin                                 | 201       |
-| `PUT`    | `/api/v1/especialidades/{id}`                | Admin                                 | 200       |
-| `DELETE` | `/api/v1/especialidades/{id}`                | Admin                                 | 204       |
-| `GET`    | `/api/v1/medicos?especialidadId=`            | Autenticado                           | 200       |
-| `GET`    | `/api/v1/medicos/{id}`                       | Autenticado                           | 200       |
-| `POST`   | `/api/v1/medicos`                            | Admin                                 | 201       |
-| `GET`    | `/api/v1/medicos/{id}/horarios`              | Autenticado                           | 200       |
-| `POST`   | `/api/v1/medicos/{id}/horarios`              | Admin                                 | 201       |
-| `DELETE` | `/api/v1/medicos/{id}/horarios/{horarioId}`  | Admin                                 | 204       |
-| `GET`    | `/api/v1/medicos/{id}/disponibilidad?fecha=` | Autenticado                           | 200       |
-| `GET`    | `/api/v1/medicos/me/agenda?fecha=`           | Médico                                | 200       |
-| `POST`   | `/api/v1/citas`                              | Paciente                              | 201       |
-| `GET`    | `/api/v1/citas/mis-citas?inicio=&fin=`       | Paciente                              | 200       |
-| `GET`    | `/api/v1/citas/{id}`                         | Paciente dueño, médico o admin        | 200       |
-| `PUT`    | `/api/v1/citas/{id}/cancelar`                | Paciente dueño o admin                | 200       |
-| `PUT`    | `/api/v1/citas/{id}/confirmar`               | Médico de la cita o admin             | 200       |
-| `PUT`    | `/api/v1/citas/{id}/atender`                 | Médico de la cita                     | 200       |
-| `GET`    | `/api/v1/admin/auditoria/citas-por-estado`   | Admin                                 | 200       |
-| `GET`    | `/api/v1/admin/auditoria/citas?inicio=&fin=` | Admin                                 | 200       |
-| `POST`   | `/api/v1/auth/logout`                        | Autenticado                           | 204       |
-| `PUT`    | `/api/v1/citas/{id}/reprogramar`             | Paciente dueño o admin                | 200       |
-| `POST`   | `/api/v1/citas/{id}/pago`                    | Paciente dueño                        | 201       |
-| `POST`   | `/api/v1/citas/{id}/atencion`                | Médico de la cita                     | 201       |
-| `PUT`    | `/api/v1/citas/{id}/atencion`                | Médico de la cita                     | 200       |
-| `GET`    | `/api/v1/citas/{id}/atencion`                | Paciente dueño, médico o admin        | 200       |
-| `POST`   | `/api/v1/citas/{id}/valoracion`              | Paciente dueño                        | 201       |
-| `GET`    | `/api/v1/citas/{id}/valoracion`              | Paciente dueño, médico o admin        | 200       |
-| `GET`    | `/api/v1/medicos/{id}/valoraciones`          | Autenticado                           | 200       |
-| `GET`    | `/api/v1/medicos/me/pacientes`               | Médico                                | 200       |
-| `GET`    | `/api/v1/pacientes/{id}/historia-clinica`    | Médico con citas del paciente o admin | 200       |
-| `GET`    | `/api/v1/historia-clinica`                   | Paciente                              | 200       |
-| `PUT`    | `/api/v1/historia-clinica/datos-medicos`     | Paciente                              | 200       |
-| `GET`    | `/api/v1/notificaciones`                     | Autenticado                           | 200       |
-| `GET`    | `/api/v1/notificaciones/resumen`             | Autenticado                           | 200       |
-| `GET`    | `/api/v1/notificaciones/stream`              | Autenticado                           | 200       |
-| `PUT`    | `/api/v1/notificaciones/{id}/leida`          | Autenticado                           | 200       |
-| `PUT`    | `/api/v1/notificaciones/leidas`              | Autenticado                           | 204       |
-| `DELETE` | `/api/v1/notificaciones/{id}`                | Autenticado                           | 204       |
-| `GET`    | `/api/v1/metodos-pago`                       | Paciente                              | 200       |
-| `POST`   | `/api/v1/metodos-pago`                       | Paciente                              | 201       |
-| `PUT`    | `/api/v1/metodos-pago/{id}/predeterminado`   | Paciente                              | 200       |
-| `DELETE` | `/api/v1/metodos-pago/{id}`                  | Paciente                              | 204       |
-| `GET`    | `/api/v1/cupones/validar?codigo=&monto=`     | Paciente                              | 200       |
-| `GET`    | `/api/v1/pagos`                              | Paciente                              | 200       |
-| `GET`    | `/api/v1/pagos/{id}`                         | Paciente dueño o admin                | 200       |
-| `GET`    | `/api/v1/admin/pagos?inicio=&fin=`           | Admin                                 | 200       |
-| `GET`    | `/api/v1/admin/cupones`                      | Admin                                 | 200       |
-| `POST`   | `/api/v1/admin/cupones`                      | Admin                                 | 201       |
-| `PUT`    | `/api/v1/admin/cupones/{id}`                 | Admin                                 | 200       |
-| `DELETE` | `/api/v1/admin/cupones/{id}`                 | Admin                                 | 204       |
-| `GET`    | `/api/v1/admin/estadisticas`                 | Admin                                 | 200       |
-| `GET`    | `/api/v1/admin/usuarios?rol=&q=`             | Admin                                 | 200       |
-| `PUT`    | `/api/v1/admin/usuarios/{id}/estado`         | Admin                                 | 200       |
-| `GET`    | `/api/v1/perfil/preferencias`                | Autenticado                           | 200       |
-| `PUT`    | `/api/v1/perfil/preferencias`                | Autenticado                           | 200       |
-| `PUT`    | `/api/v1/perfil/avatar`                      | Autenticado                           | 200       |
-| `DELETE` | `/api/v1/perfil/avatar`                      | Autenticado                           | 204       |
-| `GET`    | `/api/v1/perfil/sesiones`                    | Autenticado                           | 200       |
-| `DELETE` | `/api/v1/perfil/sesiones/{id}`               | Autenticado                           | 204       |
-| `DELETE` | `/api/v1/perfil/sesiones`                    | Autenticado                           | 204       |
-| `GET`    | `/api/v1/perfil`                             | Autenticado                           | 200       |
-| `PUT`    | `/api/v1/perfil`                             | Autenticado                           | 200       |
-| `PUT`    | `/api/v1/perfil/password`                    | Autenticado                           | 204       |
+| Método   | Ruta                                                     | Acceso                                | Respuesta |
+| -------- | -------------------------------------------------------- | ------------------------------------- | --------- |
+| `POST`   | `/api/v1/auth/login`                                     | Público                               | 200       |
+| `POST`   | `/api/v1/auth/register`                                  | Público, registra pacientes           | 201       |
+| `GET`    | `/api/v1/especialidades`                                 | Autenticado                           | 200       |
+| `GET`    | `/api/v1/especialidades/{id}`                            | Autenticado                           | 200       |
+| `POST`   | `/api/v1/especialidades`                                 | Admin                                 | 201       |
+| `PUT`    | `/api/v1/especialidades/{id}`                            | Admin                                 | 200       |
+| `DELETE` | `/api/v1/especialidades/{id}`                            | Admin                                 | 204       |
+| `GET`    | `/api/v1/medicos?especialidadId=`                        | Autenticado                           | 200       |
+| `GET`    | `/api/v1/medicos/{id}`                                   | Autenticado                           | 200       |
+| `POST`   | `/api/v1/medicos`                                        | Admin                                 | 201       |
+| `GET`    | `/api/v1/medicos/{id}/horarios`                          | Autenticado                           | 200       |
+| `POST`   | `/api/v1/medicos/{id}/horarios`                          | Admin                                 | 201       |
+| `DELETE` | `/api/v1/medicos/{id}/horarios/{horarioId}`              | Admin                                 | 204       |
+| `GET`    | `/api/v1/medicos/{id}/disponibilidad?fecha=`             | Autenticado                           | 200       |
+| `GET`    | `/api/v1/medicos/me/agenda?fecha=&inicio=&fin=`          | Médico                                | 200       |
+| `POST`   | `/api/v1/citas`                                          | Paciente                              | 201       |
+| `GET`    | `/api/v1/citas/mis-citas?inicio=&fin=`                   | Paciente                              | 200       |
+| `GET`    | `/api/v1/citas/{id}`                                     | Paciente dueño, médico o admin        | 200       |
+| `PUT`    | `/api/v1/citas/{id}/cancelar`                            | Paciente dueño o admin                | 200       |
+| `PUT`    | `/api/v1/citas/{id}/confirmar`                           | Médico de la cita o admin             | 200       |
+| `PUT`    | `/api/v1/citas/{id}/atender`                             | Médico de la cita                     | 200       |
+| `GET`    | `/api/v1/admin/auditoria/citas-por-estado`               | Admin                                 | 200       |
+| `GET`    | `/api/v1/admin/auditoria/citas?inicio=&fin=`             | Admin                                 | 200       |
+| `POST`   | `/api/v1/auth/logout`                                    | Autenticado                           | 204       |
+| `POST`   | `/api/v1/auth/refresh`                                   | Público                               | 200       |
+| `GET`    | `/api/v1/auth/mfa/estado`                                | Autenticado                           | 200       |
+| `POST`   | `/api/v1/auth/mfa/configurar`                            | Autenticado                           | 200       |
+| `POST`   | `/api/v1/auth/mfa/activar`                               | Autenticado                           | 200       |
+| `POST`   | `/api/v1/auth/mfa/desactivar`                            | Autenticado                           | 204       |
+| `POST`   | `/api/v1/auth/mfa/codigos-recuperacion/regenerar`        | Autenticado                           | 200       |
+| `POST`   | `/api/v1/auth/mfa/verificar`                             | Público con token de verificación     | 200       |
+| `PUT`    | `/api/v1/medicos/{id}/especialidades`                    | Admin                                 | 200       |
+| `GET`    | `/api/v1/medicos/{id}/disponibilidad/rango?inicio=&fin=` | Autenticado                           | 200       |
+| `GET`    | `/api/v1/admin/roles`                                    | Admin                                 | 200       |
+| `PUT`    | `/api/v1/admin/usuarios/{id}/roles`                      | Admin                                 | 200       |
+| `POST`   | `/api/v1/pacientes/{id}/compartir`                       | Médico que atiende al paciente        | 201       |
+| `DELETE` | `/api/v1/pacientes/{id}/compartir/{medicoId}`            | Médico de origen o admin              | 204       |
+| `GET`    | `/api/v1/pacientes/{id}/compartidos`                     | Médico con acceso o admin             | 200       |
+| `POST`   | `/api/v1/pagos/qr`                                       | Paciente                              | 201       |
+| `GET`    | `/api/v1/pagos/qr/{codigo}`                              | Paciente dueño                        | 200       |
+| `POST`   | `/api/v1/pagos/qr/{codigo}/simular-confirmacion`         | Paciente dueño                        | 200       |
+| `DELETE` | `/api/v1/pagos/qr/{codigo}`                              | Paciente dueño                        | 204       |
+| `PUT`    | `/api/v1/citas/{id}/reprogramar`                         | Paciente dueño o admin                | 200       |
+| `POST`   | `/api/v1/citas/{id}/pago`                                | Paciente dueño                        | 201       |
+| `POST`   | `/api/v1/citas/{id}/atencion`                            | Médico de la cita                     | 201       |
+| `PUT`    | `/api/v1/citas/{id}/atencion`                            | Médico de la cita                     | 200       |
+| `GET`    | `/api/v1/citas/{id}/atencion`                            | Paciente dueño, médico o admin        | 200       |
+| `POST`   | `/api/v1/citas/{id}/valoracion`                          | Paciente dueño                        | 201       |
+| `GET`    | `/api/v1/citas/{id}/valoracion`                          | Paciente dueño, médico o admin        | 200       |
+| `GET`    | `/api/v1/medicos/{id}/valoraciones`                      | Autenticado                           | 200       |
+| `GET`    | `/api/v1/medicos/me/pacientes`                           | Médico                                | 200       |
+| `GET`    | `/api/v1/pacientes/{id}/historia-clinica`                | Médico con citas del paciente o admin | 200       |
+| `GET`    | `/api/v1/historia-clinica`                               | Paciente                              | 200       |
+| `PUT`    | `/api/v1/historia-clinica/datos-medicos`                 | Paciente                              | 200       |
+| `GET`    | `/api/v1/notificaciones`                                 | Autenticado                           | 200       |
+| `GET`    | `/api/v1/notificaciones/resumen`                         | Autenticado                           | 200       |
+| `GET`    | `/api/v1/notificaciones/stream`                          | Autenticado                           | 200       |
+| `PUT`    | `/api/v1/notificaciones/{id}/leida`                      | Autenticado                           | 200       |
+| `PUT`    | `/api/v1/notificaciones/leidas`                          | Autenticado                           | 204       |
+| `DELETE` | `/api/v1/notificaciones/{id}`                            | Autenticado                           | 204       |
+| `GET`    | `/api/v1/metodos-pago`                                   | Paciente                              | 200       |
+| `POST`   | `/api/v1/metodos-pago`                                   | Paciente                              | 201       |
+| `PUT`    | `/api/v1/metodos-pago/{id}/predeterminado`               | Paciente                              | 200       |
+| `DELETE` | `/api/v1/metodos-pago/{id}`                              | Paciente                              | 204       |
+| `GET`    | `/api/v1/cupones/validar?codigo=&monto=`                 | Paciente                              | 200       |
+| `GET`    | `/api/v1/pagos`                                          | Paciente                              | 200       |
+| `GET`    | `/api/v1/pagos/{id}`                                     | Paciente dueño o admin                | 200       |
+| `GET`    | `/api/v1/admin/pagos?inicio=&fin=`                       | Admin                                 | 200       |
+| `GET`    | `/api/v1/admin/cupones`                                  | Admin                                 | 200       |
+| `POST`   | `/api/v1/admin/cupones`                                  | Admin                                 | 201       |
+| `PUT`    | `/api/v1/admin/cupones/{id}`                             | Admin                                 | 200       |
+| `DELETE` | `/api/v1/admin/cupones/{id}`                             | Admin                                 | 204       |
+| `GET`    | `/api/v1/admin/estadisticas`                             | Admin                                 | 200       |
+| `GET`    | `/api/v1/admin/usuarios?rol=&q=`                         | Admin                                 | 200       |
+| `PUT`    | `/api/v1/admin/usuarios/{id}/estado`                     | Admin                                 | 200       |
+| `GET`    | `/api/v1/perfil/preferencias`                            | Autenticado                           | 200       |
+| `PUT`    | `/api/v1/perfil/preferencias`                            | Autenticado                           | 200       |
+| `PUT`    | `/api/v1/perfil/avatar`                                  | Autenticado                           | 200       |
+| `DELETE` | `/api/v1/perfil/avatar`                                  | Autenticado                           | 204       |
+| `GET`    | `/api/v1/perfil/sesiones`                                | Autenticado                           | 200       |
+| `DELETE` | `/api/v1/perfil/sesiones/{id}`                           | Autenticado                           | 204       |
+| `DELETE` | `/api/v1/perfil/sesiones`                                | Autenticado                           | 204       |
+| `GET`    | `/api/v1/perfil`                                         | Autenticado                           | 200       |
+| `PUT`    | `/api/v1/perfil`                                         | Autenticado                           | 200       |
+| `PUT`    | `/api/v1/perfil/password`                                | Autenticado                           | 204       |
 
 Las fechas de los parámetros usan el formato `yyyy-MM-dd` y `fechaHora` usa `yyyy-MM-ddTHH:mm:ss`. Las rutas de creación responden con el header `Location` apuntando al recurso nuevo.
 
@@ -270,7 +295,7 @@ TOKEN=<token-de-la-respuesta>
 curl -X POST http://localhost:8080/api/v1/citas \
   -H "Authorization: Bearer $TOKEN" \
   -H 'Content-Type: application/json' \
-  -d '{"medicoId":1,"fechaHora":"2026-10-20T10:00:00","motivo":"Control de presión arterial"}'
+  -d '{"medicoId":1,"especialidadId":1,"fechaHora":"2026-10-20T10:00:00","motivo":"Control de presión arterial"}'
 ```
 
 ## Diagramas
@@ -304,7 +329,9 @@ erDiagram
     ROLES ||--o{ USUARIO_ROLES : asignado
     USUARIOS ||--o| MEDICOS : es
     USUARIOS ||--o| PACIENTES : es
-    ESPECIALIDADES ||--o{ MEDICOS : agrupa
+    ESPECIALIDADES ||--o{ MEDICO_ESPECIALIDADES : ofrece
+    MEDICOS ||--o{ MEDICO_ESPECIALIDADES : atiende
+    ESPECIALIDADES ||--o{ CITAS : tarifa
     MEDICOS ||--o{ HORARIOS_ATENCION : define
     MEDICOS ||--o{ CITAS : atiende
     PACIENTES ||--o{ CITAS : reserva
@@ -331,14 +358,17 @@ erDiagram
         bigint id PK
         varchar nombre UK
         varchar descripcion
+        numeric precio_consulta
+    }
+    MEDICO_ESPECIALIDADES {
+        bigint medico_id FK
+        bigint especialidad_id FK
     }
     MEDICOS {
         bigint id PK
         varchar colegiatura UK
         varchar consultorio
-        numeric precio_consulta
         bigint usuario_id FK
-        bigint especialidad_id FK
     }
     PACIENTES {
         bigint id PK
@@ -363,6 +393,7 @@ erDiagram
         numeric monto
         bigint medico_id FK
         bigint paciente_id FK
+        bigint especialidad_id FK
         bigint version
     }
 ```
@@ -1069,11 +1100,11 @@ sequenceDiagram
 
 `PerfilController` permite a cualquier usuario autenticado consultar y mantener sus propios datos. La identidad sale siempre del token, de modo que nadie puede leer ni modificar el perfil de otra persona.
 
-| Endpoint                      | Comportamiento                                                                                                                                                                                                                     |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `GET /api/v1/perfil`          | Devuelve nombre, apellido, email, teléfono, roles y fecha de alta, más el DNI, la fecha de nacimiento y la historia clínica si es paciente, o la colegiatura, el consultorio, la especialidad y el precio de consulta si es médico |
-| `PUT /api/v1/perfil`          | Actualiza nombre, apellido y teléfono. Un paciente puede cambiar además su fecha de nacimiento y un médico su consultorio. El email, el DNI y la colegiatura no se modifican                                                       |
-| `PUT /api/v1/perfil/password` | Verifica la contraseña actual y guarda la nueva cifrada con BCrypt. Responde 409 si la actual no coincide o si la nueva es igual a la actual, y 400 si la nueva no tiene entre 8 y 72 caracteres                                   |
+| Endpoint                      | Comportamiento                                                                                                                                                                                                                                                         |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/v1/perfil`          | Devuelve nombre, apellido, email, teléfono, roles y fecha de alta, más el DNI, la fecha de nacimiento y la historia clínica si es paciente, o la colegiatura, el consultorio y sus especialidades si es médico, además de si tiene activa la verificación en dos pasos |
+| `PUT /api/v1/perfil`          | Actualiza nombre, apellido y teléfono. Un paciente puede cambiar además su fecha de nacimiento y un médico su consultorio. El email, el DNI y la colegiatura no se modifican                                                                                           |
+| `PUT /api/v1/perfil/password` | Verifica la contraseña actual y guarda la nueva cifrada con BCrypt. Responde 409 si la actual no coincide o si la nueva es igual a la actual, y 400 si la nueva no tiene entre 8 y 72 caracteres                                                                       |
 
 ### Notificaciones en tiempo real
 
@@ -1106,6 +1137,38 @@ El médico registra la atención de una cita con diagnóstico, tratamiento, indi
 ### Reprogramación y valoraciones
 
 Reprogramar aplica las mismas validaciones de horario y solapamiento que la reserva, excluyendo la propia cita, y deja la cita en estado pendiente. Los pacientes valoran de 1 a 5 las citas atendidas, una sola vez por cita, y el promedio del médico se redondea a un decimal.
+
+### Tarifas por especialidad
+
+El precio de la consulta ya no pertenece al médico sino a la especialidad. Un médico puede atender varias especialidades y cada cita guarda la especialidad elegida y el precio vigente al reservar, de modo que un cambio de tarifa solo afecta a las nuevas reservas. El administrador edita el precio con `PUT /api/v1/especialidades/{id}` y las especialidades de un médico con `PUT /api/v1/medicos/{id}/especialidades`.
+
+### Roles de usuario
+
+El administrador consulta los roles con el número de usuarios de cada uno y reemplaza los roles de una persona. Un usuario debe conservar al menos un rol, el rol médico exige un perfil médico y el rol paciente un perfil de paciente, un administrador no puede quitarse a sí mismo el rol de administrador y el sistema nunca queda sin administradores. Al cambiar los roles se cierran las sesiones de la persona afectada y se le notifica.
+
+### Pacientes compartidos
+
+Un médico que atiende a un paciente puede compartirlo con otro colega con una nota. El colega recibe un aviso, ve al paciente en su lista marcado como compartido y puede abrir su historia clínica. Quien compartió, o un administrador, puede dejar de compartirlo en cualquier momento.
+
+### Pagos con Yape y Plin
+
+El pago con billetera genera una intención de pago con un código único, un payload para el QR y un vencimiento de 5 minutos. El cupón se valida al generar el QR y se consume al confirmar. La confirmación pasa por la interfaz `ProveedorBilletera`, cuya implementación simulada confirma el pago con `POST /api/v1/pagos/qr/{codigo}/simular-confirmacion`, habilitado con `app.pagos.simulacion-habilitada` y desactivado en producción. Para integrar un proveedor real basta con otra implementación de esa interfaz que confirme el pago desde su webhook. Al confirmar se crea el pago con su comprobante, igual que con tarjeta. El frontend dibuja el QR en el navegador y consulta el estado cada 3 segundos mientras el diálogo está abierto.
+
+### Verificación en dos pasos
+
+Cualquier usuario puede activar un segundo factor con una aplicación autenticadora. La implementación sigue el estándar TOTP con SHA-1, 6 dígitos, periodos de 30 segundos y una ventana de un periodo hacia cada lado, sin dependencias externas. El secreto se guarda cifrado con AES-GCM usando `MFA_CLAVE_CIFRADO`, que en producción es obligatoria. Al activar se entregan 8 códigos de recuperación de un solo uso, guardados como hash.
+
+Con la verificación activa, `POST /api/v1/auth/login` responde con `mfaRequerido` y un `mfaToken` de 5 minutos, sin token de acceso, y `POST /api/v1/auth/mfa/verificar` lo cambia por la sesión cuando recibe un código válido o uno de recuperación. Cinco fallos seguidos bloquean el intento durante 5 minutos con un 429. Un `mfaToken` nunca sirve como Bearer.
+
+### Renovación del token
+
+El token de acceso vive 15 minutos con `JWT_EXPIRATION_MS` y el refresh token 7 días con `JWT_REFRESH_EXPIRATION_MS`. El refresh token es opaco, se guarda solo como hash SHA-256 y rota en cada uso con `POST /api/v1/auth/refresh`. La sesión del usuario se conserva entre renovaciones, así que la lista de sesiones sigue coherente. Si llega un refresh token que ya fue rotado, se revoca toda la familia, se cierra la sesión y se avisa al usuario. Cerrar la sesión, revocarla, desactivar al usuario o cambiar sus roles revocan sus refresh tokens y una tarea programada purga los vencidos.
+
+El frontend renueva el token un minuto antes de que venza y, si una petición recibe un 401, renueva y la repite una vez. Las peticiones simultáneas comparten una sola renovación para no disparar la detección de reuso. Si el refresh token es rechazado, la sesión se cierra.
+
+### Calendario de citas
+
+`GET /api/v1/medicos/{id}/disponibilidad/rango` devuelve las horas libres de hasta 62 días en una sola petición y `GET /api/v1/medicos/me/agenda` acepta un rango de fechas. Cada cita informa su `duracionMinutos`. Reservar o reprogramar rechaza con 409 una cita que se cruce con otra cita activa del paciente, aunque sea con otro médico.
 
 ## Manejo de errores
 
@@ -1269,6 +1332,8 @@ docker compose up -d --build
 openssl rand -base64 64 | tr -d '\n'
 ```
 
+En producción también debes definir `MFA_CLAVE_CIFRADO`, la clave con la que se cifran los secretos de la verificación en dos pasos. La API se niega a arrancar sin ella. La confirmación simulada de pagos con billetera viene desactivada en `compose.yaml` y activa en `compose.dev.yaml` y `compose.qa.yaml`.
+
 Los datos de prueba están desactivados en producción. Para cargarlos, por ejemplo antes de correr la colección de Postman, defínelos al levantar el stack:
 
 ```bash
@@ -1398,14 +1463,14 @@ Todas las pantallas se cargan de forma diferida. Los parámetros de ruta llegan 
 | `/auth/login`                     | Sin sesión              | Inicio de sesión                |
 | `/auth/registro`                  | Sin sesión              | Registro de pacientes           |
 | `/`                               | Con sesión              | Redirige a la página del rol    |
-| `/especialidades`                 | Con sesión              | Lista de especialidades         |
+| `/especialidades`                 | Admin, paciente         | Lista de especialidades         |
 | `/especialidades/nueva`           | Admin                   | Alta de especialidad            |
 | `/especialidades/:id/editar`      | Admin                   | Edición de especialidad         |
-| `/medicos`                        | Con sesión              | Lista de médicos                |
+| `/medicos`                        | Admin, paciente         | Lista de médicos                |
 | `/medicos/nuevo`                  | Admin                   | Alta de médico                  |
-| `/medicos/:id`                    | Con sesión              | Detalle del médico              |
+| `/medicos/:id`                    | Admin, paciente         | Detalle del médico              |
 | `/medicos/:id/horarios`           | Admin                   | Bloques de atención             |
-| `/medicos/:id/disponibilidad`     | Con sesión              | Horas libres del médico         |
+| `/medicos/:id/disponibilidad`     | Admin, paciente         | Horas libres del médico         |
 | `/citas`                          | Paciente                | Mis citas                       |
 | `/citas/nueva`                    | Paciente                | Reserva de cita                 |
 | `/citas/:id`                      | Paciente, médico, admin | Detalle de la cita              |
@@ -1415,7 +1480,7 @@ Todas las pantallas se cargan de forma diferida. Los parámetros de ruta llegan 
 | `/notificaciones`                 | Con sesión              | Bandeja de notificaciones       |
 | `/citas/:id/atencion`             | Médico                  | Registro de la atención médica  |
 | `/historia-clinica`               | Paciente                | Historia clínica del paciente   |
-| `/pacientes`                      | Médico                  | Pacientes del médico            |
+| `/pacientes`                      | Médico, admin           | Pacientes del médico            |
 | `/pacientes/:id/historia-clinica` | Médico, admin           | Historia clínica de un paciente |
 | `/pagos`                          | Paciente                | Historial de pagos              |
 | `/pagos/metodos`                  | Paciente                | Tarjetas guardadas              |
@@ -1425,7 +1490,11 @@ Todas las pantallas se cargan de forma diferida. Los parámetros de ruta llegan 
 | `/admin/cupones`                  | Admin                   | Cupones de descuento            |
 | `/acceso-denegado`                | Todos                   | Aviso de permisos insuficientes |
 
-Al entrar a la raíz, el administrador va al panel de control, el médico a su agenda y el paciente a sus citas. Quien no inició sesión va al login, y si intentaba abrir una ruta protegida, la URL viaja como `returnUrl`. Un usuario autenticado sin el rol necesario termina en `/acceso-denegado`.
+Al entrar a la raíz, el administrador va al panel de control, el médico a su agenda y el paciente a sus citas. Quien no inició sesión va al login, y si intentaba abrir una ruta protegida, la URL viaja como `returnUrl`. Un usuario autenticado que abre una ruta de otro rol vuelve a la página de inicio de su propio rol, por ejemplo el médico que escribe `/especialidades` regresa a su agenda. Solo si esa página de inicio es la ruta prohibida se muestra `/acceso-denegado`. El menú lateral muestra solo lo que cada rol puede abrir.
+
+La primera vez que un usuario entra, una guía paso a paso resalta las partes de la interfaz que le corresponden según su rol. Se puede volver a abrir desde el menú del avatar o desde la tarjeta al pie del menú lateral, y el avance se guarda en las preferencias con `tourCompletado`.
+
+Las citas se ven en lista o en un calendario propio con vistas de mes, semana y día. La vista de día y la de semana muestran una línea con la hora actual y las citas que se cruzan se resaltan y se cuentan en la cabecera. Al reservar, el paciente elige el hueco libre directamente en el calendario: los huecos que chocan con sus propias citas no aparecen, así que no puede elegir una fecha al azar.
 
 ### Validaciones
 
@@ -1449,13 +1518,13 @@ Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrec
 
 ### Pruebas del frontend
 
-Las 71 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores y cada uno de los endpoints de los clientes de la API.
+Las 94 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API.
 
 ```bash
 npm test
 ```
 
-Las 39 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol. Requieren el stack levantado con datos de prueba.
+Las 56 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario y la renovación de sesión. Requieren el stack levantado con datos de prueba.
 
 ```bash
 npm run e2e
@@ -1664,16 +1733,20 @@ El archivo `postman/Tusalud.postman_collection.json` es la única colección del
 
 Para usarla en Postman, importa el archivo y ejecuta la colección completa con Run collection. Las carpetas están numeradas y se ejecutan en orden, porque cada una reutiliza los tokens e identificadores que capturan las anteriores:
 
-| Carpeta                   | Contenido                                                                          |
-| ------------------------- | ---------------------------------------------------------------------------------- |
-| `00 - Autenticación`      | Login de los cinco usuarios de prueba, registro de un paciente y errores 400 y 401 |
-| `01 - Especialidades`     | Alta, consulta, actualización, duplicado, acceso sin permiso y eliminación         |
-| `02 - Médicos y Horarios` | Listados, alta de médico, bloques de horario, solapamiento y disponibilidad        |
-| `03 - Citas (Paciente)`   | Reserva en el primer turno libre, conflictos y acceso a citas ajenas               |
-| `04 - Citas (Médico)`     | Agenda, confirmación, atención y transiciones inválidas                            |
-| `05 - Cancelación`        | Cancelación de una segunda cita y cancelación repetida                             |
-| `06 - Auditoría (Admin)`  | Reportes por estado y por rango, y accesos no permitidos                           |
-| `07 - Seguridad`          | Peticiones sin token y con token inválido                                          |
+| Carpeta                                                 | Contenido                                                                          |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `00 - Autenticación`                                    | Login de los cinco usuarios de prueba, registro de un paciente y errores 400 y 401 |
+| `01 - Especialidades`                                   | Alta, consulta, actualización, duplicado, acceso sin permiso y eliminación         |
+| `02 - Médicos y Horarios`                               | Listados, alta de médico, bloques de horario, solapamiento y disponibilidad        |
+| `03 - Citas (Paciente)`                                 | Reserva en el primer turno libre, conflictos y acceso a citas ajenas               |
+| `04 - Citas (Médico)`                                   | Agenda, confirmación, atención y transiciones inválidas                            |
+| `05 - Cancelación`                                      | Cancelación de una segunda cita y cancelación repetida                             |
+| `06 - Auditoría (Admin)`                                | Reportes por estado y por rango, y accesos no permitidos                           |
+| `07 - Seguridad`                                        | Peticiones sin token y con token inválido                                          |
+| `08 - Perfil`                                           | Datos personales, contraseña y preferencias                                        |
+| `09 - Tarifas, roles y pacientes compartidos`           | Tarifa por especialidad, especialidades del médico, roles y pacientes compartidos  |
+| `10 - Pagos con Yape y Plin`                            | Reserva, generación del QR, consulta y confirmación simulada                       |
+| `11 - Verificación en dos pasos y renovación del token` | Configuración del autenticador y errores del refresh token                         |
 
 Desde la línea de comandos:
 
@@ -1699,26 +1772,29 @@ El archivo `.env.example` documenta todas las variables con valores para desarro
 cp .env.example .env
 ```
 
-| Variable                   | Uso                                                              | Valor por defecto                                     |
-| -------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------- |
-| `SPRING_PROFILES_ACTIVE`   | Perfil de Spring en tiempo de ejecución                          | El perfil de Maven                                    |
-| `DB_URL`                   | URL JDBC de PostgreSQL, obligatoria en `prod`                    | Según el perfil                                       |
-| `DB_USERNAME`              | Usuario de PostgreSQL, obligatorio en `prod`                     | `postgres`                                            |
-| `DB_PASSWORD`              | Clave de PostgreSQL, obligatoria en `prod`                       | `postgres`                                            |
-| `JWT_SECRET`               | Clave HMAC en Base64 de al menos 256 bits, obligatoria en `prod` | Solo fuera de `prod`                                  |
-| `JWT_EXPIRATION_MS`        | Vigencia del token en milisegundos                               | `86400000`                                            |
-| `CORS_ALLOWED_ORIGINS`     | Orígenes permitidos, separados por comas                         | `http://localhost:4200`                               |
-| `DATA_INITIALIZER_ENABLED` | Carga de datos de prueba. Vacío usa el valor del perfil          | Según el perfil                                       |
-| `SERVER_PORT`              | Puerto HTTP de la API dentro del contenedor                      | `8080`                                                |
-| `JDK_JAVA_OPTIONS`         | Opciones adicionales de la JVM de la API                         | `-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError` |
-| `OTEL_SERVICE_NAME`        | Nombre del servicio en las trazas                                | `tusalud-api`                                         |
-| `APP_PORT`                 | Puerto de la API en el host                                      | `8080`                                                |
-| `WEB_PORT`                 | Puerto de la aplicación web en el host                           | `4200`                                                |
-| `POSTGRES_PORT`            | Puerto de PostgreSQL en el host                                  | `5432`                                                |
-| `JAEGER_UI_PORT`           | Puerto de la interfaz de Jaeger en el host                       | `16686`                                               |
-| `OTEL_GRPC_PORT`           | Puerto OTLP gRPC del Collector en el host                        | `4317`                                                |
-| `OTEL_HTTP_PORT`           | Puerto OTLP HTTP del Collector en el host                        | `4318`                                                |
-| `OTEL_HEALTH_PORT`         | Puerto del healthcheck del Collector en el host                  | `13133`                                               |
-| `PGADMIN_PORT`             | Puerto de pgAdmin en el host                                     | `5050`                                                |
-| `PGADMIN_EMAIL`            | Usuario de pgAdmin                                               | `admin@tusalud.com`                                   |
-| `PGADMIN_PASSWORD`         | Clave de pgAdmin                                                 | `admin`                                               |
+| Variable                      | Uso                                                                                   | Valor por defecto                                     |
+| ----------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `SPRING_PROFILES_ACTIVE`      | Perfil de Spring en tiempo de ejecución                                               | El perfil de Maven                                    |
+| `DB_URL`                      | URL JDBC de PostgreSQL, obligatoria en `prod`                                         | Según el perfil                                       |
+| `DB_USERNAME`                 | Usuario de PostgreSQL, obligatorio en `prod`                                          | `postgres`                                            |
+| `DB_PASSWORD`                 | Clave de PostgreSQL, obligatoria en `prod`                                            | `postgres`                                            |
+| `JWT_SECRET`                  | Clave HMAC en Base64 de al menos 256 bits, obligatoria en `prod`                      | Solo fuera de `prod`                                  |
+| `JWT_EXPIRATION_MS`           | Vigencia del token de acceso en milisegundos                                          | `900000`                                              |
+| `JWT_REFRESH_EXPIRATION_MS`   | Vigencia del refresh token en milisegundos                                            | `604800000`                                           |
+| `MFA_CLAVE_CIFRADO`           | Clave para cifrar los secretos de la verificación en dos pasos, obligatoria en `prod` | Solo fuera de `prod`                                  |
+| `PAGOS_SIMULACION_HABILITADA` | Habilita la confirmación simulada de pagos con Yape y Plin                            | `true`, y `false` en `prod`                           |
+| `CORS_ALLOWED_ORIGINS`        | Orígenes permitidos, separados por comas                                              | `http://localhost:4200`                               |
+| `DATA_INITIALIZER_ENABLED`    | Carga de datos de prueba. Vacío usa el valor del perfil                               | Según el perfil                                       |
+| `SERVER_PORT`                 | Puerto HTTP de la API dentro del contenedor                                           | `8080`                                                |
+| `JDK_JAVA_OPTIONS`            | Opciones adicionales de la JVM de la API                                              | `-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError` |
+| `OTEL_SERVICE_NAME`           | Nombre del servicio en las trazas                                                     | `tusalud-api`                                         |
+| `APP_PORT`                    | Puerto de la API en el host                                                           | `8080`                                                |
+| `WEB_PORT`                    | Puerto de la aplicación web en el host                                                | `4200`                                                |
+| `POSTGRES_PORT`               | Puerto de PostgreSQL en el host                                                       | `5432`                                                |
+| `JAEGER_UI_PORT`              | Puerto de la interfaz de Jaeger en el host                                            | `16686`                                               |
+| `OTEL_GRPC_PORT`              | Puerto OTLP gRPC del Collector en el host                                             | `4317`                                                |
+| `OTEL_HTTP_PORT`              | Puerto OTLP HTTP del Collector en el host                                             | `4318`                                                |
+| `OTEL_HEALTH_PORT`            | Puerto del healthcheck del Collector en el host                                       | `13133`                                               |
+| `PGADMIN_PORT`                | Puerto de pgAdmin en el host                                                          | `5050`                                                |
+| `PGADMIN_EMAIL`               | Usuario de pgAdmin                                                                    | `admin@tusalud.com`                                   |
+| `PGADMIN_PASSWORD`            | Clave de pgAdmin                                                                      | `admin`                                               |
