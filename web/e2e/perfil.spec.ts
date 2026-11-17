@@ -1,6 +1,6 @@
 import { Page, expect, test } from '@playwright/test';
 
-import { cerrarSesion, iniciarSesion, omitirGuia, registrarPaciente } from './support';
+import { cerrarSesion, iniciarSesion, omitirGuia, registrarPaciente, ir } from './support';
 
 test.describe('perfil', () => {
   test('el paciente ve y actualiza sus datos', async ({ page }) => {
@@ -23,7 +23,7 @@ test.describe('perfil', () => {
   test('la anticipación del recordatorio se elige de una lista y se conserva', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
     await fijarAnticipacion(page, 1440);
-    await page.goto('/perfil');
+    await ir(page, '/perfil');
     await page.getByRole('tab', { name: /Avisos/ }).click();
     await expect(page.locator('#per-anticipacion')).toBeVisible();
     await expect(page.getByRole('spinbutton')).toHaveCount(0);
@@ -41,7 +41,7 @@ test.describe('perfil', () => {
 
   test('valida los datos personales', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/perfil');
+    await ir(page, '/perfil');
     await page.locator('#per-nombre').fill('');
     await page.locator('#per-telefono').fill('123');
     await page.getByRole('button', { name: 'Guardar cambios' }).click();
@@ -51,7 +51,7 @@ test.describe('perfil', () => {
 
   test('el médico edita su consultorio y ve sus datos profesionales', async ({ page }) => {
     await iniciarSesion(page, 'medico');
-    await page.goto('/perfil');
+    await ir(page, '/perfil');
     await expect(page.locator('#per-colegiatura')).toHaveValue('CMP-12345');
     await expect(page.getByText('Cardiología')).toBeVisible();
     await page.locator('#per-consultorio').fill('Consultorio 101');
@@ -62,7 +62,7 @@ test.describe('perfil', () => {
 
   test('el administrador ve su perfil sin datos de paciente ni médico', async ({ page }) => {
     await iniciarSesion(page, 'admin');
-    await page.goto('/perfil');
+    await ir(page, '/perfil');
     await expect(page.locator('#per-email')).toHaveValue('admin@tusalud.com');
     await expect(page.locator('#per-dni')).toHaveCount(0);
     await expect(page.locator('#per-colegiatura')).toHaveCount(0);
@@ -71,7 +71,7 @@ test.describe('perfil', () => {
   test('cambia la contraseña con validaciones y vuelve a la original', async ({ page }) => {
     await omitirGuia(page);
     const cuenta = await registrarPaciente(page, 'clave');
-    await page.goto('/perfil');
+    await ir(page, '/perfil');
     await page.getByRole('tab', { name: 'Seguridad' }).click();
 
     await page.locator('#per-actual').fill('Incorrecta123!');
@@ -99,7 +99,7 @@ test.describe('perfil', () => {
     await page.getByRole('button', { name: 'Iniciar sesión' }).click();
     await expect(page).toHaveURL(/\/citas$/);
 
-    await page.goto('/perfil');
+    await ir(page, '/perfil');
     await page.getByRole('tab', { name: 'Seguridad' }).click();
     await page.locator('#per-actual').fill('NuevaClave456!');
     await page.locator('#per-nueva').fill('Paciente123!');

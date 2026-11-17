@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { idDeMedico, iniciarSesion } from './support';
+import { idDeMedico, iniciarSesion, ir } from './support';
 
 const NOMBRE_CALENDARIO = 'Calendario';
 
@@ -46,7 +46,7 @@ test.describe('planificador', () => {
   }) => {
     const paciente = await (await browser.newContext()).newPage();
     await iniciarSesion(paciente, 'paciente');
-    await paciente.goto('/calendario');
+    await ir(paciente, '/calendario');
     await expect(paciente.locator('.mini-dia')).toHaveCount(0);
     await paciente.getByRole('button', { name: 'Nuevo evento' }).click();
     await paciente.locator('#ev-tipo').click();
@@ -58,7 +58,7 @@ test.describe('planificador', () => {
 
     const admin = await (await browser.newContext()).newPage();
     await iniciarSesion(admin, 'admin');
-    await admin.goto('/calendario');
+    await ir(admin, '/calendario');
     await admin.getByRole('button', { name: 'Nuevo evento' }).click();
     await admin.locator('#ev-tipo').click();
     await expect(admin.getByRole('option', { name: 'Reunión' })).toBeVisible();
@@ -68,7 +68,7 @@ test.describe('planificador', () => {
 
   test('valida el título y el rango de fechas del evento', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/calendario');
+    await ir(page, '/calendario');
     await page.getByRole('button', { name: 'Nuevo evento' }).click();
     await page.getByRole('button', { name: /Guardar$/ }).click();
     await expect(page.getByText('El título es obligatorio.')).toBeVisible();
@@ -78,7 +78,7 @@ test.describe('planificador', () => {
   test('marca una tarea como completada', async ({ page }) => {
     const titulo = `Tarea e2e ${Date.now()}`;
     await iniciarSesion(page, 'admin');
-    await page.goto('/calendario');
+    await ir(page, '/calendario');
     await page.getByRole('button', { name: 'Nuevo evento' }).click();
     await page.locator('#ev-titulo').fill(titulo);
     await page.locator('#ev-tipo').click();
@@ -100,7 +100,7 @@ test.describe('planificador', () => {
     page,
   }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/calendario');
+    await ir(page, '/calendario');
     await page
       .getByRole('group', { name: 'Vista del calendario' })
       .getByRole('button', { name: 'Semana' })
@@ -121,7 +121,7 @@ test.describe('planificador', () => {
   test('mueve y redimensiona un evento arrastrándolo y guarda el cambio', async ({ page }) => {
     const titulo = `Arrastre e2e ${Date.now()}`;
     await iniciarSesion(page, 'paciente');
-    await page.goto('/calendario');
+    await ir(page, '/calendario');
     await page.getByRole('button', { name: 'Nuevo evento' }).click();
     await page.locator('#ev-titulo').fill(titulo);
     await page.getByRole('button', { name: /Guardar$/ }).click();
@@ -167,7 +167,7 @@ test.describe('planificador', () => {
     page,
   }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/calendario');
+    await ir(page, '/calendario');
     await expect(page.getByText('Calendarios', { exact: true })).toBeVisible();
     await page.getByText('Citas médicas').click();
 
@@ -179,7 +179,7 @@ test.describe('planificador', () => {
 
   test('el médico puede crear bloqueos de agenda', async ({ page }) => {
     await iniciarSesion(page, 'medico');
-    await page.goto('/calendario');
+    await ir(page, '/calendario');
     await expect(page.getByText('Bloqueos de agenda').first()).toBeVisible();
     await page.getByRole('button', { name: 'Nuevo evento' }).click();
     await page.locator('#ev-tipo').click();
@@ -191,7 +191,7 @@ test.describe('planificador', () => {
     page,
   }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto(`/medicos/${await idDeMedico(page, 0)}/disponibilidad`);
+    await ir(page, `/medicos/${await idDeMedico(page, 0)}/disponibilidad`);
     await expect(page.locator('p-datepicker')).toHaveCount(0);
     await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
     const huecos = page.getByRole('button', { name: /^Elegir / });

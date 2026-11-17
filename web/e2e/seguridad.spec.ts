@@ -1,6 +1,13 @@
 import { expect, test } from '@playwright/test';
 
-import { cerrarSesion, codigoTotp, iniciarSesion, omitirGuia, registrarPaciente } from './support';
+import {
+  cerrarSesion,
+  codigoTotp,
+  iniciarSesion,
+  omitirGuia,
+  registrarPaciente,
+  ir,
+} from './support';
 
 test.describe('acceso por rol', () => {
   test('el médico no ve especialidades ni el directorio de médicos y vuelve a su agenda', async ({
@@ -10,23 +17,34 @@ test.describe('acceso por rol', () => {
     await expect(page.getByRole('link', { name: 'Especialidades' })).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Médicos', exact: true })).toHaveCount(0);
 
-    for (const ruta of ['/especialidades', '/medicos', '/citas/nueva', '/pagos', '/admin/panel']) {
+    for (const ruta of [
+      '/admin/especialidades',
+      '/admin/medicos',
+      '/paciente/citas/nueva',
+      '/paciente/pagos',
+      '/admin/panel',
+    ]) {
       await page.goto(ruta);
-      await expect(page).toHaveURL(/\/agenda$/);
+      await expect(page).toHaveURL(/\/medico\/agenda$/);
     }
   });
 
   test('el paciente y el administrador vuelven a su página de inicio', async ({ browser }) => {
     const paciente = await (await browser.newContext()).newPage();
     await iniciarSesion(paciente, 'paciente');
-    for (const ruta of ['/admin/usuarios', '/agenda', '/pacientes']) {
+    for (const ruta of ['/admin/usuarios', '/medico/agenda', '/medico/pacientes']) {
       await paciente.goto(ruta);
-      await expect(paciente).toHaveURL(/\/citas$/);
+      await expect(paciente).toHaveURL(/\/paciente\/citas$/);
     }
 
     const admin = await (await browser.newContext()).newPage();
     await iniciarSesion(admin, 'admin');
-    for (const ruta of ['/citas/nueva', '/pagos/metodos', '/historia-clinica', '/agenda']) {
+    for (const ruta of [
+      '/paciente/citas/nueva',
+      '/paciente/pagos/metodos',
+      '/paciente/historia-clinica',
+      '/medico/agenda',
+    ]) {
       await admin.goto(ruta);
       await expect(admin).toHaveURL(/\/admin\/panel$/);
     }
@@ -79,7 +97,7 @@ test.describe('verificación en dos pasos', () => {
     await omitirGuia(page);
     const cuenta = await registrarPaciente(page, 'mfa');
 
-    await page.goto('/perfil?tab=seguridad');
+    await ir(page, '/perfil?tab=seguridad');
     await expect(page.locator('p-tag').getByText('Desactivada', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Activar verificación' }).click();
     const secreto = (await page.locator('.clave-manual code').innerText()).trim();
@@ -118,7 +136,7 @@ test.describe('verificación en dos pasos', () => {
     await page.getByRole('button', { name: 'Verificar y entrar' }).click();
     await expect(page).toHaveURL(/\/citas$/);
 
-    await page.goto('/perfil?tab=seguridad');
+    await ir(page, '/perfil?tab=seguridad');
     await page.getByRole('button', { name: 'Desactivar', exact: true }).click();
     await page.locator('#mfa-password').fill(cuenta.password);
     await page.locator('#mfa-codigo').fill(codigoTotp(secreto));

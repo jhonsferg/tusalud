@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test';
 
-import { CUENTAS, iniciarSesion, cerrarSesion } from './support';
+import { CUENTAS, iniciarSesion, cerrarSesion, ir } from './support';
 
 test.describe('autenticación', () => {
   test('redirige al login cuando no hay sesión', async ({ page }) => {
-    await page.goto('/citas');
-    await expect(page).toHaveURL(/\/auth\/login\?returnUrl=%2Fcitas/);
+    await page.goto('/paciente/citas');
+    await expect(page).toHaveURL(/\/auth\/login\?returnUrl=%2Fpaciente%2Fcitas/);
     await expect(page.getByRole('heading', { name: 'Bienvenido de nuevo' })).toBeVisible();
   });
 

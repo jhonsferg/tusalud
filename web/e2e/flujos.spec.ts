@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { iniciarSesion, reservarPrimeraHoraLibre } from './support';
+import { iniciarSesion, reservarPrimeraHoraLibre, ir } from './support';
 
 test.describe('paciente', () => {
   test('ve el catálogo de especialidades y médicos', async ({ page }) => {
@@ -19,7 +19,7 @@ test.describe('paciente', () => {
 
   test('reserva una cita y la cancela', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/medicos');
+    await ir(page, '/medicos');
     await page
       .locator('article', { hasText: 'Luis García' })
       .getByRole('button', { name: 'Reservar' })
@@ -39,7 +39,7 @@ test.describe('paciente', () => {
 
   test('elegir un solo día en el filtro de fechas ya filtra las citas', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/citas');
+    await ir(page, '/citas');
     await expect(page.locator('p-datepicker input')).toBeVisible();
     await page.locator('p-datepicker input').click();
     const peticion = page.waitForRequest((r) => {
@@ -54,9 +54,9 @@ test.describe('paciente', () => {
   test('no puede entrar a las secciones de administración', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
     await page.goto('/admin/auditoria');
-    await expect(page).toHaveURL(/\/citas$/);
-    await page.goto('/medicos/nuevo');
-    await expect(page).toHaveURL(/\/citas$/);
+    await expect(page).toHaveURL(/\/paciente\/citas$/);
+    await page.goto('/admin/medicos/nuevo');
+    await expect(page).toHaveURL(/\/paciente\/citas$/);
   });
 });
 
@@ -77,7 +77,7 @@ test.describe('médico', () => {
 test.describe('administrador', () => {
   test('ve la auditoría con sus indicadores', async ({ page }) => {
     await iniciarSesion(page, 'admin');
-    await page.goto('/admin/auditoria');
+    await ir(page, '/admin/auditoria');
     await expect(page.getByRole('heading', { name: 'Auditoría' })).toBeVisible();
     await expect(page.getByText('Citas por estado')).toBeVisible();
     await expect(page.getByText('Detalle de citas')).toBeVisible();
@@ -86,7 +86,7 @@ test.describe('administrador', () => {
   test('crea, edita y elimina una especialidad', async ({ page }) => {
     const nombre = `Prueba ${Date.now()}`;
     await iniciarSesion(page, 'admin');
-    await page.goto('/especialidades/nueva');
+    await ir(page, '/especialidades/nueva');
     await page.locator('#esp-nombre').fill(nombre);
     await page.locator('#esp-descripcion').fill('Creada por e2e');
     await page.locator('#esp-precio').pressSequentially('100');
@@ -106,7 +106,7 @@ test.describe('administrador', () => {
 
   test('configura los horarios de un médico', async ({ page }) => {
     await iniciarSesion(page, 'admin');
-    await page.goto('/medicos');
+    await ir(page, '/medicos');
     await page.getByRole('button', { name: 'Ver perfil' }).first().click();
     await page.getByRole('button', { name: 'Gestionar horarios' }).click();
     await expect(page.getByRole('heading', { name: 'Bloques configurados' })).toBeVisible();

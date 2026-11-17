@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test';
 
-import { iniciarSesion, omitirGuia, reservarPrimeraHoraLibre, idDeGarcia } from './support';
+import { iniciarSesion, omitirGuia, reservarPrimeraHoraLibre, idDeGarcia, ir } from './support';
 
 test.describe('pagos del paciente', () => {
   test('agrega y elimina una tarjeta', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/pagos/metodos');
+    await ir(page, '/pagos/metodos');
     await expect(page.getByText('•••• •••• •••• 4242')).toBeVisible();
 
     await page.getByRole('button', { name: 'Agregar tarjeta' }).first().click();
@@ -27,7 +27,7 @@ test.describe('pagos del paciente', () => {
 
   test('valida el número de tarjeta', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/pagos/metodos');
+    await ir(page, '/pagos/metodos');
     await page.getByRole('button', { name: 'Agregar tarjeta' }).first().click();
     await page.locator('#mp-numero').fill('1234567812345678');
     await page.getByRole('button', { name: 'Guardar tarjeta' }).click();
@@ -36,7 +36,7 @@ test.describe('pagos del paciente', () => {
 
   test('reserva, paga con cupón y ve el comprobante', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto(`/citas/nueva?medicoId=${await idDeGarcia(page)}`);
+    await ir(page, `/citas/nueva?medicoId=${await idDeGarcia(page)}`);
     await reservarPrimeraHoraLibre(page, 'Pago con cupón e2e');
 
     await page.getByRole('button', { name: 'Pagar cita' }).click();
@@ -48,7 +48,7 @@ test.describe('pagos del paciente', () => {
     await expect(page.getByText(/Pago registrado/).first()).toBeVisible();
     await expect(page.getByText('Pagada', { exact: true }).first()).toBeVisible();
 
-    await page.goto('/pagos');
+    await ir(page, '/pagos');
     await expect(page.getByRole('cell', { name: /B001-/ }).first()).toBeVisible();
     await page.getByRole('button', { name: 'Ver comprobante' }).first().click();
     await expect(page.getByText('Comprobante de pago')).toBeVisible();
@@ -62,7 +62,7 @@ test.describe('billeteras digitales', () => {
   ] as const) {
     test(`paga con ${billetera} escaneando un QR y confirmando desde la app`, async ({ page }) => {
       await iniciarSesion(page, 'paciente');
-      await page.goto(`/citas/nueva?medicoId=${await idDeGarcia(page)}`);
+      await ir(page, `/citas/nueva?medicoId=${await idDeGarcia(page)}`);
       await reservarPrimeraHoraLibre(page, `Pago con ${nombre} e2e`);
 
       await page.getByRole('button', { name: 'Pagar cita' }).click();
@@ -78,7 +78,7 @@ test.describe('billeteras digitales', () => {
 
   test('cancela un QR pendiente al cambiar de billetera', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto(`/citas/nueva?medicoId=${await idDeGarcia(page)}`);
+    await ir(page, `/citas/nueva?medicoId=${await idDeGarcia(page)}`);
     await reservarPrimeraHoraLibre(page, 'Cambio de billetera e2e');
 
     await page.getByRole('button', { name: 'Pagar cita' }).click();
@@ -118,7 +118,7 @@ test.describe('historia clínica', () => {
 test.describe('notificaciones y perfil', () => {
   test('la bandeja lista avisos y permite marcarlos como leídos', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/notificaciones');
+    await ir(page, '/notificaciones');
     await expect(page.getByRole('heading', { name: 'Notificaciones' })).toBeVisible();
     await expect(page.getByText('Nuevo inicio de sesión').first()).toBeVisible();
     await page.getByRole('button', { name: 'Marcar todas como leídas' }).click();
@@ -133,7 +133,7 @@ test.describe('notificaciones y perfil', () => {
 
   test('lista las sesiones activas y marca la actual', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/perfil?tab=seguridad');
+    await ir(page, '/perfil?tab=seguridad');
     await expect(page.getByText('Sesiones activas')).toBeVisible();
     await expect(page.getByText('Este dispositivo')).toBeVisible();
   });
@@ -142,7 +142,7 @@ test.describe('notificaciones y perfil', () => {
     await iniciarSesion(page, 'paciente');
     await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).first().click();
     await expect(page.locator('html')).toHaveClass(/app-dark/);
-    await page.goto('/perfil?tab=apariencia');
+    await ir(page, '/perfil?tab=apariencia');
     await page.getByRole('radio', { name: 'Violeta' }).click();
     await expect(page.getByRole('radio', { name: 'Violeta' })).toHaveAttribute(
       'aria-checked',
@@ -179,7 +179,7 @@ test.describe('especialidades y roles', () => {
   }) => {
     const admin = await (await browser.newContext()).newPage();
     await iniciarSesion(admin, 'admin');
-    await admin.goto('/especialidades');
+    await ir(admin, '/especialidades');
     await expect(admin.getByRole('columnheader', { name: 'Consulta' })).toBeVisible();
     await admin.getByRole('button', { name: 'Editar Oftalmología' }).click();
     await expect(admin.locator('#esp-precio')).not.toHaveValue('');
@@ -193,7 +193,7 @@ test.describe('especialidades y roles', () => {
 
     const paciente = await (await browser.newContext()).newPage();
     await iniciarSesion(paciente, 'paciente');
-    await paciente.goto('/citas/nueva');
+    await ir(paciente, '/citas/nueva');
     const opcion = paciente.getByRole('option', { name: 'Oftalmología' });
     await expect(async () => {
       await paciente.locator('#cita-especialidad').click();
@@ -209,7 +209,7 @@ test.describe('especialidades y roles', () => {
 
   test('el administrador edita las especialidades de un médico', async ({ page }) => {
     await iniciarSesion(page, 'admin');
-    await page.goto('/medicos');
+    await ir(page, '/medicos');
     await page
       .locator('article', { hasText: 'Luis García' })
       .getByRole('button', { name: 'Ver perfil' })
@@ -224,7 +224,7 @@ test.describe('especialidades y roles', () => {
 
   test('el administrador gestiona los roles de un usuario', async ({ page }) => {
     await iniciarSesion(page, 'admin');
-    await page.goto('/admin/usuarios');
+    await ir(page, '/admin/usuarios');
     await page.getByPlaceholder('Buscar por nombre o correo').fill('valeria.castillo');
     await page.getByRole('button', { name: /Gestionar roles de Valeria/ }).click();
     const dialogo = page.getByRole('dialog');
@@ -252,7 +252,7 @@ test.describe('pacientes compartidos', () => {
     test.setTimeout(90_000);
     const garcia = await (await browser.newContext()).newPage();
     await iniciarSesion(garcia, 'medico');
-    await garcia.goto('/pacientes');
+    await ir(garcia, '/pacientes');
     await garcia.getByRole('button', { name: 'Compartir a Diego Herrera' }).click();
     const previo = garcia.getByRole('button', { name: 'Dejar de compartir con Ricardo Salazar' });
     if (await previo.count()) {
@@ -278,7 +278,7 @@ test.describe('pacientes compartidos', () => {
     await salazar.locator('#login-password').fill('Medico123!');
     await salazar.getByRole('button', { name: 'Iniciar sesión' }).click();
     await expect(salazar).toHaveURL(/\/agenda$/);
-    await salazar.goto('/pacientes');
+    await ir(salazar, '/pacientes');
     await expect(
       salazar.getByRole('row', { name: /Diego Herrera/ }).getByText(/Compartido por/),
     ).toBeVisible();
@@ -299,7 +299,7 @@ test.describe('administración', () => {
   test('crea y elimina un cupón', async ({ page }) => {
     const codigo = `E2E${Date.now().toString().slice(-6)}`;
     await iniciarSesion(page, 'admin');
-    await page.goto('/admin/cupones');
+    await ir(page, '/admin/cupones');
     await expect(page.getByRole('cell', { name: /BIENVENIDA10/ }).first()).toBeVisible();
     await page.getByRole('button', { name: 'Nuevo cupón' }).first().click();
     await page.locator('#cu-codigo').fill(codigo);
@@ -315,10 +315,10 @@ test.describe('administración', () => {
 
   test('lista pagos y gestiona usuarios', async ({ page }) => {
     await iniciarSesion(page, 'admin');
-    await page.goto('/admin/pagos');
+    await ir(page, '/admin/pagos');
     await expect(page.getByRole('cell', { name: /B001-/ }).first()).toBeVisible();
 
-    await page.goto('/admin/usuarios');
+    await ir(page, '/admin/usuarios');
     await page.getByPlaceholder('Buscar por nombre o correo').fill('ana.paredes');
     const fila = page.getByRole('row', { name: /Ana Lucía Paredes/ });
     await expect(fila).toBeVisible();

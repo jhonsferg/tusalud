@@ -1,6 +1,6 @@
 import { Page, expect, test } from '@playwright/test';
 
-import { cerrarSesion, iniciarSesion, omitirGuia } from './support';
+import { cerrarSesion, iniciarSesion, omitirGuia, ir } from './support';
 
 async function entrarCon(page: Page, email: string, password: string, home: RegExp) {
   await omitirGuia(page);
@@ -28,7 +28,7 @@ test.describe('personal de la institución', () => {
     const sufijo = Date.now().toString();
     const correo = `almacen.${sufijo}@tusalud.com`;
     await iniciarSesion(page, 'admin');
-    await page.goto('/admin/usuarios');
+    await ir(page, '/admin/usuarios');
     await page.getByRole('button', { name: 'Nuevo personal' }).click();
     await page.locator('#per-nuevo-nombre').fill('Marta');
     await page.locator('#per-nuevo-apellido').fill('Soto');
@@ -41,7 +41,7 @@ test.describe('personal de la institución', () => {
     await expect(page.getByText(/fue registrado como personal/)).toBeVisible();
 
     await cerrarSesion(page);
-    await entrarCon(page, correo, 'Personal123!', /\/almacen$/);
+    await entrarCon(page, correo, 'Personal123!', /\/almacen\/$/);
     await expect(page.getByRole('heading', { name: 'Almacén' })).toBeVisible();
   });
 
@@ -57,7 +57,7 @@ test.describe('personal de la institución', () => {
     await expect(farmacia.getByRole('link', { name: 'Dispensar' })).toBeVisible();
     await expect(farmacia.getByRole('link', { name: 'Proveedores' })).toHaveCount(0);
     await farmacia.goto('/almacen/ingresos');
-    await expect(farmacia).toHaveURL(/\/farmacia$/);
+    await expect(farmacia).toHaveURL(/\/farmacia\/$/);
   });
 });
 
@@ -70,7 +70,7 @@ test.describe('almacén', () => {
     await expect(page.getByText('Productos activos')).toBeVisible();
     await expect(page.getByText('Valor del inventario')).toBeVisible();
 
-    await page.goto('/almacen/productos');
+    await ir(page, '/almacen/productos');
     await page.getByPlaceholder('Buscar por código o nombre').fill('Paracetamol');
     await expect(page.getByRole('cell', { name: /Paracetamol/ }).first()).toBeVisible();
     await page.getByRole('button', { name: 'Nuevo producto' }).click();
@@ -80,7 +80,7 @@ test.describe('almacén', () => {
     await page.getByRole('button', { name: /Guardar$/ }).click();
     await expect(page.getByText(`${nombre} fue registrado.`)).toBeVisible();
 
-    await page.goto('/almacen/ingresos');
+    await ir(page, '/almacen/ingresos');
     await page.getByRole('button', { name: 'Nuevo ingreso' }).click();
     await page.locator('#ing-producto-0').click();
     await page.getByRole('option', { name: new RegExp(codigo) }).click();
@@ -92,7 +92,7 @@ test.describe('almacén', () => {
     await page.getByRole('button', { name: /Registrar ingreso$/ }).click();
     await expect(page.getByText('El ingreso fue registrado y el stock actualizado.')).toBeVisible();
 
-    await page.goto('/almacen/productos');
+    await ir(page, '/almacen/productos');
     await page.getByPlaceholder('Buscar por código o nombre').fill(codigo);
     await expect(page.getByRole('cell', { name: new RegExp(codigo) }).first()).toBeVisible();
     await expect(page.getByText('50 unidad')).toBeVisible();
@@ -109,10 +109,10 @@ test.describe('almacén', () => {
 
   test('muestra el kardex y los proveedores', async ({ page }) => {
     await iniciarSesion(page, 'almacen');
-    await page.goto('/almacen/movimientos');
+    await ir(page, '/almacen/movimientos');
     await expect(page.getByRole('heading', { name: 'Kardex' })).toBeVisible();
     await expect(page.getByRole('row').nth(1)).toBeVisible();
-    await page.goto('/almacen/proveedores');
+    await ir(page, '/almacen/proveedores');
     await expect(page.getByRole('heading', { name: 'Proveedores' })).toBeVisible();
     await expect(page.getByRole('row').nth(1)).toBeVisible();
   });
@@ -144,7 +144,7 @@ test.describe('farmacia', () => {
     const numero = (await comprobante.locator('h4').innerText()).trim();
     await comprobante.getByRole('button', { name: 'Listo' }).click();
 
-    await page.goto('/farmacia/historial');
+    await ir(page, '/farmacia/historial');
     await expect(page.getByRole('cell', { name: numero, exact: true })).toBeVisible();
     await page.getByRole('button', { name: `Anular ${numero}` }).click();
     await page.locator('.p-confirmdialog').getByRole('button', { name: 'Anular' }).click();
@@ -153,7 +153,7 @@ test.describe('farmacia', () => {
 
   test('registra una venta libre sin receta', async ({ page }) => {
     await iniciarSesion(page, 'farmacia');
-    await page.goto('/farmacia/dispensar');
+    await ir(page, '/farmacia/dispensar');
     await page.getByRole('button', { name: 'Agregar producto' }).click();
     await page.locator('#disp-producto-0').click();
     await page
@@ -173,7 +173,7 @@ test.describe('laboratorio', () => {
     test.setTimeout(120_000);
     const medico = await (await browser.newContext()).newPage();
     await iniciarSesion(medico, 'medico');
-    await medico.goto('/laboratorio/solicitar');
+    await ir(medico, '/laboratorio/solicitar');
     await medico.locator('#sol-paciente').click();
     await medico.getByRole('option', { name: /Carlos Mendoza/ }).click();
     await medico.locator('p-multiselect').click();
@@ -192,7 +192,7 @@ test.describe('laboratorio', () => {
     const lab = await (await browser.newContext()).newPage();
     await iniciarSesion(lab, 'laboratorio');
     await expect(lab.getByText('Por tomar muestra')).toBeVisible();
-    await lab.goto(ruta);
+    await lab.goto(ruta.replace('/medico/', '/'));
     await lab.getByRole('button', { name: /Registrar toma de muestra$/ }).click();
     await expect(lab.getByText('La toma de muestra fue registrada.')).toBeVisible();
     await lab.getByRole('button', { name: /Capturar resultados$/ }).click();
@@ -205,8 +205,8 @@ test.describe('laboratorio', () => {
     await expect(lab.getByText('Los resultados fueron validados y publicados.')).toBeVisible();
 
     const paciente = await (await browser.newContext()).newPage();
-    await entrarCon(paciente, 'carlos.mendoza@correo.com', 'Paciente123!', /\/citas$/);
-    await paciente.goto('/mis-resultados');
+    await entrarCon(paciente, 'carlos.mendoza@correo.com', 'Paciente123!', /\/paciente\/citas$/);
+    await ir(paciente, '/mis-resultados');
     const tarjeta = paciente.locator('article', { hasText: codigo });
     await expect(tarjeta).toBeVisible();
     await tarjeta.getByRole('button', { name: /Ver resultados$/ }).click();
@@ -219,7 +219,7 @@ test.describe('laboratorio', () => {
   }) => {
     await iniciarSesion(page, 'laboratorio');
     await expect(page.getByRole('row').nth(1)).toBeVisible();
-    await page.goto('/laboratorio/examenes');
+    await ir(page, '/laboratorio/examenes');
     await page.getByPlaceholder('Buscar examen').fill('Hemograma');
     await expect(page.getByRole('cell', { name: /Hemograma/ }).first()).toBeVisible();
   });
@@ -227,7 +227,7 @@ test.describe('laboratorio', () => {
   test('registra un examen nuevo con sus parámetros y lo edita', async ({ page }) => {
     const codigo = `EX${Date.now().toString().slice(-7)}`;
     await iniciarSesion(page, 'laboratorio');
-    await page.goto('/laboratorio/examenes');
+    await ir(page, '/laboratorio/examenes');
     await page.getByRole('button', { name: 'Nuevo examen' }).click();
     await page.locator('#exa-codigo').fill(codigo);
     await page.locator('#exa-nombre').fill(`Examen ${codigo}`);
@@ -246,8 +246,8 @@ test.describe('laboratorio', () => {
   });
 
   test('el paciente ve sus órdenes con el avance de cada una', async ({ page }) => {
-    await entrarCon(page, 'carlos.mendoza@correo.com', 'Paciente123!', /\/citas$/);
-    await page.goto('/mis-resultados');
+    await entrarCon(page, 'carlos.mendoza@correo.com', 'Paciente123!', /\/paciente\/citas$/);
+    await ir(page, '/mis-resultados');
     await expect(page.locator('article').first()).toBeVisible();
     await expect(page.getByText('Completada').first()).toBeVisible();
   });

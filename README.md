@@ -65,7 +65,7 @@ tusalud/
 ├── .githooks/          Hooks de Git para formatear antes de commit y push
 ├── docker/             Configuración del agente y del Collector de OpenTelemetry, y de pgAdmin
 ├── postman/            Colección de Postman
-├── web/                Aplicación Angular
+├── web/                Workspace de Angular con el portal, una aplicación por rol y las librerías compartidas
 ├── compose.yaml        Stack completo en modo producción
 ├── compose.dev.yaml    Sobrescritura para el perfil dev
 ├── compose.qa.yaml     Sobrescritura para el perfil qa
@@ -1570,7 +1570,7 @@ pgAdmin queda en `http://localhost:5050` con el usuario `admin@tusalud.com` y la
 
 ## Aplicación web
 
-La carpeta `web` contiene el frontend, creado con Angular CLI 21.2.26, que es la versión LTS más reciente. El proyecto de Angular se llama `tusalud` y usa componentes standalone, detección de cambios sin zone.js, SCSS, TypeScript en modo estricto y Vitest para las pruebas unitarias.
+La carpeta `web` es un workspace de Angular 21 con varios proyectos, al estilo de un monorepo. Cada actor de la clínica tiene su propia aplicación, con sus rutas, su menú, su guía de bienvenida y sus flujos, y todas comparten librerías propias. El login es común: vive en un portal y, al autenticarse, el usuario es enviado a la aplicación de su rol. Todo usa componentes standalone, detección de cambios sin zone.js, SCSS, TypeScript en modo estricto y Vitest para las pruebas unitarias.
 
 ### Requisitos
 
@@ -1581,50 +1581,88 @@ La carpeta `web` contiene el frontend, creado con Angular CLI 21.2.26, que es la
 
 ```text
 web/
-├── nginx/                        Configuración de nginx y cabeceras de seguridad para la imagen Docker
-├── public/                       Archivos estáticos copiados tal cual al build
-├── src/
-│   ├── app/
-│   │   ├── core/
-│   │   │   ├── config/           URL base de la API, contextos HTTP y estrategia de títulos
-│   │   │   ├── guards/           authGuard, guestGuard y roleGuard
-│   │   │   ├── interceptors/     Carga, token JWT y manejo de errores
-│   │   │   ├── models/           Interfaces y tipos que reflejan los DTOs del backend
-│   │   │   ├── services/         Sesión, notificaciones, carga, almacenamiento y clientes de la API
-│   │   │   ├── state/            Stores con signals por dominio
-│   │   │   ├── utils/            JWT, fechas, parámetros HTTP y normalización de errores
-│   │   │   └── validators/       Validadores de formularios y mensajes de error
-│   │   ├── features/             Pantallas de auth, especialidades, medicos, citas, agenda y admin
-│   │   ├── layout/               Shell de la aplicación y layout de autenticación
-│   │   ├── shared/               Componentes compartidos, directivas y pipes
-│   │   ├── app.config.ts         Proveedores de router, HttpClient, interceptores y títulos
-│   │   └── app.routes.ts         Rutas raíz con lazy loading y guards
-│   ├── environments/             Configuración de cada entorno
-│   ├── testing/                  Utilidades compartidas por las pruebas
-│   ├── index.html
-│   ├── main.ts
-│   └── styles.scss
-├── angular.json                  Configuraciones de build y de servidor de desarrollo
-├── proxy.conf.json               Proxy de /api hacia el backend en el entorno local
-└── Dockerfile
+├── angular.json              Proyectos: portal, nueve aplicaciones por rol y tres librerías
+├── environments/             Configuración de cada entorno, compartida por todas las aplicaciones
+├── nginx/                    nginx y cabeceras de seguridad para la imagen Docker
+├── scripts/
+│   ├── serve-dist.mjs        Servidor que sirve todas las aplicaciones compiladas y reenvía /api
+│   └── dev.mjs               Arranque del contenedor de desarrollo
+├── e2e/                      Pruebas de extremo a extremo con Playwright
+├── public/                   Archivos estáticos copiados a cada build
+└── projects/
+    ├── core/                 Librería @tusalud/core: sesión, clientes de la API, stores, guards,
+    │                         interceptores, modelos, utilidades y enrutamiento entre aplicaciones
+    ├── ui/                   Librería @tusalud/ui: componentes compartidos, el shell con menú y
+    │                         avatar, el calendario y los estilos globales, un entry point por pieza
+    ├── features/             Librería @tusalud/features: un entry point por dominio, con las rutas
+    │                         y pantallas de citas, hospitalización, laboratorio, caja y los demás
+    ├── portal/               Login, registro, verificación en dos pasos y redirección al módulo
+    ├── paciente/             Aplicación del paciente
+    ├── medico/               Aplicación de médicos y especialistas
+    ├── admin/                Aplicación del administrador
+    ├── recepcion/            Aplicación de recepción
+    ├── caja/                 Aplicación de caja
+    ├── enfermeria/           Aplicación de enfermería y hospitalización
+    ├── laboratorio/          Aplicación del laboratorio
+    ├── farmacia/             Aplicación de la farmacia
+    └── almacen/              Aplicación del almacén
 ```
 
-Las carpetas sin código conservan un archivo `.gitkeep` para que Git las registre.
+Cada aplicación tiene solo cinco archivos propios: `app.config.ts`, `app.routes.ts`, `app.id.ts`, `nav.config.ts` y su prueba de humo. Todo lo demás viene de las librerías.
+
+### Aplicaciones por rol
+
+Todas las aplicaciones se sirven bajo el mismo origen, cada una en su ruta base, y el portal en la raíz. Como comparten el origen, comparten también la sesión guardada en `localStorage`.
+
+| Rol           | Aplicación    | Ruta base       | Página de inicio  |
+| ------------- | ------------- | --------------- | ----------------- |
+| Sin sesión    | `portal`      | `/`             | `/auth/login`     |
+| Paciente      | `paciente`    | `/paciente/`    | `/paciente/citas` |
+| Médico        | `medico`      | `/medico/`      | `/medico/agenda`  |
+| Administrador | `admin`       | `/admin/`       | `/admin/panel`    |
+| Recepción     | `recepcion`   | `/recepcion/`   | `/recepcion/`     |
+| Caja          | `caja`        | `/caja/`        | `/caja/`          |
+| Enfermería    | `enfermeria`  | `/enfermeria/`  | `/enfermeria/`    |
+| Laboratorio   | `laboratorio` | `/laboratorio/` | `/laboratorio/`   |
+| Farmacia      | `farmacia`    | `/farmacia/`    | `/farmacia/`      |
+| Almacén       | `almacen`     | `/almacen/`     | `/almacen/`       |
+
+Cada aplicación incluye exactamente las pantallas y permisos de su rol y nada más, de modo que el paquete que descarga un paciente no contiene el código de administración. Esto reduce la superficie expuesta, pero no reemplaza la seguridad real: el control de acceso lo hace siempre el backend con `@PreAuthorize` y la relación asistencial. El frontend solo oculta lo que el rol no puede usar.
+
+### Enrutamiento entre aplicaciones
+
+- Tras iniciar sesión, el portal calcula el módulo principal del usuario y navega a su ruta base con una carga completa de la página. Si el usuario tiene varios roles, el módulo principal sigue la prioridad administrador, médico, enfermería, laboratorio, farmacia, almacén, recepción, caja y paciente, y el menú del avatar ofrece Cambiar de módulo con un enlace a cada aplicación a la que tiene acceso.
+- Cada aplicación protege su entrada con `entradaModulo`. Sin sesión envía al login con el `returnUrl` de la pantalla pedida, y con sesión pero sin ningún rol de esa aplicación envía al módulo principal del usuario. El `returnUrl` solo se acepta si apunta a un módulo al que el rol tiene acceso.
+- Dentro de una aplicación siguen funcionando los guards por rol de las rutas. Cerrar sesión desde cualquier aplicación lleva al portal.
+- Los nombres de ruta de cada dominio coinciden con el de su aplicación, por ejemplo `caja` dentro de `/caja/`. Para no repetir el segmento, cada aplicación configura un prefijo oculto con `provideTusalud({ prefijoOculto })`: un serializador de URL lo quita al escribir la dirección y lo restaura al leerla. Por eso la pantalla de cobro vive en `/caja/cobrar` y no en `/caja/caja/cobrar`, y las de hospitalización de enfermería en `/enfermeria/emergencias`. El código de las pantallas no cambia.
+
+### Crear una aplicación nueva
+
+Una nueva especialidad con flujos propios, o un nuevo cargo, se agrega como un proyecto más:
+
+1. Generar el proyecto con `ng generate application nombre` y copiar el `angular.json` de una aplicación existente para heredar sus configuraciones de build, la ruta base y los entornos.
+2. Crear los cinco archivos de la aplicación copiándolos de una existente. `app.routes.ts` compone las rutas desde `@tusalud/features` y protege la entrada con `entradaModulo`, y `nav.config.ts` define el menú y los pasos de la guía de ese rol.
+3. Registrar el módulo en `MODULOS` de `@tusalud/core` con su rol, su ruta base, su etiqueta y su icono.
+4. Agregar la aplicación a `build:all` y a `test:apps` en `package.json`, a la lista de bases de `nginx/default.conf.template` y al `Dockerfile`.
+5. Si la aplicación necesita una pantalla que no existe, se crea en un entry point de `@tusalud/features` o, si es solo suya, dentro del propio proyecto.
 
 ### Arquitectura del frontend
 
-La capa `core` concentra la lógica de la aplicación y está completamente implementada y probada. Las 14 pantallas de `features`, el shell y el layout de autenticación están implementados y conectados a la API, con estados de carga, error y vacío, mensajes en español y diseño adaptable a móvil.
+La capa `core` concentra la lógica de la aplicación y está completamente implementada y probada. Las pantallas de `features`, el shell y el layout de autenticación están implementados y conectados a la API, con estados de carga, error y vacío, mensajes en español y diseño adaptable a móvil.
+
+Las librerías se consumen por alias de TypeScript, `@tusalud/core`, `@tusalud/ui/*` y `@tusalud/features/*`, directamente sobre su código fuente, así que una aplicación no necesita que se compile antes ninguna librería. Los entry points de `ui` y `features` son uno por pieza o por dominio para que cada aplicación incluya solo lo que importa, y `core` nunca depende de `ui` ni de `features`. `npm run build:libs` compila las tres con ng-packagr como comprobación, en ese orden.
 
 El estado se maneja exclusivamente con signals de Angular. No se usa `zone.js`: la detección de cambios reacciona a los signals y todos los componentes usan `ChangeDetectionStrategy.OnPush`.
 
-| Pieza                 | Responsabilidad                                                                                                                                                                                                                                                   |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AuthService`         | Guarda la sesión en un signal y expone `isAuthenticated`, `user`, `token`, `roles`, `isAdmin`, `isMedico`, `isPaciente` y `homeUrl` como signals derivados. Persiste la sesión en `localStorage`, la valida al restaurarla y la cierra sola cuando el JWT expira. |
-| Clientes de la API    | `AuthApiService`, `EspecialidadesApiService`, `MedicosApiService`, `CitasApiService`, `AuditoriaApiService` y `PerfilApiService` cubren los 26 endpoints del backend con tipos estrictos.                                                                         |
-| Stores                | `EspecialidadesStore`, `MedicosStore`, `CitasStore` y `AuditoriaStore` exponen los datos, el estado de carga y los errores como signals, y mantienen las listas sincronizadas después de cada alta, edición, eliminación o cambio de estado.                      |
-| `AsyncState`          | Base de los stores: agrupa los signals `value`, `loading`, `error` y `hasValue`, y cancela la carga anterior cuando empieza una nueva.                                                                                                                            |
-| `NotificationService` | Lista de notificaciones en un signal, con cierre automático.                                                                                                                                                                                                      |
-| `LoadingService`      | Cuenta las peticiones en curso y expone `isLoading` como signal.                                                                                                                                                                                                  |
+| Pieza                 | Responsabilidad                                                                                                                                                                                                                                 |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AuthService`         | Guarda la sesión en un signal y expone `isAuthenticated`, `user`, `token`, `roles`, un signal por rol y `homeUrl` como signals derivados. Persiste la sesión en `localStorage`, la valida al restaurarla y la cierra sola cuando el JWT expira. |
+| Clientes de la API    | Un servicio por dominio, desde `AuthApiService` hasta `HospitalizacionApiService`, con tipos estrictos y los ids como cadenas UUID.                                                                                                             |
+| Stores                | Exponen los datos, el estado de carga y los errores como signals, y mantienen las listas sincronizadas después de cada alta, edición, eliminación o cambio de estado.                                                                           |
+| `AsyncState`          | Base de los stores: agrupa los signals `value`, `loading`, `error` y `hasValue`, y cancela la carga anterior cuando empieza una nueva.                                                                                                          |
+| `NotificationService` | Lista de notificaciones en un signal, con cierre automático.                                                                                                                                                                                    |
+| `LoadingService`      | Cuenta las peticiones en curso y expone `isLoading` como signal.                                                                                                                                                                                |
+| `AppShell`            | Layout común con barra superior, menú lateral, avatar, campana de notificaciones y guía. Recibe de cada aplicación su marca, su menú y sus pasos de guía con `provideAppShell` y `provideTourSteps`.                                            |
 
 Los stores se vacían automáticamente al cerrar sesión, de modo que los datos de un usuario nunca quedan visibles para el siguiente.
 
@@ -1640,7 +1678,7 @@ Una petición puede excluirse de cada interceptor con los contextos `SKIP_LOADIN
 
 ### Rutas
 
-Todas las pantallas se cargan de forma diferida. Los parámetros de ruta llegan a los componentes como inputs con signals gracias a `withComponentInputBinding`, y cada ruta define su título.
+Todas las pantallas se cargan de forma diferida. Los parámetros de ruta llegan a los componentes como inputs con signals gracias a `withComponentInputBinding`, y cada ruta define su título. Las rutas que siguen son las internas de cada aplicación; en el navegador van precedidas de su ruta base, y los ids de las rutas son UUID.
 
 | Ruta                              | Acceso                  | Pantalla                        |
 | --------------------------------- | ----------------------- | ------------------------------- |
@@ -1675,7 +1713,7 @@ Todas las pantallas se cargan de forma diferida. Los parámetros de ruta llegan 
 | `/admin/cupones`                  | Admin                   | Cupones de descuento            |
 | `/acceso-denegado`                | Todos                   | Aviso de permisos insuficientes |
 
-Al entrar a la raíz, el administrador va al panel de control, el médico a su agenda y el paciente a sus citas. Quien no inició sesión va al login, y si intentaba abrir una ruta protegida, la URL viaja como `returnUrl`. Un usuario autenticado que abre una ruta de otro rol vuelve a la página de inicio de su propio rol, por ejemplo el médico que escribe `/especialidades` regresa a su agenda. Solo si esa página de inicio es la ruta prohibida se muestra `/acceso-denegado`. El menú lateral muestra solo lo que cada rol puede abrir.
+Quien no inició sesión va al login, y si intentaba abrir una ruta protegida, la URL viaja como `returnUrl`. Un usuario autenticado que abre la ruta base de la aplicación de otro rol vuelve a la página de inicio de su propio módulo, por ejemplo el paciente que escribe `/admin/` regresa a `/paciente/citas`. Una ruta que no existe dentro de su aplicación muestra la página no encontrada, y solo si la página de inicio de un rol es la ruta prohibida se muestra `/acceso-denegado`. El menú lateral muestra solo lo que cada rol puede abrir.
 
 La primera vez que un usuario entra, una guía paso a paso resalta las partes de la interfaz que le corresponden según su rol. Se puede volver a abrir desde el menú del avatar o desde la tarjeta al pie del menú lateral, y el avance se guarda en las preferencias con `tourCompletado`.
 
@@ -1687,7 +1725,7 @@ Las citas se ven en lista o en un calendario propio con vistas de mes, semana, d
 
 ### Interfaz y componentes
 
-La interfaz usa PrimeNG 21 con el tema Aura personalizado con una paleta verde azulado propia del sector salud, PrimeIcons y PrimeFlex para las utilidades de maquetación. El preset y las traducciones al español de PrimeNG viven en `core/config/theme.ts` y se registran en `app.config.ts`, junto con el locale `es-PE` y la moneda PEN.
+La interfaz usa PrimeNG 21 con el tema Aura personalizado con una paleta verde azulado propia del sector salud, PrimeIcons y PrimeFlex para las utilidades de maquetación. El preset y las traducciones al español de PrimeNG viven en `core/config/theme.ts` y se registran para todas las aplicaciones con `provideTusalud`, junto con el locale `es-PE` y la moneda PEN.
 
 Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrece:
 
@@ -1703,13 +1741,13 @@ Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrec
 
 ### Pruebas del frontend
 
-Las 119 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API.
+Las 193 pruebas unitarias corren con Vitest, repartidas entre los proyectos, y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, el enrutamiento entre aplicaciones, las rutas de cada aplicación con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API. Cada aplicación tiene una prueba de humo que resuelve todos sus componentes perezosos.
 
 ```bash
 npm test
 ```
 
-Las 89 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal los flujos de almacén, farmacia y laboratorio, y los de recepción, caja y hospitalización. Requieren el stack levantado con datos de prueba.
+Las 89 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal los flujos de almacén, farmacia y laboratorio, y los de recepción, caja y hospitalización. Requieren el stack levantado con datos de prueba y atraviesan el portal y las aplicaciones por sus rutas base. El helper `ir` de `e2e/support.ts` construye la dirección real de cada pantalla a partir de la aplicación en la que está el usuario y de su prefijo oculto.
 
 ```bash
 npm run e2e
@@ -1730,34 +1768,34 @@ Todos los entornos llaman a la API con la ruta relativa `/api/v1`. En local, el 
 
 ### Comandos
 
-| Comando               | Descripción                                                              |
-| --------------------- | ------------------------------------------------------------------------ |
-| `npm start`           | Servidor de desarrollo en `http://localhost:4200` con el entorno `local` |
-| `npm run start:dev`   | Servidor de desarrollo con el entorno `dev`                              |
-| `npm run build`       | Build de producción                                                      |
-| `npm run build:local` | Build con el entorno `local`                                             |
-| `npm run build:dev`   | Build con el entorno `dev`                                               |
-| `npm run build:qa`    | Build con el entorno `qa`                                                |
-| `npm run build:prod`  | Build de producción                                                      |
-| `npm test`            | Pruebas unitarias con Vitest                                             |
-| `npm run e2e`         | Pruebas de extremo a extremo con Playwright                              |
-| `npm run format`      | Formatea el código con Prettier                                          |
+| Comando                   | Descripción                                                                                                       |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `npm run start:paciente`  | Servidor de desarrollo de una aplicación, con el entorno `local`. Hay uno por aplicación y uno para `portal`      |
+| `npm run build:libs`      | Compila las librerías core, ui y features                                                                         |
+| `npm run build:all`       | Compila el portal y las nueve aplicaciones en producción en `dist/<aplicación>`                                   |
+| `npm run build:all:local` | Lo mismo con el entorno `local`. También existen `:dev`, `:qa` y `:prod`                                          |
+| `npm run serve:dist`      | Sirve todo lo compilado en `dist` bajo sus rutas base en `http://localhost:4300`                                  |
+| `npm test`                | Pruebas unitarias de todos los proyectos. Cada uno tiene su `test:core`, `test:ui`, `test:features` y `test:apps` |
+| `npm run e2e`             | Pruebas de extremo a extremo con Playwright                                                                       |
+| `npm run format`          | Formatea el código con Prettier                                                                                   |
 
-Todos los comandos se ejecutan dentro de la carpeta `web`. El build genera el sitio en `web/dist/tusalud/browser`, que contiene `index.html`, los archivos JavaScript y CSS y el contenido de `public`.
+Todos los comandos se ejecutan dentro de la carpeta `web`. Cada compilación genera el sitio de la aplicación en `web/dist/<aplicación>/browser`. Con `ng serve` se trabaja de una aplicación a la vez: el redirigir a otro módulo tras el login necesita que las demás también estén servidas, para eso existe `npm run serve:dist`.
 
 ### Desarrollo con recarga en caliente
 
-`compose.hot.yaml` reemplaza la imagen de nginx por un contenedor con `ng serve` que monta la carpeta `web` como volumen, de modo que cada cambio en el código se refleja de inmediato en el navegador. Las dependencias viven en un volumen propio y el servidor de desarrollo reenvía `/api` al servicio `app` mediante `proxy.conf.docker.json`.
+`compose.hot.yaml` reemplaza la imagen de nginx por un contenedor de desarrollo que monta la carpeta `web` como volumen. Al arrancar compila una vez el portal y las nueve aplicaciones con el entorno `local` y las sirve todas en `http://localhost:4200` con `scripts/serve-dist.mjs`, que reenvía `/api` al servicio `app`. Compilar todas una vez cuesta menos de dos minutos y casi no ocupa memoria.
+
+La recarga se activa solo en las aplicaciones en las que se trabaja con la variable `WEB_WATCH`, que acepta una lista separada por comas o `all`. Cada una de ellas ejecuta `ng build --watch` con sondeo y vuelve a compilar al guardar un archivo, y el navegador se actualiza al recargar la página. Vigilar las diez aplicaciones a la vez consume más de 13 GB de memoria, por eso no es el comportamiento por defecto.
 
 ```bash
-docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml up -d --build
+WEB_WATCH=paciente,caja docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml up -d --build
 ```
 
-La aplicación queda en `http://localhost:4200` junto con la API, PostgreSQL y los datos de prueba. Si cambia `package.json`, hay que reconstruir con `--build` y recrear el volumen de dependencias con `docker compose down -v`.
+La API, PostgreSQL y los datos de prueba quedan en el mismo stack. Los volúmenes `web-node-modules`, `web-dist` y `web-angular-cache` guardan las dependencias, lo compilado y la caché de Angular. Si cambia `package.json`, hay que reconstruir con `--build` y borrar el volumen de dependencias con `docker volume rm tusalud_web-node-modules`.
 
 ### Imagen Docker y Compose
 
-El `Dockerfile` de `web` compila la aplicación con `node:24-alpine`, con una cache de npm entre builds, y sirve el resultado con `nginxinc/nginx-unprivileged:1.30-alpine-slim`, la rama estable de nginx en su variante mínima. El contenedor corre con el usuario `nginx`, sin privilegios de root, escucha en el puerto 8080 y la imagen final pesa unos 30 MB. El argumento de build `BUILD_CONFIGURATION` elige la configuración de Angular y vale `production` por defecto.
+El `Dockerfile` de `web` compila las librerías, el portal y las nueve aplicaciones con `node:24-alpine`, con una cache de npm entre builds, copia cada aplicación a su carpeta y sirve el resultado con `nginxinc/nginx-unprivileged:1.30-alpine-slim`, la rama estable de nginx en su variante mínima. El contenedor corre con el usuario `nginx`, sin privilegios de root, escucha en el puerto 8080 y la imagen final pesa unos 30 MB. El argumento de build `BUILD_CONFIGURATION` elige la configuración de Angular y vale `production` por defecto.
 
 La aplicación web forma parte del stack de Compose como servicio `web` y queda disponible en `http://localhost:4200` al levantar cualquier entorno:
 
@@ -1777,9 +1815,9 @@ docker compose up -d --build --no-deps web
 
 nginx cumple estas funciones:
 
-- Devuelve `index.html` para cualquier ruta que no sea un archivo, de modo que las rutas de Angular funcionan al recargar la página.
+- Sirve el portal en la raíz y cada aplicación en su ruta base, como `/paciente/` o `/caja/`, y devuelve el `index.html` de la aplicación correspondiente para cualquier ruta que no sea un archivo, de modo que las rutas de Angular funcionan al recargar la página. Una ruta base sin barra final se redirige con 301.
 - Reenvía `/api/` al backend definido en `API_UPSTREAM`, que en Compose es `http://app:8080`. Conserva el header `Host` original con su puerto y agrega `X-Forwarded-Host`, `X-Forwarded-For`, `X-Forwarded-Proto` y `X-Real-IP`, de modo que el header `Location` de las respuestas 201 apunta a `http://localhost:4200`. El nombre del backend se resuelve con el DNS indicado en `NGINX_RESOLVER`, que por defecto es el DNS interno de Docker, `127.0.0.11`, por lo que nginx arranca aunque la API todavía no esté disponible.
-- Marca los archivos JavaScript y CSS con hash en el nombre como inmutables durante un año y obliga a revalidar `index.html` en cada visita.
+- Marca los archivos JavaScript y CSS con hash en el nombre como inmutables durante un año y obliga a revalidar el `index.html` de cada aplicación en cada visita.
 - Sirve los archivos de texto ya comprimidos. El build genera una versión gzip de cada archivo JavaScript, CSS, HTML y SVG, y nginx la entrega directamente con `gzip_static`, sin comprimir en cada petición. Las respuestas de la API se comprimen al vuelo.
 - Agrega las cabeceras de seguridad `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` y `Cross-Origin-Opener-Policy`, y oculta la versión de nginx.
 - Responde `ok` en `/healthz` sin registrar la petición, y el healthcheck de la imagen usa esa ruta.

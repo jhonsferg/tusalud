@@ -1,6 +1,6 @@
 import { Page, expect, test } from '@playwright/test';
 
-import { CUENTAS, cerrarSesion, iniciarSesion } from './support';
+import { CUENTAS, cerrarSesion, iniciarSesion, ir } from './support';
 
 test.describe('recepción', () => {
   test('registra un paciente en mostrador y abre un turno sin cita', async ({ page }) => {
@@ -8,7 +8,7 @@ test.describe('recepción', () => {
     await iniciarSesion(page, 'recepcion');
     await expect(page.getByRole('heading', { level: 1, name: 'Recepción' })).toBeVisible();
 
-    await page.goto('/recepcion/pacientes');
+    await ir(page, '/recepcion/pacientes');
     await page.getByRole('button', { name: 'Registrar paciente' }).click();
     await page.locator('#pac-dni').fill(dni);
     await page.locator('#pac-nombre').fill('Rosa');
@@ -22,12 +22,12 @@ test.describe('recepción', () => {
   test('la sala de espera muestra los turnos y el médico ve su cola', async ({ browser }) => {
     const recepcion = await (await browser.newContext()).newPage();
     await iniciarSesion(recepcion, 'recepcion');
-    await recepcion.goto('/recepcion/pantalla');
+    await ir(recepcion, '/recepcion/pantalla');
     await expect(recepcion.getByText(/A-00\d|P-00\d/).first()).toBeVisible();
 
     const medico = await (await browser.newContext()).newPage();
     await iniciarSesion(medico, 'medico');
-    await medico.goto('/cola');
+    await ir(medico, '/cola');
     await expect(
       medico.getByRole('heading', { level: 1, name: 'Cola de pacientes' }),
     ).toBeVisible();
@@ -39,12 +39,14 @@ test.describe('caja', () => {
     await iniciarSesion(page, 'caja');
     await expect(page.getByRole('heading', { level: 1, name: 'Caja' })).toBeVisible();
     const abrir = page.getByRole('button', { name: 'Abrir caja' });
-    if (await abrir.isVisible().catch(() => false)) {
+    const cerrar = page.getByRole('button', { name: 'Cerrar caja' });
+    await expect(abrir.or(cerrar).first()).toBeVisible();
+    if (await abrir.isVisible()) {
       await abrir.click();
     }
     await expect(page.getByRole('button', { name: 'Cerrar caja' })).toBeVisible();
 
-    await page.goto('/caja/cobrar');
+    await ir(page, '/caja/cobrar');
     await page.getByRole('button', { name: 'Cobro libre' }).click();
     await page.locator('#cob-descripcion').fill('Curación simple');
     await page.locator('#cob-precio').fill('59');
@@ -56,7 +58,7 @@ test.describe('caja', () => {
     await expect(page.getByText('IGV 18%')).toBeVisible();
     await page.getByRole('button', { name: 'Listo' }).click();
 
-    await page.goto('/caja/comprobantes');
+    await ir(page, '/caja/comprobantes');
     await page
       .getByRole('button', { name: /^Anular / })
       .first()
@@ -65,7 +67,7 @@ test.describe('caja', () => {
     await page.getByRole('button', { name: 'Anular comprobante' }).click();
     await expect(page.getByText(/fue anulado/)).toBeVisible();
 
-    await page.goto('/caja');
+    await ir(page, '/caja');
     await page.getByRole('button', { name: 'Cerrar caja' }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Cerrar caja' }).click();
     await expect(page.getByRole('dialog', { name: 'Caja cerrada' })).toBeVisible();
@@ -76,17 +78,17 @@ test.describe('caja', () => {
   }) => {
     const caja = await (await browser.newContext()).newPage();
     await iniciarSesion(caja, 'caja');
-    await caja.goto('/caja/reportes');
+    await ir(caja, '/caja/reportes');
     await expect(
       caja.getByRole('heading', { level: 1, name: 'Reporte de ingresos' }),
     ).toBeVisible();
-    await caja.goto('/caja/historial');
+    await ir(caja, '/caja/historial');
     await expect(caja.getByRole('heading', { level: 1, name: 'Historial de caja' })).toBeVisible();
 
     const paciente = await (await browser.newContext()).newPage();
     await iniciarSesion(paciente, 'paciente');
-    await paciente.goto('/caja');
-    await expect(paciente).toHaveURL(/\/citas$/);
+    await paciente.goto('/caja/');
+    await expect(paciente).toHaveURL(/\/paciente\/citas$/);
   });
 });
 
@@ -97,7 +99,7 @@ test.describe('hospitalización', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Hospitalización' })).toBeVisible();
     await expect(page.getByRole('button', { name: /^Cama / }).first()).toBeVisible();
 
-    await page.goto('/hospitalizacion/emergencias');
+    await ir(page, '/hospitalizacion/emergencias');
     await page.getByRole('button', { name: 'Registrar triaje' }).click();
     await page.getByRole('radio', { name: /3/ }).click();
     await page.locator('#tri-motivo').fill('Dolor abdominal agudo');
@@ -110,12 +112,12 @@ test.describe('hospitalización', () => {
 
   test('el paciente ve sus hospitalizaciones y no el mapa', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto('/mis-ingresos');
+    await ir(page, '/mis-ingresos');
     await expect(
       page.getByRole('heading', { level: 1, name: 'Mis hospitalizaciones' }),
     ).toBeVisible();
-    await page.goto('/hospitalizacion');
-    await expect(page).toHaveURL(/\/citas$/);
+    await page.goto('/enfermeria/');
+    await expect(page).toHaveURL(/\/paciente\/citas$/);
     await cerrarSesion(page);
   });
 });

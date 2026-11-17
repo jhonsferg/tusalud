@@ -24,12 +24,14 @@ const tipos = {
   '.txt': 'text/plain; charset=utf-8',
 };
 
-const apps = readdirSync(raiz)
-  .filter((nombre) => existsSync(join(raiz, nombre, 'browser', 'index.html')))
-  .map((nombre) => ({ nombre, dir: join(raiz, nombre, 'browser') }));
-
-const portal = apps.find((app) => app.nombre === 'portal');
-const modulos = apps.filter((app) => app.nombre !== 'portal');
+function descubrir() {
+  if (!existsSync(raiz)) {
+    return [];
+  }
+  return readdirSync(raiz)
+    .filter((nombre) => existsSync(join(raiz, nombre, 'browser', 'index.html')))
+    .map((nombre) => ({ nombre, dir: join(raiz, nombre, 'browser') }));
+}
 
 function archivo(dir, ruta) {
   const destino = normalize(join(dir, ruta));
@@ -107,6 +109,9 @@ const servidor = http.createServer((req, res) => {
     proxy(req, res);
     return;
   }
+  const apps = descubrir();
+  const portal = apps.find((app) => app.nombre === 'portal');
+  const modulos = apps.filter((app) => app.nombre !== 'portal');
   const primero = ruta.split('/').filter(Boolean)[0];
   const modulo = modulos.find((app) => app.nombre === primero);
   if (modulo) {
@@ -129,6 +134,10 @@ const servidor = http.createServer((req, res) => {
 servidor.requestTimeout = 0;
 servidor.listen(puerto, () => {
   console.log(
-    `TuSalud sirviendo ${apps.map((app) => app.nombre).join(', ')} en http://localhost:${puerto}`,
+    `TuSalud sirviendo ${
+      descubrir()
+        .map((app) => app.nombre)
+        .join(', ') || 'sin aplicaciones todavía'
+    } en http://localhost:${puerto}`,
   );
 });

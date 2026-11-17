@@ -3,20 +3,70 @@ import { createHmac } from 'node:crypto';
 import { Page, expect } from '@playwright/test';
 
 export const CUENTAS = {
-  paciente: { email: 'juan.perez@correo.com', password: 'Paciente123!', home: /\/citas$/ },
-  medico: { email: 'dr.garcia@tusalud.com', password: 'Medico123!', home: /\/agenda$/ },
+  paciente: {
+    email: 'juan.perez@correo.com',
+    password: 'Paciente123!',
+    home: /\/paciente\/citas$/,
+  },
+  medico: { email: 'dr.garcia@tusalud.com', password: 'Medico123!', home: /\/medico\/agenda$/ },
   admin: { email: 'admin@tusalud.com', password: 'Admin123!', home: /\/admin\/panel$/ },
-  laboratorio: { email: 'lab@tusalud.com', password: 'Personal123!', home: /\/laboratorio$/ },
-  farmacia: { email: 'farmacia@tusalud.com', password: 'Personal123!', home: /\/farmacia$/ },
-  almacen: { email: 'almacen@tusalud.com', password: 'Personal123!', home: /\/almacen$/ },
-  recepcion: { email: 'recepcion@tusalud.com', password: 'Personal123!', home: /\/recepcion$/ },
-  caja: { email: 'caja@tusalud.com', password: 'Personal123!', home: /\/caja$/ },
+  laboratorio: { email: 'lab@tusalud.com', password: 'Personal123!', home: /\/laboratorio\/$/ },
+  farmacia: { email: 'farmacia@tusalud.com', password: 'Personal123!', home: /\/farmacia\/$/ },
+  almacen: { email: 'almacen@tusalud.com', password: 'Personal123!', home: /\/almacen\/$/ },
+  recepcion: { email: 'recepcion@tusalud.com', password: 'Personal123!', home: /\/recepcion\/$/ },
+  caja: { email: 'caja@tusalud.com', password: 'Personal123!', home: /\/caja\/$/ },
   enfermeria: {
     email: 'enfermeria@tusalud.com',
     password: 'Personal123!',
-    home: /\/hospitalizacion$/,
+    home: /\/enfermeria\/$/,
   },
 } as const;
+
+const PREFIJO_OCULTO: Readonly<Record<string, string>> = {
+  admin: 'admin',
+  recepcion: 'recepcion',
+  caja: 'caja',
+  enfermeria: 'hospitalizacion',
+  laboratorio: 'laboratorio',
+  farmacia: 'farmacia',
+  almacen: 'almacen',
+};
+
+const APPS = [
+  'paciente',
+  'medico',
+  'admin',
+  'recepcion',
+  'caja',
+  'enfermeria',
+  'laboratorio',
+  'farmacia',
+  'almacen',
+];
+
+export function appActual(page: Page): string {
+  const primero = new URL(page.url()).pathname.split('/').filter(Boolean)[0] ?? '';
+  if (!APPS.includes(primero)) {
+    throw new Error(`La página no está dentro de una aplicación: ${page.url()}`);
+  }
+  return primero;
+}
+
+export function urlDeModulo(app: string, interna: string): string {
+  const oculto = PREFIJO_OCULTO[app];
+  const corte = interna.search(/[?#]/);
+  const ruta = corte < 0 ? interna : interna.slice(0, corte);
+  const resto = corte < 0 ? '' : interna.slice(corte);
+  let visible = ruta;
+  if (oculto && (ruta === `/${oculto}` || ruta.startsWith(`/${oculto}/`))) {
+    visible = ruta.slice(oculto.length + 1);
+  }
+  return `/${app}${visible === '' ? '/' : visible}${resto}`;
+}
+
+export async function ir(page: Page, interna: string): Promise<void> {
+  await page.goto(urlDeModulo(appActual(page), interna));
+}
 
 export async function omitirGuia(page: Page): Promise<void> {
   await page.route('**/api/v1/perfil/preferencias', async (route) => {

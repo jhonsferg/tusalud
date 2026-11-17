@@ -1,12 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-import { idDeMedico, iniciarSesion, reservarPrimeraHoraLibre, idDeGarcia } from './support';
+import { idDeMedico, iniciarSesion, reservarPrimeraHoraLibre, idDeGarcia, ir } from './support';
 
 test.describe('administrador', () => {
   test('registra un médico y configura y elimina un horario', async ({ page }) => {
     const sufijo = Date.now().toString();
     await iniciarSesion(page, 'admin');
-    await page.goto('/medicos/nuevo');
+    await ir(page, '/medicos/nuevo');
     await page.locator('#med-nombre').fill('Rosa');
     await page.locator('#med-apellido').fill(`Torres${sufijo.slice(-4)}`);
     await page.locator('#med-email').fill(`rosa.${sufijo}@tusalud.com`);
@@ -40,14 +40,14 @@ test.describe('administrador', () => {
 
   test('valida el formulario de médico y el rango de horas', async ({ page }) => {
     await iniciarSesion(page, 'admin');
-    await page.goto('/medicos/nuevo');
+    await ir(page, '/medicos/nuevo');
     await page.getByRole('button', { name: 'Registrar médico' }).click();
     await expect(page.getByText('Este campo es obligatorio.').first()).toBeVisible();
   });
 
   test('filtra la auditoría por fechas', async ({ page }) => {
     await iniciarSesion(page, 'admin');
-    await page.goto('/admin/auditoria');
+    await ir(page, '/admin/auditoria');
     await expect(page.getByRole('row').nth(1)).toBeVisible();
     await page.locator('p-datepicker input').click();
     const hoy = page.locator('.p-datepicker-panel .p-datepicker-today').first();
@@ -59,7 +59,7 @@ test.describe('administrador', () => {
 
   test('filtra médicos por especialidad y búsqueda', async ({ page }) => {
     await iniciarSesion(page, 'admin');
-    await page.goto('/medicos');
+    await ir(page, '/medicos');
     const pediatria = page.getByRole('option', { name: 'Pediatría' });
     await expect(async () => {
       await page.locator('p-select.especialidad').click();
@@ -78,7 +78,7 @@ test.describe('ciclo de vida de una cita', () => {
     test.setTimeout(90_000);
     const paciente = await (await browser.newContext()).newPage();
     await iniciarSesion(paciente, 'paciente');
-    await paciente.goto(`/citas/nueva?medicoId=${await idDeGarcia(paciente)}`);
+    await ir(paciente, `/citas/nueva?medicoId=${await idDeGarcia(paciente)}`);
     await reservarPrimeraHoraLibre(paciente, 'Chequeo del ciclo completo');
     await expect(paciente).toHaveURL(/\/citas\/[0-9a-f-]{36}$/);
     const url = paciente.url();
@@ -86,7 +86,7 @@ test.describe('ciclo de vida de una cita', () => {
 
     const medico = await (await browser.newContext()).newPage();
     await iniciarSesion(medico, 'medico');
-    await medico.goto(new URL(url).pathname);
+    await medico.goto(new URL(url).pathname.replace('/paciente/', '/medico/'));
     await medico.getByRole('button', { name: 'Confirmar cita' }).click();
     await medico
       .locator('.p-confirmdialog')
@@ -119,11 +119,11 @@ test.describe('ciclo de vida de una cita', () => {
 
   test('el paciente revisa la disponibilidad pública de un médico', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.goto(`/medicos/${await idDeMedico(page, 1)}/disponibilidad`);
+    await ir(page, `/medicos/${await idDeMedico(page, 1)}/disponibilidad`);
     await expect(page.getByRole('heading', { name: 'Disponibilidad' })).toBeVisible();
     await expect(page.getByRole('grid', { name: 'Calendario mensual' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Siguiente', exact: true })).toBeVisible();
-    await page.goto('/especialidades');
+    await ir(page, '/especialidades');
     await expect(
       page.getByRole('cell', { name: 'Cardiología', exact: true }).first(),
     ).toBeVisible();

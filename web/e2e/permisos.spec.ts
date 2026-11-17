@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { iniciarSesion } from './support';
+import { iniciarSesion, ir } from './support';
 
 const ID_AJENO = '11111111-1111-4111-8111-111111111111';
 
@@ -30,7 +30,7 @@ test.describe('permisos por rol', () => {
     await iniciarSesion(page, 'admin');
     await expect(page.getByRole('link', { name: 'Mis pacientes' })).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Dispensar' })).toHaveCount(0);
-    await page.goto(`/pacientes/${ID_AJENO}/historia-clinica`);
+    await page.goto(`/medico/pacientes/${ID_AJENO}/historia-clinica`);
     await expect(page).toHaveURL(/\/admin\/panel$/);
     await page.goto('/farmacia/dispensar');
     await expect(page).toHaveURL(/\/admin\/panel$/);
@@ -42,25 +42,25 @@ test.describe('permisos por rol', () => {
     page,
   }) => {
     await iniciarSesion(page, 'recepcion');
-    await page.goto('/hospitalizacion');
+    await ir(page, '/hospitalizacion');
     const libre = page.getByRole('button', { name: /^Cama .* Libre$/ }).first();
     await expect(libre).toBeVisible();
     await libre.click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
-    await page.goto('/hospitalizacion/emergencias');
+    await ir(page, '/hospitalizacion/emergencias');
     await expect(page.getByRole('heading', { level: 1, name: 'Emergencias' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Registrar triaje' })).toHaveCount(0);
   });
 
   test('el médico ingresa desde el mapa pero no registra triaje', async ({ page }) => {
     await iniciarSesion(page, 'medico');
-    await page.goto('/hospitalizacion');
+    await ir(page, '/hospitalizacion');
     const libre = page.getByRole('button', { name: /^Cama .* Libre$/ }).first();
     await expect(libre).toBeVisible();
     await libre.click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.keyboard.press('Escape');
-    await page.goto('/hospitalizacion/emergencias');
+    await ir(page, '/hospitalizacion/emergencias');
     await expect(page.getByRole('button', { name: 'Registrar triaje' })).toHaveCount(0);
   });
 });
