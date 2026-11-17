@@ -1,5 +1,6 @@
 package com.codesoftlabs.tusalud.app.services.impl;
 
+import com.codesoftlabs.tusalud.app.dto.request.PersonalCreateRequest;
 import com.codesoftlabs.tusalud.app.dto.response.RolResponse;
 import com.codesoftlabs.tusalud.app.dto.response.UsuarioAdminResponse;
 import com.codesoftlabs.tusalud.app.entities.Rol;
@@ -8,6 +9,8 @@ import com.codesoftlabs.tusalud.app.entities.enums.EstadoUsuario;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
+import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
+import com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.MedicoRepository;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
@@ -29,6 +32,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +49,7 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
     private final MedicoRepository medicoRepository;
     private final PacienteRepository pacienteRepository;
     private final NotificacionService notificacionService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<UsuarioAdminResponse> listar(RolNombre rol, String busqueda) {
@@ -114,11 +119,46 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
         return UsuarioAdminResponse.from(usuario, ultimosAccesos().get(usuarioId));
     }
 
+    @Override
+    @Transactional
+    public UsuarioAdminResponse crearPersonal(PersonalCreateRequest request, UsuarioPrincipal actor) {
+        Set<RolNombre> roles = EnumSet.copyOf(request.roles());
+        if (roles.contains(RolNombre.ROLE_MEDICO) || roles.contains(RolNombre.ROLE_PACIENTE)) {
+            throw new DatosInvalidosException(
+                    "El personal solo admite los roles de administrador, laboratorio, farmacia o almacén");
+        }
+        String email = request.email().trim().toLowerCase(Locale.ROOT);
+        if (usuarioRepository.existsByEmailIgnoreCase(email)) {
+            throw new ConflictException("Ya existe un usuario registrado con el email " + email);
+        }
+        Set<Rol> entidades = new java.util.HashSet<>();
+        for (RolNombre nombre : roles) {
+            entidades.add(rolRepository
+                    .findByNombre(nombre)
+                    .orElseGet(() ->
+                            rolRepository.save(Rol.builder().nombre(nombre).build())));
+        }
+        Usuario usuario = usuarioRepository.saveAndFlush(Usuario.builder()
+                .nombre(request.nombre().trim())
+                .apellido(request.apellido().trim())
+                .email(email)
+                .password(passwordEncoder.encode(request.password()))
+                .telefono(request.telefono())
+                .estado(EstadoUsuario.ACTIVO)
+                .roles(entidades)
+                .build());
+        log.info("Personal {} creado con roles {} por {}", email, roles, actor.getEmail());
+        return UsuarioAdminResponse.from(usuario, null);
+    }
+
     private static String descripcion(RolNombre rol) {
         return switch (rol) {
             case ROLE_ADMIN -> "Gestiona usuarios, roles, especialidades, precios, cupones y reportes";
             case ROLE_MEDICO -> "Atiende pacientes, registra atenciones y comparte historias clínicas";
             case ROLE_PACIENTE -> "Reserva citas, paga consultas y consulta su historia clínica";
+            case ROLE_LABORATORIO -> "Gestiona órdenes de laboratorio, toma de muestras y resultados";
+            case ROLE_FARMACIA -> "Dispensa recetas, atiende la venta libre y consulta el stock";
+            case ROLE_ALMACEN -> "Administra productos, lotes, proveedores e inventario";
         };
     }
 

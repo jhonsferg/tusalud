@@ -25,4 +25,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     @Query("SELECT DISTINCT u FROM Usuario u LEFT JOIN FETCH u.roles ORDER BY u.apellido ASC, u.nombre ASC")
     List<Usuario> findAllConRoles();
+
+    @Query("""
+            SELECT DISTINCT u FROM Usuario u JOIN u.roles r
+            WHERE r.nombre = :rol AND u.estado = com.codesoftlabs.tusalud.app.entities.enums.EstadoUsuario.ACTIVO
+            """)
+    List<Usuario> findActivosPorRol(@Param("rol") com.codesoftlabs.tusalud.app.entities.enums.RolNombre rol);
 }

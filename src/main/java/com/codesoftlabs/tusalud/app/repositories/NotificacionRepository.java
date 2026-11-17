@@ -24,4 +24,9 @@ public interface NotificacionRepository extends JpaRepository<Notificacion, Long
     @Modifying
     @Query("UPDATE Notificacion n SET n.leida = true WHERE n.usuario.id = :usuarioId AND n.leida = false")
     int marcarTodasComoLeidas(@Param("usuarioId") Long usuarioId);
+
+    boolean existsByUsuarioIdAndTipoAndCreatedAtGreaterThanEqual(
+            Long usuarioId,
+            com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion tipo,
+            java.time.LocalDateTime desde);
 }

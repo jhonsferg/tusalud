@@ -1,5 +1,6 @@
 package com.codesoftlabs.tusalud.app.services.interfaces;
 
+import com.codesoftlabs.tusalud.app.dto.request.PersonalCreateRequest;
 import com.codesoftlabs.tusalud.app.dto.response.RolResponse;
 import com.codesoftlabs.tusalud.app.dto.response.UsuarioAdminResponse;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoUsuario;
@@ -14,6 +15,8 @@ public interface UsuarioAdminService {
     List<RolResponse> listarRoles();
 
     UsuarioAdminResponse asignarRoles(Long usuarioId, List<RolNombre> roles, UsuarioPrincipal actor);
+
+    UsuarioAdminResponse crearPersonal(PersonalCreateRequest request, UsuarioPrincipal actor);
 
     UsuarioAdminResponse cambiarEstado(Long usuarioId, EstadoUsuario estado, UsuarioPrincipal actor);
 }

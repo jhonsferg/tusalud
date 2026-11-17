@@ -45,11 +45,22 @@ public class EventoCalendarioServiceImpl implements EventoCalendarioService {
     private static final long VENTANA_CITA_MINUTOS = 240;
     private static final int DURACION_CITA_POR_DEFECTO = 30;
 
+    private static final Set<TipoEvento> TIPOS_PERSONAL =
+            EnumSet.of(TipoEvento.REUNION, TipoEvento.TAREA, TipoEvento.RECORDATORIO, TipoEvento.PERSONAL);
+
     private static final Map<RolNombre, Set<TipoEvento>> TIPOS_POR_ROL = Map.of(
-            RolNombre.ROLE_PACIENTE, EnumSet.of(TipoEvento.PERSONAL, TipoEvento.RECORDATORIO),
+            RolNombre.ROLE_PACIENTE,
+            EnumSet.of(TipoEvento.PERSONAL, TipoEvento.RECORDATORIO),
             RolNombre.ROLE_ADMIN,
-                    EnumSet.of(TipoEvento.REUNION, TipoEvento.TAREA, TipoEvento.RECORDATORIO, TipoEvento.PERSONAL),
-            RolNombre.ROLE_MEDICO, EnumSet.allOf(TipoEvento.class));
+            EnumSet.of(TipoEvento.REUNION, TipoEvento.TAREA, TipoEvento.RECORDATORIO, TipoEvento.PERSONAL),
+            RolNombre.ROLE_MEDICO,
+            EnumSet.allOf(TipoEvento.class),
+            RolNombre.ROLE_LABORATORIO,
+            TIPOS_PERSONAL,
+            RolNombre.ROLE_FARMACIA,
+            TIPOS_PERSONAL,
+            RolNombre.ROLE_ALMACEN,
+            TIPOS_PERSONAL);
 
     private static final List<TipoEvento> ORDEN_TIPOS = List.of(
             TipoEvento.PERSONAL, TipoEvento.RECORDATORIO, TipoEvento.REUNION, TipoEvento.TAREA, TipoEvento.BLOQUEO);

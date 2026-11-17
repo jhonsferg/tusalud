@@ -37,4 +37,27 @@ public interface AtencionRepository extends JpaRepository<Atencion, Long> {
             ORDER BY a.fecha DESC, a.id DESC
             """)
     List<Atencion> findByPacienteIdConDetalle(@Param("pacienteId") Long pacienteId);
+
+    @Query("""
+            SELECT DISTINCT a FROM Atencion a
+            JOIN FETCH a.cita c
+            JOIN FETCH a.medico m
+            JOIN FETCH m.usuario
+            JOIN FETCH a.paciente pa
+            JOIN FETCH pa.usuario
+            WHERE a.fecha >= :desde AND a.receta IS NOT EMPTY
+            ORDER BY a.fecha DESC, a.id DESC
+            """)
+    List<Atencion> findConRecetaDesde(@Param("desde") java.time.LocalDateTime desde);
+
+    @Query("""
+            SELECT a FROM Atencion a
+            JOIN FETCH a.cita c
+            JOIN FETCH a.medico m
+            JOIN FETCH m.usuario
+            JOIN FETCH a.paciente pa
+            JOIN FETCH pa.usuario
+            WHERE a.id = :id
+            """)
+    Optional<Atencion> findByIdConDetalle(@Param("id") Long id);
 }

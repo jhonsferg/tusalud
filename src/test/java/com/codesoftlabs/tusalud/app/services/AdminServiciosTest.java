@@ -3,6 +3,7 @@ package com.codesoftlabs.tusalud.app.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.codesoftlabs.tusalud.app.dto.request.PersonalCreateRequest;
 import com.codesoftlabs.tusalud.app.dto.response.EstadisticasResponse;
 import com.codesoftlabs.tusalud.app.dto.response.RolResponse;
 import com.codesoftlabs.tusalud.app.dto.response.UsuarioAdminResponse;
@@ -12,6 +13,8 @@ import com.codesoftlabs.tusalud.app.entities.enums.EstadoUsuario;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
+import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
+import com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.NotificacionRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
@@ -123,9 +126,86 @@ class AdminServiciosTest {
 
         List<RolResponse> roles = usuarioAdminService.listarRoles();
 
-        assertThat(roles).extracting(RolResponse::nombre).containsExactly("ROLE_ADMIN", "ROLE_MEDICO", "ROLE_PACIENTE");
+        assertThat(roles)
+                .extracting(RolResponse::nombre)
+                .containsExactly(
+                        "ROLE_ADMIN",
+                        "ROLE_MEDICO",
+                        "ROLE_PACIENTE",
+                        "ROLE_LABORATORIO",
+                        "ROLE_FARMACIA",
+                        "ROLE_ALMACEN");
         assertThat(roles).allSatisfy(rol -> assertThat(rol.descripcion()).isNotBlank());
         assertThat(roles.get(2).usuarios()).isPositive();
+    }
+
+    @Test
+    void asignaLosRolesDePersonalSinExigirPerfil() {
+        Usuario admin = fixture.usuario("adminpersonal", RolNombre.ROLE_ADMIN);
+        Usuario persona = fixture.usuario("personal", RolNombre.ROLE_PACIENTE);
+
+        UsuarioAdminResponse respuesta = usuarioAdminService.asignarRoles(
+                persona.getId(),
+                List.of(RolNombre.ROLE_LABORATORIO, RolNombre.ROLE_FARMACIA),
+                fixture.principal(admin));
+
+        assertThat(respuesta.roles()).containsExactly("ROLE_FARMACIA", "ROLE_LABORATORIO");
+    }
+
+    @Test
+    void creaPersonalActivoConSusRoles() {
+        Usuario admin = fixture.usuario("altapersonal", RolNombre.ROLE_ADMIN);
+        String email = "Nuevo.Almacen" + System.nanoTime() + "@Tusalud.com";
+
+        UsuarioAdminResponse creado = usuarioAdminService.crearPersonal(
+                new PersonalCreateRequest(
+                        " Pedro ", "Ramos", email, "Personal123!", "903334455", List.of(RolNombre.ROLE_ALMACEN)),
+                fixture.principal(admin));
+
+        assertThat(creado.email()).isEqualTo(email.toLowerCase());
+        assertThat(creado.nombreCompleto()).isEqualTo("Pedro Ramos");
+        assertThat(creado.roles()).containsExactly("ROLE_ALMACEN");
+        assertThat(creado.estado()).isEqualTo(EstadoUsuario.ACTIVO);
+        assertThat(usuarioRepository.findById(creado.id()).orElseThrow().getPassword())
+                .startsWith("$2")
+                .isNotEqualTo("Personal123!");
+    }
+
+    @Test
+    void rechazaPersonalConEmailRepetidoOConRolesClinicos() {
+        Usuario admin = fixture.usuario("rechazopersonal", RolNombre.ROLE_ADMIN);
+        Usuario existente = fixture.usuario("existente", RolNombre.ROLE_PACIENTE);
+
+        assertThatThrownBy(() -> usuarioAdminService.crearPersonal(
+                        new PersonalCreateRequest(
+                                "Ana",
+                                "Gómez",
+                                existente.getEmail().toUpperCase(),
+                                "Personal123!",
+                                null,
+                                List.of(RolNombre.ROLE_FARMACIA)),
+                        fixture.principal(admin)))
+                .isInstanceOf(ConflictException.class);
+        assertThatThrownBy(() -> usuarioAdminService.crearPersonal(
+                        new PersonalCreateRequest(
+                                "Ana",
+                                "Gómez",
+                                "clinico" + System.nanoTime() + "@tusalud.com",
+                                "Personal123!",
+                                null,
+                                List.of(RolNombre.ROLE_MEDICO)),
+                        fixture.principal(admin)))
+                .isInstanceOf(DatosInvalidosException.class);
+        assertThatThrownBy(() -> usuarioAdminService.crearPersonal(
+                        new PersonalCreateRequest(
+                                "Ana",
+                                "Gómez",
+                                "clinico2" + System.nanoTime() + "@tusalud.com",
+                                "Personal123!",
+                                null,
+                                List.of(RolNombre.ROLE_PACIENTE, RolNombre.ROLE_ALMACEN)),
+                        fixture.principal(admin)))
+                .isInstanceOf(DatosInvalidosException.class);
     }
 
     @Test

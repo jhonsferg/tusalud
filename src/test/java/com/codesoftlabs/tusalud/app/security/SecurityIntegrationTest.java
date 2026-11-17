@@ -201,6 +201,59 @@ class SecurityIntegrationTest {
     }
 
     @Test
+    void elAltaDePersonalSoloLaHaceElAdministradorYValidaLosRoles() throws Exception {
+        String cuerpo =
+                "{\"nombre\":\"Rosa\",\"apellido\":\"Medina\",\"email\":\"rosa.sec@tusalud.com\",\"password\":\"Personal123!\",\"roles\":[\"ROLE_FARMACIA\"]}";
+        mockMvc.perform(post("/api/v1/admin/personal")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cuerpo))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/v1/admin/personal")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cuerpo))
+                .andExpect(status().isUnauthorized());
+
+        Rol rolAdmin = rolRepository
+                .findByNombre(RolNombre.ROLE_ADMIN)
+                .orElseGet(() -> rolRepository.save(
+                        Rol.builder().nombre(RolNombre.ROLE_ADMIN).build()));
+        Usuario admin = usuarioRepository.save(usuario("admin.personal@test.com", EstadoUsuario.ACTIVO, rolAdmin));
+        String tokenAdmin = jwtUtils.generateToken(UsuarioPrincipal.from(admin));
+
+        mockMvc.perform(post("/api/v1/admin/personal")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenAdmin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cuerpo))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.roles[0]").value("ROLE_FARMACIA"));
+        mockMvc.perform(post("/api/v1/admin/personal")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenAdmin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cuerpo))
+                .andExpect(status().isConflict());
+        mockMvc.perform(post("/api/v1/admin/personal")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenAdmin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cuerpo.replace("rosa.sec", "medico.sec").replace("ROLE_FARMACIA", "ROLE_MEDICO")))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/v1/admin/personal")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenAdmin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cuerpo.replace("rosa.sec", "vacio.sec").replace("[\"ROLE_FARMACIA\"]", "[]")))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void losPrefijosDeLosModulosClinicosExigenAutenticacion() throws Exception {
+        for (String ruta :
+                new String[] {"/api/v1/almacen/productos", "/api/v1/farmacia/productos", "/api/v1/laboratorio/examenes"
+                }) {
+            mockMvc.perform(get(ruta)).andExpect(status().isUnauthorized());
+        }
+    }
+
+    @Test
     void losPagosConBilleteraSonDelPacienteYLosPacientesCompartidosDelMedico() throws Exception {
         mockMvc.perform(post("/api/v1/pagos/qr")).andExpect(status().isUnauthorized());
         mockMvc.perform(post("/api/v1/pacientes/1/compartir")

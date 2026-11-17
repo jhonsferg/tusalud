@@ -20,6 +20,9 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
     @Query("SELECT p FROM Paciente p JOIN FETCH p.usuario WHERE p.id = :id")
     Optional<Paciente> findByIdWithUsuario(@Param("id") Long id);
 
+    @Query("SELECT p FROM Paciente p JOIN FETCH p.usuario u WHERE u.id = :usuarioId")
+    Optional<Paciente> findByUsuarioId(@Param("usuarioId") Long usuarioId);
+
     boolean existsByDni(String dni);
 
     @Query("SELECT COALESCE(MAX(p.id), 0) + 1 FROM Paciente p")

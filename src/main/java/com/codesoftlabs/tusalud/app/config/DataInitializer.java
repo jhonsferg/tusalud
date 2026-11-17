@@ -69,6 +69,9 @@ public class DataInitializer implements CommandLineRunner {
         Rol rolAdmin = obtenerOCrearRol(RolNombre.ROLE_ADMIN, creados);
         Rol rolMedico = obtenerOCrearRol(RolNombre.ROLE_MEDICO, creados);
         Rol rolPaciente = obtenerOCrearRol(RolNombre.ROLE_PACIENTE, creados);
+        obtenerOCrearRol(RolNombre.ROLE_LABORATORIO, creados);
+        obtenerOCrearRol(RolNombre.ROLE_FARMACIA, creados);
+        obtenerOCrearRol(RolNombre.ROLE_ALMACEN, creados);
 
         Especialidad cardiologia = obtenerOCrearEspecialidad(
                 "Cardiología",

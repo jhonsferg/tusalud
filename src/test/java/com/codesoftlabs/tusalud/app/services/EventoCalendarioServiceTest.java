@@ -234,6 +234,20 @@ class EventoCalendarioServiceTest {
     }
 
     @Test
+    void elPersonalDeLaboratorioFarmaciaYAlmacenUsaLosTiposDeAdministracion() {
+        for (RolNombre rol : List.of(RolNombre.ROLE_LABORATORIO, RolNombre.ROLE_FARMACIA, RolNombre.ROLE_ALMACEN)) {
+            UsuarioPrincipal personal = fixture.principal(fixture.usuario("personal", rol));
+            assertThat(eventoService.tiposPermitidos(personal))
+                    .containsExactly(
+                            TipoEvento.PERSONAL, TipoEvento.RECORDATORIO, TipoEvento.REUNION, TipoEvento.TAREA);
+            assertThat(crear(personal, TipoEvento.TAREA, lunes.atTime(9, 0), 30).tipo())
+                    .isEqualTo(TipoEvento.TAREA);
+            assertThatThrownBy(() -> crear(personal, TipoEvento.BLOQUEO, lunes.atTime(12, 0), 30))
+                    .isInstanceOf(ForbiddenOperationException.class);
+        }
+    }
+
+    @Test
     void actualizarTambienRespetaLaMatrizDeTiposDelRol() {
         EventoCalendarioResponse creado = crear(pacientePrincipal, TipoEvento.PERSONAL, lunes.atTime(9, 0), 60);
 

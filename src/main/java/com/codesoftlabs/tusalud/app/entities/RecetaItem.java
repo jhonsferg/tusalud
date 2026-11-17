@@ -27,4 +27,7 @@ public class RecetaItem {
 
     @Column(length = 100)
     private String duracion;
+
+    @Column(nullable = false)
+    private boolean dispensado;
 }
