@@ -1,10 +1,10 @@
 INSERT INTO eventos_calendario (usuario_id, titulo, descripcion, ubicacion, tipo, inicio, fin, todo_el_dia, color, completado, recordatorio_minutos, recordatorio_enviado, created_at, updated_at)
-SELECT u.id, 'Llevar los exámenes de laboratorio', 'Recoger los resultados y llevarlos a la próxima consulta', NULL, 'TAREA',
-       CURRENT_DATE + 1 + TIME '09:00', CURRENT_DATE + 1 + TIME '09:30', false, 'NARANJA', false, 60, false, NOW(), NOW()
+SELECT u.id, 'Tomar la medicación', 'Antihipertensivo con el desayuno', NULL, 'RECORDATORIO',
+       CURRENT_DATE + 1 + TIME '08:00', CURRENT_DATE + 1 + TIME '08:15', false, 'NARANJA', false, 15, false, NOW(), NOW()
 FROM usuarios u WHERE u.email = 'juan.perez@correo.com';
 
 INSERT INTO eventos_calendario (usuario_id, titulo, descripcion, ubicacion, tipo, inicio, fin, todo_el_dia, color, completado, recordatorio_minutos, recordatorio_enviado, created_at, updated_at)
-SELECT u.id, 'Reunión con el área de recursos humanos', 'Revisión de beneficios de salud', 'Oficina central', 'REUNION',
+SELECT u.id, 'Cita con el dentista particular', 'Limpieza dental', 'Clínica dental del centro', 'PERSONAL',
        CURRENT_DATE + 3 + TIME '15:00', CURRENT_DATE + 3 + TIME '16:00', false, 'AZUL', false, 30, false, NOW(), NOW()
 FROM usuarios u WHERE u.email = 'juan.perez@correo.com';
 

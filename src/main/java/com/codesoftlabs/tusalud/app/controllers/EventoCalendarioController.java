@@ -5,6 +5,7 @@ import com.codesoftlabs.tusalud.app.dto.request.EventoCalendarioRequest;
 import com.codesoftlabs.tusalud.app.dto.request.MoverEventoRequest;
 import com.codesoftlabs.tusalud.app.dto.response.ErrorResponse;
 import com.codesoftlabs.tusalud.app.dto.response.EventoCalendarioResponse;
+import com.codesoftlabs.tusalud.app.entities.enums.TipoEvento;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.EventoCalendarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
-@RequestMapping("/api/v1/calendario/eventos")
+@RequestMapping("/api/v1/calendario")
 @RequiredArgsConstructor
 @Validated
 @PreAuthorize("isAuthenticated()")
@@ -46,7 +47,17 @@ public class EventoCalendarioController {
 
     private final EventoCalendarioService eventoService;
 
-    @GetMapping
+    @GetMapping("/tipos")
+    @Operation(
+            summary = "Tipos de evento permitidos",
+            description = "Devuelve los tipos de evento que el rol del usuario autenticado puede crear.")
+    @ApiResponse(responseCode = "200", description = "Tipos permitidos")
+    public ResponseEntity<List<TipoEvento>> tipos(
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
+        return ResponseEntity.ok(eventoService.tiposPermitidos(principal));
+    }
+
+    @GetMapping("/eventos")
     @Operation(
             summary = "Listar los eventos del usuario en un rango",
             description = "Devuelve los eventos propios que se solapan con el rango de fechas, de hasta 100 días.")
@@ -70,7 +81,7 @@ public class EventoCalendarioController {
         return ResponseEntity.ok(eventoService.listar(principal, inicio, fin));
     }
 
-    @PostMapping
+    @PostMapping("/eventos")
     @Operation(summary = "Crear un evento", description = "Los bloqueos de agenda solo los crean los médicos.")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Evento creado"),
@@ -94,7 +105,7 @@ public class EventoCalendarioController {
         return ResponseEntity.created(location).body(creado);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/eventos/{id}")
     @Operation(summary = "Actualizar un evento", description = "Reemplaza los datos de un evento propio.")
     public ResponseEntity<EventoCalendarioResponse> actualizar(
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
@@ -103,7 +114,7 @@ public class EventoCalendarioController {
         return ResponseEntity.ok(eventoService.actualizar(principal, id, request));
     }
 
-    @PutMapping("/{id}/mover")
+    @PutMapping("/eventos/{id}/mover")
     @Operation(
             summary = "Mover o redimensionar un evento",
             description = "Cambia el inicio y el fin de un evento propio, por ejemplo al arrastrarlo en el calendario.")
@@ -114,7 +125,7 @@ public class EventoCalendarioController {
         return ResponseEntity.ok(eventoService.mover(principal, id, request));
     }
 
-    @PutMapping("/{id}/completado")
+    @PutMapping("/eventos/{id}/completado")
     @Operation(summary = "Completar una tarea", description = "Marca una tarea propia como completada o pendiente.")
     public ResponseEntity<EventoCalendarioResponse> completar(
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
@@ -123,7 +134,7 @@ public class EventoCalendarioController {
         return ResponseEntity.ok(eventoService.completar(principal, id, request));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/eventos/{id}")
     @Operation(summary = "Eliminar un evento", description = "Elimina un evento propio.")
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Evento eliminado"),

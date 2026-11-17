@@ -164,7 +164,7 @@ class SecurityIntegrationTest {
     @Test
     void elCalendarioPersonalAceptaUnCuerpoMinimoYAislaLosEventosDeCadaUsuario() throws Exception {
         String cuerpo =
-                "{\"titulo\":\"Llamar\",\"tipo\":\"TAREA\",\"inicio\":\"2027-01-04T09:00:00\",\"fin\":\"2027-01-04T10:00:00\"}";
+                "{\"titulo\":\"Llamar\",\"tipo\":\"PERSONAL\",\"inicio\":\"2027-01-04T09:00:00\",\"fin\":\"2027-01-04T10:00:00\"}";
         mockMvc.perform(post("/api/v1/calendario/eventos")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -184,8 +184,20 @@ class SecurityIntegrationTest {
         mockMvc.perform(post("/api/v1/calendario/eventos")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(cuerpo.replace("TAREA", "BLOQUEO")))
+                        .content(cuerpo.replace("PERSONAL", "BLOQUEO")))
                 .andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/v1/calendario/eventos")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(cuerpo.replace("PERSONAL", "REUNION")))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("Tu rol no permite crear eventos de tipo REUNION"));
+        mockMvc.perform(get("/api/v1/calendario/tipos").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0]").value("PERSONAL"))
+                .andExpect(jsonPath("$[1]").value("RECORDATORIO"))
+                .andExpect(jsonPath("$.length()").value(2));
+        mockMvc.perform(get("/api/v1/calendario/tipos")).andExpect(status().isUnauthorized());
     }
 
     @Test

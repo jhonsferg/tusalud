@@ -14,6 +14,7 @@ import com.codesoftlabs.tusalud.app.entities.Cita;
 import com.codesoftlabs.tusalud.app.entities.Medico;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoCita;
+import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoEvento;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
@@ -91,13 +92,13 @@ class EventoCalendarioServiceTest {
 
     @Test
     void creaYListaLosEventosPropiosDelRango() {
-        crear(pacientePrincipal, TipoEvento.REUNION, lunes.atTime(10, 0), 60);
-        crear(pacientePrincipal, TipoEvento.TAREA, lunes.plusDays(40).atTime(10, 0), 60);
+        crear(pacientePrincipal, TipoEvento.PERSONAL, lunes.atTime(10, 0), 60);
+        crear(pacientePrincipal, TipoEvento.RECORDATORIO, lunes.plusDays(40).atTime(10, 0), 60);
 
         List<EventoCalendarioResponse> semana = eventoService.listar(pacientePrincipal, lunes, lunes.plusDays(6));
 
         assertThat(semana).hasSize(1);
-        assertThat(semana.get(0).titulo()).isEqualTo("Evento REUNION");
+        assertThat(semana.get(0).titulo()).isEqualTo("Evento PERSONAL");
         assertThat(semana.get(0).createdAt()).isNotNull();
     }
 
@@ -112,7 +113,7 @@ class EventoCalendarioServiceTest {
 
     @Test
     void unUsuarioNoVeNiTocaLosEventosDeOtro() {
-        EventoCalendarioResponse ajeno = crear(pacientePrincipal, TipoEvento.TAREA, lunes.atTime(9, 0), 30);
+        EventoCalendarioResponse ajeno = crear(pacientePrincipal, TipoEvento.PERSONAL, lunes.atTime(9, 0), 30);
 
         assertThat(eventoService.listar(medicoPrincipal, lunes, lunes)).isEmpty();
         assertThatThrownBy(() -> eventoService.eliminar(medicoPrincipal, ajeno.id()))
@@ -131,7 +132,7 @@ class EventoCalendarioServiceTest {
 
     @Test
     void rechazaUnFinAnteriorAlInicioYUnaDuracionExcesiva() {
-        assertThatThrownBy(() -> crear(pacientePrincipal, TipoEvento.REUNION, lunes.atTime(10, 0), -30))
+        assertThatThrownBy(() -> crear(pacientePrincipal, TipoEvento.PERSONAL, lunes.atTime(10, 0), -30))
                 .isInstanceOf(DatosInvalidosException.class);
         assertThatThrownBy(() -> eventoService.crear(
                         pacientePrincipal,
@@ -175,21 +176,21 @@ class EventoCalendarioServiceTest {
 
     @Test
     void soloLasTareasSeCompletan() {
-        EventoCalendarioResponse tarea = crear(pacientePrincipal, TipoEvento.TAREA, lunes.atTime(9, 0), 30);
-        EventoCalendarioResponse reunion = crear(pacientePrincipal, TipoEvento.REUNION, lunes.atTime(11, 0), 30);
+        EventoCalendarioResponse tarea = crear(medicoPrincipal, TipoEvento.TAREA, lunes.atTime(9, 0), 30);
+        EventoCalendarioResponse reunion = crear(medicoPrincipal, TipoEvento.REUNION, lunes.atTime(11, 0), 30);
 
         assertThat(eventoService
-                        .completar(pacientePrincipal, tarea.id(), new CompletarEventoRequest(true))
+                        .completar(medicoPrincipal, tarea.id(), new CompletarEventoRequest(true))
                         .completado())
                 .isTrue();
-        assertThatThrownBy(() ->
-                        eventoService.completar(pacientePrincipal, reunion.id(), new CompletarEventoRequest(true)))
+        assertThatThrownBy(
+                        () -> eventoService.completar(medicoPrincipal, reunion.id(), new CompletarEventoRequest(true)))
                 .isInstanceOf(DatosInvalidosException.class);
     }
 
     @Test
     void mueveYEliminaUnEvento() {
-        EventoCalendarioResponse creado = crear(pacientePrincipal, TipoEvento.REUNION, lunes.atTime(9, 0), 60);
+        EventoCalendarioResponse creado = crear(pacientePrincipal, TipoEvento.PERSONAL, lunes.atTime(9, 0), 60);
 
         EventoCalendarioResponse movido = eventoService.mover(
                 pacientePrincipal,
@@ -200,6 +201,48 @@ class EventoCalendarioServiceTest {
 
         eventoService.eliminar(pacientePrincipal, creado.id());
         assertThat(eventoRepository.findById(creado.id())).isEmpty();
+    }
+
+    @Test
+    void losPacientesSoloCreanEventosPersonalesYRecordatorios() {
+        assertThat(eventoService.tiposPermitidos(pacientePrincipal))
+                .containsExactly(TipoEvento.PERSONAL, TipoEvento.RECORDATORIO);
+        assertThat(crear(pacientePrincipal, TipoEvento.PERSONAL, lunes.atTime(9, 0), 30)
+                        .tipo())
+                .isEqualTo(TipoEvento.PERSONAL);
+        assertThat(crear(pacientePrincipal, TipoEvento.RECORDATORIO, lunes.atTime(10, 0), 30)
+                        .tipo())
+                .isEqualTo(TipoEvento.RECORDATORIO);
+        for (TipoEvento prohibido : List.of(TipoEvento.REUNION, TipoEvento.TAREA, TipoEvento.BLOQUEO)) {
+            assertThatThrownBy(() -> crear(pacientePrincipal, prohibido, lunes.atTime(11, 0), 30))
+                    .isInstanceOf(ForbiddenOperationException.class)
+                    .hasMessage("Tu rol no permite crear eventos de tipo " + prohibido.name());
+        }
+    }
+
+    @Test
+    void elMedicoUsaTodosLosTiposYElAdministradorTodosMenosBloqueo() {
+        assertThat(eventoService.tiposPermitidos(medicoPrincipal)).containsExactlyInAnyOrder(TipoEvento.values());
+        UsuarioPrincipal admin = fixture.principal(fixture.usuario("admin", RolNombre.ROLE_ADMIN));
+        assertThat(eventoService.tiposPermitidos(admin))
+                .containsExactly(TipoEvento.PERSONAL, TipoEvento.RECORDATORIO, TipoEvento.REUNION, TipoEvento.TAREA);
+        assertThat(crear(admin, TipoEvento.REUNION, lunes.atTime(9, 0), 30).tipo())
+                .isEqualTo(TipoEvento.REUNION);
+        assertThatThrownBy(() -> crear(admin, TipoEvento.BLOQUEO, lunes.atTime(12, 0), 30))
+                .isInstanceOf(ForbiddenOperationException.class)
+                .hasMessageContaining("BLOQUEO");
+    }
+
+    @Test
+    void actualizarTambienRespetaLaMatrizDeTiposDelRol() {
+        EventoCalendarioResponse creado = crear(pacientePrincipal, TipoEvento.PERSONAL, lunes.atTime(9, 0), 60);
+
+        assertThatThrownBy(() -> eventoService.actualizar(
+                        pacientePrincipal,
+                        creado.id(),
+                        evento(TipoEvento.REUNION, lunes.atTime(9, 0), lunes.atTime(10, 0))))
+                .isInstanceOf(ForbiddenOperationException.class)
+                .hasMessage("Tu rol no permite crear eventos de tipo REUNION");
     }
 
     @Test
@@ -312,7 +355,7 @@ class EventoCalendarioServiceTest {
                         "Reunión",
                         null,
                         null,
-                        TipoEvento.REUNION,
+                        TipoEvento.PERSONAL,
                         ahora.plusHours(5),
                         ahora.plusHours(6),
                         false,

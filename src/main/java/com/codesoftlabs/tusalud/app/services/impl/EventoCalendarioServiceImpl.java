@@ -26,8 +26,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +44,15 @@ public class EventoCalendarioServiceImpl implements EventoCalendarioService {
     private static final long MAX_DIAS_EVENTO = 31;
     private static final long VENTANA_CITA_MINUTOS = 240;
     private static final int DURACION_CITA_POR_DEFECTO = 30;
+
+    private static final Map<RolNombre, Set<TipoEvento>> TIPOS_POR_ROL = Map.of(
+            RolNombre.ROLE_PACIENTE, EnumSet.of(TipoEvento.PERSONAL, TipoEvento.RECORDATORIO),
+            RolNombre.ROLE_ADMIN,
+                    EnumSet.of(TipoEvento.REUNION, TipoEvento.TAREA, TipoEvento.RECORDATORIO, TipoEvento.PERSONAL),
+            RolNombre.ROLE_MEDICO, EnumSet.allOf(TipoEvento.class));
+
+    private static final List<TipoEvento> ORDEN_TIPOS = List.of(
+            TipoEvento.PERSONAL, TipoEvento.RECORDATORIO, TipoEvento.REUNION, TipoEvento.TAREA, TipoEvento.BLOQUEO);
 
     private final EventoCalendarioRepository eventoRepository;
     private final UsuarioRepository usuarioRepository;
@@ -171,14 +183,25 @@ public class EventoCalendarioServiceImpl implements EventoCalendarioService {
         return new LocalDateTime[] {desde, hasta};
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<TipoEvento> tiposPermitidos(UsuarioPrincipal actor) {
+        return ORDEN_TIPOS.stream().filter(tipo -> tipoPermitido(actor, tipo)).toList();
+    }
+
+    private boolean tipoPermitido(UsuarioPrincipal actor, TipoEvento tipo) {
+        return actor.getRoles().stream()
+                .map(RolNombre::valueOf)
+                .anyMatch(rol -> TIPOS_POR_ROL.getOrDefault(rol, Set.of()).contains(tipo));
+    }
+
     private void validarTipo(UsuarioPrincipal actor, TipoEvento tipo, LocalDateTime inicio, LocalDateTime fin) {
-        if (tipo != TipoEvento.BLOQUEO) {
-            return;
+        if (!tipoPermitido(actor, tipo)) {
+            throw new ForbiddenOperationException("Tu rol no permite crear eventos de tipo " + tipo.name());
         }
-        if (!actor.getRoles().contains(RolNombre.ROLE_MEDICO.name())) {
-            throw new ForbiddenOperationException("Solo los médicos pueden crear bloqueos de agenda");
+        if (tipo == TipoEvento.BLOQUEO) {
+            validarSinCitasActivas(actor, inicio, fin);
         }
-        validarSinCitasActivas(actor, inicio, fin);
     }
 
     private void validarSinCitasActivas(UsuarioPrincipal actor, LocalDateTime inicio, LocalDateTime fin) {

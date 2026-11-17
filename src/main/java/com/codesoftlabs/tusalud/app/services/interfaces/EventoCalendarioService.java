@@ -4,6 +4,7 @@ import com.codesoftlabs.tusalud.app.dto.request.CompletarEventoRequest;
 import com.codesoftlabs.tusalud.app.dto.request.EventoCalendarioRequest;
 import com.codesoftlabs.tusalud.app.dto.request.MoverEventoRequest;
 import com.codesoftlabs.tusalud.app.dto.response.EventoCalendarioResponse;
+import com.codesoftlabs.tusalud.app.entities.enums.TipoEvento;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +20,8 @@ public interface EventoCalendarioService {
     EventoCalendarioResponse mover(UsuarioPrincipal actor, Long id, MoverEventoRequest request);
 
     EventoCalendarioResponse completar(UsuarioPrincipal actor, Long id, CompletarEventoRequest request);
+
+    List<TipoEvento> tiposPermitidos(UsuarioPrincipal actor);
 
     void eliminar(UsuarioPrincipal actor, Long id);
 }
