@@ -1319,13 +1319,13 @@ Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrec
 
 ### Pruebas del frontend
 
-Las 61 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores y cada uno de los 23 endpoints de los clientes de la API.
+Las 62 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores y cada uno de los 23 endpoints de los clientes de la API.
 
 ```bash
 npm test
 ```
 
-Las pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades y los permisos por rol. Requieren el stack levantado con datos de prueba.
+Las 22 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, los filtros y los permisos por rol. Requieren el stack levantado con datos de prueba.
 
 ```bash
 npm run e2e
