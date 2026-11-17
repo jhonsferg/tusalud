@@ -6,7 +6,9 @@ test.describe('paciente', () => {
   test('ve el catálogo de especialidades y médicos', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
     await page.getByRole('link', { name: 'Especialidades' }).first().click();
-    await expect(page.getByRole('cell', { name: 'Cardiología' })).toBeVisible();
+    await expect(
+      page.getByRole('cell', { name: 'Cardiología', exact: true }).first(),
+    ).toBeVisible();
     await expect(page.getByRole('button', { name: 'Nueva especialidad' })).toHaveCount(0);
 
     await page.getByRole('link', { name: 'Médicos' }).first().click();
@@ -26,7 +28,7 @@ test.describe('paciente', () => {
 
     const horas = page.getByRole('radio');
     await expect(horas.first()).toBeVisible();
-    await horas.last().click();
+    await horas.nth(Math.floor(Math.random() * (await horas.count()))).click();
 
     await page.locator('#cita-motivo').fill('Control de rutina e2e');
     await page.getByRole('button', { name: 'Confirmar reserva' }).click();
