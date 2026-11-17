@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { CUENTAS, iniciarSesion } from './support';
+import { CUENTAS, iniciarSesion, cerrarSesion } from './support';
 
 test.describe('autenticación', () => {
   test('redirige al login cuando no hay sesión', async ({ page }) => {
@@ -27,7 +27,7 @@ test.describe('autenticación', () => {
     test(`el ${rol} llega a su página de inicio y puede cerrar sesión`, async ({ page }) => {
       await iniciarSesion(page, rol);
       await expect(page.getByText(CUENTAS[rol].email, { exact: false })).toHaveCount(0);
-      await page.getByRole('button', { name: 'Cerrar sesión' }).first().click();
+      await cerrarSesion(page);
       await expect(page).toHaveURL(/\/auth\/login/);
     });
   }

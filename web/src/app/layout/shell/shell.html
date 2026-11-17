@@ -122,6 +122,9 @@
   <div class="notif">
     <div class="notif-head">
       <strong>Notificaciones</strong>
+      @if (notificaciones.enVivo()) {
+        <span class="live" title="Recibiendo avisos en tiempo real">En vivo</span>
+      }
       @if (notificaciones.noLeidas() > 0) {
         <button type="button" class="link-button" (click)="marcarTodas()">
           Marcar todas como leídas

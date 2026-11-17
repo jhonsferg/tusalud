@@ -4,20 +4,28 @@ import { Observable, Subscription, tap, timer } from 'rxjs';
 import { NotificacionResponse } from '@tusalud/app/core/models';
 import { NotificacionesApiService } from '@tusalud/app/core/services/api/notificaciones-api.service';
 import { AuthService } from '@tusalud/app/core/services/auth.service';
+import { NotificationService } from '@tusalud/app/core/services/notification.service';
+import { RealtimeService } from '@tusalud/app/core/services/realtime.service';
 import { AsyncState } from '@tusalud/app/core/state/async-state';
+import { CitasStore } from '@tusalud/app/core/state/citas.store';
 import { resetOnLogout } from '@tusalud/app/core/state/session-scoped';
 
-const POLL_MS = 60_000;
+const FALLBACK_POLL_MS = 120_000;
 
 @Injectable({ providedIn: 'root' })
 export class NotificacionesStore {
   private readonly api = inject(NotificacionesApiService);
   private readonly auth = inject(AuthService);
+  private readonly realtime = inject(RealtimeService);
+  private readonly aviso = inject(NotificationService);
+  private readonly citas = inject(CitasStore);
   private readonly noLeidasState = signal(0);
-  private polling: Subscription | null = null;
+  private fallback: Subscription | null = null;
+  private eventos: Subscription | null = null;
 
   readonly lista = new AsyncState<NotificacionResponse[]>();
   readonly noLeidas = this.noLeidasState.asReadonly();
+  readonly enVivo = this.realtime.connected;
   readonly items = computed(() => this.lista.value() ?? []);
   readonly recientes = computed(() => this.items().slice(0, 6));
 
@@ -25,9 +33,9 @@ export class NotificacionesStore {
     resetOnLogout(() => this.reset());
     effect(() => {
       const autenticado = this.auth.isAuthenticated();
-      untracked(() => (autenticado ? this.iniciarSondeo() : this.detenerSondeo()));
+      untracked(() => (autenticado ? this.iniciar() : this.detener()));
     });
-    inject(DestroyRef).onDestroy(() => this.detenerSondeo());
+    inject(DestroyRef).onDestroy(() => this.detener());
   }
 
   cargar(soloNoLeidas = false): void {
@@ -79,13 +87,65 @@ export class NotificacionesStore {
     this.lista.reset();
   }
 
-  private iniciarSondeo(): void {
-    this.detenerSondeo();
-    this.polling = timer(0, POLL_MS).subscribe(() => this.refrescarContador());
+  private iniciar(): void {
+    this.detener();
+    this.realtime.connect();
+    this.refrescarContador();
+    this.eventos = this.realtime.events$.subscribe(({ event, data }) => {
+      if (event === 'conectado') {
+        this.refrescarContador();
+        if (this.lista.hasValue()) {
+          this.cargar();
+        }
+      } else if (event === 'notificacion') {
+        this.recibir(data);
+      }
+    });
+    this.fallback = timer(FALLBACK_POLL_MS, FALLBACK_POLL_MS).subscribe(() => {
+      if (!this.realtime.connected()) {
+        this.refrescarContador();
+      }
+    });
   }
 
-  private detenerSondeo(): void {
-    this.polling?.unsubscribe();
-    this.polling = null;
+  private detener(): void {
+    this.realtime.disconnect();
+    this.eventos?.unsubscribe();
+    this.fallback?.unsubscribe();
+    this.eventos = null;
+    this.fallback = null;
+  }
+
+  private recibir(datos: string): void {
+    let notificacion: NotificacionResponse;
+    try {
+      notificacion = JSON.parse(datos) as NotificacionResponse;
+    } catch {
+      return;
+    }
+    if (this.items().some((item) => item.id === notificacion.id)) {
+      return;
+    }
+    this.lista.update((items) => (items ? [notificacion, ...items] : items));
+    if (!notificacion.leida) {
+      this.noLeidasState.update((n) => n + 1);
+    }
+    this.aviso.info(`${notificacion.titulo}. ${notificacion.mensaje}`, 7000);
+    if (notificacion.tipo.startsWith('CITA_') || notificacion.tipo === 'PAGO_REEMBOLSADO') {
+      this.sincronizarCitas(notificacion);
+    }
+  }
+
+  private sincronizarCitas(notificacion: NotificacionResponse): void {
+    if (this.citas.misCitas.hasValue()) {
+      this.citas.loadMisCitas(this.citas.rango());
+    }
+    if (this.citas.agenda.hasValue()) {
+      this.citas.loadAgenda(this.citas.fechaAgenda());
+    }
+    const seleccionada = this.citas.selected.value();
+    if (seleccionada && notificacion.enlace === `/citas/${seleccionada.id}`) {
+      this.citas.loadOne(seleccionada.id);
+    }
   }
 }

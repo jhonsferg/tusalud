@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { iniciarSesion } from './support';
+import { iniciarSesion, cerrarSesion } from './support';
 
 test.describe('perfil', () => {
   test('el paciente ve y actualiza sus datos', async ({ page }) => {
@@ -9,7 +9,7 @@ test.describe('perfil', () => {
     await expect(page).toHaveURL(/\/perfil$/);
     await expect(page.locator('#per-email')).toHaveValue('juan.perez@correo.com');
     await expect(page.locator('#per-dni')).toHaveValue('12345678');
-    await expect(page.getByText('Historia clínica')).toBeVisible();
+    await expect(page.locator('app-perfil aside').getByText('Historia clínica')).toBeVisible();
 
     await expect(page.locator('#per-nombre')).toHaveValue('Juan');
     await page.locator('#per-telefono').fill('999888777');
@@ -68,7 +68,7 @@ test.describe('perfil', () => {
     await page.getByRole('button', { name: 'Cambiar contraseña' }).click();
     await expect(page.getByText('Tu contraseña fue actualizada.')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Cerrar sesión' }).first().click();
+    await cerrarSesion(page);
     await page.goto('/auth/login');
     await page.getByLabel('Email').fill('juan.perez@correo.com');
     await page.locator('#login-password').fill('Paciente123!');

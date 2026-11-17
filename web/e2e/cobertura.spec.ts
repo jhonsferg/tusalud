@@ -97,17 +97,20 @@ test.describe('ciclo de vida de una cita', () => {
       .getByRole('button', { name: 'Confirmar cita' })
       .click();
     await expect(medico.getByText('La cita fue confirmada.')).toBeVisible();
-    await medico.getByRole('button', { name: 'Marcar como atendida' }).click();
-    await medico
-      .locator('.p-confirmdialog')
-      .getByRole('button', { name: 'Marcar atendida' })
-      .click();
-    await expect(medico.getByText('La cita fue marcada como atendida.')).toBeVisible();
-    await expect(medico.getByRole('button', { name: 'Marcar como atendida' })).toHaveCount(0);
+    await expect(paciente.getByText('Confirmada', { exact: true })).toBeVisible({
+      timeout: 10_000,
+    });
+    await medico.getByRole('button', { name: 'Registrar atención' }).click();
+    await expect(medico).toHaveURL(/\/atencion$/);
+    await medico.locator('#at-diagnostico').fill('Control sin hallazgos');
+    await medico.getByRole('button', { name: 'Guardar atención' }).click();
+    await expect(medico.getByText('La atención médica fue guardada.')).toBeVisible();
+    await expect(medico.getByRole('button', { name: 'Editar atención' })).toBeVisible();
 
     await paciente.reload();
     await expect(paciente.getByText('Atendida', { exact: true })).toBeVisible();
     await expect(paciente.getByRole('button', { name: 'Cancelar cita' })).toHaveCount(0);
+    await expect(paciente.getByRole('button', { name: 'Valorar atención' })).toBeVisible();
   });
 
   test('el paciente ve el historial y filtra por vista', async ({ page }) => {

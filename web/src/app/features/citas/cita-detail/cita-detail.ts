@@ -119,10 +119,7 @@ export class CitaDetail {
   }
 
   protected puedeAtender(cita: CitaResponse): boolean {
-    return (
-      this.auth.isMedico() &&
-      (esCitaActiva(cita) || (cita.estado === 'ATENDIDA' && !this.clinica.atencion.hasValue()))
-    );
+    return this.auth.isMedico() && (esCitaActiva(cita) || cita.estado === 'ATENDIDA');
   }
 
   protected puedeValorar(cita: CitaResponse): boolean {

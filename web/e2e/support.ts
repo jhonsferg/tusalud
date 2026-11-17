@@ -54,3 +54,8 @@ export function diaHabilAleatorio(): Date {
   } while (fecha.getDay() === 0 || fecha.getDay() === 6);
   return fecha;
 }
+
+export async function cerrarSesion(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Menú de usuario' }).click();
+  await page.getByRole('menuitem', { name: 'Cerrar sesión' }).click();
+}
