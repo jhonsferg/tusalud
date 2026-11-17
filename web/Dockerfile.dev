@@ -1,0 +1,10 @@
+ARG NODE_IMAGE=node:24-alpine
+
+FROM ${NODE_IMAGE}
+ENV NG_CLI_ANALYTICS=false \
+    CI=true
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund --prefer-offline
+EXPOSE 4200
+CMD ["npx", "ng", "serve", "--configuration", "local", "--host", "0.0.0.0", "--port", "4200", "--poll", "1000", "--proxy-config", "proxy.conf.docker.json"]

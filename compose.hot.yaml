@@ -1,0 +1,17 @@
+services:
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile.dev
+    image: tusalud-web:hot
+    environment: !reset {}
+    healthcheck:
+      disable: true
+    ports: !override
+      - "${WEB_PORT:-4200}:4200"
+    volumes:
+      - ./web:/app
+      - web-node-modules:/app/node_modules
+
+volumes:
+  web-node-modules:
