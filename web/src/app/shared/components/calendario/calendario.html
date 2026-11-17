@@ -49,42 +49,9 @@
     </div>
   </header>
 
-  <div class="cal-cuerpo" [class.con-lateral]="lateral()">
-    @if (lateral()) {
+  <div class="cal-cuerpo" [class.con-lateral]="lateral() && categorias().length > 0">
+    @if (lateral() && categorias().length > 0) {
       <aside class="lateral" aria-label="Navegación del calendario">
-        <div class="mini">
-          <div class="mini-cabecera">
-            <strong>{{ miMes() | date: 'LLLL y' }}</strong>
-            <span>
-              <button type="button" aria-label="Mes anterior" (click)="moverMini(-1)">
-                <i class="pi pi-chevron-left"></i>
-              </button>
-              <button type="button" aria-label="Mes siguiente" (click)="moverMini(1)">
-                <i class="pi pi-chevron-right"></i>
-              </button>
-            </span>
-          </div>
-          <div class="mini-rejilla">
-            @for (letra of letrasDias; track $index) {
-              <span class="mini-letra">{{ letra }}</span>
-            }
-            @for (celda of celdasMini(); track celda.fecha.getTime()) {
-              <button
-                type="button"
-                class="mini-dia"
-                [class.fuera]="!celda.delMes"
-                [class.hoy]="celda.esHoy"
-                [class.en-rango]="celda.enRango"
-                [class.con-eventos]="celda.conEventos"
-                [attr.aria-label]="celda.fecha | date: 'EEEE d MMMM'"
-                (click)="elegirFechaMini(celda.fecha)"
-              >
-                {{ celda.fecha.getDate() }}
-              </button>
-            }
-          </div>
-        </div>
-
         @if (categorias().length > 0) {
           <div class="categorias">
             <strong>Calendarios</strong>

@@ -1,5 +1,5 @@
 import { EventoCalendarioResponse } from '@tusalud/app/core/models';
-import { eventoApiACalendario } from './evento-calendario';
+import { categoriasPara, eventoApiACalendario, tiposPermitidos } from './evento-calendario';
 
 const base: EventoCalendarioResponse = {
   id: 3,
@@ -29,5 +29,33 @@ describe('eventoApiACalendario', () => {
     expect(eventoApiACalendario({ ...base, inicio: 'no-es-fecha' })).toBeNull();
     const corto = eventoApiACalendario({ ...base, fin: base.inicio })!;
     expect(corto.fin.getTime() - corto.inicio.getTime()).toBe(30 * 60_000);
+  });
+
+  it('limita los tipos de evento según el rol', () => {
+    expect(tiposPermitidos(['ROLE_PACIENTE'])).toEqual(['PERSONAL', 'RECORDATORIO']);
+    expect(tiposPermitidos(['ROLE_ADMIN'])).toEqual([
+      'REUNION',
+      'TAREA',
+      'RECORDATORIO',
+      'PERSONAL',
+    ]);
+    expect(tiposPermitidos(['ROLE_MEDICO'])).toEqual([
+      'REUNION',
+      'TAREA',
+      'RECORDATORIO',
+      'PERSONAL',
+      'BLOQUEO',
+    ]);
+    expect(tiposPermitidos(['ROLE_PACIENTE', 'ROLE_ADMIN'])).toContain('REUNION');
+  });
+
+  it('ofrece calendarios acordes al rol', () => {
+    expect(categoriasPara(['ROLE_PACIENTE']).map((c) => c.clave)).toEqual([
+      'CITA',
+      'RECORDATORIO',
+      'PERSONAL',
+    ]);
+    expect(categoriasPara(['ROLE_ADMIN']).map((c) => c.clave)).not.toContain('CITA');
+    expect(categoriasPara(['ROLE_MEDICO']).map((c) => c.clave)).toContain('BLOQUEO');
   });
 });

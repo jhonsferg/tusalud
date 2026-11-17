@@ -85,14 +85,6 @@ interface CeldaMes {
   readonly cruces: number;
 }
 
-interface CeldaMini {
-  readonly fecha: Date;
-  readonly delMes: boolean;
-  readonly esHoy: boolean;
-  readonly enRango: boolean;
-  readonly conEventos: boolean;
-}
-
 interface GrupoAgenda {
   readonly fecha: Date;
   readonly eventos: CalEvento[];
@@ -115,7 +107,6 @@ const ALTO_HORA = 56;
 const MAX_EVENTOS_MES = 3;
 const UMBRAL_ARRASTRE_PX = 5;
 const DIAS_CORTOS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-const LETRAS_DIAS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
 @Component({
   selector: 'app-calendario',
@@ -151,7 +142,6 @@ export class Calendario {
 
   protected readonly altoHora = ALTO_HORA;
   protected readonly diasCortos = DIAS_CORTOS;
-  protected readonly letrasDias = LETRAS_DIAS;
   protected readonly etiquetaVista: Readonly<Record<VistaCalendario, string>> = {
     mes: 'Mes',
     semana: 'Semana',
@@ -165,7 +155,6 @@ export class Calendario {
   private readonly ahoraState = signal(new Date());
   protected readonly ahora = this.ahoraState.asReadonly();
   protected readonly ocultas = signal<ReadonlySet<string>>(new Set());
-  protected readonly miMes = signal(inicioDelDia(new Date()));
   protected readonly arrastre = signal<Arrastre | null>(null);
 
   protected readonly modoSeleccion = computed(() => this.huecos() !== null);
@@ -324,23 +313,6 @@ export class Calendario {
       .filter((grupo) => grupo.eventos.length > 0);
   });
 
-  protected readonly celdasMini = computed<CeldaMini[]>(() => {
-    const base = this.miMes();
-    const { inicio, fin } = rangoVisible('mes', base);
-    const total = Math.round((fin.getTime() - inicio.getTime()) / 86_400_000) + 1;
-    const rango = this.rango();
-    const conEventos = new Set(
-      this.eventosVisibles().map((evento) => inicioDelDia(evento.inicio).getTime()),
-    );
-    return diasDeRango(inicio, total).map((fecha) => ({
-      fecha,
-      delMes: fecha.getMonth() === base.getMonth(),
-      esHoy: mismoDia(fecha, this.ahora()),
-      enRango: fecha >= rango.inicio && fecha <= rango.fin,
-      conEventos: conEventos.has(fecha.getTime()),
-    }));
-  });
-
   protected readonly lineaAhora = computed(() => {
     const ahora = this.ahora();
     const { minimo, maximo } = this.horasVisibles();
@@ -372,10 +344,6 @@ export class Calendario {
     inject(DestroyRef).onDestroy(() => clearInterval(temporizador));
     effect(() => this.rangoCambiado.emit(this.rango()));
     effect(() => {
-      const fecha = this.fecha();
-      untracked(() => this.miMes.set(new Date(fecha.getFullYear(), fecha.getMonth(), 1)));
-    });
-    effect(() => {
       const vista = this.vista();
       if (vista === 'semana' || vista === 'dia') {
         untracked(() => this.irAHoraActual());
@@ -399,15 +367,6 @@ export class Calendario {
   protected abrirDia(fecha: Date): void {
     this.fecha.set(inicioDelDia(fecha));
     this.vista.set('dia');
-  }
-
-  protected elegirFechaMini(fecha: Date): void {
-    this.fecha.set(inicioDelDia(fecha));
-  }
-
-  protected moverMini(pasos: number): void {
-    const base = this.miMes();
-    this.miMes.set(new Date(base.getFullYear(), base.getMonth() + pasos, 1));
   }
 
   protected alternarCategoria(clave: string): void {

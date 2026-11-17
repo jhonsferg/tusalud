@@ -1179,7 +1179,7 @@ El frontend renueva el token un minuto antes de que venza y, si una petición re
 
 ### Planificador de eventos
 
-Cada usuario tiene su propia agenda de eventos personales en la tabla `eventos_calendario`. Un evento puede ser una reunión, una tarea, un recordatorio, un evento personal o, solo para médicos, un bloqueo de agenda. Tiene título, notas, lugar, color opcional, duración de hasta 31 días, la marca de todo el día y un aviso previo opcional en minutos. Nadie ve ni modifica los eventos de otra persona.
+Cada usuario tiene su propia agenda de eventos personales en la tabla `eventos_calendario`. Los tipos de evento dependen del rol. Un paciente solo agenda eventos personales y recordatorios, un administrador añade reuniones y tareas y un médico puede crear además bloqueos de agenda. Crear o editar un tipo que el rol no permite responde 403 y `GET /api/v1/calendario/tipos` devuelve los tipos del usuario. Tiene título, notas, lugar, color opcional, duración de hasta 31 días, la marca de todo el día y un aviso previo opcional en minutos. Nadie ve ni modifica los eventos de otra persona.
 
 | Endpoint                                         | Comportamiento                                                        |
 | ------------------------------------------------ | --------------------------------------------------------------------- |
@@ -1541,13 +1541,13 @@ Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrec
 
 ### Pruebas del frontend
 
-Las 105 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API.
+Las 107 pruebas unitarias corren con Vitest y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, las rutas con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API.
 
 ```bash
 npm test
 ```
 
-Las 64 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre y la renovación de sesión. Requieren el stack levantado con datos de prueba.
+Las 65 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre y la renovación de sesión. Requieren el stack levantado con datos de prueba.
 
 ```bash
 npm run e2e

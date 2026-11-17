@@ -5120,7 +5120,7 @@
       "description": "Eventos personales del calendario, bloqueos de agenda y su efecto en la disponibilidad.",
       "item": [
         {
-          "name": "Crear una reunión",
+          "name": "Crear un evento personal",
           "event": [
             {
               "listen": "prerequest",
@@ -5147,7 +5147,7 @@
                   "const j = pm.response.json();",
                   "pm.test('Devuelve el evento creado', () => {",
                   "    pm.expect(j.id).to.be.a(\"number\");",
-                  "    pm.expect(j.tipo).to.eql(\"REUNION\");",
+                  "    pm.expect(j.tipo).to.eql(\"PERSONAL\");",
                   "    pm.expect(j.completado).to.eql(false);",
                   "});",
                   "pm.collectionVariables.set('eventoId', j.id);"
@@ -5181,7 +5181,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"titulo\": \"Reunión de seguimiento\",\n  \"tipo\": \"REUNION\",\n  \"inicio\": \"{{fechaInicioEvento}}\",\n  \"fin\": \"{{fechaFinEvento}}\",\n  \"ubicacion\": \"Consultorio virtual\",\n  \"recordatorioMinutos\": 30\n}",
+              "raw": "{\n  \"titulo\": \"Recordatorio de seguimiento\",\n  \"tipo\": \"PERSONAL\",\n  \"inicio\": \"{{fechaInicioEvento}}\",\n  \"fin\": \"{{fechaFinEvento}}\",\n  \"ubicacion\": \"Consultorio virtual\",\n  \"recordatorioMinutos\": 30\n}",
               "options": {
                 "raw": {
                   "language": "json"

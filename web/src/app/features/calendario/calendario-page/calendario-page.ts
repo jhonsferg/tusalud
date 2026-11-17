@@ -31,10 +31,10 @@ import { PageHeader } from '@tusalud/app/shared/components/page-header/page-head
 import { citaAEvento } from '@tusalud/app/shared/utils/cita-calendario';
 import { horarioLaboral } from '@tusalud/app/shared/utils/disponibilidad-calendario';
 import {
-  CATEGORIAS_BASE,
-  CATEGORIA_BLOQUEO,
   DatosEvento,
+  categoriasPara,
   eventoApiACalendario,
+  tiposPermitidos,
 } from '@tusalud/app/shared/utils/evento-calendario';
 
 interface DatosCita {
@@ -67,13 +67,8 @@ export class CalendarioPage implements OnInit {
 
   protected readonly vistas: readonly VistaCalendario[] = ['mes', 'semana', 'dia', 'agenda'];
 
-  protected readonly categorias = computed(() => {
-    const base =
-      this.auth.isAdmin() && !this.auth.isPaciente() && !this.auth.isMedico()
-        ? CATEGORIAS_BASE.filter((categoria) => categoria.clave !== 'CITA')
-        : [...CATEGORIAS_BASE];
-    return this.auth.isMedico() ? [...base, CATEGORIA_BLOQUEO] : base;
-  });
+  protected readonly tipos = computed(() => tiposPermitidos(this.auth.roles()));
+  protected readonly categorias = computed(() => categoriasPara(this.auth.roles()));
 
   protected readonly eventos = computed<CalEvento[]>(() => {
     const deCitas = this.auth.isMedico()

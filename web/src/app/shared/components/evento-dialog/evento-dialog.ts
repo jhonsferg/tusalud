@@ -74,7 +74,7 @@ export class EventoDialog {
   readonly visible = model(false);
   readonly evento = input<EventoCalendarioResponse | null>(null);
   readonly borrador = input<CrearEvento | null>(null);
-  readonly permitirBloqueo = input(false);
+  readonly tiposPermitidos = input<readonly TipoEvento[]>(['PERSONAL', 'RECORDATORIO']);
 
   readonly guardado = output<EventoCalendarioResponse>();
   readonly eliminado = output<number>();
@@ -110,7 +110,7 @@ export class EventoDialog {
   protected readonly todoElDia = computed(() => this.valores().todoElDia ?? false);
   protected readonly esTarea = computed(() => this.valores().tipo === 'TAREA');
   protected readonly tipos = computed(() =>
-    TIPOS_EVENTO.filter((tipo) => tipo !== 'BLOQUEO' || this.permitirBloqueo()).map((tipo) => ({
+    TIPOS_EVENTO.filter((tipo) => this.tiposPermitidos().includes(tipo)).map((tipo) => ({
       label: ETIQUETA_TIPO[tipo],
       value: tipo,
     })),
@@ -148,7 +148,7 @@ export class EventoDialog {
           const inicio = borrador?.inicio ?? new Date();
           this.form.reset({
             titulo: '',
-            tipo: 'REUNION',
+            tipo: this.tiposPermitidos()[0] ?? 'PERSONAL',
             todoElDia: borrador?.todoElDia ?? false,
             inicio,
             fin: borrador?.fin ?? new Date(inicio.getTime() + 60 * 60_000),

@@ -1,4 +1,9 @@
-import { ColorEventoApi, EventoCalendarioResponse, TipoEvento } from '@tusalud/app/core/models';
+import {
+  ColorEventoApi,
+  EventoCalendarioResponse,
+  Rol,
+  TipoEvento,
+} from '@tusalud/app/core/models';
 import { parseIsoDateTime } from '@tusalud/app/core/utils/date';
 import {
   CalCategoria,
@@ -38,6 +43,37 @@ export const ICONO_TIPO: Readonly<Record<TipoEvento, string>> = {
   PERSONAL: 'pi-user',
   BLOQUEO: 'pi-ban',
 };
+
+const TIPOS_POR_ROL: Readonly<Record<Rol, readonly TipoEvento[]>> = {
+  ROLE_PACIENTE: ['PERSONAL', 'RECORDATORIO'],
+  ROLE_ADMIN: ['REUNION', 'TAREA', 'RECORDATORIO', 'PERSONAL'],
+  ROLE_MEDICO: ['REUNION', 'TAREA', 'RECORDATORIO', 'PERSONAL', 'BLOQUEO'],
+};
+
+const ORDEN_TIPOS: readonly TipoEvento[] = [
+  'REUNION',
+  'TAREA',
+  'RECORDATORIO',
+  'PERSONAL',
+  'BLOQUEO',
+];
+
+export function tiposPermitidos(roles: readonly Rol[]): TipoEvento[] {
+  const permitidos = new Set(roles.flatMap((rol) => TIPOS_POR_ROL[rol] ?? []));
+  const unicamentePaciente = roles.length === 1 && roles[0] === 'ROLE_PACIENTE';
+  return unicamentePaciente
+    ? [...TIPOS_POR_ROL.ROLE_PACIENTE]
+    : ORDEN_TIPOS.filter((tipo) => permitidos.has(tipo));
+}
+
+export function categoriasPara(roles: readonly Rol[]): CalCategoria[] {
+  const tipos = new Set<string>(tiposPermitidos(roles));
+  const esSoloAdmin = roles.length > 0 && roles.every((rol) => rol === 'ROLE_ADMIN');
+  const base = CATEGORIAS_BASE.filter((categoria) =>
+    categoria.clave === 'CITA' ? !esSoloAdmin : tipos.has(categoria.clave),
+  );
+  return tipos.has('BLOQUEO') ? [...base, CATEGORIA_BLOQUEO] : base;
+}
 
 export const CATEGORIAS_BASE: readonly CalCategoria[] = [
   { clave: 'CITA', nombre: 'Citas médicas', color: 'info' },

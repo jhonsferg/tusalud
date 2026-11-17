@@ -41,6 +41,31 @@ test.describe('planificador', () => {
     await expect(page.getByText(`${titulo} editado`)).toHaveCount(0);
   });
 
+  test('cada rol solo puede agendar los tipos de evento que le corresponden', async ({
+    browser,
+  }) => {
+    const paciente = await (await browser.newContext()).newPage();
+    await iniciarSesion(paciente, 'paciente');
+    await paciente.goto('/calendario');
+    await expect(paciente.locator('.mini-dia')).toHaveCount(0);
+    await paciente.getByRole('button', { name: 'Nuevo evento' }).click();
+    await paciente.locator('#ev-tipo').click();
+    await expect(paciente.getByRole('option', { name: 'Personal' })).toBeVisible();
+    await expect(paciente.getByRole('option', { name: 'Recordatorio' })).toBeVisible();
+    await expect(paciente.getByRole('option', { name: 'Reunión' })).toHaveCount(0);
+    await expect(paciente.getByRole('option', { name: 'Tarea' })).toHaveCount(0);
+    await expect(paciente.getByRole('option', { name: 'Bloqueo de agenda' })).toHaveCount(0);
+
+    const admin = await (await browser.newContext()).newPage();
+    await iniciarSesion(admin, 'admin');
+    await admin.goto('/calendario');
+    await admin.getByRole('button', { name: 'Nuevo evento' }).click();
+    await admin.locator('#ev-tipo').click();
+    await expect(admin.getByRole('option', { name: 'Reunión' })).toBeVisible();
+    await expect(admin.getByRole('option', { name: 'Tarea' })).toBeVisible();
+    await expect(admin.getByRole('option', { name: 'Bloqueo de agenda' })).toHaveCount(0);
+  });
+
   test('valida el título y el rango de fechas del evento', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
     await page.goto('/calendario');
@@ -52,7 +77,7 @@ test.describe('planificador', () => {
 
   test('marca una tarea como completada', async ({ page }) => {
     const titulo = `Tarea e2e ${Date.now()}`;
-    await iniciarSesion(page, 'paciente');
+    await iniciarSesion(page, 'admin');
     await page.goto('/calendario');
     await page.getByRole('button', { name: 'Nuevo evento' }).click();
     await page.locator('#ev-titulo').fill(titulo);
