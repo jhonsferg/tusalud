@@ -134,7 +134,11 @@ class AdminServiciosTest {
                         "ROLE_PACIENTE",
                         "ROLE_LABORATORIO",
                         "ROLE_FARMACIA",
-                        "ROLE_ALMACEN");
+                        "ROLE_ALMACEN",
+                        "ROLE_RECEPCION",
+                        "ROLE_CAJA",
+                        "ROLE_ENFERMERIA");
+        assertThat(roles).hasSize(9);
         assertThat(roles).allSatisfy(rol -> assertThat(rol.descripcion()).isNotBlank());
         assertThat(roles.get(2).usuarios()).isPositive();
     }
@@ -169,6 +173,37 @@ class AdminServiciosTest {
         assertThat(usuarioRepository.findById(creado.id()).orElseThrow().getPassword())
                 .startsWith("$2")
                 .isNotEqualTo("Personal123!");
+    }
+
+    @Test
+    void creaPersonalDeRecepcionCajaYEnfermeriaSinExigirPerfil() {
+        Usuario admin = fixture.usuario("altafase2", RolNombre.ROLE_ADMIN);
+        for (RolNombre rol : List.of(RolNombre.ROLE_RECEPCION, RolNombre.ROLE_CAJA, RolNombre.ROLE_ENFERMERIA)) {
+            UsuarioAdminResponse creado = usuarioAdminService.crearPersonal(
+                    new PersonalCreateRequest(
+                            "Ana",
+                            "Gómez",
+                            rol.name().toLowerCase() + System.nanoTime() + "@tusalud.com",
+                            "Personal123!",
+                            null,
+                            List.of(rol)),
+                    fixture.principal(admin));
+            assertThat(creado.roles()).containsExactly(rol.name());
+            assertThat(creado.estado()).isEqualTo(EstadoUsuario.ACTIVO);
+        }
+    }
+
+    @Test
+    void asignaLosRolesDeFase2SinExigirPerfil() {
+        Usuario admin = fixture.usuario("adminfase2", RolNombre.ROLE_ADMIN);
+        Usuario persona = fixture.usuario("personalfase2", RolNombre.ROLE_PACIENTE);
+
+        UsuarioAdminResponse respuesta = usuarioAdminService.asignarRoles(
+                persona.getId(),
+                List.of(RolNombre.ROLE_RECEPCION, RolNombre.ROLE_CAJA, RolNombre.ROLE_ENFERMERIA),
+                fixture.principal(admin));
+
+        assertThat(respuesta.roles()).containsExactlyInAnyOrder("ROLE_RECEPCION", "ROLE_CAJA", "ROLE_ENFERMERIA");
     }
 
     @Test

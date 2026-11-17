@@ -60,6 +60,12 @@ public class EventoCalendarioServiceImpl implements EventoCalendarioService {
             RolNombre.ROLE_FARMACIA,
             TIPOS_PERSONAL,
             RolNombre.ROLE_ALMACEN,
+            TIPOS_PERSONAL,
+            RolNombre.ROLE_RECEPCION,
+            TIPOS_PERSONAL,
+            RolNombre.ROLE_CAJA,
+            TIPOS_PERSONAL,
+            RolNombre.ROLE_ENFERMERIA,
             TIPOS_PERSONAL);
 
     private static final List<TipoEvento> ORDEN_TIPOS = List.of(

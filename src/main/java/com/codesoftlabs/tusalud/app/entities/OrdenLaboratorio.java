@@ -93,6 +93,10 @@ public class OrdenLaboratorio {
     @Column(name = "motivo_cancelacion", length = 300)
     private String motivoCancelacion;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean cobrado = false;
+
     @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id ASC")
     @Builder.Default

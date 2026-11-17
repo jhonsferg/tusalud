@@ -234,8 +234,14 @@ class EventoCalendarioServiceTest {
     }
 
     @Test
-    void elPersonalDeLaboratorioFarmaciaYAlmacenUsaLosTiposDeAdministracion() {
-        for (RolNombre rol : List.of(RolNombre.ROLE_LABORATORIO, RolNombre.ROLE_FARMACIA, RolNombre.ROLE_ALMACEN)) {
+    void elPersonalDeApoyoUsaLosTiposDeAdministracion() {
+        for (RolNombre rol : List.of(
+                RolNombre.ROLE_LABORATORIO,
+                RolNombre.ROLE_FARMACIA,
+                RolNombre.ROLE_ALMACEN,
+                RolNombre.ROLE_RECEPCION,
+                RolNombre.ROLE_CAJA,
+                RolNombre.ROLE_ENFERMERIA)) {
             UsuarioPrincipal personal = fixture.principal(fixture.usuario("personal", rol));
             assertThat(eventoService.tiposPermitidos(personal))
                     .containsExactly(

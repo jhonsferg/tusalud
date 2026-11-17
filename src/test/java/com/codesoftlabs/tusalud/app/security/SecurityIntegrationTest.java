@@ -254,6 +254,43 @@ class SecurityIntegrationTest {
     }
 
     @Test
+    void losPrefijosDeFase2ExigenAutenticacionYDelegaranEnLosControladores() throws Exception {
+        for (String ruta :
+                new String[] {"/api/v1/recepcion/turnos", "/api/v1/caja/comprobantes", "/api/v1/hospitalizacion/camas"
+                }) {
+            mockMvc.perform(get(ruta)).andExpect(status().isUnauthorized());
+            mockMvc.perform(get(ruta).header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente))
+                    .andExpect(status().is4xxClientError())
+                    .andExpect(status().is(org.hamcrest.Matchers.not(401)));
+        }
+    }
+
+    @Test
+    void elAdministradorRegistraPersonalDeRecepcionCajaYEnfermeria() throws Exception {
+        Rol rolAdmin = rolRepository
+                .findByNombre(RolNombre.ROLE_ADMIN)
+                .orElseGet(() -> rolRepository.save(
+                        Rol.builder().nombre(RolNombre.ROLE_ADMIN).build()));
+        Usuario admin = usuarioRepository.save(usuario("admin.fase2@test.com", EstadoUsuario.ACTIVO, rolAdmin));
+        String tokenAdmin = jwtUtils.generateToken(UsuarioPrincipal.from(admin));
+        String[] roles = {"ROLE_RECEPCION", "ROLE_CAJA", "ROLE_ENFERMERIA"};
+        for (String rol : roles) {
+            mockMvc.perform(post("/api/v1/admin/personal")
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenAdmin)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"nombre\":\"Ana\",\"apellido\":\"Gómez\",\"email\":\"" + rol.toLowerCase()
+                                    + ".sec@tusalud.com\",\"password\":\"Personal123!\",\"roles\":[\"" + rol + "\"]}"))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.roles[0]").value(rol));
+        }
+        mockMvc.perform(get("/api/v1/admin/roles").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenAdmin))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(9));
+        mockMvc.perform(get("/api/v1/admin/roles").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void losPagosConBilleteraSonDelPacienteYLosPacientesCompartidosDelMedico() throws Exception {
         mockMvc.perform(post("/api/v1/pagos/qr")).andExpect(status().isUnauthorized());
         mockMvc.perform(post("/api/v1/pacientes/1/compartir")
