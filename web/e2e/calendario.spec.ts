@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { iniciarSesion } from './support';
+import { iniciarSesion, reservarPrimeraHoraLibre } from './support';
 
 test.describe('calendario', () => {
   test('el paciente ve sus citas en las vistas de mes, semana y día', async ({ page }) => {
@@ -60,5 +60,45 @@ test.describe('calendario', () => {
     await expect(page.getByRole('grid', { name: 'Calendario mensual' })).toBeVisible();
     await page.getByText('Día', { exact: true }).first().click();
     await expect(page.getByRole('grid', { name: 'Calendario mensual' })).toHaveCount(0);
+  });
+});
+
+test.describe('reprogramación', () => {
+  test('el paciente reprograma una cita en su propia página con el calendario', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    await iniciarSesion(page, 'paciente');
+    await page.goto('/citas');
+    await page.getByRole('button', { name: 'Ver detalle' }).first().click();
+    await expect(page).toHaveURL(/\/citas\/\d+$/);
+    const detalle = new URL(page.url()).pathname;
+    await page.getByRole('button', { name: 'Reprogramar' }).click();
+    await expect(page).toHaveURL(/\/citas\/\d+\/reprogramar$/);
+    await expect(page.locator('p-datepicker')).toHaveCount(0);
+    await expect(page.getByText('Cita actual').first()).toBeVisible();
+
+    const huecos = page.getByRole('button', { name: /^Elegir / });
+    for (let i = 0; i < 12 && !(await huecos.count()); i++) {
+      await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
+      await page.waitForTimeout(500);
+    }
+    await huecos.nth(Math.floor((await huecos.count()) / 2)).click();
+    await page.getByRole('button', { name: /Confirmar reprogramación$/ }).click();
+    await expect(page.getByText(/Tu cita fue reprogramada/).first()).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(detalle + '$'));
+  });
+
+  test('una cita cancelada no se puede reprogramar', async ({ page }) => {
+    test.setTimeout(90_000);
+    await iniciarSesion(page, 'paciente');
+    await page.goto('/citas/nueva?medicoId=1');
+    await reservarPrimeraHoraLibre(page, 'Cita para cancelar y no reprogramar');
+    const url = new URL(page.url()).pathname;
+    await page.getByRole('button', { name: 'Cancelar cita' }).click();
+    await page.getByRole('button', { name: 'Sí, cancelar cita' }).click();
+    await expect(page.getByText('Cancelada', { exact: true })).toBeVisible();
+    await page.goto(`${url}/reprogramar`);
+    await expect(page.getByText('Esta cita no se puede reprogramar')).toBeVisible();
   });
 });

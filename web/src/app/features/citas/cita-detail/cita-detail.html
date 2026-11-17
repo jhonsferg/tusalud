@@ -62,7 +62,7 @@
               icon="pi pi-refresh"
               severity="secondary"
               [outlined]="true"
-              (onClick)="reprogramarVisible.set(true)"
+              [routerLink]="['/citas', cita.id, 'reprogramar']"
             />
           }
           @if (puedeValorar(cita)) {
@@ -229,7 +229,6 @@
   </div>
 
   <app-pago-dialog [cita]="cita" [(visible)]="pagoVisible" />
-  <app-reprogramar-dialog [cita]="cita" [(visible)]="reprogramarVisible" />
   <app-valoracion-dialog [cita]="cita" [(visible)]="valoracionVisible" />
 } @else {
   <div class="layout">

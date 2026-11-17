@@ -1,0 +1,93 @@
+<app-page-header
+  title="Reprogramar cita"
+  subtitle="Elige un nuevo horario libre en el calendario"
+  icon="pi-refresh"
+  [backLink]="id() ? '/citas/' + id() : '/citas'"
+  backLabel="Volver a la cita"
+/>
+
+@if (citas.selected.error(); as problema) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar la cita"
+      [message]="problema.message"
+    />
+  </div>
+} @else if (cita(); as c) {
+  @if (!reprogramable()) {
+    <div class="panel">
+      <app-empty-state
+        icon="pi-lock"
+        title="Esta cita no se puede reprogramar"
+        message="Solo se reprograman citas pendientes o confirmadas que aún no ocurrieron."
+      >
+        <p-button label="Volver a la cita" [routerLink]="['/citas', c.id]" />
+      </app-empty-state>
+    </div>
+  } @else {
+    <section class="panel resumen">
+      <div>
+        <small class="text-muted">Cita con</small>
+        <strong>{{ c.medicoNombre }}</strong>
+        <span class="text-muted">{{ c.especialidadNombre }}</span>
+      </div>
+      <div>
+        <small class="text-muted">Horario actual</small>
+        <strong>{{ c.fechaHora | date: 'EEEE d MMMM, HH:mm' }}</strong>
+      </div>
+      <div>
+        <small class="text-muted">Nuevo horario</small>
+        @if (elegido(); as nuevo) {
+          <strong class="nuevo">{{ nuevo | date: 'EEEE d MMMM, HH:mm' }}</strong>
+        } @else {
+          <span class="text-muted">Por elegir</span>
+        }
+      </div>
+    </section>
+
+    <section class="panel">
+      @if (error(); as mensaje) {
+        <p-message severity="error" styleClass="w-full mb-3">{{ mensaje }}</p-message>
+      }
+      <div class="leyenda">
+        <span class="libre"><i></i> Hora libre</span>
+        <span class="actual"><i></i> Cita actual</span>
+        <span class="atencion"><i></i> Fuera del horario de atención</span>
+      </div>
+      <app-calendario
+        [eventos]="eventos()"
+        [huecos]="huecos()"
+        [horarioLaboral]="laboral()"
+        [(seleccion)]="elegido"
+        [cargando]="medicos.disponibilidadRango.loading()"
+        [(vista)]="vista"
+        [(fecha)]="fecha"
+        (rangoCambiado)="cargarRango($event)"
+      />
+    </section>
+
+    <div class="barra" [class.activa]="elegido()">
+      @if (elegido(); as nuevo) {
+        <span>
+          <i class="pi pi-calendar-plus"></i> Reprogramar para
+          <strong>{{ nuevo | date: 'EEEE d MMMM, HH:mm' }}</strong>
+        </span>
+        <p-button
+          label="Confirmar reprogramación"
+          icon="pi pi-check"
+          [loading]="guardando()"
+          (onClick)="confirmar()"
+        />
+      } @else {
+        <span class="text-muted">
+          <i class="pi pi-info-circle"></i> Selecciona un bloque verde del calendario para
+          continuar.
+        </span>
+      }
+    </div>
+  }
+} @else {
+  <div class="panel"><p-skeleton height="16rem" /></div>
+}

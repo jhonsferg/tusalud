@@ -1,0 +1,84 @@
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  strong {
+    text-transform: capitalize;
+  }
+
+  .nuevo {
+    color: var(--p-green-600);
+  }
+}
+
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+  color: var(--p-text-muted-color);
+  font-size: 0.85rem;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  i {
+    width: 0.9rem;
+    height: 0.9rem;
+    border-radius: 4px;
+  }
+
+  .libre i {
+    border: 1px dashed var(--p-green-500);
+    background: color-mix(in srgb, var(--p-green-500) 18%, transparent);
+  }
+
+  .actual i {
+    border-left: 3px solid var(--p-orange-500);
+    background: color-mix(in srgb, var(--p-orange-500) 18%, transparent);
+  }
+
+  .atencion i {
+    background: repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--p-text-muted-color) 25%, transparent) 0 3px,
+      transparent 3px 6px
+    );
+  }
+}
+
+.barra {
+  position: sticky;
+  bottom: 1rem;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 0.8rem 1.1rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 14px;
+  background: var(--p-content-background);
+  box-shadow: 0 8px 24px rgb(15 23 42 / 12%);
+
+  &.activa {
+    border-color: var(--p-green-500);
+  }
+
+  strong {
+    text-transform: capitalize;
+  }
+}

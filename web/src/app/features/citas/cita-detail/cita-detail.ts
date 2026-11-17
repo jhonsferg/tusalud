@@ -25,7 +25,6 @@ import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-sta
 import { EstadoCitaTag } from '@tusalud/app/shared/components/estado-cita-tag/estado-cita-tag';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
 import { PagoDialog } from '@tusalud/app/shared/components/pago-dialog/pago-dialog';
-import { ReprogramarDialog } from '@tusalud/app/shared/components/reprogramar-dialog/reprogramar-dialog';
 import { ValoracionDialog } from '@tusalud/app/shared/components/valoracion-dialog/valoracion-dialog';
 import { CitaActions } from '@tusalud/app/shared/services/cita-actions.service';
 
@@ -44,7 +43,6 @@ import { CitaActions } from '@tusalud/app/shared/services/cita-actions.service';
     EstadoCitaTag,
     PageHeader,
     PagoDialog,
-    ReprogramarDialog,
     ValoracionDialog,
   ],
   templateUrl: './cita-detail.html',
@@ -60,7 +58,6 @@ export class CitaDetail {
   private readonly acciones = inject(CitaActions);
 
   protected readonly pagoVisible = signal(false);
-  protected readonly reprogramarVisible = signal(false);
   protected readonly valoracionVisible = signal(false);
 
   protected readonly volver = computed(() =>

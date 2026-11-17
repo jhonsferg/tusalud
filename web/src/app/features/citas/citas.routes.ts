@@ -19,6 +19,15 @@ export const CITAS_ROUTES: Routes = [
       import('@tusalud/app/features/citas/cita-form/cita-form').then((m) => m.CitaForm),
   },
   {
+    path: ':id/reprogramar',
+    title: 'Reprogramar cita',
+    canMatch: [roleGuard('ROLE_ADMIN', 'ROLE_PACIENTE')],
+    loadComponent: () =>
+      import('@tusalud/app/features/citas/cita-reprogramar/cita-reprogramar').then(
+        (m) => m.CitaReprogramar,
+      ),
+  },
+  {
     path: ':id/atencion',
     title: 'Atención médica',
     canMatch: [roleGuard('ROLE_MEDICO')],
