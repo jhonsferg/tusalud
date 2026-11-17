@@ -6,7 +6,6 @@ services:
     image: tusalud-api:qa
     environment:
       SPRING_PROFILES_ACTIVE: qa
-      DATA_INITIALIZER_ENABLED: ${DATA_INITIALIZER_ENABLED:-true}
       OTEL_RESOURCE_ATTRIBUTES: service.namespace=tusalud,deployment.environment.name=qa
 
   web:

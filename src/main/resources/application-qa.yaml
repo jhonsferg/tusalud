@@ -8,9 +8,11 @@ spring:
       maximum-pool-size: 10
       minimum-idle: 2
       pool-name: TusaludHikariPool
+  flyway:
+    locations: classpath:db/migration,classpath:db/demo
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
     properties:
       hibernate:
@@ -20,7 +22,7 @@ app:
   jwt:
     secret: ${JWT_SECRET:7M+c4b4GZSekiWHhQKtFdWMk3BbcEwa1YQ0PqmCFie75dy5ko50rildSWFTsI18NTxineFm3/IIKY1lyrZn89g==}
   data-initializer:
-    enabled: ${DATA_INITIALIZER_ENABLED:true}
+    enabled: ${DATA_INITIALIZER_ENABLED:false}
 
 logging:
   level:
