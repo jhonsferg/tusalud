@@ -132,15 +132,15 @@ class SecurityIntegrationTest {
     void losEndpointsDeAdministracionDeRolesSoloLosVeElAdministrador() throws Exception {
         mockMvc.perform(get("/api/v1/admin/roles").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente))
                 .andExpect(status().isForbidden());
-        mockMvc.perform(put("/api/v1/admin/usuarios/1/roles")
+        mockMvc.perform(put("/api/v1/admin/usuarios/00000000-0000-0000-0000-000000000001/roles")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"roles\":[\"ROLE_ADMIN\"]}"))
                 .andExpect(status().isForbidden());
-        mockMvc.perform(put("/api/v1/medicos/1/especialidades")
+        mockMvc.perform(put("/api/v1/medicos/00000000-0000-0000-0000-000000000001/especialidades")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"especialidadIds\":[1]}"))
+                        .content("{\"especialidadIds\":[\"00000000-0000-0000-0000-000000000001\"]}"))
                 .andExpect(status().isForbidden());
     }
 
@@ -153,10 +153,10 @@ class SecurityIntegrationTest {
         Usuario admin = usuarioRepository.save(usuario("admin.sec@test.com", EstadoUsuario.ACTIVO, rolAdmin));
         String tokenAdmin = jwtUtils.generateToken(UsuarioPrincipal.from(admin));
 
-        mockMvc.perform(put("/api/v1/medicos/999999/especialidades")
+        mockMvc.perform(put("/api/v1/medicos/00000000-0000-0000-0000-000000999999/especialidades")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenAdmin)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"especialidadIds\":[1]}"))
+                        .content("{\"especialidadIds\":[\"00000000-0000-0000-0000-000000000001\"]}"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Médico")));
     }
@@ -293,15 +293,15 @@ class SecurityIntegrationTest {
     @Test
     void losPagosConBilleteraSonDelPacienteYLosPacientesCompartidosDelMedico() throws Exception {
         mockMvc.perform(post("/api/v1/pagos/qr")).andExpect(status().isUnauthorized());
-        mockMvc.perform(post("/api/v1/pacientes/1/compartir")
+        mockMvc.perform(post("/api/v1/pacientes/00000000-0000-0000-0000-000000000001/compartir")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"medicoId\":1}"))
+                        .content("{\"medicoId\":\"00000000-0000-0000-0000-000000000001\"}"))
                 .andExpect(status().isForbidden());
         mockMvc.perform(post("/api/v1/pagos/qr")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"citaId\":1}"))
+                        .content("{\"citaId\":\"00000000-0000-0000-0000-000000000001\"}"))
                 .andExpect(status().isBadRequest());
     }
 

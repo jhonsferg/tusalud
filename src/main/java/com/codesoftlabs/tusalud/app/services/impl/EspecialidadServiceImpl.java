@@ -8,6 +8,7 @@ import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.EspecialidadRepository;
 import com.codesoftlabs.tusalud.app.services.interfaces.EspecialidadService;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class EspecialidadServiceImpl implements EspecialidadService {
     }
 
     @Override
-    public EspecialidadResponse obtener(Long id) {
+    public EspecialidadResponse obtener(UUID id) {
         return EspecialidadResponse.from(buscar(id));
     }
 
@@ -52,7 +53,7 @@ public class EspecialidadServiceImpl implements EspecialidadService {
 
     @Override
     @Transactional
-    public EspecialidadResponse actualizar(Long id, EspecialidadRequest request) {
+    public EspecialidadResponse actualizar(UUID id, EspecialidadRequest request) {
         Especialidad especialidad = buscar(id);
         String nombre = request.nombre().trim();
         if (especialidadRepository.existsByNombreIgnoreCaseAndIdNot(nombre, id)) {
@@ -67,7 +68,7 @@ public class EspecialidadServiceImpl implements EspecialidadService {
 
     @Override
     @Transactional
-    public void eliminar(Long id) {
+    public void eliminar(UUID id) {
         Especialidad especialidad = buscar(id);
         if (especialidadRepository.tieneMedicosAsignados(id)) {
             throw new ConflictException("No se puede eliminar la especialidad " + especialidad.getNombre()
@@ -81,7 +82,7 @@ public class EspecialidadServiceImpl implements EspecialidadService {
         log.info("Especialidad eliminada: id {}", id);
     }
 
-    private Especialidad buscar(Long id) {
+    private Especialidad buscar(UUID id) {
         return especialidadRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Especialidad", "id", id));

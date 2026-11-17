@@ -37,6 +37,7 @@ import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,7 +107,7 @@ class HospitalizacionServiceTest {
         return new EvolucionHospRequest(tipo, nota, "120/80", 80, new BigDecimal("36.8"), 98);
     }
 
-    private void retrocederIngreso(Long id, long dias, long horas) {
+    private void retrocederIngreso(UUID id, long dias, long horas) {
         IngresoHospitalario ingreso = ingresoRepository.findById(id).orElseThrow();
         LocalDateTime antes = LocalDateTime.now().minusDays(dias).minusHours(horas);
         ingreso.setFechaIngreso(antes);

@@ -5,12 +5,15 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Schema(description = "Bloque de horario de atención")
 public record HorarioResponse(
-        @Schema(example = "1") Long id,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID id,
 
-        @Schema(example = "1") Long medicoId,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID medicoId,
 
         @Schema(example = "MONDAY") DayOfWeek diaSemana,
 

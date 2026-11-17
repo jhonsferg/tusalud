@@ -23,6 +23,7 @@ import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -174,7 +175,7 @@ class AtencionServiceImplTest {
     void citaInexistenteLanzaNotFound() {
         prepararCita(EstadoCita.CONFIRMADA);
 
-        assertThatThrownBy(() -> atencionService.obtener(999999999L, principalMedico))
+        assertThatThrownBy(() -> atencionService.obtener(UUID.randomUUID(), principalMedico))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 }

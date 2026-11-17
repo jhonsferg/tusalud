@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,7 +14,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DispensacionRepository extends JpaRepository<Dispensacion, Long> {
+public interface DispensacionRepository extends JpaRepository<Dispensacion, UUID> {
 
     @Query("""
             SELECT d FROM Dispensacion d
@@ -39,7 +40,7 @@ public interface DispensacionRepository extends JpaRepository<Dispensacion, Long
             LEFT JOIN FETCH d.atencion
             WHERE d.id = :id
             """)
-    Optional<Dispensacion> findByIdConDetalle(@Param("id") Long id);
+    Optional<Dispensacion> findByIdConDetalle(@Param("id") UUID id);
 
     @Query("""
             SELECT d FROM Dispensacion d
@@ -49,7 +50,7 @@ public interface DispensacionRepository extends JpaRepository<Dispensacion, Long
             WHERE p.id = :pacienteId
             ORDER BY d.fecha DESC, d.id DESC
             """)
-    List<Dispensacion> findByPacienteId(@Param("pacienteId") Long pacienteId);
+    List<Dispensacion> findByPacienteId(@Param("pacienteId") UUID pacienteId);
 
     @Query("""
             SELECT COALESCE(SUM(d.total), 0) FROM Dispensacion d

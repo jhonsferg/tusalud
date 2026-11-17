@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ public class AtencionServiceImpl implements AtencionService {
 
     @Override
     @Transactional
-    public AtencionResponse registrar(Long citaId, AtencionRequest request, UsuarioPrincipal medico) {
+    public AtencionResponse registrar(UUID citaId, AtencionRequest request, UsuarioPrincipal medico) {
         Cita cita = buscarCita(citaId);
         if (!esMedicoDe(cita, medico)) {
             throw new ForbiddenOperationException("Solo el médico de la cita puede registrar su atención");
@@ -78,7 +79,7 @@ public class AtencionServiceImpl implements AtencionService {
 
     @Override
     @Transactional
-    public AtencionResponse actualizar(Long citaId, AtencionRequest request, UsuarioPrincipal medico) {
+    public AtencionResponse actualizar(UUID citaId, AtencionRequest request, UsuarioPrincipal medico) {
         Cita cita = buscarCita(citaId);
         if (!esMedicoDe(cita, medico)) {
             throw new ForbiddenOperationException("Solo el médico de la cita puede editar su atención");
@@ -89,7 +90,7 @@ public class AtencionServiceImpl implements AtencionService {
     }
 
     @Override
-    public AtencionResponse obtener(Long citaId, UsuarioPrincipal actor) {
+    public AtencionResponse obtener(UUID citaId, UsuarioPrincipal actor) {
         Cita cita = buscarCita(citaId);
         boolean admin = actor.getRoles().contains(RolNombre.ROLE_ADMIN.name());
         boolean paciente = cita.getPaciente().getUsuario().getId().equals(actor.getId());
@@ -99,13 +100,13 @@ public class AtencionServiceImpl implements AtencionService {
         return AtencionResponse.from(buscarAtencion(citaId));
     }
 
-    private Cita buscarCita(Long citaId) {
+    private Cita buscarCita(UUID citaId) {
         return citaRepository
                 .findByIdWithDetails(citaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cita", "id", citaId));
     }
 
-    private Atencion buscarAtencion(Long citaId) {
+    private Atencion buscarAtencion(UUID citaId) {
         return atencionRepository
                 .findByCitaIdConDetalle(citaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Atención", "cita", citaId));

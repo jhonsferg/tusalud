@@ -19,6 +19,7 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -136,7 +137,7 @@ public class CajaController {
     @GetMapping("/comprobantes/{id}")
     @PreAuthorize("hasAnyRole('CAJA', 'ADMIN')")
     @Operation(summary = "Detalle de un comprobante")
-    public ResponseEntity<ComprobanteResponse> obtener(@PathVariable Long id) {
+    public ResponseEntity<ComprobanteResponse> obtener(@PathVariable UUID id) {
         return ResponseEntity.ok(cajaService.obtener(id));
     }
 
@@ -147,7 +148,7 @@ public class CajaController {
             description = "Revierte el pago de la cita o el cobro de la orden de laboratorio de origen.")
     public ResponseEntity<ComprobanteResponse> anular(
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody AnularComprobanteRequest request) {
         return ResponseEntity.ok(cajaService.anular(principal, id, request.motivo()));
     }

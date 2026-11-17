@@ -98,7 +98,7 @@ public class SesionServiceImpl implements SesionService {
 
     @Override
     @Transactional
-    public void revocar(UsuarioPrincipal actor, Long sesionId) {
+    public void revocar(UsuarioPrincipal actor, UUID sesionId) {
         SesionUsuario sesion = sesionRepository
                 .findByIdAndUsuarioId(sesionId, actor.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Sesión", "id", sesionId));
@@ -131,12 +131,12 @@ public class SesionServiceImpl implements SesionService {
 
     @Override
     @Transactional
-    public void revocarTodasDelUsuario(Long usuarioId) {
+    public void revocarTodasDelUsuario(UUID usuarioId) {
         sesionRepository.revocarTodasDelUsuario(usuarioId);
         refreshTokenService.revocarDeUsuario(usuarioId);
     }
 
-    private boolean alertasActivas(Long usuarioId) {
+    private boolean alertasActivas(UUID usuarioId) {
         return preferenciaRepository
                 .findByUsuarioId(usuarioId)
                 .map(preferencia -> preferencia.isAlertasInicioSesion())

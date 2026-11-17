@@ -8,17 +8,18 @@ import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public interface PagoService {
 
-    PagoResponse pagarCita(Long citaId, PagoRequest request, UsuarioPrincipal actor);
+    PagoResponse pagarCita(UUID citaId, PagoRequest request, UsuarioPrincipal actor);
 
     Pago registrarPagoBilletera(
             Cita cita, String descripcion, BigDecimal monto, BigDecimal descuento, String codigoCupon);
 
     List<PagoResponse> listarMisPagos(UsuarioPrincipal actor);
 
-    PagoResponse obtenerMiPago(UsuarioPrincipal actor, Long id);
+    PagoResponse obtenerMiPago(UsuarioPrincipal actor, UUID id);
 
     List<PagoResponse> listarTodos(LocalDate inicio, LocalDate fin);
 }

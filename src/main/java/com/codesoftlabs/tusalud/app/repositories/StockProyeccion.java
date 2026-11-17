@@ -1,10 +1,11 @@
 package com.codesoftlabs.tusalud.app.repositories;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public interface StockProyeccion {
 
-    Long getProductoId();
+    UUID getProductoId();
 
     Long getStock();
 

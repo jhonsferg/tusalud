@@ -4,15 +4,16 @@ import com.codesoftlabs.tusalud.app.entities.MovimientoInventario;
 import com.codesoftlabs.tusalud.app.entities.enums.MotivoMovimiento;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoMovimiento;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record MovimientoResponse(
-        Long id,
+        UUID id,
         LocalDateTime fecha,
         TipoMovimiento tipo,
         MotivoMovimiento motivo,
-        Long productoId,
+        UUID productoId,
         String productoNombre,
-        Long loteId,
+        UUID loteId,
         String numeroLote,
         int cantidad,
         String usuarioNombre,

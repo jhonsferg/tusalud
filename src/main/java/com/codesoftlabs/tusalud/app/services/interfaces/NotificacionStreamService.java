@@ -1,13 +1,14 @@
 package com.codesoftlabs.tusalud.app.services.interfaces;
 
 import com.codesoftlabs.tusalud.app.dto.response.NotificacionResponse;
+import java.util.UUID;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public interface NotificacionStreamService {
 
-    SseEmitter suscribir(Long usuarioId);
+    SseEmitter suscribir(UUID usuarioId);
 
-    void publicar(Long usuarioId, NotificacionResponse notificacion);
+    void publicar(UUID usuarioId, NotificacionResponse notificacion);
 
     void enviarLatido();
 

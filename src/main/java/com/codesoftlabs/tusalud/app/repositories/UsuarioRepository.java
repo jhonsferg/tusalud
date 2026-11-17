@@ -3,13 +3,14 @@ package com.codesoftlabs.tusalud.app.repositories;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
     @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.roles WHERE LOWER(u.email) = LOWER(:email)")
     Optional<Usuario> findByEmailWithRoles(@Param("email") String email);
@@ -18,7 +19,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     boolean existsByEmailIgnoreCase(@Param("email") String email);
 
     @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.roles WHERE u.id = :id")
-    Optional<Usuario> findByIdConRoles(@Param("id") Long id);
+    Optional<Usuario> findByIdConRoles(@Param("id") UUID id);
 
     @Query("SELECT COUNT(u) FROM Usuario u JOIN u.roles r WHERE r.nombre = :rol")
     long contarPorRol(@Param("rol") com.codesoftlabs.tusalud.app.entities.enums.RolNombre rol);

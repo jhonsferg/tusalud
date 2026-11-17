@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,8 +35,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class Producto {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(nullable = false, length = 30)
     private String codigo;

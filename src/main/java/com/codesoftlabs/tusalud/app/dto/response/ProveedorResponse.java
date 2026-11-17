@@ -1,9 +1,10 @@
 package com.codesoftlabs.tusalud.app.dto.response;
 
 import com.codesoftlabs.tusalud.app.entities.Proveedor;
+import java.util.UUID;
 
 public record ProveedorResponse(
-        Long id,
+        UUID id,
         String ruc,
         String razonSocial,
         String contacto,

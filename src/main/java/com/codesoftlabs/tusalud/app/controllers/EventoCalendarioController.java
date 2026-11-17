@@ -16,10 +16,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -109,7 +109,7 @@ public class EventoCalendarioController {
     @Operation(summary = "Actualizar un evento", description = "Reemplaza los datos de un evento propio.")
     public ResponseEntity<EventoCalendarioResponse> actualizar(
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
-            @PathVariable @Positive Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody EventoCalendarioRequest request) {
         return ResponseEntity.ok(eventoService.actualizar(principal, id, request));
     }
@@ -120,7 +120,7 @@ public class EventoCalendarioController {
             description = "Cambia el inicio y el fin de un evento propio, por ejemplo al arrastrarlo en el calendario.")
     public ResponseEntity<EventoCalendarioResponse> mover(
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
-            @PathVariable @Positive Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody MoverEventoRequest request) {
         return ResponseEntity.ok(eventoService.mover(principal, id, request));
     }
@@ -129,7 +129,7 @@ public class EventoCalendarioController {
     @Operation(summary = "Completar una tarea", description = "Marca una tarea propia como completada o pendiente.")
     public ResponseEntity<EventoCalendarioResponse> completar(
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
-            @PathVariable @Positive Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody CompletarEventoRequest request) {
         return ResponseEntity.ok(eventoService.completar(principal, id, request));
     }
@@ -144,8 +144,7 @@ public class EventoCalendarioController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Void> eliminar(
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
-            @PathVariable @Positive Long id) {
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable UUID id) {
         eventoService.eliminar(principal, id);
         return ResponseEntity.noContent().build();
     }

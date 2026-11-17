@@ -11,6 +11,7 @@ import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.events.NotificacionCreadaEvent;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
@@ -54,7 +55,7 @@ public class NotificacionServiceImpl implements NotificacionService {
 
     @Override
     @Transactional
-    public NotificacionResponse marcarLeida(UsuarioPrincipal actor, Long id) {
+    public NotificacionResponse marcarLeida(UsuarioPrincipal actor, UUID id) {
         Notificacion notificacion = buscarDelUsuario(actor, id);
         notificacion.setLeida(true);
         return NotificacionResponse.from(notificacionRepository.saveAndFlush(notificacion));
@@ -68,11 +69,11 @@ public class NotificacionServiceImpl implements NotificacionService {
 
     @Override
     @Transactional
-    public void eliminar(UsuarioPrincipal actor, Long id) {
+    public void eliminar(UsuarioPrincipal actor, UUID id) {
         notificacionRepository.delete(buscarDelUsuario(actor, id));
     }
 
-    private Notificacion buscarDelUsuario(UsuarioPrincipal actor, Long id) {
+    private Notificacion buscarDelUsuario(UsuarioPrincipal actor, UUID id) {
         return notificacionRepository
                 .findByIdAndUsuarioId(id, actor.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Notificación", "id", id));

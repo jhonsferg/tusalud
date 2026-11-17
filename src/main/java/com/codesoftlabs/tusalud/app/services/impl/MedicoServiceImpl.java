@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,7 +48,7 @@ public class MedicoServiceImpl implements MedicoService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public List<MedicoResponse> listar(Long especialidadId) {
+    public List<MedicoResponse> listar(UUID especialidadId) {
         List<Medico> medicos;
         if (especialidadId == null) {
             medicos = medicoRepository.findAllWithDetails();
@@ -61,7 +62,7 @@ public class MedicoServiceImpl implements MedicoService {
     }
 
     @Override
-    public MedicoResponse obtener(Long id) {
+    public MedicoResponse obtener(UUID id) {
         return medicoRepository
                 .findByIdWithDetails(id)
                 .map(MedicoResponse::from)
@@ -116,7 +117,7 @@ public class MedicoServiceImpl implements MedicoService {
 
     @Override
     @Transactional
-    public MedicoResponse actualizarEspecialidades(Long medicoId, MedicoEspecialidadesRequest request) {
+    public MedicoResponse actualizarEspecialidades(UUID medicoId, MedicoEspecialidadesRequest request) {
         Medico medico = medicoRepository
                 .findByIdWithDetails(medicoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Médico", "id", medicoId));
@@ -128,7 +129,7 @@ public class MedicoServiceImpl implements MedicoService {
     }
 
     @Override
-    public List<HorarioResponse> listarHorarios(Long medicoId) {
+    public List<HorarioResponse> listarHorarios(UUID medicoId) {
         verificarMedicoExiste(medicoId);
         return horarioRepository.findByMedicoId(medicoId).stream()
                 .map(HorarioResponse::from)
@@ -137,7 +138,7 @@ public class MedicoServiceImpl implements MedicoService {
 
     @Override
     @Transactional
-    public HorarioResponse agregarHorario(Long medicoId, HorarioRequest request) {
+    public HorarioResponse agregarHorario(UUID medicoId, HorarioRequest request) {
         Medico medico = medicoRepository
                 .findById(medicoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Médico", "id", medicoId));
@@ -177,7 +178,7 @@ public class MedicoServiceImpl implements MedicoService {
 
     @Override
     @Transactional
-    public void eliminarHorario(Long medicoId, Long horarioId) {
+    public void eliminarHorario(UUID medicoId, UUID horarioId) {
         Medico medico = medicoRepository
                 .findById(medicoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Médico", "id", medicoId));
@@ -191,13 +192,13 @@ public class MedicoServiceImpl implements MedicoService {
         log.info("Horario {} eliminado del médico {}", horarioId, medicoId);
     }
 
-    private Set<Especialidad> resolverEspecialidades(List<Long> ids) {
-        Set<Long> unicos = new LinkedHashSet<>(ids);
+    private Set<Especialidad> resolverEspecialidades(List<UUID> ids) {
+        Set<UUID> unicos = new LinkedHashSet<>(ids);
         List<Especialidad> encontradas = especialidadRepository.findAllById(unicos);
         if (encontradas.size() != unicos.size()) {
-            Set<Long> existentes = new HashSet<>();
+            Set<UUID> existentes = new HashSet<>();
             encontradas.forEach(e -> existentes.add(e.getId()));
-            Long faltante = unicos.stream()
+            UUID faltante = unicos.stream()
                     .filter(id -> !existentes.contains(id))
                     .findFirst()
                     .orElseThrow();
@@ -206,7 +207,7 @@ public class MedicoServiceImpl implements MedicoService {
         return new LinkedHashSet<>(encontradas);
     }
 
-    private void verificarMedicoExiste(Long medicoId) {
+    private void verificarMedicoExiste(UUID medicoId) {
         if (!medicoRepository.existsById(medicoId)) {
             throw new ResourceNotFoundException("Médico", "id", medicoId);
         }

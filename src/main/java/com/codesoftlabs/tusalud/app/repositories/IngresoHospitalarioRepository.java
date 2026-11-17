@@ -5,6 +5,7 @@ import com.codesoftlabs.tusalud.app.entities.enums.EstadoIngresoHosp;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoIngresoHosp;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface IngresoHospitalarioRepository extends JpaRepository<IngresoHospitalario, Long> {
+public interface IngresoHospitalarioRepository extends JpaRepository<IngresoHospitalario, UUID> {
 
     @Query("""
             SELECT i FROM IngresoHospitalario i
@@ -24,7 +25,7 @@ public interface IngresoHospitalarioRepository extends JpaRepository<IngresoHosp
             LEFT JOIN FETCH i.triajeRegistradoPor
             WHERE i.id = :id
             """)
-    Optional<IngresoHospitalario> findByIdConDetalle(@Param("id") Long id);
+    Optional<IngresoHospitalario> findByIdConDetalle(@Param("id") UUID id);
 
     @Query("""
             SELECT i FROM IngresoHospitalario i
@@ -62,7 +63,7 @@ public interface IngresoHospitalarioRepository extends JpaRepository<IngresoHosp
             WHERE p.usuario.id = :usuarioId
             ORDER BY i.fechaIngreso DESC
             """)
-    List<IngresoHospitalario> findDelUsuarioPaciente(@Param("usuarioId") Long usuarioId);
+    List<IngresoHospitalario> findDelUsuarioPaciente(@Param("usuarioId") UUID usuarioId);
 
     @Query("""
             SELECT i FROM IngresoHospitalario i
@@ -86,7 +87,7 @@ public interface IngresoHospitalarioRepository extends JpaRepository<IngresoHosp
             """)
     List<IngresoHospitalario> findEmergenciasActivas();
 
-    boolean existsByPacienteIdAndEstado(Long pacienteId, EstadoIngresoHosp estado);
+    boolean existsByPacienteIdAndEstado(UUID pacienteId, EstadoIngresoHosp estado);
 
     long countByEstado(EstadoIngresoHosp estado);
 

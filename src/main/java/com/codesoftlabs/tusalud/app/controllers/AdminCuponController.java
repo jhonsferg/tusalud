@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -75,7 +76,7 @@ public class AdminCuponController {
         return ResponseEntity.created(location).body(creado);
     }
 
-    @PutMapping("/{id:\\d+}")
+    @PutMapping("/{id}")
     @Operation(summary = "Actualizar cupón")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Cupón actualizado"),
@@ -93,12 +94,13 @@ public class AdminCuponController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<CuponResponse> actualizar(
-            @Parameter(description = "ID del cupón", example = "1") @PathVariable Long id,
+            @Parameter(description = "ID del cupón", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Valid @RequestBody CuponRequest request) {
         return ResponseEntity.ok(cuponService.actualizar(id, request));
     }
 
-    @DeleteMapping("/{id:\\d+}")
+    @DeleteMapping("/{id}")
     @Operation(
             summary = "Eliminar cupón",
             description = "Solo se puede eliminar un cupón que nunca fue utilizado (usos actuales en cero).")
@@ -114,7 +116,8 @@ public class AdminCuponController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Void> eliminar(
-            @Parameter(description = "ID del cupón", example = "1") @PathVariable Long id) {
+            @Parameter(description = "ID del cupón", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id) {
         cuponService.eliminar(id);
         return ResponseEntity.noContent().build();
     }

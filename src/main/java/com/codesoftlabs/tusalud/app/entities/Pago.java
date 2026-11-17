@@ -15,6 +15,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,8 +32,8 @@ import lombok.Setter;
 public class Pago {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cita_id", nullable = false, unique = true)

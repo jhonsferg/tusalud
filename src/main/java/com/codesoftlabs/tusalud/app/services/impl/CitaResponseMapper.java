@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ public class CitaResponseMapper {
     }
 
     public List<CitaResponse> mapear(Collection<Cita> citas) {
-        Map<Long, List<HorarioAtencion>> horariosPorMedico = new HashMap<>();
+        Map<UUID, List<HorarioAtencion>> horariosPorMedico = new HashMap<>();
         return citas.stream()
                 .map(cita -> CitaResponse.from(
                         cita,

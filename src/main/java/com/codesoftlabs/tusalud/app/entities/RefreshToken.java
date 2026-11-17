@@ -37,8 +37,8 @@ import org.hibernate.annotations.CreationTimestamp;
 public class RefreshToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)

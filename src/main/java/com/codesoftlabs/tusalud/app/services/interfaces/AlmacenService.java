@@ -11,6 +11,7 @@ import com.codesoftlabs.tusalud.app.entities.enums.TipoMovimiento;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public interface AlmacenService {
 
@@ -22,7 +23,7 @@ public interface AlmacenService {
 
     MovimientoResponse registrarAjuste(UsuarioPrincipal actor, AjusteRequest request);
 
-    List<MovimientoResponse> movimientos(Long productoId, TipoMovimiento tipo, LocalDate desde, LocalDate hasta);
+    List<MovimientoResponse> movimientos(UUID productoId, TipoMovimiento tipo, LocalDate desde, LocalDate hasta);
 
     AlertasInventarioResponse alertas();
 

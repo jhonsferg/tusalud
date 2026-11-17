@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class AtencionController {
 
     private final AtencionService atencionService;
 
-    @PostMapping("/{id:\\d+}/atencion")
+    @PostMapping("/{id}/atencion")
     @PreAuthorize("hasRole('MEDICO')")
     @Operation(
             summary = "Registrar atención",
@@ -62,13 +63,14 @@ public class AtencionController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<AtencionResponse> registrar(
-            @Parameter(description = "ID de la cita", example = "10") @PathVariable Long id,
+            @Parameter(description = "ID de la cita", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Valid @RequestBody AtencionRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.status(HttpStatus.CREATED).body(atencionService.registrar(id, request, principal));
     }
 
-    @PutMapping("/{id:\\d+}/atencion")
+    @PutMapping("/{id}/atencion")
     @PreAuthorize("hasRole('MEDICO')")
     @Operation(
             summary = "Editar atención",
@@ -89,13 +91,14 @@ public class AtencionController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<AtencionResponse> actualizar(
-            @Parameter(description = "ID de la cita", example = "10") @PathVariable Long id,
+            @Parameter(description = "ID de la cita", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Valid @RequestBody AtencionRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(atencionService.actualizar(id, request, principal));
     }
 
-    @GetMapping("/{id:\\d+}/atencion")
+    @GetMapping("/{id}/atencion")
     @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO', 'PACIENTE')")
     @Operation(
             summary = "Obtener atención",
@@ -112,7 +115,8 @@ public class AtencionController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<AtencionResponse> obtener(
-            @Parameter(description = "ID de la cita", example = "10") @PathVariable Long id,
+            @Parameter(description = "ID de la cita", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(atencionService.obtener(id, principal));
     }

@@ -5,18 +5,25 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Schema(description = "Atención médica registrada para una cita")
 public record AtencionResponse(
-        @Schema(example = "3") Long id,
-        @Schema(example = "10") Long citaId,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID id,
+
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID citaId,
 
         @Schema(type = "string", example = "2026-10-19T09:30:00")
         LocalDateTime fecha,
 
         @Schema(example = "Luis García") String medicoNombre,
         @Schema(example = "Cardiología") String especialidad,
-        @Schema(example = "1") Long pacienteId,
+
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID pacienteId,
+
         @Schema(example = "Juan Pérez") String pacienteNombre,
         @Schema(example = "Hipertensión arterial leve") String diagnostico,
         @Schema(example = "Control con dieta baja en sal") String tratamiento,

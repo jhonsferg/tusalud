@@ -2,9 +2,10 @@ package com.codesoftlabs.tusalud.app.dto.response;
 
 import com.codesoftlabs.tusalud.app.entities.DispensacionItem;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record DispensacionItemResponse(
-        Long productoId,
+        UUID productoId,
         String productoNombre,
         int cantidad,
         BigDecimal precioUnitario,

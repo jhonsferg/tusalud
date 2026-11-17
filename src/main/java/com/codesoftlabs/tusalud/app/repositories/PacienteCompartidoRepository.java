@@ -3,23 +3,24 @@ package com.codesoftlabs.tusalud.app.repositories;
 import com.codesoftlabs.tusalud.app.entities.PacienteCompartido;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PacienteCompartidoRepository extends JpaRepository<PacienteCompartido, Long> {
+public interface PacienteCompartidoRepository extends JpaRepository<PacienteCompartido, UUID> {
 
-    boolean existsByPacienteIdAndMedicoDestinoId(Long pacienteId, Long medicoDestinoId);
+    boolean existsByPacienteIdAndMedicoDestinoId(UUID pacienteId, UUID medicoDestinoId);
 
     @Query("""
             SELECT COUNT(pc) > 0 FROM PacienteCompartido pc
             WHERE pc.paciente.id = :pacienteId AND pc.medicoDestino.usuario.id = :usuarioId
             """)
-    boolean existsParaUsuario(@Param("pacienteId") Long pacienteId, @Param("usuarioId") Long usuarioId);
+    boolean existsParaUsuario(@Param("pacienteId") UUID pacienteId, @Param("usuarioId") UUID usuarioId);
 
-    Optional<PacienteCompartido> findByPacienteIdAndMedicoDestinoId(Long pacienteId, Long medicoDestinoId);
+    Optional<PacienteCompartido> findByPacienteIdAndMedicoDestinoId(UUID pacienteId, UUID medicoDestinoId);
 
     @Query("""
             SELECT DISTINCT pc FROM PacienteCompartido pc
@@ -30,7 +31,7 @@ public interface PacienteCompartidoRepository extends JpaRepository<PacienteComp
             WHERE pc.paciente.id = :pacienteId
             ORDER BY pc.createdAt DESC
             """)
-    List<PacienteCompartido> findByPacienteIdConDetalle(@Param("pacienteId") Long pacienteId);
+    List<PacienteCompartido> findByPacienteIdConDetalle(@Param("pacienteId") UUID pacienteId);
 
     @Query("""
             SELECT pc FROM PacienteCompartido pc
@@ -41,5 +42,5 @@ public interface PacienteCompartidoRepository extends JpaRepository<PacienteComp
             WHERE pc.medicoDestino.usuario.id = :usuarioId
             ORDER BY pc.createdAt DESC
             """)
-    List<PacienteCompartido> findParaUsuarioConDetalle(@Param("usuarioId") Long usuarioId);
+    List<PacienteCompartido> findParaUsuarioConDetalle(@Param("usuarioId") UUID usuarioId);
 }

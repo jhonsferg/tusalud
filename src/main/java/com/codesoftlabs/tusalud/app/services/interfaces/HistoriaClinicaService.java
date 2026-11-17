@@ -6,6 +6,7 @@ import com.codesoftlabs.tusalud.app.dto.response.PacienteHistoriaResponse;
 import com.codesoftlabs.tusalud.app.dto.response.PacienteMedicoResponse;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.util.List;
+import java.util.UUID;
 
 public interface HistoriaClinicaService {
 
@@ -13,7 +14,7 @@ public interface HistoriaClinicaService {
 
     PacienteHistoriaResponse actualizarDatosMedicos(UsuarioPrincipal paciente, DatosMedicosRequest request);
 
-    HistoriaClinicaResponse obtenerDePaciente(Long pacienteId, UsuarioPrincipal actor);
+    HistoriaClinicaResponse obtenerDePaciente(UUID pacienteId, UsuarioPrincipal actor);
 
     List<PacienteMedicoResponse> listarPacientesDeMedico(UsuarioPrincipal medico);
 }

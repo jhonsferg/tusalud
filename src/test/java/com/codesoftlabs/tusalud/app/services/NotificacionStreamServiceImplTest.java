@@ -6,6 +6,7 @@ import com.codesoftlabs.tusalud.app.dto.response.NotificacionResponse;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionStreamService;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +22,7 @@ class NotificacionStreamServiceImplTest {
 
     private static NotificacionResponse aviso() {
         return new NotificacionResponse(
-                1L,
+                UUID.randomUUID(),
                 TipoNotificacion.CITA_CONFIRMADA,
                 "Cita confirmada",
                 "Mensaje",
@@ -34,12 +35,12 @@ class NotificacionStreamServiceImplTest {
     void registraSuscriptoresYPublicaSinFallarSiNoHayConexionActiva() {
         int antes = streamService.suscriptoresActivos();
 
-        SseEmitter emisor = streamService.suscribir(987_654L);
+        SseEmitter emisor = streamService.suscribir(UUID.randomUUID());
 
         assertThat(emisor).isNotNull();
         assertThat(streamService.suscriptoresActivos()).isGreaterThanOrEqualTo(antes);
-        streamService.publicar(987_654L, aviso());
-        streamService.publicar(111_111L, aviso());
+        streamService.publicar(UUID.randomUUID(), aviso());
+        streamService.publicar(UUID.randomUUID(), aviso());
         streamService.enviarLatido();
         emisor.complete();
     }

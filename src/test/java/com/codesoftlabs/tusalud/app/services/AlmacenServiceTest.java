@@ -40,6 +40,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +105,7 @@ class AlmacenServiceTest {
                 true));
     }
 
-    private IngresoResponse ingreso(Long productoId, String lote, int dias, int cantidad) {
+    private IngresoResponse ingreso(UUID productoId, String lote, int dias, int cantidad) {
         return almacenService.registrarIngreso(
                 almacen,
                 new IngresoRequest(
@@ -120,7 +121,7 @@ class AlmacenServiceTest {
                                 "Estante"))));
     }
 
-    private Lote vencer(Long loteId, int diasAtras) {
+    private Lote vencer(UUID loteId, int diasAtras) {
         Lote lote = loteRepository.findById(loteId).orElseThrow();
         lote.setFechaVencimiento(LocalDate.now().minusDays(diasAtras));
         return loteRepository.saveAndFlush(lote);
@@ -270,7 +271,7 @@ class AlmacenServiceTest {
     void elAjustePositivoSumaStockAUnLoteVigenteYRechazaLosVencidos() {
         ProductoResponse producto = producto("g", TipoProducto.INSUMO, 1);
         IngresoResponse ingreso = ingreso(producto.id(), "AJ", 100, 5);
-        Long loteId = ingreso.items().get(0).id();
+        UUID loteId = ingreso.items().get(0).id();
 
         MovimientoResponse movimiento = almacenService.registrarAjuste(almacen, new AjusteRequest(loteId, 3, "Conteo"));
 
@@ -281,7 +282,7 @@ class AlmacenServiceTest {
         vencer(loteId, 1);
         assertThatThrownBy(() -> almacenService.registrarAjuste(almacen, new AjusteRequest(loteId, 1, null)))
                 .isInstanceOf(ConflictException.class);
-        assertThatThrownBy(() -> almacenService.registrarAjuste(almacen, new AjusteRequest(999999L, 1, null)))
+        assertThatThrownBy(() -> almacenService.registrarAjuste(almacen, new AjusteRequest(UUID.randomUUID(), 1, null)))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 

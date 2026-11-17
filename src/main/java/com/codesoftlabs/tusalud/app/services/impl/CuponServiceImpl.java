@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +52,7 @@ public class CuponServiceImpl implements CuponService {
 
     @Override
     @Transactional
-    public CuponResponse actualizar(Long id, CuponRequest request) {
+    public CuponResponse actualizar(UUID id, CuponRequest request) {
         Cupon cupon = buscar(id);
         String codigo = normalizar(request.codigo());
         if (cuponRepository.existsByCodigoAndIdNot(codigo, id)) {
@@ -64,7 +65,7 @@ public class CuponServiceImpl implements CuponService {
 
     @Override
     @Transactional
-    public void eliminar(Long id) {
+    public void eliminar(UUID id) {
         Cupon cupon = buscar(id);
         if (cupon.getUsosActuales() > 0) {
             throw new ConflictException("No se puede eliminar un cupón que ya fue utilizado");
@@ -106,7 +107,7 @@ public class CuponServiceImpl implements CuponService {
         return cupon;
     }
 
-    private Cupon buscar(Long id) {
+    private Cupon buscar(UUID id) {
         return cuponRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cupón", "id", id));
     }
 

@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +136,7 @@ class RecepcionServiceTest {
         assertThatThrownBy(() -> recepcionService.registrarLlegada(atendida.getId()))
                 .isInstanceOf(ConflictException.class);
 
-        assertThatThrownBy(() -> recepcionService.registrarLlegada(999_999L))
+        assertThatThrownBy(() -> recepcionService.registrarLlegada(UUID.randomUUID()))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -153,7 +154,7 @@ class RecepcionServiceTest {
 
         List<TurnoResponse> cola = recepcionService.cola(null, null, recepcion);
         assertThat(cola).extracting(TurnoResponse::numero).containsExactly("U-001", "P-001", "A-001", "A-002");
-        assertThat(recepcionService.cola(null, medico.getId() + 1_000, admin)).isEmpty();
+        assertThat(recepcionService.cola(null, UUID.randomUUID(), admin)).isEmpty();
     }
 
     @Test

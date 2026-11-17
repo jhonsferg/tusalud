@@ -5,10 +5,11 @@ import com.codesoftlabs.tusalud.app.entities.enums.TipoEvolucion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Schema(description = "Nota de evolución de un ingreso")
 public record EvolucionHospResponse(
-        Long id,
+        UUID id,
         @Schema(example = "MEDICA") TipoEvolucion tipo,
         String nota,
         String presionArterial,

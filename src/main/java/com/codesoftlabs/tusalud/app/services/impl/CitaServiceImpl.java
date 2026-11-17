@@ -43,6 +43,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +60,7 @@ public class CitaServiceImpl implements CitaService {
     private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final int DIAS_RANGO_POR_DEFECTO = 30;
-    private static final Long NINGUNA_CITA = 0L;
+    private static final UUID NINGUNA_CITA = new UUID(0L, 0L);
 
     private static final Set<EstadoCita> ESTADOS_CANCELABLES = EnumSet.of(EstadoCita.PENDIENTE, EstadoCita.CONFIRMADA);
     private static final Set<EstadoCita> ESTADOS_ATENDIBLES = EnumSet.of(EstadoCita.PENDIENTE, EstadoCita.CONFIRMADA);
@@ -156,7 +157,7 @@ public class CitaServiceImpl implements CitaService {
     }
 
     @Override
-    public CitaResponse obtenerCita(Long citaId, UsuarioPrincipal actor) {
+    public CitaResponse obtenerCita(UUID citaId, UsuarioPrincipal actor) {
         Cita cita = buscarCita(citaId);
         if (!esAdmin(actor) && !esPacienteDe(cita, actor) && !esMedicoDe(cita, actor)) {
             throw new ForbiddenOperationException("No tiene permiso para ver esta cita");
@@ -166,7 +167,7 @@ public class CitaServiceImpl implements CitaService {
 
     @Override
     @Transactional
-    public CitaResponse cancelarCita(Long citaId, UsuarioPrincipal actor) {
+    public CitaResponse cancelarCita(UUID citaId, UsuarioPrincipal actor) {
         Cita cita = buscarCita(citaId);
         boolean admin = esAdmin(actor);
         if (!admin && !esPacienteDe(cita, actor)) {
@@ -201,7 +202,7 @@ public class CitaServiceImpl implements CitaService {
 
     @Override
     @Transactional
-    public CitaResponse confirmarCita(Long citaId, UsuarioPrincipal actor) {
+    public CitaResponse confirmarCita(UUID citaId, UsuarioPrincipal actor) {
         Cita cita = buscarCita(citaId);
         if (!esAdmin(actor) && !esMedicoDe(cita, actor)) {
             throw new ForbiddenOperationException("Solo el médico de la cita o un administrador pueden confirmarla");
@@ -222,7 +223,7 @@ public class CitaServiceImpl implements CitaService {
 
     @Override
     @Transactional
-    public CitaResponse atenderCita(Long citaId, UsuarioPrincipal actor) {
+    public CitaResponse atenderCita(UUID citaId, UsuarioPrincipal actor) {
         Cita cita = buscarCita(citaId);
         if (!esMedicoDe(cita, actor)) {
             throw new ForbiddenOperationException("Solo el médico de la cita puede marcarla como atendida");
@@ -243,7 +244,7 @@ public class CitaServiceImpl implements CitaService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CitaResponse reprogramarCita(Long citaId, ReprogramarRequest request, UsuarioPrincipal actor) {
+    public CitaResponse reprogramarCita(UUID citaId, ReprogramarRequest request, UsuarioPrincipal actor) {
         Cita cita = buscarCita(citaId);
         if (!esAdmin(actor) && !esPacienteDe(cita, actor)) {
             throw new ForbiddenOperationException(
@@ -305,7 +306,7 @@ public class CitaServiceImpl implements CitaService {
     }
 
     @Override
-    public DisponibilidadResponse consultarDisponibilidad(Long medicoId, LocalDate fecha) {
+    public DisponibilidadResponse consultarDisponibilidad(UUID medicoId, LocalDate fecha) {
         Medico medico = medicoRepository
                 .findByIdWithDetails(medicoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Médico", "id", medicoId));
@@ -337,7 +338,7 @@ public class CitaServiceImpl implements CitaService {
 
     @Override
     public List<DisponibilidadRangoResponse> consultarDisponibilidadRango(
-            Long medicoId, LocalDate inicio, LocalDate fin) {
+            UUID medicoId, LocalDate inicio, LocalDate fin) {
         validarRangoCalendario(inicio, fin);
         Medico medico = medicoRepository
                 .findById(medicoId)
@@ -427,7 +428,7 @@ public class CitaServiceImpl implements CitaService {
         }
     }
 
-    private void validarDisponibilidad(Medico medico, Paciente paciente, LocalDateTime fechaHora, Long citaExcluida) {
+    private void validarDisponibilidad(Medico medico, Paciente paciente, LocalDateTime fechaHora, UUID citaExcluida) {
         DayOfWeek dia = fechaHora.getDayOfWeek();
         List<HorarioAtencion> horarios = horarioRepository.findByMedicoAndDia(medico.getId(), dia);
         if (horarios.isEmpty()) {
@@ -470,7 +471,7 @@ public class CitaServiceImpl implements CitaService {
         }
     }
 
-    private Cita buscarCita(Long citaId) {
+    private Cita buscarCita(UUID citaId) {
         return citaRepository
                 .findByIdWithDetails(citaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cita", "id", citaId));

@@ -6,6 +6,7 @@ import com.codesoftlabs.tusalud.app.services.interfaces.InventarioService;
 import com.codesoftlabs.tusalud.app.services.interfaces.InventarioService.StockProducto;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,7 @@ public class ProductoResponseMapper {
     private final InventarioService inventarioService;
 
     public List<ProductoResponse> aRespuestas(List<Producto> productos) {
-        Map<Long, StockProducto> stock = inventarioService.stockDe(
+        Map<UUID, StockProducto> stock = inventarioService.stockDe(
                 productos.stream().map(Producto::getId).toList());
         return productos.stream()
                 .map(producto -> {

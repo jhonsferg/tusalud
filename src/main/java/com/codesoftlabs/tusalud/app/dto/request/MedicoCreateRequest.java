@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.util.List;
+import java.util.UUID;
 
 @Schema(description = "Alta de un médico (crea también su usuario con ROLE_MEDICO)")
 public record MedicoCreateRequest(
@@ -44,4 +45,4 @@ public record MedicoCreateRequest(
         String consultorio,
 
         @Schema(example = "[1, 3]") @NotEmpty(message = "Indique al menos una especialidad")
-        List<@NotNull(message = "La especialidad es obligatoria") Long> especialidadIds) {}
+        List<@NotNull(message = "La especialidad es obligatoria") UUID> especialidadIds) {}

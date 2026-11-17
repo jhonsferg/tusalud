@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -78,7 +79,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     @Override
     @Transactional(readOnly = true)
     public List<CamaResponse> listarCamas(AreaCama area, EstadoCama estado) {
-        Map<Long, IngresoHospitalario> ocupantes = ocupantesPorCama();
+        Map<UUID, IngresoHospitalario> ocupantes = ocupantesPorCama();
         return camaRepository.findAllByOrderByAreaAscCodigoAsc().stream()
                 .filter(cama -> area == null || cama.getArea() == area)
                 .filter(cama -> estado == null || cama.getEstado() == estado)
@@ -98,7 +99,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     }
 
     @Override
-    public CamaResponse actualizarCama(Long id, CamaRequest request) {
+    public CamaResponse actualizarCama(UUID id, CamaRequest request) {
         Cama cama = buscarCama(id);
         String codigo = normalizarCodigo(request.codigo());
         camaRepository
@@ -116,7 +117,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     }
 
     @Override
-    public CamaResponse cambiarEstadoCama(Long id, CamaEstadoRequest request) {
+    public CamaResponse cambiarEstadoCama(UUID id, CamaEstadoRequest request) {
         Cama cama = buscarCama(id);
         EstadoCama nuevo = request.estado();
         if (cama.getEstado() == EstadoCama.OCUPADA && nuevo != EstadoCama.OCUPADA) {
@@ -177,7 +178,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
 
     @Override
     @Transactional(readOnly = true)
-    public IngresoHospResponse obtenerIngreso(UsuarioPrincipal actor, Long id) {
+    public IngresoHospResponse obtenerIngreso(UsuarioPrincipal actor, UUID id) {
         IngresoHospitalario ingreso = buscarIngreso(id);
         if (!esPersonalClinico(actor) && !esDuenio(actor, ingreso)) {
             throw new ForbiddenOperationException("No tiene acceso a este ingreso");
@@ -186,7 +187,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     }
 
     @Override
-    public IngresoHospResponse trasladar(Long id, CamaAsignacionRequest request) {
+    public IngresoHospResponse trasladar(UUID id, CamaAsignacionRequest request) {
         IngresoHospitalario ingreso = buscarIngresoActivo(id);
         Cama actual = ingreso.getCama();
         if (actual == null) {
@@ -205,7 +206,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     }
 
     @Override
-    public IngresoHospResponse asignarCama(Long id, CamaAsignacionRequest request) {
+    public IngresoHospResponse asignarCama(UUID id, CamaAsignacionRequest request) {
         IngresoHospitalario ingreso = buscarIngresoActivo(id);
         if (ingreso.getTipo() != TipoIngresoHosp.EMERGENCIA || ingreso.getCama() != null) {
             throw new ConflictException("Solo una emergencia sin cama puede recibir una asignación");
@@ -223,7 +224,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     }
 
     @Override
-    public IngresoHospResponse darAlta(Long id, AltaHospRequest request) {
+    public IngresoHospResponse darAlta(UUID id, AltaHospRequest request) {
         IngresoHospitalario ingreso = buscarIngresoActivo(id);
         LocalDateTime ahora = LocalDateTime.now();
         Cama cama = ingreso.getCama();
@@ -249,7 +250,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     }
 
     @Override
-    public IngresoHospResponse cancelarIngreso(Long id) {
+    public IngresoHospResponse cancelarIngreso(UUID id) {
         IngresoHospitalario ingreso = buscarIngresoActivo(id);
         if (evolucionRepository.countByIngresoId(id) > 0) {
             throw new ConflictException("El ingreso ya tiene evoluciones registradas y no se puede cancelar");
@@ -266,7 +267,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
 
     @Override
     public EvolucionHospResponse registrarEvolucion(
-            UsuarioPrincipal actor, Long ingresoId, EvolucionHospRequest request) {
+            UsuarioPrincipal actor, UUID ingresoId, EvolucionHospRequest request) {
         IngresoHospitalario ingreso = buscarIngresoActivo(ingresoId);
         RolNombre requerido =
                 request.tipo() == TipoEvolucion.MEDICA ? RolNombre.ROLE_MEDICO : RolNombre.ROLE_ENFERMERIA;
@@ -295,7 +296,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<EvolucionHospResponse> listarEvoluciones(UsuarioPrincipal actor, Long ingresoId) {
+    public List<EvolucionHospResponse> listarEvoluciones(UsuarioPrincipal actor, UUID ingresoId) {
         IngresoHospitalario ingreso = buscarIngreso(ingresoId);
         boolean personal = esPersonalClinico(actor);
         if (!personal && !esDuenio(actor, ingreso)) {
@@ -370,7 +371,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     @Override
     @Transactional(readOnly = true)
     public MapaCamasResponse mapa() {
-        Map<Long, IngresoHospitalario> ocupantes = ocupantesPorCama();
+        Map<UUID, IngresoHospitalario> ocupantes = ocupantesPorCama();
         Map<AreaCama, List<CamaResponse>> porArea = new EnumMap<>(AreaCama.class);
         for (AreaCama area : AreaCama.values()) {
             porArea.put(area, new java.util.ArrayList<>());
@@ -424,7 +425,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
 
     private IngresoHospitalario guardarConCodigo(IngresoHospitalario nuevo) {
         IngresoHospitalario guardado = ingresoRepository.saveAndFlush(nuevo);
-        guardado.setCodigo(String.format("HOS-%06d", guardado.getId()));
+        guardado.setCodigo(String.format("HOS-%06d", ingresoRepository.count()));
         return guardado;
     }
 
@@ -446,13 +447,13 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
         cama.setActiva(request.activa() == null || request.activa());
     }
 
-    private Map<Long, IngresoHospitalario> ocupantesPorCama() {
+    private Map<UUID, IngresoHospitalario> ocupantesPorCama() {
         return ingresoRepository.findActivosConCama().stream()
                 .collect(Collectors.toMap(
                         ingreso -> ingreso.getCama().getId(), Function.identity(), (a, b) -> a, HashMap::new));
     }
 
-    private static CamaResponse respuesta(Cama cama, Map<Long, IngresoHospitalario> ocupantes) {
+    private static CamaResponse respuesta(Cama cama, Map<UUID, IngresoHospitalario> ocupantes) {
         IngresoHospitalario ocupante = ocupantes.get(cama.getId());
         return CamaResponse.from(
                 cama,
@@ -460,11 +461,11 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
                 ocupante == null ? null : ocupante.getPaciente().getUsuario().getNombreCompleto());
     }
 
-    private Cama buscarCama(Long id) {
+    private Cama buscarCama(UUID id) {
         return camaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cama", "id", id));
     }
 
-    private Cama buscarCamaLibre(Long id) {
+    private Cama buscarCamaLibre(UUID id) {
         Cama cama = buscarCama(id);
         if (!cama.isActiva()) {
             throw new ConflictException("La cama " + cama.getCodigo() + " está desactivada");
@@ -475,19 +476,19 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
         return cama;
     }
 
-    private Paciente buscarPaciente(Long id) {
+    private Paciente buscarPaciente(UUID id) {
         return pacienteRepository
                 .findByIdWithUsuario(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Paciente", "id", id));
     }
 
-    private IngresoHospitalario buscarIngreso(Long id) {
+    private IngresoHospitalario buscarIngreso(UUID id) {
         return ingresoRepository
                 .findByIdConDetalle(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ingreso hospitalario", "id", id));
     }
 
-    private IngresoHospitalario buscarIngresoActivo(Long id) {
+    private IngresoHospitalario buscarIngresoActivo(UUID id) {
         IngresoHospitalario ingreso = buscarIngreso(id);
         if (ingreso.getEstado() != EstadoIngresoHosp.ACTIVO) {
             throw new ConflictException("El ingreso " + ingreso.getCodigo() + " ya no está activo");
@@ -501,7 +502,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
         }
     }
 
-    private Medico resolverMedico(UsuarioPrincipal actor, Long medicoId) {
+    private Medico resolverMedico(UsuarioPrincipal actor, UUID medicoId) {
         if (tieneRol(actor, RolNombre.ROLE_MEDICO)) {
             return medicoRepository
                     .findByUsuarioEmail(actor.getEmail())

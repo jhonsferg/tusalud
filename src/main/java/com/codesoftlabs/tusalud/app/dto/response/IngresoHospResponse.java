@@ -8,19 +8,22 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Schema(description = "Ingreso hospitalario o de emergencia")
 public record IngresoHospResponse(
-        @Schema(example = "1") Long id,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID id,
+
         @Schema(example = "HOS-000001") String codigo,
         @Schema(example = "PROGRAMADO") TipoIngresoHosp tipo,
         @Schema(example = "ACTIVO") EstadoIngresoHosp estado,
-        Long pacienteId,
+        UUID pacienteId,
         String pacienteNombre,
         String dni,
-        Long camaId,
+        UUID camaId,
         String camaCodigo,
-        Long medicoId,
+        UUID medicoId,
         String medicoNombre,
         String motivo,
         String diagnosticoIngreso,

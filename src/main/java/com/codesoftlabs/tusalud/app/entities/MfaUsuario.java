@@ -11,6 +11,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,8 +31,8 @@ import org.hibernate.annotations.CreationTimestamp;
 public class MfaUsuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)

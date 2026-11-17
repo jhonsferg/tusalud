@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -74,7 +75,7 @@ class MedicoEspecialidadServiceImplTest {
 
     @Test
     void crearMedicoYValidarDuplicados() {
-        Long especialidadId = fixture.especialidad().getId();
+        UUID especialidadId = fixture.especialidad().getId();
         int n = ServiceTestFixture.siguiente();
         MedicoCreateRequest request = new MedicoCreateRequest(
                 "Ana",
@@ -94,14 +95,14 @@ class MedicoEspecialidadServiceImplTest {
                 .extracting(MedicoResponse::id)
                 .containsExactly(medico.id());
         assertThatThrownBy(() -> medicoService.crear(request)).isInstanceOf(ConflictException.class);
-        assertThatThrownBy(() -> medicoService.listar(-1L)).isInstanceOf(ResourceNotFoundException.class);
+        assertThatThrownBy(() -> medicoService.listar(UUID.randomUUID())).isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
     void actualizarEspecialidadesReemplazaLasDelMedico() {
         Medico medico = fixture.medicoConHorarioLunes(BigDecimal.TEN);
-        Long nueva = fixture.especialidad().getId();
-        Long otra = fixture.especialidad().getId();
+        UUID nueva = fixture.especialidad().getId();
+        UUID otra = fixture.especialidad().getId();
 
         MedicoResponse actualizado = medicoService.actualizarEspecialidades(
                 medico.getId(), new MedicoEspecialidadesRequest(List.of(nueva, otra, nueva)));
@@ -111,17 +112,17 @@ class MedicoEspecialidadServiceImplTest {
                 .containsExactlyInAnyOrder(nueva, otra);
         assertThat(medicoService.listar(nueva)).extracting(MedicoResponse::id).contains(medico.getId());
         assertThatThrownBy(() -> medicoService.actualizarEspecialidades(
-                        medico.getId(), new MedicoEspecialidadesRequest(List.of(-5L))))
+                        medico.getId(), new MedicoEspecialidadesRequest(List.of(UUID.randomUUID()))))
                 .isInstanceOf(ResourceNotFoundException.class);
-        assertThatThrownBy(() ->
-                        medicoService.actualizarEspecialidades(-1L, new MedicoEspecialidadesRequest(List.of(nueva))))
+        assertThatThrownBy(() -> medicoService.actualizarEspecialidades(
+                        UUID.randomUUID(), new MedicoEspecialidadesRequest(List.of(nueva))))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test
     void agregarYEliminarHorarioConValidaciones() {
         Medico medico = fixture.medicoConHorarioLunes(BigDecimal.TEN);
-        Long id = medico.getId();
+        UUID id = medico.getId();
 
         assertThatThrownBy(() -> medicoService.agregarHorario(
                         id, new HorarioRequest(DayOfWeek.TUESDAY, LocalTime.of(10, 0), LocalTime.of(9, 0), 30)))

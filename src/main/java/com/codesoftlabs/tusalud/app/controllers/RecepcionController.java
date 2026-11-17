@@ -23,9 +23,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -77,7 +77,7 @@ public class RecepcionController {
                 description = "La llegada ya fue registrada o la cita no corresponde a hoy",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<TurnoResponse> registrarLlegada(@PathVariable @Positive Long id) {
+    public ResponseEntity<TurnoResponse> registrarLlegada(@PathVariable UUID id) {
         TurnoResponse turno = recepcionService.registrarLlegada(id);
         return ResponseEntity.created(ubicacionTurno(turno.id())).body(turno);
     }
@@ -107,7 +107,7 @@ public class RecepcionController {
     public ResponseEntity<List<TurnoResponse>> cola(
             @Parameter(description = "Estado del turno") @RequestParam(required = false) EstadoTurno estado,
             @Parameter(description = "Médico, solo para recepción y administración") @RequestParam(required = false)
-                    Long medicoId,
+                    UUID medicoId,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(recepcionService.cola(estado, medicoId, principal));
     }
@@ -123,8 +123,7 @@ public class RecepcionController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<TurnoResponse> llamar(
-            @PathVariable @Positive Long id,
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
+            @PathVariable UUID id, @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(recepcionService.llamar(id, principal));
     }
 
@@ -133,8 +132,7 @@ public class RecepcionController {
     @Operation(summary = "Iniciar la atención de un turno", description = "Solo el médico asignado al turno.")
     @ApiResponse(responseCode = "200", description = "Atención iniciada")
     public ResponseEntity<TurnoResponse> iniciar(
-            @PathVariable @Positive Long id,
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
+            @PathVariable UUID id, @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(recepcionService.iniciar(id, principal));
     }
 
@@ -143,8 +141,7 @@ public class RecepcionController {
     @Operation(summary = "Finalizar la atención de un turno", description = "Solo el médico asignado al turno.")
     @ApiResponse(responseCode = "200", description = "Turno atendido")
     public ResponseEntity<TurnoResponse> finalizar(
-            @PathVariable @Positive Long id,
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
+            @PathVariable UUID id, @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(recepcionService.finalizar(id, principal));
     }
 
@@ -153,8 +150,7 @@ public class RecepcionController {
     @Operation(summary = "Marcar a un paciente como ausente", description = "Para turnos en espera o llamados.")
     @ApiResponse(responseCode = "200", description = "Turno marcado como ausente")
     public ResponseEntity<TurnoResponse> ausente(
-            @PathVariable @Positive Long id,
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
+            @PathVariable UUID id, @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(recepcionService.marcarAusente(id, principal));
     }
 
@@ -163,8 +159,7 @@ public class RecepcionController {
     @Operation(summary = "Cancelar un turno", description = "Para turnos en espera o llamados.")
     @ApiResponse(responseCode = "200", description = "Turno cancelado")
     public ResponseEntity<TurnoResponse> cancelar(
-            @PathVariable @Positive Long id,
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
+            @PathVariable UUID id, @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(recepcionService.cancelar(id, principal));
     }
 
@@ -239,7 +234,7 @@ public class RecepcionController {
         return ResponseEntity.created(location).body(cita);
     }
 
-    private static URI ubicacionTurno(Long id) {
+    private static URI ubicacionTurno(UUID id) {
         return ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/api/v1/recepcion/cola")
                 .queryParam("turnoId", id)

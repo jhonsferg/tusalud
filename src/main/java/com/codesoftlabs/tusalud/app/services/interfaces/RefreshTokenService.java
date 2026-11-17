@@ -13,11 +13,11 @@ public interface RefreshTokenService {
 
     void revocarFamilia(UUID familia);
 
-    void revocarDeSesion(Long sesionId);
+    void revocarDeSesion(UUID sesionId);
 
-    void revocarDeUsuario(Long usuarioId);
+    void revocarDeUsuario(UUID usuarioId);
 
-    void revocarDeUsuarioExceptoSesion(Long usuarioId, UUID tokenIdActual);
+    void revocarDeUsuarioExceptoSesion(UUID usuarioId, UUID tokenIdActual);
 
     long getRefreshExpirationMs();
 }

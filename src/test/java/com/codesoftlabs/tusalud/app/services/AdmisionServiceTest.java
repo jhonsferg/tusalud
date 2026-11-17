@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,7 +198,7 @@ class AdmisionServiceTest {
     @Test
     void reservarParaUnPacienteInexistenteResponde404() {
         CitaMostradorRequest solicitud = new CitaMostradorRequest(
-                999_999L,
+                UUID.randomUUID(),
                 medico.getId(),
                 medico.getEspecialidades().iterator().next().getId(),
                 proximoLunes(9, 30),

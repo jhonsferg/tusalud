@@ -4,10 +4,11 @@ import com.codesoftlabs.tusalud.app.entities.SesionCaja;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoCaja;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record SesionCajaResponse(
-        Long id,
-        Long cajeroId,
+        UUID id,
+        UUID cajeroId,
         String cajeroNombre,
         LocalDateTime apertura,
         BigDecimal montoApertura,

@@ -3,6 +3,7 @@ package com.codesoftlabs.tusalud.app.services.interfaces;
 import com.codesoftlabs.tusalud.app.dto.request.ProveedorRequest;
 import com.codesoftlabs.tusalud.app.dto.response.ProveedorResponse;
 import java.util.List;
+import java.util.UUID;
 
 public interface ProveedorService {
 
@@ -10,5 +11,5 @@ public interface ProveedorService {
 
     ProveedorResponse crear(ProveedorRequest request);
 
-    ProveedorResponse actualizar(Long id, ProveedorRequest request);
+    ProveedorResponse actualizar(UUID id, ProveedorRequest request);
 }

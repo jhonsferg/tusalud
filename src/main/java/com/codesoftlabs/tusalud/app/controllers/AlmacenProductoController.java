@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,19 +51,19 @@ public class AlmacenProductoController {
         return ResponseEntity.ok(productoService.listar(principal, q, tipo, bajoStock, activo));
     }
 
-    @GetMapping("/{id:\\d+}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ALMACEN', 'ADMIN', 'FARMACIA', 'LABORATORIO')")
     @Operation(summary = "Obtener producto")
     public ResponseEntity<ProductoResponse> obtener(
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable Long id) {
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable UUID id) {
         return ResponseEntity.ok(productoService.obtener(principal, id));
     }
 
-    @GetMapping("/{id:\\d+}/lotes")
+    @GetMapping("/{id}/lotes")
     @PreAuthorize("hasAnyRole('ALMACEN', 'ADMIN', 'FARMACIA', 'LABORATORIO')")
     @Operation(summary = "Listar lotes de un producto", description = "Ordenados por fecha de vencimiento.")
     public ResponseEntity<List<LoteResponse>> lotes(
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable Long id) {
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable UUID id) {
         return ResponseEntity.ok(productoService.lotes(principal, id));
     }
 
@@ -78,11 +79,11 @@ public class AlmacenProductoController {
         return ResponseEntity.created(location).body(creado);
     }
 
-    @PutMapping("/{id:\\d+}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ALMACEN', 'ADMIN')")
     @Operation(summary = "Actualizar producto")
     public ResponseEntity<ProductoResponse> actualizar(
-            @PathVariable Long id, @Valid @RequestBody ProductoRequest request) {
+            @PathVariable UUID id, @Valid @RequestBody ProductoRequest request) {
         return ResponseEntity.ok(productoService.actualizar(id, request));
     }
 }

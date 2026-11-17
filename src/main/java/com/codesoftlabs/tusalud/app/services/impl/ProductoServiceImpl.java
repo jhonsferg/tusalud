@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,7 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
-    public ProductoResponse obtener(UsuarioPrincipal actor, Long id) {
+    public ProductoResponse obtener(UsuarioPrincipal actor, UUID id) {
         return mapper.aRespuesta(buscarVisible(actor, id));
     }
 
@@ -69,7 +70,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional
-    public ProductoResponse actualizar(Long id, ProductoRequest request) {
+    public ProductoResponse actualizar(UUID id, ProductoRequest request) {
         Producto producto =
                 productoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Producto", "id", id));
         String codigo = normalizarCodigo(request.codigo());
@@ -82,7 +83,7 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     @Override
-    public List<LoteResponse> lotes(UsuarioPrincipal actor, Long productoId) {
+    public List<LoteResponse> lotes(UsuarioPrincipal actor, UUID productoId) {
         buscarVisible(actor, productoId);
         LocalDate hoy = LocalDate.now();
         return loteRepository.findByProductoIdConDetalle(productoId).stream()
@@ -90,7 +91,7 @@ public class ProductoServiceImpl implements ProductoService {
                 .toList();
     }
 
-    private Producto buscarVisible(UsuarioPrincipal actor, Long id) {
+    private Producto buscarVisible(UsuarioPrincipal actor, UUID id) {
         Producto producto =
                 productoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Producto", "id", id));
         if (soloLaboratorio(actor) && !TIPOS_DE_LABORATORIO.contains(producto.getTipo())) {

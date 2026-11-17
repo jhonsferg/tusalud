@@ -6,20 +6,21 @@ import com.codesoftlabs.tusalud.app.dto.request.MedicoEspecialidadesRequest;
 import com.codesoftlabs.tusalud.app.dto.response.HorarioResponse;
 import com.codesoftlabs.tusalud.app.dto.response.MedicoResponse;
 import java.util.List;
+import java.util.UUID;
 
 public interface MedicoService {
 
-    List<MedicoResponse> listar(Long especialidadId);
+    List<MedicoResponse> listar(UUID especialidadId);
 
-    MedicoResponse obtener(Long id);
+    MedicoResponse obtener(UUID id);
 
     MedicoResponse crear(MedicoCreateRequest request);
 
-    MedicoResponse actualizarEspecialidades(Long medicoId, MedicoEspecialidadesRequest request);
+    MedicoResponse actualizarEspecialidades(UUID medicoId, MedicoEspecialidadesRequest request);
 
-    List<HorarioResponse> listarHorarios(Long medicoId);
+    List<HorarioResponse> listarHorarios(UUID medicoId);
 
-    HorarioResponse agregarHorario(Long medicoId, HorarioRequest request);
+    HorarioResponse agregarHorario(UUID medicoId, HorarioRequest request);
 
-    void eliminarHorario(Long medicoId, Long horarioId);
+    void eliminarHorario(UUID medicoId, UUID horarioId);
 }

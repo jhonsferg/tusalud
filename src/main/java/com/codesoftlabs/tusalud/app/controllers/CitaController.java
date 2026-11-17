@@ -14,10 +14,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -117,7 +117,7 @@ public class CitaController {
         return ResponseEntity.ok(citaService.listarMisCitas(principal, inicio, fin));
     }
 
-    @GetMapping("/{id:\\d+}")
+    @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'MEDICO', 'PACIENTE')")
     @Operation(
             summary = "Obtener cita",
@@ -139,12 +139,13 @@ public class CitaController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<CitaResponse> obtener(
-            @Parameter(description = "ID de la cita", example = "1") @PathVariable @Positive Long id,
+            @Parameter(description = "ID de la cita", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(citaService.obtenerCita(id, principal));
     }
 
-    @PutMapping("/{id:\\d+}/cancelar")
+    @PutMapping("/{id}/cancelar")
     @PreAuthorize("hasAnyRole('PACIENTE', 'ADMIN')")
     @Operation(
             summary = "Cancelar cita",
@@ -170,12 +171,13 @@ public class CitaController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<CitaResponse> cancelar(
-            @Parameter(description = "ID de la cita", example = "1") @PathVariable @Positive Long id,
+            @Parameter(description = "ID de la cita", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(citaService.cancelarCita(id, principal));
     }
 
-    @PutMapping("/{id:\\d+}/reprogramar")
+    @PutMapping("/{id}/reprogramar")
     @PreAuthorize("hasAnyRole('PACIENTE', 'ADMIN')")
     @Operation(
             summary = "Reprogramar cita",
@@ -201,13 +203,14 @@ public class CitaController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<CitaResponse> reprogramar(
-            @Parameter(description = "ID de la cita", example = "1") @PathVariable @Positive Long id,
+            @Parameter(description = "ID de la cita", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Valid @RequestBody ReprogramarRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(citaService.reprogramarCita(id, request, principal));
     }
 
-    @PutMapping("/{id:\\d+}/confirmar")
+    @PutMapping("/{id}/confirmar")
     @PreAuthorize("hasAnyRole('MEDICO', 'ADMIN')")
     @Operation(
             summary = "Confirmar cita",
@@ -233,12 +236,13 @@ public class CitaController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<CitaResponse> confirmar(
-            @Parameter(description = "ID de la cita", example = "1") @PathVariable @Positive Long id,
+            @Parameter(description = "ID de la cita", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(citaService.confirmarCita(id, principal));
     }
 
-    @PutMapping("/{id:\\d+}/atender")
+    @PutMapping("/{id}/atender")
     @PreAuthorize("hasRole('MEDICO')")
     @Operation(
             summary = "Marcar cita como atendida",
@@ -263,7 +267,8 @@ public class CitaController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<CitaResponse> atender(
-            @Parameter(description = "ID de la cita", example = "1") @PathVariable @Positive Long id,
+            @Parameter(description = "ID de la cita", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(citaService.atenderCita(id, principal));
     }

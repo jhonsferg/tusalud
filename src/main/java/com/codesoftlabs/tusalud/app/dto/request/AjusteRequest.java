@@ -3,9 +3,10 @@ package com.codesoftlabs.tusalud.app.dto.request;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.UUID;
 
 public record AjusteRequest(
-        @NotNull(message = "El lote es obligatorio") Long loteId,
+        @NotNull(message = "El lote es obligatorio") UUID loteId,
 
         @NotNull(message = "La cantidad es obligatoria") @Min(value = 1, message = "La cantidad debe ser mayor a cero")
         Integer cantidad,

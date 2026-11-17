@@ -12,6 +12,7 @@ import com.codesoftlabs.tusalud.app.entities.enums.EstadoComprobante;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public interface CajaService {
 
@@ -31,9 +32,9 @@ public interface CajaService {
 
     List<ComprobanteResponse> comprobantes(LocalDate desde, LocalDate hasta, String q, EstadoComprobante estado);
 
-    ComprobanteResponse obtener(Long id);
+    ComprobanteResponse obtener(UUID id);
 
-    ComprobanteResponse anular(UsuarioPrincipal actor, Long id, String motivo);
+    ComprobanteResponse anular(UsuarioPrincipal actor, UUID id, String motivo);
 
     ReporteIngresosResponse reporteIngresos(LocalDate desde, LocalDate hasta);
 }

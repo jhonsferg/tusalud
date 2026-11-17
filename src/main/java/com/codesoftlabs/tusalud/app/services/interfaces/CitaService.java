@@ -8,6 +8,7 @@ import com.codesoftlabs.tusalud.app.dto.response.DisponibilidadResponse;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public interface CitaService {
 
@@ -15,21 +16,21 @@ public interface CitaService {
 
     List<CitaResponse> listarMisCitas(UsuarioPrincipal paciente, LocalDate inicio, LocalDate fin);
 
-    CitaResponse obtenerCita(Long citaId, UsuarioPrincipal actor);
+    CitaResponse obtenerCita(UUID citaId, UsuarioPrincipal actor);
 
-    CitaResponse cancelarCita(Long citaId, UsuarioPrincipal actor);
+    CitaResponse cancelarCita(UUID citaId, UsuarioPrincipal actor);
 
-    CitaResponse confirmarCita(Long citaId, UsuarioPrincipal actor);
+    CitaResponse confirmarCita(UUID citaId, UsuarioPrincipal actor);
 
-    CitaResponse atenderCita(Long citaId, UsuarioPrincipal medico);
+    CitaResponse atenderCita(UUID citaId, UsuarioPrincipal medico);
 
-    CitaResponse reprogramarCita(Long citaId, ReprogramarRequest request, UsuarioPrincipal actor);
+    CitaResponse reprogramarCita(UUID citaId, ReprogramarRequest request, UsuarioPrincipal actor);
 
     List<CitaResponse> agendaMedico(UsuarioPrincipal medico, LocalDate fecha);
 
     List<CitaResponse> agendaMedico(UsuarioPrincipal medico, LocalDate fecha, LocalDate inicio, LocalDate fin);
 
-    DisponibilidadResponse consultarDisponibilidad(Long medicoId, LocalDate fecha);
+    DisponibilidadResponse consultarDisponibilidad(UUID medicoId, LocalDate fecha);
 
-    List<DisponibilidadRangoResponse> consultarDisponibilidadRango(Long medicoId, LocalDate inicio, LocalDate fin);
+    List<DisponibilidadRangoResponse> consultarDisponibilidadRango(UUID medicoId, LocalDate inicio, LocalDate fin);
 }

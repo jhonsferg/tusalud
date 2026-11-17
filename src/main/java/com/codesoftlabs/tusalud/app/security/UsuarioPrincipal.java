@@ -3,6 +3,7 @@ package com.codesoftlabs.tusalud.app.security;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Getter
 public class UsuarioPrincipal implements UserDetails {
 
-    private final Long id;
+    private final UUID id;
     private final String email;
     private final String password;
     private final String nombreCompleto;
@@ -19,7 +20,7 @@ public class UsuarioPrincipal implements UserDetails {
     private final List<GrantedAuthority> authorities;
 
     private UsuarioPrincipal(
-            Long id,
+            UUID id,
             String email,
             String password,
             String nombreCompleto,

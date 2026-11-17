@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -292,7 +293,7 @@ class EventoCalendarioServiceTest {
     @Test
     void noSePuedeReservarNiReprogramarSobreUnBloqueo() {
         crear(medicoPrincipal, TipoEvento.BLOQUEO, lunes.atTime(9, 0), 60);
-        Long especialidadId = medico.getEspecialidades().iterator().next().getId();
+        UUID especialidadId = medico.getEspecialidades().iterator().next().getId();
 
         assertThatThrownBy(() -> citaService.crearCita(
                         new CitaCreateRequest(medico.getId(), lunes.atTime(9, 30), "Control", especialidadId),

@@ -4,14 +4,15 @@ import com.codesoftlabs.tusalud.app.entities.enums.PrioridadTurno;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.UUID;
 
 @Schema(description = "Turno de atención sin cita previa")
 public record TurnoCreateRequest(
         @Schema(example = "3") @NotNull(message = "El paciente es obligatorio")
-        Long pacienteId,
+        UUID pacienteId,
 
         @Schema(example = "1", description = "Médico que atenderá el turno; es opcional")
-        Long medicoId,
+        UUID medicoId,
 
         @Schema(example = "NORMAL") @NotNull(message = "La prioridad es obligatoria")
         PrioridadTurno prioridad,

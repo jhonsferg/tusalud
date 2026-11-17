@@ -34,6 +34,7 @@ import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,7 +148,7 @@ class LaboratorioServiceTest {
     void creaLaOrdenConCodigoTotalYNotificaAlPacienteYAlLaboratorio() {
         OrdenLabResponse orden = solicitar(PrioridadOrden.URGENTE, hemograma, glucosa);
 
-        assertThat(orden.codigo()).isEqualTo(String.format("LAB-%06d", orden.id()));
+        assertThat(orden.codigo()).matches("LAB-[0-9]{6}");
         assertThat(orden.estado()).isEqualTo(EstadoOrdenLab.SOLICITADA);
         assertThat(orden.total()).isEqualByComparingTo("50.00");
         assertThat(orden.items()).hasSize(2).allSatisfy(item -> {
@@ -206,16 +207,21 @@ class LaboratorioServiceTest {
         assertThatThrownBy(() -> laboratorioService.crearOrden(
                         medicoPrincipal,
                         new OrdenLabCreateRequest(
-                                paciente.getId(), null, PrioridadOrden.NORMAL, null, List.of(999999L))))
-                .isInstanceOf(ResourceNotFoundException.class);
-        assertThatThrownBy(() -> laboratorioService.crearOrden(
-                        medicoPrincipal,
-                        new OrdenLabCreateRequest(999999L, null, PrioridadOrden.NORMAL, null, List.of(hemograma.id()))))
+                                paciente.getId(), null, PrioridadOrden.NORMAL, null, List.of(UUID.randomUUID()))))
                 .isInstanceOf(ResourceNotFoundException.class);
         assertThatThrownBy(() -> laboratorioService.crearOrden(
                         medicoPrincipal,
                         new OrdenLabCreateRequest(
-                                paciente.getId(), 999999L, PrioridadOrden.NORMAL, null, List.of(hemograma.id()))))
+                                UUID.randomUUID(), null, PrioridadOrden.NORMAL, null, List.of(hemograma.id()))))
+                .isInstanceOf(ResourceNotFoundException.class);
+        assertThatThrownBy(() -> laboratorioService.crearOrden(
+                        medicoPrincipal,
+                        new OrdenLabCreateRequest(
+                                paciente.getId(),
+                                UUID.randomUUID(),
+                                PrioridadOrden.NORMAL,
+                                null,
+                                List.of(hemograma.id()))))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -308,7 +314,7 @@ class LaboratorioServiceTest {
     void validaLosParametrosYLosValoresNumericos() {
         OrdenLabResponse orden = solicitar(PrioridadOrden.NORMAL, hemograma, glucosa);
         laboratorioService.tomarMuestra(laboratorio, orden.id());
-        Long itemHemograma = orden.items().get(0).id();
+        UUID itemHemograma = orden.items().get(0).id();
 
         assertThatThrownBy(() -> laboratorioService.registrarResultados(
                         laboratorio, orden.id(), itemHemograma, resultados(hemograma, "abc")))
@@ -322,7 +328,7 @@ class LaboratorioServiceTest {
                                         glucosa.parametros().get(0).id(), "90")),
                                 null)))
                 .isInstanceOf(DatosInvalidosException.class);
-        Long hemoglobina = hemograma.parametros().get(0).id();
+        UUID hemoglobina = hemograma.parametros().get(0).id();
         assertThatThrownBy(() -> laboratorioService.registrarResultados(
                         laboratorio,
                         orden.id(),
@@ -334,7 +340,7 @@ class LaboratorioServiceTest {
                                 null)))
                 .isInstanceOf(DatosInvalidosException.class);
         assertThatThrownBy(() -> laboratorioService.registrarResultados(
-                        laboratorio, orden.id(), 999999L, resultados(hemograma, "13")))
+                        laboratorio, orden.id(), UUID.randomUUID(), resultados(hemograma, "13")))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -394,7 +400,7 @@ class LaboratorioServiceTest {
                 .isEqualTo(orden.id());
         assertThatThrownBy(() -> laboratorioService.obtenerOrden(ajeno, orden.id()))
                 .isInstanceOf(ForbiddenOperationException.class);
-        assertThatThrownBy(() -> laboratorioService.obtenerOrden(laboratorio, 999999L))
+        assertThatThrownBy(() -> laboratorioService.obtenerOrden(laboratorio, UUID.randomUUID()))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -431,7 +437,7 @@ class LaboratorioServiceTest {
         completar(terminada, "13", "90");
 
         List<OrdenLabResponse> deLaboratorio = laboratorioService.listarOrdenes(laboratorio, null, null, null);
-        List<Long> ids = deLaboratorio.stream().map(OrdenLabResponse::id).toList();
+        List<UUID> ids = deLaboratorio.stream().map(OrdenLabResponse::id).toList();
         assertThat(ids).containsSubsequence(urgente.id(), normal.id(), terminada.id());
 
         assertThat(laboratorioService.listarOrdenes(laboratorio, EstadoOrdenLab.COMPLETADA, null, null))
@@ -518,7 +524,7 @@ class LaboratorioServiceTest {
                                         new BigDecimal("5"),
                                         1)))))
                 .isInstanceOf(DatosInvalidosException.class);
-        assertThatThrownBy(() -> laboratorioService.obtenerExamen(999999L))
+        assertThatThrownBy(() -> laboratorioService.obtenerExamen(UUID.randomUUID()))
                 .isInstanceOf(ResourceNotFoundException.class);
 
         assertThat(laboratorioService.listarExamenes("catálogo editado", null, null))

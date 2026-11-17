@@ -3,12 +3,13 @@ package com.codesoftlabs.tusalud.app.dto.response;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoReceta;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public record RecetaFarmaciaResponse(
-        Long atencionId,
-        Long citaId,
+        UUID atencionId,
+        UUID citaId,
         LocalDateTime fecha,
-        Long pacienteId,
+        UUID pacienteId,
         String pacienteNombre,
         String dni,
         String medicoNombre,

@@ -4,6 +4,7 @@ import com.codesoftlabs.tusalud.app.entities.Medico;
 import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -11,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MedicoRepository extends JpaRepository<Medico, Long> {
+public interface MedicoRepository extends JpaRepository<Medico, UUID> {
 
     @Query("""
             SELECT DISTINCT m FROM Medico m
@@ -21,7 +22,7 @@ public interface MedicoRepository extends JpaRepository<Medico, Long> {
               AND u.estado = com.codesoftlabs.tusalud.app.entities.enums.EstadoUsuario.ACTIVO
             ORDER BY u.apellido ASC, u.nombre ASC
             """)
-    List<Medico> findByEspecialidadId(@Param("especialidadId") Long especialidadId);
+    List<Medico> findByEspecialidadId(@Param("especialidadId") UUID especialidadId);
 
     @Query("""
             SELECT DISTINCT m FROM Medico m
@@ -37,7 +38,7 @@ public interface MedicoRepository extends JpaRepository<Medico, Long> {
             LEFT JOIN FETCH m.especialidades
             WHERE m.id = :id
             """)
-    Optional<Medico> findByIdWithDetails(@Param("id") Long id);
+    Optional<Medico> findByIdWithDetails(@Param("id") UUID id);
 
     @Query("""
             SELECT m FROM Medico m
@@ -49,7 +50,7 @@ public interface MedicoRepository extends JpaRepository<Medico, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT m FROM Medico m WHERE m.id = :id")
-    Optional<Medico> findByIdForUpdate(@Param("id") Long id);
+    Optional<Medico> findByIdForUpdate(@Param("id") UUID id);
 
     boolean existsByColegiaturaIgnoreCase(String colegiatura);
 }

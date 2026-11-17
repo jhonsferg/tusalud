@@ -3,11 +3,12 @@ package com.codesoftlabs.tusalud.app.repositories;
 import com.codesoftlabs.tusalud.app.entities.Rol;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RolRepository extends JpaRepository<Rol, Long> {
+public interface RolRepository extends JpaRepository<Rol, UUID> {
 
     Optional<Rol> findByNombre(RolNombre nombre);
 

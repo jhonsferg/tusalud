@@ -8,10 +8,13 @@ import com.codesoftlabs.tusalud.app.entities.enums.TipoParametro;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Schema(description = "Examen del catálogo de laboratorio con sus parámetros")
 public record ExamenLabResponse(
-        @Schema(example = "1") Long id,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID id,
+
         @Schema(example = "HEM-01") String codigo,
         @Schema(example = "Hemograma completo") String nombre,
         @Schema(example = "HEMATOLOGIA") CategoriaExamen categoria,
@@ -23,7 +26,7 @@ public record ExamenLabResponse(
         List<ParametroResponse> parametros) {
 
     public record ParametroResponse(
-            Long id,
+            UUID id,
             String nombre,
             String unidad,
             TipoParametro tipo,

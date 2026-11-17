@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,10 +53,10 @@ public class AlmacenProveedorController {
         return ResponseEntity.created(location).body(creado);
     }
 
-    @PutMapping("/{id:\\d+}")
+    @PutMapping("/{id}")
     @Operation(summary = "Actualizar proveedor")
     public ResponseEntity<ProveedorResponse> actualizar(
-            @PathVariable Long id, @Valid @RequestBody ProveedorRequest request) {
+            @PathVariable UUID id, @Valid @RequestBody ProveedorRequest request) {
         return ResponseEntity.ok(proveedorService.actualizar(id, request));
     }
 }

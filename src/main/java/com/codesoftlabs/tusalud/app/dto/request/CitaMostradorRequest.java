@@ -6,17 +6,18 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Schema(description = "Reserva de una cita en el mostrador a nombre de un paciente")
 public record CitaMostradorRequest(
         @Schema(example = "3") @NotNull(message = "El paciente es obligatorio")
-        Long pacienteId,
+        UUID pacienteId,
 
         @Schema(example = "1") @NotNull(message = "El médico es obligatorio")
-        Long medicoId,
+        UUID medicoId,
 
         @Schema(example = "1") @NotNull(message = "La especialidad es obligatoria")
-        Long especialidadId,
+        UUID especialidadId,
 
         @Schema(type = "string", example = "2026-10-19T09:00:00")
         @NotNull(message = "La fecha y hora es obligatoria")

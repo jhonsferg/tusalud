@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,15 +85,15 @@ class CitaRepositoryTest {
 
     @Test
     void detectaSolapamientoIgnorandoCanceladas() {
-        assertThat(citaRepository.existsSolapamiento(medico.getId(), lunes10, 0L))
+        assertThat(citaRepository.existsSolapamiento(medico.getId(), lunes10, UUID.randomUUID()))
                 .isTrue();
-        assertThat(citaRepository.existsSolapamiento(medico.getId(), lunes10.plusHours(1), 0L))
+        assertThat(citaRepository.existsSolapamiento(medico.getId(), lunes10.plusHours(1), UUID.randomUUID()))
                 .isFalse();
         assertThat(citaRepository.existsCitaMedicoEnFranja(
-                        medico.getId(), lunes10.minusMinutes(30), lunes10.plusMinutes(30), 0L))
+                        medico.getId(), lunes10.minusMinutes(30), lunes10.plusMinutes(30), UUID.randomUUID()))
                 .isTrue();
         assertThat(citaRepository.existsCitaPacienteEnFranja(
-                        paciente.getId(), lunes10.plusMinutes(30), lunes10.plusMinutes(90), 0L))
+                        paciente.getId(), lunes10.plusMinutes(30), lunes10.plusMinutes(90), UUID.randomUUID()))
                 .isFalse();
     }
 
@@ -118,7 +119,7 @@ class CitaRepositoryTest {
 
     @Test
     void consultasDeMedicoHorarioYAuditoria() {
-        Long especialidadId = medicoRepository
+        UUID especialidadId = medicoRepository
                 .findById(medico.getId())
                 .orElseThrow()
                 .getEspecialidades()

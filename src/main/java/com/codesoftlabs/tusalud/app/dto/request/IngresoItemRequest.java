@@ -8,9 +8,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 public record IngresoItemRequest(
-        @NotNull(message = "El producto es obligatorio") Long productoId,
+        @NotNull(message = "El producto es obligatorio") UUID productoId,
 
         @NotBlank(message = "El número de lote es obligatorio")
         @Size(max = 40, message = "El número de lote no puede superar 40 caracteres")

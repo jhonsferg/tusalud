@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +59,7 @@ public class HistoriaClinicaServiceImpl implements HistoriaClinicaService {
     }
 
     @Override
-    public HistoriaClinicaResponse obtenerDePaciente(Long pacienteId, UsuarioPrincipal actor) {
+    public HistoriaClinicaResponse obtenerDePaciente(UUID pacienteId, UsuarioPrincipal actor) {
         boolean admin = actor.getRoles().contains(RolNombre.ROLE_ADMIN.name());
         boolean acceso = citaRepository.existsRelacionMedicoPaciente(actor.getId(), pacienteId)
                 || compartidoRepository.existsParaUsuario(pacienteId, actor.getId());
@@ -74,7 +75,7 @@ public class HistoriaClinicaServiceImpl implements HistoriaClinicaService {
 
     @Override
     public List<PacienteMedicoResponse> listarPacientesDeMedico(UsuarioPrincipal medico) {
-        Map<Long, List<Cita>> citasPorPaciente = new LinkedHashMap<>();
+        Map<UUID, List<Cita>> citasPorPaciente = new LinkedHashMap<>();
         for (Cita cita : citaRepository.findDelMedicoConPacientes(medico.getId())) {
             citasPorPaciente
                     .computeIfAbsent(cita.getPaciente().getId(), id -> new ArrayList<>())

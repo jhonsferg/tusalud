@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,7 +146,8 @@ class PagoQrServiceImplTest {
         UsuarioPrincipal otro = fixture.principal(fixture.paciente().getUsuario());
         assertThatThrownBy(() -> pagoQrService.crear(new PagoQrRequest(cita.getId(), Billetera.YAPE, null), otro))
                 .isInstanceOf(ForbiddenOperationException.class);
-        assertThatThrownBy(() -> pagoQrService.crear(new PagoQrRequest(-1L, Billetera.YAPE, null), principal))
+        assertThatThrownBy(() ->
+                        pagoQrService.crear(new PagoQrRequest(UUID.randomUUID(), Billetera.YAPE, null), principal))
                 .isInstanceOf(ResourceNotFoundException.class);
         Cita cancelada = fixture.cita(medico, paciente, LocalDateTime.now().plusDays(10), EstadoCita.CANCELADA);
         assertThatThrownBy(() ->

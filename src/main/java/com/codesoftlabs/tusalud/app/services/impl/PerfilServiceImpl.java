@@ -124,7 +124,7 @@ public class PerfilServiceImpl implements PerfilService {
                         .usuario(cargarUsuario(principal))
                         .build());
         preferencia.setRecordatoriosActivos(request.recordatoriosActivos());
-        preferencia.setHorasAntelacionRecordatorio(request.horasAntelacionRecordatorio());
+        preferencia.setMinutosAntelacionRecordatorio(request.minutosAntelacionRecordatorio());
         preferencia.setAlertasInicioSesion(request.alertasInicioSesion());
         if (request.tourCompletado() != null) {
             preferencia.setTourCompletado(request.tourCompletado());

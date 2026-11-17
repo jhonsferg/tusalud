@@ -20,7 +20,7 @@ JOIN citas c ON c.paciente_id = p.id AND c.fecha_hora::date = CURRENT_DATE
 JOIN medicos m ON m.id = c.medico_id;
 
 INSERT INTO turnos (numero, secuencia, fecha, prioridad, estado, motivo, consultorio, paciente_id, cita_id, medico_id, creado_en, llamado_en, inicio_atencion_en, fin_atencion_en)
-SELECT 'P-001', 1, CURRENT_DATE, 'PREFERENTE', 'EN_ESPERA', 'Dolor intenso en la rodilla', m.consultorio, p.id, NULL::bigint,
+SELECT 'P-001', 1, CURRENT_DATE, 'PREFERENTE', 'EN_ESPERA', 'Dolor intenso en la rodilla', m.consultorio, p.id, NULL::uuid,
        m.id, (NOW() - INTERVAL '10 minutes')::timestamp, NULL::timestamp, NULL::timestamp, NULL::timestamp
 FROM pacientes p
 JOIN usuarios u ON u.id = p.usuario_id

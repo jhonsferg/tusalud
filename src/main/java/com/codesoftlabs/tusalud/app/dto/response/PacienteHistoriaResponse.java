@@ -4,10 +4,13 @@ import com.codesoftlabs.tusalud.app.entities.Paciente;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.UUID;
 
 @Schema(description = "Datos del paciente dentro de la historia clínica")
 public record PacienteHistoriaResponse(
-        @Schema(example = "1") Long pacienteId,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID pacienteId,
+
         @Schema(example = "Juan Pérez") String nombreCompleto,
         @Schema(example = "12345678") String dni,
         @Schema(example = "HC-000001") String historialClinicoNumero,

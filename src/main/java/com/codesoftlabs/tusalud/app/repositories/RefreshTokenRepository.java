@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID> {
 
     Optional<RefreshToken> findByTokenHash(String tokenHash);
 
@@ -21,18 +21,18 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
 
     @Modifying
     @Query("UPDATE RefreshToken r SET r.revocado = true WHERE r.sesion.id = :sesionId AND r.revocado = false")
-    int revocarDeSesion(@Param("sesionId") Long sesionId);
+    int revocarDeSesion(@Param("sesionId") UUID sesionId);
 
     @Modifying
     @Query("UPDATE RefreshToken r SET r.revocado = true WHERE r.usuario.id = :usuarioId AND r.revocado = false")
-    int revocarDeUsuario(@Param("usuarioId") Long usuarioId);
+    int revocarDeUsuario(@Param("usuarioId") UUID usuarioId);
 
     @Modifying
     @Query("""
             UPDATE RefreshToken r SET r.revocado = true
             WHERE r.usuario.id = :usuarioId AND r.revocado = false AND r.sesion.tokenId <> :tokenActual
             """)
-    int revocarDeUsuarioExcepto(@Param("usuarioId") Long usuarioId, @Param("tokenActual") UUID tokenActual);
+    int revocarDeUsuarioExcepto(@Param("usuarioId") UUID usuarioId, @Param("tokenActual") UUID tokenActual);
 
     @Modifying
     @Query("DELETE FROM RefreshToken r WHERE r.expiraEn < :limite")

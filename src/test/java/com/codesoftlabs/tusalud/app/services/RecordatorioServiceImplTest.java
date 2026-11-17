@@ -106,7 +106,7 @@ class RecordatorioServiceImplTest {
     void laAntelacionDelPacienteSeRespeta() {
         prepararMedicoYPaciente();
         perfilService.actualizarPreferencias(
-                fixture.principal(paciente.getUsuario()), new PreferenciasRequest(true, 2, true, null));
+                fixture.principal(paciente.getUsuario()), new PreferenciasRequest(true, 120, true, null));
         LocalDateTime ahora = LocalDateTime.now();
         Cita lejana = fixture.cita(medico, paciente, ahora.plusHours(5), EstadoCita.CONFIRMADA);
         Cita cercana = fixture.cita(medico, paciente, ahora.plusHours(1), EstadoCita.CONFIRMADA);
@@ -121,7 +121,7 @@ class RecordatorioServiceImplTest {
     void losRecordatoriosDesactivadosNoSeEnvian() {
         prepararMedicoYPaciente();
         perfilService.actualizarPreferencias(
-                fixture.principal(paciente.getUsuario()), new PreferenciasRequest(false, 24, true, null));
+                fixture.principal(paciente.getUsuario()), new PreferenciasRequest(false, 1440, true, null));
         LocalDateTime ahora = LocalDateTime.now();
         Cita cita = fixture.cita(medico, paciente, ahora.plusHours(4), EstadoCita.PENDIENTE);
 

@@ -8,26 +8,27 @@ import com.codesoftlabs.tusalud.app.dto.response.TurnoResponse;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoTurno;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.util.List;
+import java.util.UUID;
 
 public interface RecepcionService {
 
     List<CitaHoyResponse> citasHoy(String q);
 
-    TurnoResponse registrarLlegada(Long citaId);
+    TurnoResponse registrarLlegada(UUID citaId);
 
     TurnoResponse crearTurno(TurnoCreateRequest request);
 
-    List<TurnoResponse> cola(EstadoTurno estado, Long medicoId, UsuarioPrincipal actor);
+    List<TurnoResponse> cola(EstadoTurno estado, UUID medicoId, UsuarioPrincipal actor);
 
-    TurnoResponse llamar(Long turnoId, UsuarioPrincipal actor);
+    TurnoResponse llamar(UUID turnoId, UsuarioPrincipal actor);
 
-    TurnoResponse iniciar(Long turnoId, UsuarioPrincipal actor);
+    TurnoResponse iniciar(UUID turnoId, UsuarioPrincipal actor);
 
-    TurnoResponse finalizar(Long turnoId, UsuarioPrincipal actor);
+    TurnoResponse finalizar(UUID turnoId, UsuarioPrincipal actor);
 
-    TurnoResponse marcarAusente(Long turnoId, UsuarioPrincipal actor);
+    TurnoResponse marcarAusente(UUID turnoId, UsuarioPrincipal actor);
 
-    TurnoResponse cancelar(Long turnoId, UsuarioPrincipal actor);
+    TurnoResponse cancelar(UUID turnoId, UsuarioPrincipal actor);
 
     List<PantallaTurnoResponse> pantalla();
 

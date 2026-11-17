@@ -4,10 +4,12 @@ import com.codesoftlabs.tusalud.app.entities.Notificacion;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Schema(description = "Notificación dirigida al usuario autenticado")
 public record NotificacionResponse(
-        @Schema(example = "7") Long id,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID id,
 
         @Schema(example = "CITA_CREADA") TipoNotificacion tipo,
 

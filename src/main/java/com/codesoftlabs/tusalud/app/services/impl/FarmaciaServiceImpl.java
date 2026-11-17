@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -125,8 +126,8 @@ public class FarmaciaServiceImpl implements FarmaciaService {
                 .comprobante("")
                 .build();
         BigDecimal total = BigDecimal.ZERO;
-        Map<Long, Producto> productos = new LinkedHashMap<>();
-        Map<Long, Integer> demanda = new HashMap<>();
+        Map<UUID, Producto> productos = new LinkedHashMap<>();
+        Map<UUID, Integer> demanda = new HashMap<>();
         for (DispensacionItemRequest item : request.items()) {
             Producto producto = productoRepository
                     .findById(item.productoId())
@@ -192,13 +193,13 @@ public class FarmaciaServiceImpl implements FarmaciaService {
     }
 
     @Override
-    public DispensacionResponse obtener(Long id) {
+    public DispensacionResponse obtener(UUID id) {
         return DispensacionResponse.from(buscar(id));
     }
 
     @Override
     @Transactional
-    public DispensacionResponse anular(UsuarioPrincipal actor, Long id) {
+    public DispensacionResponse anular(UsuarioPrincipal actor, UUID id) {
         Usuario usuario = usuario(actor);
         Dispensacion dispensacion = buscar(id);
         if (dispensacion.getEstado() == EstadoDispensacion.ANULADA) {
@@ -266,9 +267,9 @@ public class FarmaciaServiceImpl implements FarmaciaService {
         }
     }
 
-    private void validarStock(Map<Long, Producto> productos, Map<Long, Integer> demanda) {
-        Map<Long, InventarioService.StockProducto> stock = inventarioService.stockDe(demanda.keySet());
-        for (Map.Entry<Long, Integer> pedido : demanda.entrySet()) {
+    private void validarStock(Map<UUID, Producto> productos, Map<UUID, Integer> demanda) {
+        Map<UUID, InventarioService.StockProducto> stock = inventarioService.stockDe(demanda.keySet());
+        for (Map.Entry<UUID, Integer> pedido : demanda.entrySet()) {
             long disponible = stock.containsKey(pedido.getKey())
                     ? stock.get(pedido.getKey()).stock()
                     : 0;
@@ -346,7 +347,7 @@ public class FarmaciaServiceImpl implements FarmaciaService {
                 producto.requiereReceta());
     }
 
-    private Dispensacion buscar(Long id) {
+    private Dispensacion buscar(UUID id) {
         return dispensacionRepository
                 .findByIdConDetalle(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Dispensación", "id", id));

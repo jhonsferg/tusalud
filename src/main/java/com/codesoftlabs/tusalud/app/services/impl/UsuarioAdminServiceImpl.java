@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,7 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
     @Override
     public List<UsuarioAdminResponse> listar(RolNombre rol, String busqueda) {
         String termino = busqueda == null ? "" : busqueda.trim().toLowerCase(Locale.ROOT);
-        Map<Long, LocalDateTime> accesos = ultimosAccesos();
+        Map<UUID, LocalDateTime> accesos = ultimosAccesos();
         return usuarioRepository.findAllConRoles().stream()
                 .filter(usuario -> rol == null || usuario.getRoles().stream().anyMatch(r -> r.getNombre() == rol))
                 .filter(usuario -> termino.isEmpty() || coincide(usuario, termino))
@@ -71,7 +72,7 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
 
     @Override
     @Transactional
-    public UsuarioAdminResponse asignarRoles(Long usuarioId, List<RolNombre> roles, UsuarioPrincipal actor) {
+    public UsuarioAdminResponse asignarRoles(UUID usuarioId, List<RolNombre> roles, UsuarioPrincipal actor) {
         Usuario usuario = usuarioRepository
                 .findByIdConRoles(usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", usuarioId));
@@ -167,7 +168,7 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
 
     @Override
     @Transactional
-    public UsuarioAdminResponse cambiarEstado(Long usuarioId, EstadoUsuario estado, UsuarioPrincipal actor) {
+    public UsuarioAdminResponse cambiarEstado(UUID usuarioId, EstadoUsuario estado, UsuarioPrincipal actor) {
         Usuario usuario = usuarioRepository
                 .findById(usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", usuarioId));
@@ -184,10 +185,10 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
         return UsuarioAdminResponse.from(usuario, ultimosAccesos().get(usuarioId));
     }
 
-    private Map<Long, LocalDateTime> ultimosAccesos() {
-        Map<Long, LocalDateTime> accesos = new HashMap<>();
+    private Map<UUID, LocalDateTime> ultimosAccesos() {
+        Map<UUID, LocalDateTime> accesos = new HashMap<>();
         for (Object[] fila : sesionRepository.findUltimoAccesoPorUsuario()) {
-            accesos.put((Long) fila[0], (LocalDateTime) fila[1]);
+            accesos.put((UUID) fila[0], (LocalDateTime) fila[1]);
         }
         return accesos;
     }

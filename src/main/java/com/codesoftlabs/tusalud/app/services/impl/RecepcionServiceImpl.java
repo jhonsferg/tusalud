@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +72,7 @@ public class RecepcionServiceImpl implements RecepcionService {
                         .filter(cita -> cita.getEstado() != EstadoCita.CANCELADA)
                         .filter(cita -> coincide(cita, q))
                         .toList();
-        Map<Long, String> turnos = citas.isEmpty()
+        Map<UUID, String> turnos = citas.isEmpty()
                 ? Map.of()
                 : turnoRepository.findByCitaIds(citas.stream().map(Cita::getId).toList()).stream()
                         .collect(Collectors.toMap(turno -> turno.getCita().getId(), Turno::getNumero));
@@ -81,7 +82,7 @@ public class RecepcionServiceImpl implements RecepcionService {
     }
 
     @Override
-    public TurnoResponse registrarLlegada(Long citaId) {
+    public TurnoResponse registrarLlegada(UUID citaId) {
         Cita cita = citaRepository
                 .findByIdWithDetails(citaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cita", "id", citaId));
@@ -144,13 +145,13 @@ public class RecepcionServiceImpl implements RecepcionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TurnoResponse> cola(EstadoTurno estado, Long medicoId, UsuarioPrincipal actor) {
-        Long medicoFiltro = medicoId;
+    public List<TurnoResponse> cola(EstadoTurno estado, UUID medicoId, UsuarioPrincipal actor) {
+        UUID medicoFiltro = medicoId;
         if (esSoloMedico(actor)) {
             medicoFiltro = medicoDe(actor).getId();
         }
         Set<EstadoTurno> estados = estado == null ? EstadoTurno.ABIERTOS : EnumSet.of(estado);
-        Long filtro = medicoFiltro;
+        UUID filtro = medicoFiltro;
         LocalDateTime ahora = LocalDateTime.now();
         return turnoRepository.findDelDia(LocalDate.now()).stream()
                 .filter(turno -> estados.contains(turno.getEstado()))
@@ -165,7 +166,7 @@ public class RecepcionServiceImpl implements RecepcionService {
     }
 
     @Override
-    public TurnoResponse llamar(Long turnoId, UsuarioPrincipal actor) {
+    public TurnoResponse llamar(UUID turnoId, UsuarioPrincipal actor) {
         Turno turno = obtener(turnoId);
         autorizarOperacion(turno, actor);
         exigirEstado(turno, ESTADOS_LLAMABLES, "Solo se llama a un turno en espera");
@@ -184,7 +185,7 @@ public class RecepcionServiceImpl implements RecepcionService {
     }
 
     @Override
-    public TurnoResponse iniciar(Long turnoId, UsuarioPrincipal actor) {
+    public TurnoResponse iniciar(UUID turnoId, UsuarioPrincipal actor) {
         Turno turno = obtener(turnoId);
         exigirMedicoDelTurno(turno, actor);
         exigirEstado(turno, ESTADOS_INICIABLES, "Solo se inicia la atención de un turno en espera o llamado");
@@ -194,7 +195,7 @@ public class RecepcionServiceImpl implements RecepcionService {
     }
 
     @Override
-    public TurnoResponse finalizar(Long turnoId, UsuarioPrincipal actor) {
+    public TurnoResponse finalizar(UUID turnoId, UsuarioPrincipal actor) {
         Turno turno = obtener(turnoId);
         exigirMedicoDelTurno(turno, actor);
         exigirEstado(turno, EnumSet.of(EstadoTurno.EN_ATENCION), "Solo se finaliza un turno en atención");
@@ -204,7 +205,7 @@ public class RecepcionServiceImpl implements RecepcionService {
     }
 
     @Override
-    public TurnoResponse marcarAusente(Long turnoId, UsuarioPrincipal actor) {
+    public TurnoResponse marcarAusente(UUID turnoId, UsuarioPrincipal actor) {
         Turno turno = obtener(turnoId);
         autorizarOperacion(turno, actor);
         exigirEstado(turno, ESTADOS_CERRABLES, "Solo se marca ausente a un turno en espera o llamado");
@@ -213,7 +214,7 @@ public class RecepcionServiceImpl implements RecepcionService {
     }
 
     @Override
-    public TurnoResponse cancelar(Long turnoId, UsuarioPrincipal actor) {
+    public TurnoResponse cancelar(UUID turnoId, UsuarioPrincipal actor) {
         Turno turno = obtener(turnoId);
         autorizarOperacion(turno, actor);
         exigirEstado(turno, ESTADOS_CERRABLES, "Solo se cancela un turno en espera o llamado");
@@ -250,7 +251,7 @@ public class RecepcionServiceImpl implements RecepcionService {
                         .toMinutes())
                 .average()
                 .orElse(0));
-        Set<Long> conTurno = turnos.stream()
+        Set<UUID> conTurno = turnos.stream()
                 .filter(turno -> turno.getCita() != null)
                 .map(turno -> turno.getCita().getId())
                 .collect(Collectors.toSet());
@@ -287,7 +288,7 @@ public class RecepcionServiceImpl implements RecepcionService {
         return turnoRepository.saveAndFlush(turno);
     }
 
-    private Turno obtener(Long id) {
+    private Turno obtener(UUID id) {
         return turnoRepository
                 .findByIdWithDetails(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Turno", "id", id));

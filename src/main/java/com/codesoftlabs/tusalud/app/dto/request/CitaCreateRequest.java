@@ -6,11 +6,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Schema(description = "Solicitud de una nueva cita (el paciente se toma del token)")
 public record CitaCreateRequest(
         @Schema(example = "1") @NotNull(message = "El médico es obligatorio")
-        Long medicoId,
+        UUID medicoId,
 
         @Schema(type = "string", example = "2026-10-19T09:00:00", description = "ISO-8601 sin zona horaria")
         @NotNull(message = "La fecha y hora es obligatoria")
@@ -24,4 +25,4 @@ public record CitaCreateRequest(
 
         @Schema(example = "1", description = "Especialidad de la consulta; debe pertenecer al médico")
         @NotNull(message = "La especialidad es obligatoria")
-        Long especialidadId) {}
+        UUID especialidadId) {}

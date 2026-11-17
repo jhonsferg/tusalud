@@ -6,17 +6,18 @@ import com.codesoftlabs.tusalud.app.dto.response.ProductoResponse;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoProducto;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.util.List;
+import java.util.UUID;
 
 public interface ProductoService {
 
     List<ProductoResponse> listar(
             UsuarioPrincipal actor, String q, TipoProducto tipo, Boolean bajoStock, Boolean activo);
 
-    ProductoResponse obtener(UsuarioPrincipal actor, Long id);
+    ProductoResponse obtener(UsuarioPrincipal actor, UUID id);
 
     ProductoResponse crear(ProductoRequest request);
 
-    ProductoResponse actualizar(Long id, ProductoRequest request);
+    ProductoResponse actualizar(UUID id, ProductoRequest request);
 
-    List<LoteResponse> lotes(UsuarioPrincipal actor, Long productoId);
+    List<LoteResponse> lotes(UsuarioPrincipal actor, UUID productoId);
 }

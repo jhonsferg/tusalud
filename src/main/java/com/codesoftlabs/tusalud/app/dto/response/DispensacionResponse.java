@@ -6,13 +6,14 @@ import com.codesoftlabs.tusalud.app.entities.enums.MetodoPagoFarmacia;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public record DispensacionResponse(
-        Long id,
+        UUID id,
         LocalDateTime fecha,
         String comprobante,
         EstadoDispensacion estado,
-        Long pacienteId,
+        UUID pacienteId,
         String pacienteNombre,
         String farmaceuticoNombre,
         MetodoPagoFarmacia metodoPago,

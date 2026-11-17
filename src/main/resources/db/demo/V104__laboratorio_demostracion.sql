@@ -72,11 +72,12 @@ SELECT 'LAB-000005', NOW() - INTERVAL '14 days', 'COMPLETADA', 'NORMAL', p.id, m
 FROM pacientes p JOIN usuarios pu ON pu.id = p.usuario_id, medicos m JOIN usuarios mu ON mu.id = m.usuario_id
 WHERE pu.email = 'sofia.ramirez@correo.com' AND mu.email = 'dr.salazar@tusalud.com';
 
-INSERT INTO items_orden_lab (orden_id, examen_id, estado, observaciones, fecha_resultado, validado_por_id)
+INSERT INTO items_orden_lab (orden_id, examen_id, estado, observaciones, fecha_resultado, validado_por_id, posicion)
 SELECT o.id, e.id, v.estado, v.obs::varchar,
        CASE WHEN v.estado = 'PENDIENTE' THEN NULL ELSE o.fecha + INTERVAL '3 hours' END,
-       CASE WHEN v.estado = 'VALIDADO' THEN (SELECT id FROM usuarios WHERE email = 'lab@tusalud.com') ELSE NULL END
-FROM (VALUES
+       CASE WHEN v.estado = 'VALIDADO' THEN (SELECT id FROM usuarios WHERE email = 'lab@tusalud.com') ELSE NULL END,
+       (ROW_NUMBER() OVER (PARTITION BY v.orden ORDER BY v.n) - 1)::integer
+FROM (SELECT x.*, ROW_NUMBER() OVER () AS n FROM (VALUES
     ('LAB-000001', 'HEM-01', 'PENDIENTE', NULL),
     ('LAB-000001', 'PCR-01', 'PENDIENTE', NULL),
     ('LAB-000002', 'GLU-01', 'PENDIENTE', NULL),
@@ -88,13 +89,14 @@ FROM (VALUES
     ('LAB-000004', 'HBA-01', 'VALIDADO', NULL),
     ('LAB-000005', 'CRE-01', 'VALIDADO', NULL),
     ('LAB-000005', 'URE-01', 'VALIDADO', NULL)
-) AS v(orden, examen, estado, obs)
+) AS x(orden, examen, estado, obs)) AS v
 JOIN ordenes_laboratorio o ON o.codigo = v.orden
 JOIN examenes_laboratorio e ON e.codigo = v.examen;
 
-INSERT INTO resultados_lab (item_id, parametro_id, parametro_nombre, unidad, valor, valor_min, valor_max, fuera_de_rango)
-SELECT i.id, p.id, p.nombre, p.unidad, v.valor, p.valor_min, p.valor_max, v.fuera
-FROM (VALUES
+INSERT INTO resultados_lab (item_id, parametro_id, parametro_nombre, unidad, valor, valor_min, valor_max, fuera_de_rango, posicion)
+SELECT i.id, p.id, p.nombre, p.unidad, v.valor, p.valor_min, p.valor_max, v.fuera,
+       (ROW_NUMBER() OVER (PARTITION BY v.orden, v.examen ORDER BY v.n) - 1)::integer
+FROM (SELECT x.*, ROW_NUMBER() OVER () AS n FROM (VALUES
     ('LAB-000003', 'HEM-01', 'Hemoglobina', '12.9', false),
     ('LAB-000003', 'HEM-01', 'Hematocrito', '38.0', false),
     ('LAB-000003', 'HEM-01', 'Leucocitos', '11.8', true),
@@ -107,7 +109,7 @@ FROM (VALUES
     ('LAB-000004', 'HBA-01', 'HbA1c', '6.1', true),
     ('LAB-000005', 'CRE-01', 'Creatinina', '0.9', false),
     ('LAB-000005', 'URE-01', 'Urea', '28', false)
-) AS v(orden, examen, parametro, valor, fuera)
+) AS x(orden, examen, parametro, valor, fuera)) AS v
 JOIN ordenes_laboratorio o ON o.codigo = v.orden
 JOIN examenes_laboratorio e ON e.codigo = v.examen
 JOIN items_orden_lab i ON i.orden_id = o.id AND i.examen_id = e.id

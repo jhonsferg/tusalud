@@ -5,17 +5,18 @@ import com.codesoftlabs.tusalud.app.entities.enums.EstadoLote;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record LoteResponse(
-        Long id,
-        Long productoId,
+        UUID id,
+        UUID productoId,
         String productoNombre,
         String numeroLote,
         LocalDate fechaVencimiento,
         int cantidadInicial,
         int cantidadActual,
         BigDecimal costoUnitario,
-        Long proveedorId,
+        UUID proveedorId,
         String proveedorNombre,
         String ubicacion,
         EstadoLote estado,

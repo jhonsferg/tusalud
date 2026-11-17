@@ -7,6 +7,7 @@ import com.codesoftlabs.tusalud.app.entities.enums.EstadoUsuario;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.util.List;
+import java.util.UUID;
 
 public interface UsuarioAdminService {
 
@@ -14,9 +15,9 @@ public interface UsuarioAdminService {
 
     List<RolResponse> listarRoles();
 
-    UsuarioAdminResponse asignarRoles(Long usuarioId, List<RolNombre> roles, UsuarioPrincipal actor);
+    UsuarioAdminResponse asignarRoles(UUID usuarioId, List<RolNombre> roles, UsuarioPrincipal actor);
 
     UsuarioAdminResponse crearPersonal(PersonalCreateRequest request, UsuarioPrincipal actor);
 
-    UsuarioAdminResponse cambiarEstado(Long usuarioId, EstadoUsuario estado, UsuarioPrincipal actor);
+    UsuarioAdminResponse cambiarEstado(UUID usuarioId, EstadoUsuario estado, UsuarioPrincipal actor);
 }

@@ -19,6 +19,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,8 +36,8 @@ import lombok.Setter;
 public class ItemOrdenLab {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "orden_id", nullable = false)
@@ -61,8 +62,12 @@ public class ItemOrdenLab {
     @JoinColumn(name = "validado_por_id")
     private Usuario validadoPor;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private int posicion = 0;
+
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("id ASC")
+    @OrderBy("posicion ASC")
     @Builder.Default
     private List<ResultadoLab> resultados = new ArrayList<>();
 
@@ -70,6 +75,7 @@ public class ItemOrdenLab {
         resultados.clear();
         nuevos.forEach(resultado -> {
             resultado.setItem(this);
+            resultado.setPosicion(resultados.size());
             resultados.add(resultado);
         });
     }

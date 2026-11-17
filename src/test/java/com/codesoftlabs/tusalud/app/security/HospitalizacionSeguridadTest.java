@@ -16,6 +16,7 @@ import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import com.codesoftlabs.tusalud.app.services.ServiceTestFixture;
 import com.jayway.jsonpath.JsonPath;
 import java.math.BigDecimal;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,30 +82,30 @@ class HospitalizacionSeguridadTest {
                 + "\"descripcion\":\"Cama de prueba\",\"precioDia\":150.00,\"activa\":true}";
     }
 
-    private long crearCama(String codigo, String area) throws Exception {
+    private UUID crearCama(String codigo, String area) throws Exception {
         MvcResult resultado = mockMvc.perform(post(BASE + "/camas")
                         .header(HttpHeaders.AUTHORIZATION, tokenAdmin)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cuerpoCama(codigo, area)))
                 .andExpect(status().isCreated())
                 .andReturn();
-        return ((Number) JsonPath.read(resultado.getResponse().getContentAsString(), "$.id")).longValue();
+        return UUID.fromString(JsonPath.read(resultado.getResponse().getContentAsString(), "$.id"));
     }
 
-    private long crearIngreso(long camaId, Paciente destino) throws Exception {
+    private UUID crearIngreso(UUID camaId, Paciente destino) throws Exception {
         MvcResult resultado = mockMvc.perform(post(BASE + "/ingresos")
                         .header(HttpHeaders.AUTHORIZATION, tokenMedico)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"pacienteId\":" + destino.getId() + ",\"camaId\":" + camaId
+                        .content("{\"pacienteId\":\"" + destino.getId() + "\",\"camaId\":\"" + camaId + "\""
                                 + ",\"motivo\":\"Control postoperatorio\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
                 .andReturn();
-        return ((Number) JsonPath.read(resultado.getResponse().getContentAsString(), "$.id")).longValue();
+        return UUID.fromString(JsonPath.read(resultado.getResponse().getContentAsString(), "$.id"));
     }
 
     private static String triaje(int nivel, Paciente destino) {
-        return "{\"pacienteId\":" + destino.getId() + ",\"triaje\":{\"nivel\":" + nivel
+        return "{\"pacienteId\":\"" + destino.getId() + "\",\"triaje\":{\"nivel\":" + nivel
                 + ",\"presionArterial\":\"140/90\",\"frecuenciaCardiaca\":100,\"motivoConsulta\":\"Dolor abdominal\"}}";
     }
 
@@ -145,7 +146,7 @@ class HospitalizacionSeguridadTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cuerpoCama(codigo, "UCI")))
                 .andExpect(status().isForbidden());
-        long id = crearCama(codigo, "UCI");
+        UUID id = crearCama(codigo, "UCI");
         mockMvc.perform(post(BASE + "/camas")
                         .header(HttpHeaders.AUTHORIZATION, tokenAdmin)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -171,7 +172,7 @@ class HospitalizacionSeguridadTest {
         mockMvc.perform(get(BASE + "/camas?area=OBSERVACION&estado=MANTENIMIENTO")
                         .header(HttpHeaders.AUTHORIZATION, tokenRecepcion))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.id == " + id + ")]", hasSize(1)));
+                .andExpect(jsonPath("$[?(@.id == '" + id + "')]", hasSize(1)));
     }
 
     @Test
@@ -195,9 +196,10 @@ class HospitalizacionSeguridadTest {
         mockMvc.perform(post(BASE + "/ingresos")
                         .header(HttpHeaders.AUTHORIZATION, tokenRecepcion)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"pacienteId\":" + otroPaciente.getId() + ",\"camaId\":1,\"motivo\":\"X\"}"))
+                        .content("{\"pacienteId\":\"" + otroPaciente.getId()
+                                + "\",\"camaId\":\"00000000-0000-0000-0000-000000000001\",\"motivo\":\"X\"}"))
                 .andExpect(status().isForbidden());
-        mockMvc.perform(put(BASE + "/ingresos/1/alta")
+        mockMvc.perform(put(BASE + "/ingresos/00000000-0000-0000-0000-000000000001/alta")
                         .header(HttpHeaders.AUTHORIZATION, tokenRecepcion)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"diagnosticoAlta\":\"A\",\"indicacionesAlta\":\"B\"}"))
@@ -214,27 +216,29 @@ class HospitalizacionSeguridadTest {
         mockMvc.perform(post(BASE + "/emergencias")
                         .header(HttpHeaders.AUTHORIZATION, tokenEnfermeria)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"pacienteId\":" + paciente.getId() + "}"))
+                        .content("{\"pacienteId\":\"" + paciente.getId() + "\"}"))
                 .andExpect(status().isBadRequest());
         mockMvc.perform(post(BASE + "/ingresos")
                         .header(HttpHeaders.AUTHORIZATION, tokenMedico)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"pacienteId\":" + paciente.getId() + ",\"camaId\":1,\"motivo\":\"\"}"))
+                        .content("{\"pacienteId\":\"" + paciente.getId()
+                                + "\",\"camaId\":\"00000000-0000-0000-0000-000000000001\",\"motivo\":\"\"}"))
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(get(BASE + "/ingresos/999999").header(HttpHeaders.AUTHORIZATION, tokenMedico))
+        mockMvc.perform(get(BASE + "/ingresos/00000000-0000-0000-0000-000000999999")
+                        .header(HttpHeaders.AUTHORIZATION, tokenMedico))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void flujoCompletoDeIngresoEvolucionTrasladoYAltaPorRol() throws Exception {
-        long origen = crearCama("FL-" + ServiceTestFixture.siguiente(), "HOSPITALIZACION");
-        long destino = crearCama("FL-" + ServiceTestFixture.siguiente(), "UCI");
-        long ingreso = crearIngreso(origen, paciente);
+        UUID origen = crearCama("FL-" + ServiceTestFixture.siguiente(), "HOSPITALIZACION");
+        UUID destino = crearCama("FL-" + ServiceTestFixture.siguiente(), "UCI");
+        UUID ingreso = crearIngreso(origen, paciente);
 
         mockMvc.perform(post(BASE + "/ingresos")
                         .header(HttpHeaders.AUTHORIZATION, tokenMedico)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"pacienteId\":" + paciente.getId() + ",\"camaId\":" + destino
+                        .content("{\"pacienteId\":\"" + paciente.getId() + "\",\"camaId\":\"" + destino + "\""
                                 + ",\"motivo\":\"Otro ingreso\"}"))
                 .andExpect(status().isConflict());
 
@@ -273,16 +277,16 @@ class HospitalizacionSeguridadTest {
         mockMvc.perform(get(BASE + "/mis-ingresos").header(HttpHeaders.AUTHORIZATION, tokenPaciente))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", is((int) ingreso)));
+                .andExpect(jsonPath("$[0].id", is(ingreso.toString())));
         mockMvc.perform(get(BASE + "/mis-ingresos").header(HttpHeaders.AUTHORIZATION, tokenMedico))
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(put(BASE + "/ingresos/" + ingreso + "/trasladar")
                         .header(HttpHeaders.AUTHORIZATION, tokenEnfermeria)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"camaId\":" + destino + "}"))
+                        .content("{\"camaId\":\"" + destino + "\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.camaId", is((int) destino)));
+                .andExpect(jsonPath("$.camaId", is(destino.toString())));
         mockMvc.perform(put(BASE + "/ingresos/" + ingreso + "/cancelar").header(HttpHeaders.AUTHORIZATION, tokenMedico))
                 .andExpect(status().isConflict());
 
@@ -307,7 +311,7 @@ class HospitalizacionSeguridadTest {
 
     @Test
     void laEnfermeriaAsignaCamaALaEmergenciaYElAdministradorNoPuede() throws Exception {
-        long box = crearCama("EM-" + ServiceTestFixture.siguiente(), "EMERGENCIA");
+        UUID box = crearCama("EM-" + ServiceTestFixture.siguiente(), "EMERGENCIA");
         MvcResult resultado = mockMvc.perform(post(BASE + "/emergencias")
                         .header(HttpHeaders.AUTHORIZATION, tokenEnfermeria)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -315,18 +319,18 @@ class HospitalizacionSeguridadTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.triaje.clasificacion", is("ROJO")))
                 .andReturn();
-        long id = ((Number) JsonPath.read(resultado.getResponse().getContentAsString(), "$.id")).longValue();
+        UUID id = UUID.fromString(JsonPath.read(resultado.getResponse().getContentAsString(), "$.id"));
 
         mockMvc.perform(put(BASE + "/ingresos/" + id + "/asignar-cama")
                         .header(HttpHeaders.AUTHORIZATION, tokenAdmin)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"camaId\":" + box + "}"))
+                        .content("{\"camaId\":\"" + box + "\"}"))
                 .andExpect(status().isForbidden());
         mockMvc.perform(put(BASE + "/ingresos/" + id + "/asignar-cama")
                         .header(HttpHeaders.AUTHORIZATION, tokenEnfermeria)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"camaId\":" + box + "}"))
+                        .content("{\"camaId\":\"" + box + "\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.camaId", is((int) box)));
+                .andExpect(jsonPath("$.camaId", is(box.toString())));
     }
 }

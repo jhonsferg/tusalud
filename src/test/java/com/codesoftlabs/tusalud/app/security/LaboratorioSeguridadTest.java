@@ -20,6 +20,7 @@ import com.codesoftlabs.tusalud.app.services.ServiceTestFixture;
 import com.jayway.jsonpath.JsonPath;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,14 +83,14 @@ class LaboratorioSeguridadTest {
                 + "\"valorMin\":12,\"valorMax\":17.5}]}";
     }
 
-    private long crearExamen(String codigo) throws Exception {
+    private UUID crearExamen(String codigo) throws Exception {
         MvcResult resultado = mockMvc.perform(post(BASE + "/examenes")
                         .header(HttpHeaders.AUTHORIZATION, tokenLaboratorio)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(cuerpoExamen(codigo)))
                 .andExpect(status().isCreated())
                 .andReturn();
-        return ((Number) JsonPath.read(resultado.getResponse().getContentAsString(), "$.id")).longValue();
+        return UUID.fromString(JsonPath.read(resultado.getResponse().getContentAsString(), "$.id"));
     }
 
     @Test
@@ -111,10 +112,12 @@ class LaboratorioSeguridadTest {
                 .andExpect(status().isForbidden());
         mockMvc.perform(get(BASE + "/resumen").header(HttpHeaders.AUTHORIZATION, tokenPaciente))
                 .andExpect(status().isForbidden());
-        mockMvc.perform(post(BASE + "/ordenes")
-                        .header(HttpHeaders.AUTHORIZATION, tokenPaciente)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"pacienteId\":1,\"prioridad\":\"NORMAL\",\"examenIds\":[1]}"))
+        mockMvc.perform(
+                        post(BASE + "/ordenes")
+                                .header(HttpHeaders.AUTHORIZATION, tokenPaciente)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"pacienteId\":\"00000000-0000-0000-0000-000000000001\",\"prioridad\":\"NORMAL\",\"examenIds\":[\"00000000-0000-0000-0000-000000000001\"]}"))
                 .andExpect(status().isForbidden());
     }
 
@@ -129,9 +132,11 @@ class LaboratorioSeguridadTest {
                 .andExpect(status().isForbidden());
         mockMvc.perform(get(BASE + "/mis-ordenes").header(HttpHeaders.AUTHORIZATION, tokenMedico))
                 .andExpect(status().isForbidden());
-        mockMvc.perform(put(BASE + "/ordenes/1/muestra").header(HttpHeaders.AUTHORIZATION, tokenMedico))
+        mockMvc.perform(put(BASE + "/ordenes/00000000-0000-0000-0000-000000000001/muestra")
+                        .header(HttpHeaders.AUTHORIZATION, tokenMedico))
                 .andExpect(status().isForbidden());
-        mockMvc.perform(put(BASE + "/ordenes/1/validar").header(HttpHeaders.AUTHORIZATION, tokenMedico))
+        mockMvc.perform(put(BASE + "/ordenes/00000000-0000-0000-0000-000000000001/validar")
+                        .header(HttpHeaders.AUTHORIZATION, tokenMedico))
                 .andExpect(status().isForbidden());
         mockMvc.perform(get(BASE + "/resumen").header(HttpHeaders.AUTHORIZATION, tokenMedico))
                 .andExpect(status().isForbidden());
@@ -161,10 +166,12 @@ class LaboratorioSeguridadTest {
         mockMvc.perform(get(BASE + "/resumen").header(HttpHeaders.AUTHORIZATION, tokenLaboratorio))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.pendientes", notNullValue()));
-        mockMvc.perform(post(BASE + "/ordenes")
-                        .header(HttpHeaders.AUTHORIZATION, tokenLaboratorio)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"pacienteId\":1,\"prioridad\":\"NORMAL\",\"examenIds\":[1]}"))
+        mockMvc.perform(
+                        post(BASE + "/ordenes")
+                                .header(HttpHeaders.AUTHORIZATION, tokenLaboratorio)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"pacienteId\":\"00000000-0000-0000-0000-000000000001\",\"prioridad\":\"NORMAL\",\"examenIds\":[\"00000000-0000-0000-0000-000000000001\"]}"))
                 .andExpect(status().isForbidden());
         mockMvc.perform(get(BASE + "/mis-ordenes").header(HttpHeaders.AUTHORIZATION, tokenLaboratorio))
                 .andExpect(status().isForbidden());
@@ -181,7 +188,8 @@ class LaboratorioSeguridadTest {
                 .andExpect(status().isOk());
         mockMvc.perform(get(BASE + "/ordenes").header(HttpHeaders.AUTHORIZATION, tokenAdmin))
                 .andExpect(status().isOk());
-        mockMvc.perform(put(BASE + "/ordenes/1/muestra").header(HttpHeaders.AUTHORIZATION, tokenAdmin))
+        mockMvc.perform(put(BASE + "/ordenes/00000000-0000-0000-0000-000000000001/muestra")
+                        .header(HttpHeaders.AUTHORIZATION, tokenAdmin))
                 .andExpect(status().isForbidden());
     }
 
@@ -198,43 +206,44 @@ class LaboratorioSeguridadTest {
         mockMvc.perform(post(BASE + "/ordenes")
                         .header(HttpHeaders.AUTHORIZATION, tokenMedico)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"pacienteId\":" + paciente.getId() + ",\"prioridad\":\"NORMAL\",\"examenIds\":[]}"))
+                        .content("{\"pacienteId\":\"" + paciente.getId()
+                                + "\",\"prioridad\":\"NORMAL\",\"examenIds\":[]}"))
                 .andExpect(status().isBadRequest());
         mockMvc.perform(post(BASE + "/examenes")
                         .header(HttpHeaders.AUTHORIZATION, tokenLaboratorio)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"codigo\":\"\",\"nombre\":\"\"}"))
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(get(BASE + "/ordenes/999999").header(HttpHeaders.AUTHORIZATION, tokenLaboratorio))
+        mockMvc.perform(get(BASE + "/ordenes/00000000-0000-0000-0000-000000999999")
+                        .header(HttpHeaders.AUTHORIZATION, tokenLaboratorio))
                 .andExpect(status().isNotFound());
-        mockMvc.perform(get(BASE + "/examenes/999999").header(HttpHeaders.AUTHORIZATION, tokenMedico))
+        mockMvc.perform(get(BASE + "/examenes/00000000-0000-0000-0000-000000999999")
+                        .header(HttpHeaders.AUTHORIZATION, tokenMedico))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void recorreElFlujoCompletoPorHttp() throws Exception {
-        long examenId = crearExamen("HTTP-FLU");
+        UUID examenId = crearExamen("HTTP-FLU");
         MvcResult creada = mockMvc.perform(post(BASE + "/ordenes")
                         .header(HttpHeaders.AUTHORIZATION, tokenMedico)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"pacienteId\":" + paciente.getId() + ",\"prioridad\":\"URGENTE\","
-                                + "\"indicaciones\":\"Control\",\"examenIds\":[" + examenId + "]}"))
+                        .content("{\"pacienteId\":\"" + paciente.getId() + "\",\"prioridad\":\"URGENTE\","
+                                + "\"indicaciones\":\"Control\",\"examenIds\":[\"" + examenId + "\"]}"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string(HttpHeaders.LOCATION, containsString(BASE + "/ordenes/")))
                 .andExpect(jsonPath("$.estado", is("SOLICITADA")))
                 .andExpect(jsonPath("$.codigo", containsString("LAB-")))
                 .andReturn();
         String json = creada.getResponse().getContentAsString();
-        long ordenId = ((Number) JsonPath.read(json, "$.id")).longValue();
-        long itemId = ((Number) JsonPath.read(json, "$.items[0].id")).longValue();
-        long parametroId = ((Number) JsonPath.read(
-                        mockMvc.perform(get(BASE + "/examenes/" + examenId)
-                                        .header(HttpHeaders.AUTHORIZATION, tokenMedico))
-                                .andReturn()
-                                .getResponse()
-                                .getContentAsString(),
-                        "$.parametros[0].id"))
-                .longValue();
+        UUID ordenId = UUID.fromString(JsonPath.read(json, "$.id"));
+        UUID itemId = UUID.fromString(JsonPath.read(json, "$.items[0].id"));
+        UUID parametroId = UUID.fromString(JsonPath.read(
+                mockMvc.perform(get(BASE + "/examenes/" + examenId).header(HttpHeaders.AUTHORIZATION, tokenMedico))
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString(),
+                "$.parametros[0].id"));
 
         mockMvc.perform(get(BASE + "/ordenes/" + ordenId).header(HttpHeaders.AUTHORIZATION, tokenPaciente))
                 .andExpect(status().isForbidden());
@@ -245,14 +254,14 @@ class LaboratorioSeguridadTest {
         mockMvc.perform(put(BASE + "/ordenes/" + ordenId + "/items/" + itemId + "/resultados")
                         .header(HttpHeaders.AUTHORIZATION, tokenLaboratorio)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"resultados\":[{\"parametroId\":" + parametroId + ",\"valor\":\"10.2\"}]}"))
+                        .content("{\"resultados\":[{\"parametroId\":\"" + parametroId + "\",\"valor\":\"10.2\"}]}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estado", is("EN_PROCESO")))
                 .andExpect(jsonPath("$.items[0].resultados[0].fueraDeRango", is(true)));
         mockMvc.perform(put(BASE + "/ordenes/" + ordenId + "/items/" + itemId + "/resultados")
                         .header(HttpHeaders.AUTHORIZATION, tokenLaboratorio)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"resultados\":[{\"parametroId\":" + parametroId + ",\"valor\":\"no\"}]}"))
+                        .content("{\"resultados\":[{\"parametroId\":\"" + parametroId + "\",\"valor\":\"no\"}]}"))
                 .andExpect(status().isBadRequest());
         mockMvc.perform(put(BASE + "/ordenes/" + ordenId + "/validar")
                         .header(HttpHeaders.AUTHORIZATION, tokenLaboratorio))
@@ -270,22 +279,22 @@ class LaboratorioSeguridadTest {
                         .param("estado", "COMPLETADA")
                         .header(HttpHeaders.AUTHORIZATION, tokenMedico))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].id", hasItem((int) ordenId)));
+                .andExpect(jsonPath("$[*].id", hasItem(ordenId.toString())));
         mockMvc.perform(put(BASE + "/ordenes/" + ordenId + "/cancelar").header(HttpHeaders.AUTHORIZATION, tokenAdmin))
                 .andExpect(status().isConflict());
     }
 
     @Test
     void elMedicoCancelaSinCuerpoUnaOrdenSolicitada() throws Exception {
-        long examenId = crearExamen("HTTP-CAN");
+        UUID examenId = crearExamen("HTTP-CAN");
         MvcResult creada = mockMvc.perform(post(BASE + "/ordenes")
                         .header(HttpHeaders.AUTHORIZATION, tokenMedico)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"pacienteId\":" + paciente.getId() + ",\"prioridad\":\"NORMAL\",\"examenIds\":["
-                                + examenId + "]}"))
+                        .content("{\"pacienteId\":\"" + paciente.getId() + "\",\"prioridad\":\"NORMAL\",\"examenIds\":["
+                                + "\"" + examenId + "\"]}"))
                 .andExpect(status().isCreated())
                 .andReturn();
-        long ordenId = ((Number) JsonPath.read(creada.getResponse().getContentAsString(), "$.id")).longValue();
+        UUID ordenId = UUID.fromString(JsonPath.read(creada.getResponse().getContentAsString(), "$.id"));
 
         mockMvc.perform(put(BASE + "/ordenes/" + ordenId + "/cancelar").header(HttpHeaders.AUTHORIZATION, tokenMedico))
                 .andExpect(status().isOk())

@@ -156,7 +156,7 @@ class CajaSeguridadTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        int id = JsonPath.read(respuesta, "$.id");
+        String id = JsonPath.read(respuesta, "$.id");
 
         mockMvc.perform(post("/api/v1/caja/cobros")
                         .header(HttpHeaders.AUTHORIZATION, caja)
@@ -199,7 +199,7 @@ class CajaSeguridadTest {
         mockMvc.perform(get("/api/v1/caja/historial").header(HttpHeaders.AUTHORIZATION, caja))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
-        mockMvc.perform(put("/api/v1/caja/comprobantes/999999/anular")
+        mockMvc.perform(put("/api/v1/caja/comprobantes/00000000-0000-0000-0000-000000999999/anular")
                         .header(HttpHeaders.AUTHORIZATION, admin)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"motivo\":\"x\"}"))

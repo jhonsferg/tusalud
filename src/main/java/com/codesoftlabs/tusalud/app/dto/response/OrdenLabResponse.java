@@ -12,10 +12,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Schema(description = "Orden de laboratorio con sus exámenes y resultados")
 public record OrdenLabResponse(
-        @Schema(example = "1") Long id,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID id,
+
         @Schema(example = "LAB-000001") String codigo,
 
         @Schema(type = "string", example = "2026-11-17T10:00:00")
@@ -23,12 +26,12 @@ public record OrdenLabResponse(
 
         @Schema(example = "SOLICITADA") EstadoOrdenLab estado,
         @Schema(example = "NORMAL") PrioridadOrden prioridad,
-        Long pacienteId,
+        UUID pacienteId,
         String pacienteNombre,
         String dni,
-        Long medicoId,
+        UUID medicoId,
         String medicoNombre,
-        Long atencionId,
+        UUID atencionId,
         String indicaciones,
         BigDecimal total,
 
@@ -41,8 +44,8 @@ public record OrdenLabResponse(
         List<ItemResponse> items) {
 
     public record ItemResponse(
-            Long id,
-            Long examenId,
+            UUID id,
+            UUID examenId,
             String examenNombre,
             CategoriaExamen categoria,
             TipoMuestra muestra,
@@ -74,7 +77,7 @@ public record OrdenLabResponse(
     }
 
     public record ResultadoResponse(
-            Long parametroId,
+            UUID parametroId,
             String parametro,
             String unidad,
             String valor,

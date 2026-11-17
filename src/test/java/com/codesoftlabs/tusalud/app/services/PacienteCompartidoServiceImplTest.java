@@ -23,6 +23,7 @@ import com.codesoftlabs.tusalud.app.services.interfaces.PacienteCompartidoServic
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,10 +109,10 @@ class PacienteCompartidoServiceImplTest {
                         paciente.getId(), new CompartirPacienteRequest(origen.getId(), null), principalOrigen))
                 .isInstanceOf(BusinessLogicException.class);
         assertThatThrownBy(() -> compartidoService.compartir(
-                        paciente.getId(), new CompartirPacienteRequest(-1L, null), principalOrigen))
+                        paciente.getId(), new CompartirPacienteRequest(UUID.randomUUID(), null), principalOrigen))
                 .isInstanceOf(ResourceNotFoundException.class);
         assertThatThrownBy(() -> compartidoService.compartir(
-                        -1L, new CompartirPacienteRequest(destino.getId(), null), principalOrigen))
+                        UUID.randomUUID(), new CompartirPacienteRequest(destino.getId(), null), principalOrigen))
                 .isInstanceOf(ResourceNotFoundException.class);
         assertThatThrownBy(() -> compartidoService.compartir(
                         paciente.getId(),
@@ -147,7 +148,7 @@ class PacienteCompartidoServiceImplTest {
     void listarExigeAccesoAlPaciente() {
         assertThatThrownBy(() -> compartidoService.listar(paciente.getId(), principalDestino))
                 .isInstanceOf(ForbiddenOperationException.class);
-        assertThatThrownBy(() -> compartidoService.listar(-1L, principalOrigen))
+        assertThatThrownBy(() -> compartidoService.listar(UUID.randomUUID(), principalOrigen))
                 .isInstanceOf(ResourceNotFoundException.class);
         assertThat(compartidoService.listar(
                         paciente.getId(), fixture.principal(fixture.usuario("admin", RolNombre.ROLE_ADMIN))))

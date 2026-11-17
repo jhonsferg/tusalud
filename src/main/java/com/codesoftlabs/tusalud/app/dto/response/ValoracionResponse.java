@@ -3,12 +3,19 @@ package com.codesoftlabs.tusalud.app.dto.response;
 import com.codesoftlabs.tusalud.app.entities.Valoracion;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Schema(description = "Valoración de un paciente sobre la atención de un médico")
 public record ValoracionResponse(
-        @Schema(example = "1") Long id,
-        @Schema(example = "10") Long citaId,
-        @Schema(example = "1") Long medicoId,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID id,
+
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID citaId,
+
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID medicoId,
+
         @Schema(example = "Juan Pérez") String pacienteNombre,
         @Schema(example = "5") int puntuacion,
         @Schema(example = "Muy buena atención") String comentario,

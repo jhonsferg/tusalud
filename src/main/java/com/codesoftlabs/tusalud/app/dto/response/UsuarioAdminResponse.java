@@ -6,10 +6,13 @@ import com.codesoftlabs.tusalud.app.entities.enums.EstadoUsuario;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Schema(description = "Cuenta de usuario vista por un administrador")
 public record UsuarioAdminResponse(
-        @Schema(example = "4") Long id,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID id,
+
         @Schema(example = "Juan Pérez") String nombreCompleto,
         @Schema(example = "juan.perez@correo.com") String email,
         @Schema(example = "987654321") String telefono,

@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,15 +27,15 @@ import lombok.Setter;
 public class ResultadoLab {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "item_id", nullable = false)
     private ItemOrdenLab item;
 
     @Column(name = "parametro_id")
-    private Long parametroId;
+    private UUID parametroId;
 
     @Column(name = "parametro_nombre", nullable = false, length = 100)
     private String parametroNombre;
@@ -53,4 +54,8 @@ public class ResultadoLab {
 
     @Column(name = "fuera_de_rango", nullable = false)
     private boolean fueraDeRango;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private int posicion = 0;
 }

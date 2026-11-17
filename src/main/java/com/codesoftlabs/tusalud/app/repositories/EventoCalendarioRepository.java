@@ -4,13 +4,14 @@ import com.codesoftlabs.tusalud.app.entities.EventoCalendario;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface EventoCalendarioRepository extends JpaRepository<EventoCalendario, Long> {
+public interface EventoCalendarioRepository extends JpaRepository<EventoCalendario, UUID> {
 
-    Optional<EventoCalendario> findByIdAndUsuarioId(Long id, Long usuarioId);
+    Optional<EventoCalendario> findByIdAndUsuarioId(UUID id, UUID usuarioId);
 
     @Query("""
             SELECT e FROM EventoCalendario e
@@ -20,7 +21,7 @@ public interface EventoCalendarioRepository extends JpaRepository<EventoCalendar
             ORDER BY e.inicio ASC
             """)
     List<EventoCalendario> findSolapados(
-            @Param("usuarioId") Long usuarioId, @Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
+            @Param("usuarioId") UUID usuarioId, @Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
 
     @Query("""
             SELECT e FROM EventoCalendario e
@@ -31,7 +32,7 @@ public interface EventoCalendarioRepository extends JpaRepository<EventoCalendar
             ORDER BY e.inicio ASC
             """)
     List<EventoCalendario> findBloqueosSolapados(
-            @Param("usuarioId") Long usuarioId, @Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
+            @Param("usuarioId") UUID usuarioId, @Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
 
     @Query("""
             SELECT e FROM EventoCalendario e

@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -139,7 +140,7 @@ public class CajaServiceImpl implements CajaService {
 
     @Override
     public List<SesionCajaResponse> historial(UsuarioPrincipal actor) {
-        Long cajeroId = actor.getRoles().contains(RolNombre.ROLE_ADMIN.name()) ? null : actor.getId();
+        UUID cajeroId = actor.getRoles().contains(RolNombre.ROLE_ADMIN.name()) ? null : actor.getId();
         return sesionRepository.historial(cajeroId, PageRequest.of(0, LIMITE_HISTORIAL)).stream()
                 .map(SesionCajaResponse::from)
                 .toList();
@@ -318,13 +319,13 @@ public class CajaServiceImpl implements CajaService {
     }
 
     @Override
-    public ComprobanteResponse obtener(Long id) {
+    public ComprobanteResponse obtener(UUID id) {
         return ComprobanteResponse.from(comprobante(id));
     }
 
     @Override
     @Transactional
-    public ComprobanteResponse anular(UsuarioPrincipal actor, Long id, String motivo) {
+    public ComprobanteResponse anular(UsuarioPrincipal actor, UUID id, String motivo) {
         Comprobante comprobante = comprobante(id);
         if (comprobante.getEstado() != EstadoComprobante.EMITIDO) {
             throw new BusinessLogicException("El comprobante " + comprobante.getCodigo() + " ya está anulado");
@@ -388,7 +389,7 @@ public class CajaServiceImpl implements CajaService {
     }
 
     private void revertirOrigen(Comprobante comprobante) {
-        Long referencia = comprobante.getReferenciaId();
+        UUID referencia = comprobante.getReferenciaId();
         if (referencia == null) {
             return;
         }
@@ -430,7 +431,7 @@ public class CajaServiceImpl implements CajaService {
         cita.setPago(pago);
     }
 
-    private Cita citaParaCobrar(Long citaId) {
+    private Cita citaParaCobrar(UUID citaId) {
         if (citaId == null) {
             throw new DatosInvalidosException("Debe indicar la cita a cobrar");
         }
@@ -450,7 +451,7 @@ public class CajaServiceImpl implements CajaService {
         return cita;
     }
 
-    private OrdenLaboratorio ordenParaCobrar(Long ordenId) {
+    private OrdenLaboratorio ordenParaCobrar(UUID ordenId) {
         if (ordenId == null) {
             throw new DatosInvalidosException("Debe indicar la orden de laboratorio a cobrar");
         }
@@ -524,13 +525,13 @@ public class CajaServiceImpl implements CajaService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private Comprobante comprobante(Long id) {
+    private Comprobante comprobante(UUID id) {
         return comprobanteRepository
                 .findByIdConDetalle(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Comprobante", "id", id));
     }
 
-    private Usuario usuario(Long id) {
+    private Usuario usuario(UUID id) {
         return usuarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", id));
     }
 

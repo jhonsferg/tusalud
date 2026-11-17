@@ -6,13 +6,15 @@ import com.codesoftlabs.tusalud.app.entities.enums.EstadoIntencionPago;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Schema(description = "Intención de pago con billetera digital y su código QR")
 public record PagoQrResponse(
         @Schema(example = "5b0f0a9e-6c2e-4f6d-9a3c-0a1b2c3d4e5f")
         String codigo,
 
-        @Schema(example = "10") Long citaId,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID citaId,
 
         @Schema(example = "YAPE") Billetera billetera,
 
@@ -33,7 +35,7 @@ public record PagoQrResponse(
         LocalDateTime expiraEn,
 
         @Schema(example = "7", description = "Pago generado cuando la intención está CONFIRMADA")
-        Long pagoId) {
+        UUID pagoId) {
 
     public static PagoQrResponse from(IntencionPago intencion, String qrPayload) {
         return new PagoQrResponse(

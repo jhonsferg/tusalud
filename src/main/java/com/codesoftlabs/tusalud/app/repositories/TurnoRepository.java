@@ -7,13 +7,14 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TurnoRepository extends JpaRepository<Turno, Long> {
+public interface TurnoRepository extends JpaRepository<Turno, UUID> {
 
     @Query("""
             SELECT t FROM Turno t
@@ -35,13 +36,13 @@ public interface TurnoRepository extends JpaRepository<Turno, Long> {
             LEFT JOIN FETCH t.cita
             WHERE t.id = :id
             """)
-    Optional<Turno> findByIdWithDetails(@Param("id") Long id);
+    Optional<Turno> findByIdWithDetails(@Param("id") UUID id);
 
     @Query("SELECT t FROM Turno t JOIN FETCH t.cita c WHERE c.id IN :citaIds")
-    List<Turno> findByCitaIds(@Param("citaIds") Collection<Long> citaIds);
+    List<Turno> findByCitaIds(@Param("citaIds") Collection<UUID> citaIds);
 
     @Query("SELECT COUNT(t) > 0 FROM Turno t WHERE t.cita.id = :citaId")
-    boolean existsByCitaId(@Param("citaId") Long citaId);
+    boolean existsByCitaId(@Param("citaId") UUID citaId);
 
     @Query("""
             SELECT COUNT(t) > 0 FROM Turno t
@@ -50,7 +51,7 @@ public interface TurnoRepository extends JpaRepository<Turno, Long> {
               AND t.estado IN :estados
             """)
     boolean existsAbiertoDelPaciente(
-            @Param("pacienteId") Long pacienteId,
+            @Param("pacienteId") UUID pacienteId,
             @Param("fecha") LocalDate fecha,
             @Param("estados") Collection<EstadoTurno> estados);
 

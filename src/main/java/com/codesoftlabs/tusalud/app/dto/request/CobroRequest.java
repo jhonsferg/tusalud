@@ -9,13 +9,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
+import java.util.UUID;
 
 public record CobroRequest(
         @NotNull(message = "El origen del cobro es obligatorio")
         OrigenComprobante origen,
 
-        Long referenciaId,
-        Long pacienteId,
+        UUID referenciaId,
+        UUID pacienteId,
 
         @NotNull(message = "El tipo de comprobante es obligatorio")
         TipoComprobante tipoComprobante,

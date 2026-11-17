@@ -6,6 +6,7 @@ import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionStreamServic
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +23,10 @@ public class NotificacionStreamServiceImpl implements NotificacionStreamService 
 
     private static final long SIN_TIEMPO_LIMITE = 0L;
 
-    private final Map<Long, List<SseEmitter>> suscriptores = new ConcurrentHashMap<>();
+    private final Map<UUID, List<SseEmitter>> suscriptores = new ConcurrentHashMap<>();
 
     @Override
-    public SseEmitter suscribir(Long usuarioId) {
+    public SseEmitter suscribir(UUID usuarioId) {
         SseEmitter emisor = new SseEmitter(SIN_TIEMPO_LIMITE);
         List<SseEmitter> lista = suscriptores.computeIfAbsent(usuarioId, id -> new CopyOnWriteArrayList<>());
         lista.add(emisor);
@@ -38,7 +39,7 @@ public class NotificacionStreamServiceImpl implements NotificacionStreamService 
     }
 
     @Override
-    public void publicar(Long usuarioId, NotificacionResponse notificacion) {
+    public void publicar(UUID usuarioId, NotificacionResponse notificacion) {
         List<SseEmitter> lista = suscriptores.get(usuarioId);
         if (lista == null) {
             log.debug("El usuario {} no tiene suscriptores de notificaciones", usuarioId);
@@ -68,7 +69,7 @@ public class NotificacionStreamServiceImpl implements NotificacionStreamService 
         return suscriptores.values().stream().mapToInt(List::size).sum();
     }
 
-    private void enviar(Long usuarioId, SseEmitter emisor, SseEmitter.SseEventBuilder evento) {
+    private void enviar(UUID usuarioId, SseEmitter emisor, SseEmitter.SseEventBuilder evento) {
         try {
             emisor.send(evento);
         } catch (IOException | IllegalStateException e) {
@@ -77,7 +78,7 @@ public class NotificacionStreamServiceImpl implements NotificacionStreamService 
         }
     }
 
-    private void retirar(Long usuarioId, SseEmitter emisor) {
+    private void retirar(UUID usuarioId, SseEmitter emisor) {
         List<SseEmitter> lista = suscriptores.get(usuarioId);
         if (lista == null) {
             return;

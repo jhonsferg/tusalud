@@ -12,32 +12,33 @@ import com.codesoftlabs.tusalud.app.entities.enums.EstadoOrdenLab;
 import com.codesoftlabs.tusalud.app.entities.enums.PrioridadOrden;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.util.List;
+import java.util.UUID;
 
 public interface LaboratorioService {
 
     List<ExamenLabResponse> listarExamenes(String busqueda, CategoriaExamen categoria, Boolean activo);
 
-    ExamenLabResponse obtenerExamen(Long id);
+    ExamenLabResponse obtenerExamen(UUID id);
 
     ExamenLabResponse crearExamen(ExamenLabRequest request);
 
-    ExamenLabResponse actualizarExamen(Long id, ExamenLabRequest request);
+    ExamenLabResponse actualizarExamen(UUID id, ExamenLabRequest request);
 
     OrdenLabResponse crearOrden(UsuarioPrincipal actor, OrdenLabCreateRequest request);
 
     List<OrdenLabResponse> listarOrdenes(
             UsuarioPrincipal actor, EstadoOrdenLab estado, String busqueda, PrioridadOrden prioridad);
 
-    OrdenLabResponse obtenerOrden(UsuarioPrincipal actor, Long id);
+    OrdenLabResponse obtenerOrden(UsuarioPrincipal actor, UUID id);
 
-    OrdenLabResponse tomarMuestra(UsuarioPrincipal actor, Long ordenId);
+    OrdenLabResponse tomarMuestra(UsuarioPrincipal actor, UUID ordenId);
 
     OrdenLabResponse registrarResultados(
-            UsuarioPrincipal actor, Long ordenId, Long itemId, ResultadosLabRequest request);
+            UsuarioPrincipal actor, UUID ordenId, UUID itemId, ResultadosLabRequest request);
 
-    OrdenLabResponse validar(UsuarioPrincipal actor, Long ordenId);
+    OrdenLabResponse validar(UsuarioPrincipal actor, UUID ordenId);
 
-    OrdenLabResponse cancelar(UsuarioPrincipal actor, Long ordenId, CancelarOrdenLabRequest request);
+    OrdenLabResponse cancelar(UsuarioPrincipal actor, UUID ordenId, CancelarOrdenLabRequest request);
 
     List<OrdenLabResponse> misOrdenes(UsuarioPrincipal actor);
 

@@ -47,7 +47,7 @@ public class JwtUtils {
                 .issuer(properties.issuer())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusMillis(properties.expirationMs())))
-                .claim(CLAIM_USER_ID, principal.getId())
+                .claim(CLAIM_USER_ID, principal.getId().toString())
                 .claim(CLAIM_NOMBRE, principal.getNombreCompleto())
                 .claim(CLAIM_ROLES, principal.getRoles());
         if (tokenId != null) {
@@ -63,18 +63,18 @@ public class JwtUtils {
                 .issuer(properties.issuer())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(MFA_TOKEN_TTL)))
-                .claim(CLAIM_USER_ID, principal.getId())
+                .claim(CLAIM_USER_ID, principal.getId().toString())
                 .claim(CLAIM_PROPOSITO, PROPOSITO_MFA)
                 .signWith(signingKey)
                 .compact();
     }
 
-    public Long extractMfaUserId(String token) {
+    public UUID extractMfaUserId(String token) {
         Claims claims = parseClaims(token);
         if (!PROPOSITO_MFA.equals(claims.get(CLAIM_PROPOSITO, String.class))) {
             throw new JwtException("El token no corresponde a una verificación en dos pasos");
         }
-        return claims.get(CLAIM_USER_ID, Long.class);
+        return UUID.fromString(claims.get(CLAIM_USER_ID, String.class));
     }
 
     public Claims parseClaims(String token) {

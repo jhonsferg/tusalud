@@ -18,6 +18,7 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,8 +39,8 @@ import org.hibernate.annotations.CreationTimestamp;
 public class Usuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(nullable = false, length = 100)
     private String nombre;

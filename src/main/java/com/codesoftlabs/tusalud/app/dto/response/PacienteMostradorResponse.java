@@ -3,10 +3,13 @@ package com.codesoftlabs.tusalud.app.dto.response;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Schema(description = "Paciente encontrado en el mostrador")
 public record PacienteMostradorResponse(
-        @Schema(example = "3") Long pacienteId,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID pacienteId,
+
         @Schema(example = "Juan Pérez") String nombreCompleto,
         @Schema(example = "12345678") String dni,
         @Schema(example = "987654321") String telefono,

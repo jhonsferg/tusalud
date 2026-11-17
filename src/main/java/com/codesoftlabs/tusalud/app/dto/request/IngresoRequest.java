@@ -4,9 +4,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import java.util.List;
+import java.util.UUID;
 
 public record IngresoRequest(
-        Long proveedorId,
+        UUID proveedorId,
 
         @Size(max = 40, message = "El documento no puede superar 40 caracteres")
         String documento,

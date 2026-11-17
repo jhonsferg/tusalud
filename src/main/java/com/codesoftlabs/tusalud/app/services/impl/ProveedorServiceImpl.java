@@ -9,6 +9,7 @@ import com.codesoftlabs.tusalud.app.repositories.ProveedorRepository;
 import com.codesoftlabs.tusalud.app.services.interfaces.ProveedorService;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +43,7 @@ public class ProveedorServiceImpl implements ProveedorService {
 
     @Override
     @Transactional
-    public ProveedorResponse actualizar(Long id, ProveedorRequest request) {
+    public ProveedorResponse actualizar(UUID id, ProveedorRequest request) {
         Proveedor proveedor = proveedorRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Proveedor", "id", id));

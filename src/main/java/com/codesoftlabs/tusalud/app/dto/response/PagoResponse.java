@@ -6,11 +6,16 @@ import com.codesoftlabs.tusalud.app.entities.enums.EstadoPago;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Schema(description = "Pago registrado de una cita")
 public record PagoResponse(
-        @Schema(example = "1") Long id,
-        @Schema(example = "10") Long citaId,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID id,
+
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID citaId,
+
         @Schema(example = "Juan Pérez") String pacienteNombre,
         @Schema(example = "Luis García") String medicoNombre,
         @Schema(example = "Cardiología") String especialidad,

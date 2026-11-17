@@ -19,6 +19,7 @@ import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.PacienteCompartidoService;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class PacienteCompartidoServiceImpl implements PacienteCompartidoService 
     @Override
     @Transactional
     public PacienteCompartidoResponse compartir(
-            Long pacienteId, CompartirPacienteRequest request, UsuarioPrincipal actor) {
+            UUID pacienteId, CompartirPacienteRequest request, UsuarioPrincipal actor) {
         Medico origen = medicoRepository
                 .findByUsuarioEmail(actor.getEmail())
                 .orElseThrow(() -> new ForbiddenOperationException("Solo un médico puede compartir pacientes"));
@@ -87,7 +88,7 @@ public class PacienteCompartidoServiceImpl implements PacienteCompartidoService 
 
     @Override
     @Transactional
-    public void revocar(Long pacienteId, Long medicoId, UsuarioPrincipal actor) {
+    public void revocar(UUID pacienteId, UUID medicoId, UsuarioPrincipal actor) {
         PacienteCompartido compartido = compartidoRepository
                 .findByPacienteIdAndMedicoDestinoId(pacienteId, medicoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Paciente compartido", "id", pacienteId));
@@ -102,7 +103,7 @@ public class PacienteCompartidoServiceImpl implements PacienteCompartidoService 
     }
 
     @Override
-    public List<PacienteCompartidoResponse> listar(Long pacienteId, UsuarioPrincipal actor) {
+    public List<PacienteCompartidoResponse> listar(UUID pacienteId, UsuarioPrincipal actor) {
         if (!pacienteRepository.existsById(pacienteId)) {
             throw new ResourceNotFoundException("Paciente", "id", pacienteId);
         }

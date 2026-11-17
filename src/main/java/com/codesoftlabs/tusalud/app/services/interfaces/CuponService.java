@@ -6,6 +6,7 @@ import com.codesoftlabs.tusalud.app.dto.response.ValidacionCuponResponse;
 import com.codesoftlabs.tusalud.app.entities.Cupon;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 public interface CuponService {
 
@@ -13,9 +14,9 @@ public interface CuponService {
 
     CuponResponse crear(CuponRequest request);
 
-    CuponResponse actualizar(Long id, CuponRequest request);
+    CuponResponse actualizar(UUID id, CuponRequest request);
 
-    void eliminar(Long id);
+    void eliminar(UUID id);
 
     ValidacionCuponResponse validar(String codigo, BigDecimal monto);
 

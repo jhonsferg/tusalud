@@ -19,6 +19,7 @@ import com.codesoftlabs.tusalud.app.services.interfaces.ValoracionService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class ValoracionServiceImpl implements ValoracionService {
 
     @Override
     @Transactional
-    public ValoracionResponse valorar(Long citaId, ValoracionRequest request, UsuarioPrincipal paciente) {
+    public ValoracionResponse valorar(UUID citaId, ValoracionRequest request, UsuarioPrincipal paciente) {
         Cita cita = buscarCita(citaId);
         if (!cita.getPaciente().getUsuario().getId().equals(paciente.getId())) {
             throw new ForbiddenOperationException("Solo el paciente de la cita puede valorarla");
@@ -62,7 +63,7 @@ public class ValoracionServiceImpl implements ValoracionService {
     }
 
     @Override
-    public ValoracionResponse obtenerDeCita(Long citaId, UsuarioPrincipal actor) {
+    public ValoracionResponse obtenerDeCita(UUID citaId, UsuarioPrincipal actor) {
         Cita cita = buscarCita(citaId);
         boolean admin = actor.getRoles().contains(RolNombre.ROLE_ADMIN.name());
         boolean paciente = cita.getPaciente().getUsuario().getId().equals(actor.getId());
@@ -77,7 +78,7 @@ public class ValoracionServiceImpl implements ValoracionService {
     }
 
     @Override
-    public ValoracionesMedicoResponse listarDeMedico(Long medicoId) {
+    public ValoracionesMedicoResponse listarDeMedico(UUID medicoId) {
         if (!medicoRepository.existsById(medicoId)) {
             throw new ResourceNotFoundException("Médico", "id", medicoId);
         }
@@ -95,7 +96,7 @@ public class ValoracionServiceImpl implements ValoracionService {
         return new ValoracionesMedicoResponse(promedio, valoraciones.size(), valoraciones);
     }
 
-    private Cita buscarCita(Long citaId) {
+    private Cita buscarCita(UUID citaId) {
         return citaRepository
                 .findByIdWithDetails(citaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cita", "id", citaId));

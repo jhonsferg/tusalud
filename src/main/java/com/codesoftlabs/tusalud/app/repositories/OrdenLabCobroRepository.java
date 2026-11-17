@@ -3,6 +3,7 @@ package com.codesoftlabs.tusalud.app.repositories;
 import com.codesoftlabs.tusalud.app.entities.OrdenLaboratorio;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,14 +11,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OrdenLabCobroRepository extends JpaRepository<OrdenLaboratorio, Long> {
+public interface OrdenLabCobroRepository extends JpaRepository<OrdenLaboratorio, UUID> {
 
     @Query("""
             SELECT o FROM OrdenLaboratorio o
             JOIN FETCH o.paciente p JOIN FETCH p.usuario
             WHERE o.id = :id
             """)
-    Optional<OrdenLaboratorio> findParaCobro(@Param("id") Long id);
+    Optional<OrdenLaboratorio> findParaCobro(@Param("id") UUID id);
 
     @Query("""
             SELECT o FROM OrdenLaboratorio o

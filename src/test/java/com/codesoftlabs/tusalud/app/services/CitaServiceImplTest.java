@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +76,7 @@ class CitaServiceImplTest {
         return new CitaCreateRequest(medico.getId(), fechaHora, "  Dolor de cabeza  ", primeraEspecialidad(medico));
     }
 
-    private static Long primeraEspecialidad(Medico medico) {
+    private static UUID primeraEspecialidad(Medico medico) {
         return medico.getEspecialidades().iterator().next().getId();
     }
 
@@ -140,7 +141,8 @@ class CitaServiceImplTest {
 
     @Test
     void crearCitaConMedicoInexistenteLanzaResourceNotFound() {
-        CitaCreateRequest request = new CitaCreateRequest(-1L, proximoLunes.atTime(9, 0), "Control", 1L);
+        CitaCreateRequest request =
+                new CitaCreateRequest(UUID.randomUUID(), proximoLunes.atTime(9, 0), "Control", UUID.randomUUID());
 
         assertThatThrownBy(() -> citaService.crearCita(request, pacientePrincipal))
                 .isInstanceOf(ResourceNotFoundException.class);
@@ -316,7 +318,7 @@ class CitaServiceImplTest {
 
     @Test
     void crearCitaConEspecialidadQueElMedicoNoAtiendeLanzaBusinessLogicException() {
-        Long ajena = fixture.especialidad().getId();
+        UUID ajena = fixture.especialidad().getId();
         CitaCreateRequest request = new CitaCreateRequest(medico.getId(), proximoLunes.atTime(9, 0), "Control", ajena);
 
         assertThatThrownBy(() -> citaService.crearCita(request, pacientePrincipal))

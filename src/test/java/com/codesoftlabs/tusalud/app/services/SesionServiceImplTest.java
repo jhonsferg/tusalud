@@ -97,7 +97,7 @@ class SesionServiceImplTest {
     void alertasDesactivadasNoGeneranNotificacion() {
         Usuario usuario = fixture.usuario("sinalerta", RolNombre.ROLE_PACIENTE);
         perfilService.actualizarPreferencias(
-                fixture.principal(usuario), new PreferenciasRequest(true, 24, false, null));
+                fixture.principal(usuario), new PreferenciasRequest(true, 1440, false, null));
         sesionService.iniciarSesion(usuario, new ContextoConexion("190.1.2.3", UA_CHROME_WINDOWS));
 
         sesionService.iniciarSesion(usuario, new ContextoConexion("200.1.1.1", UA_SAFARI_IPHONE));
@@ -154,7 +154,7 @@ class SesionServiceImplTest {
         Usuario dueno = fixture.usuario("dueno.ses", RolNombre.ROLE_PACIENTE);
         Usuario otro = fixture.usuario("otro.ses", RolNombre.ROLE_PACIENTE);
         UUID tokenId = sesionService.iniciarSesion(dueno, new ContextoConexion("190.1.2.3", UA_CHROME_WINDOWS));
-        Long sesionId = sesionRepository.findByTokenId(tokenId).orElseThrow().getId();
+        UUID sesionId = sesionRepository.findByTokenId(tokenId).orElseThrow().getId();
 
         assertThatThrownBy(() -> sesionService.revocar(fixture.principal(otro), sesionId))
                 .isInstanceOf(ResourceNotFoundException.class);

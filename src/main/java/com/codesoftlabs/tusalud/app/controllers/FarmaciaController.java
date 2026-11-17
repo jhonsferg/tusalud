@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -84,21 +85,21 @@ public class FarmaciaController {
         return ResponseEntity.ok(farmaciaService.listar(desde, hasta, q));
     }
 
-    @GetMapping("/dispensaciones/{id:\\d+}")
+    @GetMapping("/dispensaciones/{id}")
     @PreAuthorize("hasAnyRole('FARMACIA', 'ADMIN')")
     @Operation(summary = "Detalle de una dispensación")
-    public ResponseEntity<DispensacionResponse> obtener(@PathVariable Long id) {
+    public ResponseEntity<DispensacionResponse> obtener(@PathVariable UUID id) {
         return ResponseEntity.ok(farmaciaService.obtener(id));
     }
 
-    @PutMapping("/dispensaciones/{id:\\d+}/anular")
+    @PutMapping("/dispensaciones/{id}/anular")
     @PreAuthorize("hasAnyRole('FARMACIA', 'ADMIN')")
     @Operation(
             summary = "Anular una dispensación",
             description =
                     "Devuelve el stock a sus lotes y reabre los ítems de receta. Responde 409 si ya está anulada.")
     public ResponseEntity<DispensacionResponse> anular(
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable Long id) {
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable UUID id) {
         return ResponseEntity.ok(farmaciaService.anular(principal, id));
     }
 

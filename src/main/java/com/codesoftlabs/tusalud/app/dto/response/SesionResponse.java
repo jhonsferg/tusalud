@@ -7,7 +7,8 @@ import java.util.UUID;
 
 @Schema(description = "Sesión activa del usuario autenticado")
 public record SesionResponse(
-        @Schema(example = "3") Long id,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID id,
 
         @Schema(example = "Chrome en Windows") String dispositivo,
 

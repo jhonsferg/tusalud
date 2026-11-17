@@ -56,10 +56,10 @@ public class RecordatorioServiceImpl implements RecordatorioService {
                     .findByUsuarioId(paciente.getUsuario().getId())
                     .orElse(null);
             boolean activos = preferencia == null || preferencia.isRecordatoriosActivos();
-            int horas = preferencia == null
-                    ? PreferenciasResponse.HORAS_POR_DEFECTO
-                    : preferencia.getHorasAntelacionRecordatorio();
-            if (!activos || cita.getFechaHora().isAfter(ahora.plusHours(horas))) {
+            int minutos = preferencia == null
+                    ? PreferenciasResponse.MINUTOS_POR_DEFECTO
+                    : preferencia.getMinutosAntelacionRecordatorio();
+            if (!activos || cita.getFechaHora().isAfter(ahora.plusMinutes(minutos))) {
                 continue;
             }
             String fecha = cita.getFechaHora().format(FORMATO_FECHA);

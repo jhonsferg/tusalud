@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
+import java.util.UUID;
 
 @Schema(description = "Resultados de un examen de una orden de laboratorio")
 public record ResultadosLabRequest(
@@ -19,7 +20,7 @@ public record ResultadosLabRequest(
     @Schema(description = "Valor medido para un parámetro")
     public record ResultadoValor(
             @Schema(example = "1") @NotNull(message = "El parámetro es obligatorio")
-            Long parametroId,
+            UUID parametroId,
 
             @Schema(example = "13.4") @NotBlank(message = "El valor es obligatorio") @Size(max = 100)
             String valor) {}

@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +16,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CitaRepository extends JpaRepository<Cita, Long> {
+public interface CitaRepository extends JpaRepository<Cita, UUID> {
 
     @Query("""
             SELECT COUNT(c) > 0 FROM Cita c
@@ -25,9 +26,9 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
               AND c.estado NOT IN (com.codesoftlabs.tusalud.app.entities.enums.EstadoCita.CANCELADA)
             """)
     boolean existsSolapamiento(
-            @Param("medicoId") Long medicoId,
+            @Param("medicoId") UUID medicoId,
             @Param("fechaHora") LocalDateTime fechaHora,
-            @Param("excluirId") Long excluirId);
+            @Param("excluirId") UUID excluirId);
 
     @Query("""
             SELECT COUNT(c) > 0 FROM Cita c
@@ -38,10 +39,10 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
               AND c.estado <> com.codesoftlabs.tusalud.app.entities.enums.EstadoCita.CANCELADA
             """)
     boolean existsCitaMedicoEnFranja(
-            @Param("medicoId") Long medicoId,
+            @Param("medicoId") UUID medicoId,
             @Param("desde") LocalDateTime desde,
             @Param("hasta") LocalDateTime hasta,
-            @Param("excluirId") Long excluirId);
+            @Param("excluirId") UUID excluirId);
 
     @Query("""
             SELECT COUNT(c) > 0 FROM Cita c
@@ -52,10 +53,10 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
               AND c.estado <> com.codesoftlabs.tusalud.app.entities.enums.EstadoCita.CANCELADA
             """)
     boolean existsCitaPacienteEnFranja(
-            @Param("pacienteId") Long pacienteId,
+            @Param("pacienteId") UUID pacienteId,
             @Param("desde") LocalDateTime desde,
             @Param("hasta") LocalDateTime hasta,
-            @Param("excluirId") Long excluirId);
+            @Param("excluirId") UUID excluirId);
 
     @Query("""
             SELECT c FROM Cita c
@@ -85,7 +86,7 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             ORDER BY c.fechaHora ASC
             """)
     List<Cita> findByPacienteAndRango(
-            @Param("pacienteId") Long pacienteId,
+            @Param("pacienteId") UUID pacienteId,
             @Param("inicio") LocalDateTime inicio,
             @Param("fin") LocalDateTime fin);
 
@@ -102,9 +103,9 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             ORDER BY c.fechaHora ASC
             """)
     List<Cita> findAgendaMedico(
-            @Param("medicoId") Long medicoId, @Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
+            @Param("medicoId") UUID medicoId, @Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
 
-    default List<Cita> findAgendaMedicoPorFecha(Long medicoId, LocalDate fecha) {
+    default List<Cita> findAgendaMedicoPorFecha(UUID medicoId, LocalDate fecha) {
         return findAgendaMedico(
                 medicoId, fecha.atStartOfDay(), fecha.plusDays(1).atStartOfDay());
     }
@@ -117,7 +118,7 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
               AND c.estado <> com.codesoftlabs.tusalud.app.entities.enums.EstadoCita.CANCELADA
             """)
     List<LocalDateTime> findHorasOcupadas(
-            @Param("medicoId") Long medicoId, @Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
+            @Param("medicoId") UUID medicoId, @Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
 
     @Query("""
             SELECT c FROM Cita c
@@ -131,10 +132,10 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
                 com.codesoftlabs.tusalud.app.entities.enums.EstadoCita.CONFIRMADA)
             """)
     List<Cita> findActivasPacienteEnVentana(
-            @Param("pacienteId") Long pacienteId,
+            @Param("pacienteId") UUID pacienteId,
             @Param("desde") LocalDateTime desde,
             @Param("hasta") LocalDateTime hasta,
-            @Param("excluirId") Long excluirId);
+            @Param("excluirId") UUID excluirId);
 
     @Query("""
             SELECT c FROM Cita c
@@ -145,7 +146,7 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             JOIN FETCH p.usuario
             WHERE c.id = :id
             """)
-    Optional<Cita> findByIdWithDetails(@Param("id") Long id);
+    Optional<Cita> findByIdWithDetails(@Param("id") UUID id);
 
     @Query("""
             SELECT new com.codesoftlabs.tusalud.app.dto.response.CitasPorEstadoResponse(c.estado, COUNT(c))
@@ -172,7 +173,7 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             WHERE c.medico.usuario.id = :usuarioId
               AND c.paciente.id = :pacienteId
             """)
-    boolean existsRelacionMedicoPaciente(@Param("usuarioId") Long usuarioId, @Param("pacienteId") Long pacienteId);
+    boolean existsRelacionMedicoPaciente(@Param("usuarioId") UUID usuarioId, @Param("pacienteId") UUID pacienteId);
 
     @Query("""
             SELECT c FROM Cita c
@@ -181,7 +182,7 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             WHERE c.medico.usuario.id = :usuarioId
             ORDER BY c.fechaHora DESC
             """)
-    List<Cita> findDelMedicoConPacientes(@Param("usuarioId") Long usuarioId);
+    List<Cita> findDelMedicoConPacientes(@Param("usuarioId") UUID usuarioId);
 
     @Query("""
             SELECT COUNT(c) FROM Cita c

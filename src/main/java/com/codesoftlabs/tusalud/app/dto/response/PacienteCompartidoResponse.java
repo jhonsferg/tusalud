@@ -6,10 +6,12 @@ import com.codesoftlabs.tusalud.app.entities.PacienteCompartido;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Schema(description = "Médico con quien se comparte un paciente")
 public record PacienteCompartidoResponse(
-        @Schema(example = "3") Long medicoId,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID medicoId,
 
         @Schema(example = "Ricardo Salazar") String medicoNombre,
 

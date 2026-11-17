@@ -6,6 +6,7 @@ import com.codesoftlabs.tusalud.app.entities.enums.OrigenComprobante;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,13 +14,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ComprobanteRepository extends JpaRepository<Comprobante, Long> {
+public interface ComprobanteRepository extends JpaRepository<Comprobante, UUID> {
 
     @Query("SELECT COALESCE(MAX(c.numero), 0) FROM Comprobante c WHERE c.serie = :serie")
     int ultimoNumero(@Param("serie") String serie);
 
     boolean existsByOrigenAndReferenciaIdAndEstado(
-            OrigenComprobante origen, Long referenciaId, EstadoComprobante estado);
+            OrigenComprobante origen, UUID referenciaId, EstadoComprobante estado);
 
     @Query("""
             SELECT c FROM Comprobante c
@@ -27,7 +28,7 @@ public interface ComprobanteRepository extends JpaRepository<Comprobante, Long> 
             LEFT JOIN FETCH c.paciente
             WHERE c.id = :id
             """)
-    Optional<Comprobante> findByIdConDetalle(@Param("id") Long id);
+    Optional<Comprobante> findByIdConDetalle(@Param("id") UUID id);
 
     @Query("""
             SELECT c FROM Comprobante c
@@ -36,7 +37,7 @@ public interface ComprobanteRepository extends JpaRepository<Comprobante, Long> 
             """)
     Optional<Comprobante> findVigente(
             @Param("origen") OrigenComprobante origen,
-            @Param("referenciaId") Long referenciaId,
+            @Param("referenciaId") UUID referenciaId,
             @Param("estado") EstadoComprobante estado);
 
     @Query("""
@@ -59,7 +60,7 @@ public interface ComprobanteRepository extends JpaRepository<Comprobante, Long> 
             SELECT c FROM Comprobante c
             WHERE c.caja.id = :cajaId AND c.estado = :estado
             """)
-    List<Comprobante> findDeCaja(@Param("cajaId") Long cajaId, @Param("estado") EstadoComprobante estado);
+    List<Comprobante> findDeCaja(@Param("cajaId") UUID cajaId, @Param("estado") EstadoComprobante estado);
 
     @Query("""
             SELECT c FROM Comprobante c

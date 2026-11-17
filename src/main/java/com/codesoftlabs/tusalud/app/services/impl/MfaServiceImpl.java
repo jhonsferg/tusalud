@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -66,7 +67,7 @@ public class MfaServiceImpl implements MfaService {
     }
 
     @Override
-    public boolean estaActivo(Long usuarioId) {
+    public boolean estaActivo(UUID usuarioId) {
         return mfaRepository
                 .findByUsuarioId(usuarioId)
                 .map(MfaUsuario::isActivo)
@@ -159,7 +160,7 @@ public class MfaServiceImpl implements MfaService {
 
     @Override
     @Transactional(noRollbackFor = {BadCredentialsException.class, DemasiadosIntentosException.class})
-    public void validarSegundoPaso(Long usuarioId, String codigo) {
+    public void validarSegundoPaso(UUID usuarioId, String codigo) {
         MfaUsuario mfa = mfaRepository
                 .findByUsuarioId(usuarioId)
                 .filter(MfaUsuario::isActivo)
@@ -186,7 +187,7 @@ public class MfaServiceImpl implements MfaService {
         return valido;
     }
 
-    private boolean consumirCodigoRecuperacion(Long usuarioId, String codigo) {
+    private boolean consumirCodigoRecuperacion(UUID usuarioId, String codigo) {
         String hash = hash(codigo);
         for (MfaCodigoRecuperacion candidato : codigoRepository.findByUsuarioIdAndUsadoFalse(usuarioId)) {
             if (MessageDigest.isEqual(
@@ -258,14 +259,14 @@ public class MfaServiceImpl implements MfaService {
         mfa.setBloqueadoHasta(null);
     }
 
-    private MfaUsuario mfaActivo(Long usuarioId) {
+    private MfaUsuario mfaActivo(UUID usuarioId) {
         return mfaRepository
                 .findByUsuarioId(usuarioId)
                 .filter(MfaUsuario::isActivo)
                 .orElseThrow(() -> new BusinessLogicException("La verificación en dos pasos no está activada"));
     }
 
-    private Usuario cargarUsuario(Long id) {
+    private Usuario cargarUsuario(UUID id) {
         return usuarioRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id " + id));

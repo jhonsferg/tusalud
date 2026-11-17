@@ -15,8 +15,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -61,7 +61,7 @@ public class AdminUsuarioController {
         return ResponseEntity.ok(usuarioAdminService.listar(rol, q));
     }
 
-    @PutMapping("/{id:\\d+}/roles")
+    @PutMapping("/{id}/roles")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
             summary = "Asignar roles a un usuario",
@@ -79,13 +79,14 @@ public class AdminUsuarioController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<UsuarioAdminResponse> asignarRoles(
-            @Parameter(description = "ID del usuario", example = "4") @PathVariable @Positive Long id,
+            @Parameter(description = "ID del usuario", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Valid @RequestBody RolesUsuarioRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(usuarioAdminService.asignarRoles(id, request.roles(), principal));
     }
 
-    @PutMapping("/{id:\\d+}/estado")
+    @PutMapping("/{id}/estado")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
             summary = "Activar o desactivar un usuario",
@@ -103,7 +104,8 @@ public class AdminUsuarioController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<UsuarioAdminResponse> cambiarEstado(
-            @Parameter(description = "ID del usuario", example = "4") @PathVariable @Positive Long id,
+            @Parameter(description = "ID del usuario", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Valid @RequestBody CambioEstadoUsuarioRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(usuarioAdminService.cambiarEstado(id, request.estado(), principal));

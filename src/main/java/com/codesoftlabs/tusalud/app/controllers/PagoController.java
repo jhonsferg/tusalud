@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class PagoController {
 
     private final PagoService pagoService;
 
-    @PostMapping("/citas/{id:\\d+}/pago")
+    @PostMapping("/citas/{id}/pago")
     @PreAuthorize("hasRole('PACIENTE')")
     @Operation(
             summary = "Pagar cita",
@@ -62,7 +63,8 @@ public class PagoController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<PagoResponse> pagar(
-            @Parameter(description = "ID de la cita", example = "10") @PathVariable Long id,
+            @Parameter(description = "ID de la cita", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Valid @RequestBody PagoRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.status(HttpStatus.CREATED).body(pagoService.pagarCita(id, request, principal));
@@ -83,7 +85,7 @@ public class PagoController {
         return ResponseEntity.ok(pagoService.listarMisPagos(principal));
     }
 
-    @GetMapping("/pagos/{id:\\d+}")
+    @GetMapping("/pagos/{id}")
     @PreAuthorize("hasRole('PACIENTE')")
     @Operation(summary = "Obtener un pago", description = "Solo el paciente dueño del pago.")
     @ApiResponses({
@@ -94,7 +96,8 @@ public class PagoController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<PagoResponse> obtener(
-            @Parameter(description = "ID del pago", example = "1") @PathVariable Long id,
+            @Parameter(description = "ID del pago", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(pagoService.obtenerMiPago(principal, id));
     }

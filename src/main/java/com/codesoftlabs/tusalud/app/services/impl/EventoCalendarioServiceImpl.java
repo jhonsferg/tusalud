@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -122,7 +123,7 @@ public class EventoCalendarioServiceImpl implements EventoCalendarioService {
     }
 
     @Override
-    public EventoCalendarioResponse actualizar(UsuarioPrincipal actor, Long id, EventoCalendarioRequest request) {
+    public EventoCalendarioResponse actualizar(UsuarioPrincipal actor, UUID id, EventoCalendarioRequest request) {
         EventoCalendario evento = buscar(actor, id);
         boolean todoElDia = Boolean.TRUE.equals(request.todoElDia());
         LocalDateTime[] horario = normalizar(request.inicio(), request.fin(), todoElDia);
@@ -147,7 +148,7 @@ public class EventoCalendarioServiceImpl implements EventoCalendarioService {
     }
 
     @Override
-    public EventoCalendarioResponse mover(UsuarioPrincipal actor, Long id, MoverEventoRequest request) {
+    public EventoCalendarioResponse mover(UsuarioPrincipal actor, UUID id, MoverEventoRequest request) {
         EventoCalendario evento = buscar(actor, id);
         boolean todoElDia = request.todoElDia() != null ? request.todoElDia() : evento.isTodoElDia();
         LocalDateTime[] horario = normalizar(request.inicio(), request.fin(), todoElDia);
@@ -162,7 +163,7 @@ public class EventoCalendarioServiceImpl implements EventoCalendarioService {
     }
 
     @Override
-    public EventoCalendarioResponse completar(UsuarioPrincipal actor, Long id, CompletarEventoRequest request) {
+    public EventoCalendarioResponse completar(UsuarioPrincipal actor, UUID id, CompletarEventoRequest request) {
         EventoCalendario evento = buscar(actor, id);
         if (evento.getTipo() != TipoEvento.TAREA) {
             throw new DatosInvalidosException("Solo las tareas se pueden marcar como completadas");
@@ -172,11 +173,11 @@ public class EventoCalendarioServiceImpl implements EventoCalendarioService {
     }
 
     @Override
-    public void eliminar(UsuarioPrincipal actor, Long id) {
+    public void eliminar(UsuarioPrincipal actor, UUID id) {
         eventoRepository.delete(buscar(actor, id));
     }
 
-    private EventoCalendario buscar(UsuarioPrincipal actor, Long id) {
+    private EventoCalendario buscar(UsuarioPrincipal actor, UUID id) {
         return eventoRepository
                 .findByIdAndUsuarioId(id, actor.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Evento", "id", id));

@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -184,7 +185,7 @@ class CitaCalendarioServiceTest {
                 .isInstanceOf(DatosInvalidosException.class);
         assertThatCode(() -> citaService.consultarDisponibilidadRango(medico.getId(), lunes, lunes.plusDays(61)))
                 .doesNotThrowAnyException();
-        assertThatThrownBy(() -> citaService.consultarDisponibilidadRango(999_999L, lunes, lunes))
+        assertThatThrownBy(() -> citaService.consultarDisponibilidadRango(UUID.randomUUID(), lunes, lunes))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 

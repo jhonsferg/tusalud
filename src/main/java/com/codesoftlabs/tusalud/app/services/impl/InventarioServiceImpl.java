@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,8 +95,8 @@ public class InventarioServiceImpl implements InventarioService {
     }
 
     @Override
-    public Map<Long, StockProducto> stockDe(Collection<Long> productoIds) {
-        Map<Long, StockProducto> resultado = new HashMap<>();
+    public Map<UUID, StockProducto> stockDe(Collection<UUID> productoIds) {
+        Map<UUID, StockProducto> resultado = new HashMap<>();
         if (productoIds.isEmpty()) {
             return resultado;
         }

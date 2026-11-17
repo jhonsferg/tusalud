@@ -4,11 +4,12 @@ import com.codesoftlabs.tusalud.app.entities.enums.Billetera;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.UUID;
 
 @Schema(description = "Solicitud de un código QR para pagar una cita con una billetera digital")
 public record PagoQrRequest(
         @Schema(example = "10") @NotNull(message = "La cita es obligatoria")
-        Long citaId,
+        UUID citaId,
 
         @Schema(example = "YAPE") @NotNull(message = "La billetera es obligatoria")
         Billetera billetera,

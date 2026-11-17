@@ -2,6 +2,7 @@ package com.codesoftlabs.tusalud.app.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import java.util.UUID;
 import lombok.Builder;
 
 @Builder
@@ -20,7 +21,8 @@ public record AuthResponse(
         @Schema(description = "Vigencia del token en milisegundos", example = "900000")
         long expiresIn,
 
-        @Schema(example = "1") Long usuarioId,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID usuarioId,
 
         @Schema(example = "admin@tusalud.com") String email,
 

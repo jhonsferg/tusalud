@@ -3,6 +3,7 @@ package com.codesoftlabs.tusalud.app.repositories;
 import com.codesoftlabs.tusalud.app.entities.Producto;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoProducto;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductoRepository extends JpaRepository<Producto, Long> {
+public interface ProductoRepository extends JpaRepository<Producto, UUID> {
 
     @Query("""
             SELECT p FROM Producto p
@@ -25,7 +26,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     boolean existsByCodigo(String codigo);
 
-    boolean existsByCodigoAndIdNot(String codigo, Long id);
+    boolean existsByCodigoAndIdNot(String codigo, UUID id);
 
     long countByActivoTrue();
 }

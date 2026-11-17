@@ -17,6 +17,7 @@ import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,8 +36,8 @@ import lombok.Setter;
 public class ExamenLab {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(nullable = false, length = 20)
     private String codigo;

@@ -15,6 +15,7 @@ import jakarta.persistence.Table;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,8 +34,8 @@ import lombok.Setter;
 public class HorarioAtencion {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "dia_semana", nullable = false, length = 10)

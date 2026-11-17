@@ -14,6 +14,7 @@ import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.MetodoPagoService;
 import java.time.YearMonth;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +34,7 @@ public class MetodoPagoServiceImpl implements MetodoPagoService {
     @Override
     public List<MetodoPagoResponse> listar(UsuarioPrincipal actor) {
         YearMonth hoy = YearMonth.now();
-        return metodoPagoRepository.findByUsuarioIdOrderByPredeterminadoDescIdDesc(actor.getId()).stream()
+        return metodoPagoRepository.findByUsuarioIdOrderByPredeterminadoDescCreatedAtDesc(actor.getId()).stream()
                 .map(metodo -> MetodoPagoResponse.from(metodo, hoy))
                 .toList();
     }
@@ -51,7 +52,7 @@ public class MetodoPagoServiceImpl implements MetodoPagoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", actor.getId()));
 
         List<MetodoPago> existentes =
-                metodoPagoRepository.findByUsuarioIdOrderByPredeterminadoDescIdDesc(actor.getId());
+                metodoPagoRepository.findByUsuarioIdOrderByPredeterminadoDescCreatedAtDesc(actor.getId());
         boolean predeterminado = existentes.isEmpty() || Boolean.TRUE.equals(request.predeterminado());
         if (predeterminado) {
             existentes.forEach(metodo -> metodo.setPredeterminado(false));
@@ -72,8 +73,9 @@ public class MetodoPagoServiceImpl implements MetodoPagoService {
 
     @Override
     @Transactional
-    public MetodoPagoResponse marcarPredeterminado(UsuarioPrincipal actor, Long id) {
-        List<MetodoPago> metodos = metodoPagoRepository.findByUsuarioIdOrderByPredeterminadoDescIdDesc(actor.getId());
+    public MetodoPagoResponse marcarPredeterminado(UsuarioPrincipal actor, UUID id) {
+        List<MetodoPago> metodos =
+                metodoPagoRepository.findByUsuarioIdOrderByPredeterminadoDescCreatedAtDesc(actor.getId());
         MetodoPago objetivo = buscar(metodos, id);
         metodos.forEach(metodo -> metodo.setPredeterminado(metodo.getId().equals(id)));
         return MetodoPagoResponse.from(objetivo, YearMonth.now());
@@ -81,8 +83,9 @@ public class MetodoPagoServiceImpl implements MetodoPagoService {
 
     @Override
     @Transactional
-    public void eliminar(UsuarioPrincipal actor, Long id) {
-        List<MetodoPago> metodos = metodoPagoRepository.findByUsuarioIdOrderByPredeterminadoDescIdDesc(actor.getId());
+    public void eliminar(UsuarioPrincipal actor, UUID id) {
+        List<MetodoPago> metodos =
+                metodoPagoRepository.findByUsuarioIdOrderByPredeterminadoDescCreatedAtDesc(actor.getId());
         MetodoPago metodo = buscar(metodos, id);
         boolean eraPredeterminado = metodo.isPredeterminado();
         pagoRepository.desvincularMetodo(id);
@@ -95,7 +98,7 @@ public class MetodoPagoServiceImpl implements MetodoPagoService {
         }
     }
 
-    private static MetodoPago buscar(List<MetodoPago> metodos, Long id) {
+    private static MetodoPago buscar(List<MetodoPago> metodos, UUID id) {
         return metodos.stream()
                 .filter(metodo -> metodo.getId().equals(id))
                 .findFirst()

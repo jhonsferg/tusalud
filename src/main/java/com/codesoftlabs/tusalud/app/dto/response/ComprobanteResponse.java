@@ -9,9 +9,10 @@ import com.codesoftlabs.tusalud.app.entities.enums.TipoDocumentoCliente;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public record ComprobanteResponse(
-        Long id,
+        UUID id,
         TipoComprobante tipo,
         String serie,
         Integer numero,
@@ -27,9 +28,9 @@ public record ComprobanteResponse(
         EstadoComprobante estado,
         String motivoAnulacion,
         OrigenComprobante origen,
-        Long referenciaId,
-        Long pacienteId,
-        Long cajaId,
+        UUID referenciaId,
+        UUID pacienteId,
+        UUID cajaId,
         String cajeroNombre,
         List<ComprobanteItemResponse> items) {
 

@@ -4,9 +4,10 @@ import com.codesoftlabs.tusalud.app.entities.Producto;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoProducto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 public record ProductoResponse(
-        Long id,
+        UUID id,
         String codigo,
         String nombre,
         String descripcion,

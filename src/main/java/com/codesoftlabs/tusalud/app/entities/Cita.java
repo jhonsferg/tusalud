@@ -17,6 +17,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,8 +41,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class Cita {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(name = "fecha_hora", nullable = false)
     private LocalDateTime fechaHora;

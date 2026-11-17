@@ -4,13 +4,14 @@ import com.codesoftlabs.tusalud.app.entities.IntencionPago;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoIntencionPago;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface IntencionPagoRepository extends JpaRepository<IntencionPago, Long> {
+public interface IntencionPagoRepository extends JpaRepository<IntencionPago, UUID> {
 
     @Query("""
             SELECT i FROM IntencionPago i
@@ -19,7 +20,7 @@ public interface IntencionPagoRepository extends JpaRepository<IntencionPago, Lo
             WHERE i.codigo = :codigo AND i.usuario.id = :usuarioId
             """)
     Optional<IntencionPago> findByCodigoAndUsuarioId(
-            @Param("codigo") String codigo, @Param("usuarioId") Long usuarioId);
+            @Param("codigo") String codigo, @Param("usuarioId") UUID usuarioId);
 
-    List<IntencionPago> findByCitaIdAndEstado(Long citaId, EstadoIntencionPago estado);
+    List<IntencionPago> findByCitaIdAndEstado(UUID citaId, EstadoIntencionPago estado);
 }

@@ -157,10 +157,12 @@ class AlmacenFarmaciaSeguridadTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"items\":[]}"))
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(post("/api/v1/almacen/salidas")
-                        .header(HttpHeaders.AUTHORIZATION, almacen)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"productoId\":1,\"cantidad\":0,\"motivo\":\"MERMA\"}"))
+        mockMvc.perform(
+                        post("/api/v1/almacen/salidas")
+                                .header(HttpHeaders.AUTHORIZATION, almacen)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"productoId\":\"00000000-0000-0000-0000-000000000001\",\"cantidad\":0,\"motivo\":\"MERMA\"}"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -178,14 +180,17 @@ class AlmacenFarmaciaSeguridadTest {
                 .andExpect(status().isOk());
         mockMvc.perform(get("/api/v1/farmacia/recetas").header(HttpHeaders.AUTHORIZATION, medico))
                 .andExpect(status().isForbidden());
-        mockMvc.perform(post("/api/v1/farmacia/dispensaciones")
-                        .header(HttpHeaders.AUTHORIZATION, medico)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"items\":[{\"productoId\":1,\"cantidad\":1}],\"metodoPago\":\"EFECTIVO\"}"))
+        mockMvc.perform(
+                        post("/api/v1/farmacia/dispensaciones")
+                                .header(HttpHeaders.AUTHORIZATION, medico)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"items\":[{\"productoId\":\"00000000-0000-0000-0000-000000000001\",\"cantidad\":1}],\"metodoPago\":\"EFECTIVO\"}"))
                 .andExpect(status().isForbidden());
-        mockMvc.perform(put("/api/v1/farmacia/dispensaciones/1/anular").header(HttpHeaders.AUTHORIZATION, almacen))
+        mockMvc.perform(put("/api/v1/farmacia/dispensaciones/00000000-0000-0000-0000-000000000001/anular")
+                        .header(HttpHeaders.AUTHORIZATION, almacen))
                 .andExpect(status().isForbidden());
-        mockMvc.perform(put("/api/v1/farmacia/dispensaciones/999999/anular")
+        mockMvc.perform(put("/api/v1/farmacia/dispensaciones/00000000-0000-0000-0000-000000999999/anular")
                         .header(HttpHeaders.AUTHORIZATION, farmacia))
                 .andExpect(status().isNotFound());
     }
@@ -197,10 +202,12 @@ class AlmacenFarmaciaSeguridadTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"items\":[],\"metodoPago\":\"EFECTIVO\"}"))
                 .andExpect(status().isBadRequest());
-        mockMvc.perform(post("/api/v1/farmacia/dispensaciones")
-                        .header(HttpHeaders.AUTHORIZATION, farmacia)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"items\":[{\"productoId\":999999,\"cantidad\":1}],\"metodoPago\":\"EFECTIVO\"}"))
+        mockMvc.perform(
+                        post("/api/v1/farmacia/dispensaciones")
+                                .header(HttpHeaders.AUTHORIZATION, farmacia)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"items\":[{\"productoId\":\"00000000-0000-0000-0000-000000999999\",\"cantidad\":1}],\"metodoPago\":\"EFECTIVO\"}"))
                 .andExpect(status().isNotFound());
     }
 }

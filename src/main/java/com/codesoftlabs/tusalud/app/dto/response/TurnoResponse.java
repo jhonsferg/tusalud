@@ -7,17 +7,28 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Schema(description = "Turno de atención en la sala de espera")
 public record TurnoResponse(
-        @Schema(example = "12") Long id,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID id,
+
         @Schema(example = "A-003") String numero,
         @Schema(type = "string", example = "2026-10-19") LocalDate fecha,
-        @Schema(example = "3") Long pacienteId,
+
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID pacienteId,
+
         @Schema(example = "Juan Pérez") String pacienteNombre,
         @Schema(example = "12345678") String dni,
-        @Schema(example = "10") Long citaId,
-        @Schema(example = "1") Long medicoId,
+
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID citaId,
+
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID medicoId,
+
         @Schema(example = "Luis García") String medicoNombre,
         @Schema(example = "NORMAL") PrioridadTurno prioridad,
         @Schema(example = "EN_ESPERA") EstadoTurno estado,

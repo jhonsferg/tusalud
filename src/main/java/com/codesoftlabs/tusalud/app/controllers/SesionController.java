@@ -56,7 +56,7 @@ public class SesionController {
         return ResponseEntity.ok(sesionService.listarActivas(principal, tokenActual));
     }
 
-    @DeleteMapping("/{id:\\d+}")
+    @DeleteMapping("/{id}")
     @Operation(summary = "Cerrar una sesión", description = "Revoca una sesión propia por su identificador.")
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Sesión revocada"),
@@ -66,7 +66,8 @@ public class SesionController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Void> revocar(
-            @Parameter(description = "ID de la sesión", example = "3") @PathVariable Long id,
+            @Parameter(description = "ID de la sesión", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         sesionService.revocar(principal, id);
         return ResponseEntity.noContent().build();

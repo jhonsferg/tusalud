@@ -6,10 +6,11 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
+import java.util.UUID;
 
 public record DispensacionRequest(
-        Long atencionId,
-        Long pacienteId,
+        UUID atencionId,
+        UUID pacienteId,
 
         @NotEmpty(message = "Debe indicar al menos un producto") @Valid
         List<DispensacionItemRequest> items,

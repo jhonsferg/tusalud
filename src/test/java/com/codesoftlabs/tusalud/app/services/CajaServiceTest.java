@@ -38,6 +38,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +97,7 @@ class CajaServiceTest {
                 List.of(new CobroItemRequest("Curación", cantidad, new BigDecimal(precio))));
     }
 
-    private CobroRequest deCita(Long citaId, MetodoPagoCaja metodo) {
+    private CobroRequest deCita(UUID citaId, MetodoPagoCaja metodo) {
         return new CobroRequest(
                 OrigenComprobante.CITA,
                 citaId,
@@ -263,7 +264,7 @@ class CajaServiceTest {
 
         assertThatThrownBy(() -> cajaService.cobrar(cajero, deCita(cancelada.getId(), MetodoPagoCaja.EFECTIVO)))
                 .isInstanceOf(BusinessLogicException.class);
-        assertThatThrownBy(() -> cajaService.cobrar(cajero, deCita(999_999L, MetodoPagoCaja.EFECTIVO)))
+        assertThatThrownBy(() -> cajaService.cobrar(cajero, deCita(UUID.randomUUID(), MetodoPagoCaja.EFECTIVO)))
                 .isInstanceOf(ResourceNotFoundException.class);
         assertThatThrownBy(() -> cajaService.cobrar(cajero, deCita(null, MetodoPagoCaja.EFECTIVO)))
                 .isInstanceOf(DatosInvalidosException.class);

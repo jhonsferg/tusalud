@@ -21,9 +21,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -69,7 +69,7 @@ public class LaboratorioController {
                 description = "Examen no encontrado",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<ExamenLabResponse> obtenerExamen(@PathVariable @Positive Long id) {
+    public ResponseEntity<ExamenLabResponse> obtenerExamen(@PathVariable UUID id) {
         return ResponseEntity.ok(laboratorioService.obtenerExamen(id));
     }
 
@@ -105,7 +105,7 @@ public class LaboratorioController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<ExamenLabResponse> actualizarExamen(
-            @PathVariable @Positive Long id, @Valid @RequestBody ExamenLabRequest request) {
+            @PathVariable UUID id, @Valid @RequestBody ExamenLabRequest request) {
         return ResponseEntity.ok(laboratorioService.actualizarExamen(id, request));
     }
 
@@ -170,8 +170,7 @@ public class LaboratorioController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<OrdenLabResponse> obtenerOrden(
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
-            @PathVariable @Positive Long id) {
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable UUID id) {
         return ResponseEntity.ok(laboratorioService.obtenerOrden(principal, id));
     }
 
@@ -186,8 +185,7 @@ public class LaboratorioController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<OrdenLabResponse> tomarMuestra(
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
-            @PathVariable @Positive Long id) {
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable UUID id) {
         return ResponseEntity.ok(laboratorioService.tomarMuestra(principal, id));
     }
 
@@ -209,8 +207,8 @@ public class LaboratorioController {
     })
     public ResponseEntity<OrdenLabResponse> registrarResultados(
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
-            @PathVariable @Positive Long id,
-            @PathVariable @Positive Long itemId,
+            @PathVariable UUID id,
+            @PathVariable UUID itemId,
             @Valid @RequestBody ResultadosLabRequest request) {
         return ResponseEntity.ok(laboratorioService.registrarResultados(principal, id, itemId, request));
     }
@@ -228,8 +226,7 @@ public class LaboratorioController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<OrdenLabResponse> validar(
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
-            @PathVariable @Positive Long id) {
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable UUID id) {
         return ResponseEntity.ok(laboratorioService.validar(principal, id));
     }
 
@@ -252,7 +249,7 @@ public class LaboratorioController {
     })
     public ResponseEntity<OrdenLabResponse> cancelar(
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
-            @PathVariable @Positive Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody(required = false) CancelarOrdenLabRequest request) {
         return ResponseEntity.ok(laboratorioService.cancelar(principal, id, request));
     }

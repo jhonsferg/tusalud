@@ -3,6 +3,7 @@ package com.codesoftlabs.tusalud.app.repositories;
 import com.codesoftlabs.tusalud.app.entities.Cita;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CitaCobroRepository extends JpaRepository<Cita, Long> {
+public interface CitaCobroRepository extends JpaRepository<Cita, UUID> {
 
     @Query("""
             SELECT c FROM Cita c
@@ -20,7 +21,7 @@ public interface CitaCobroRepository extends JpaRepository<Cita, Long> {
             LEFT JOIN FETCH c.pago
             WHERE c.id = :id
             """)
-    Optional<Cita> findParaCobro(@Param("id") Long id);
+    Optional<Cita> findParaCobro(@Param("id") UUID id);
 
     @Query("""
             SELECT c FROM Cita c

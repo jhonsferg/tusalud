@@ -38,6 +38,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -93,7 +94,7 @@ public class AlmacenServiceImpl implements AlmacenService {
                 .total(total)
                 .usuario(usuario)
                 .build());
-        String referencia = String.format("ING-%06d", ingreso.getId());
+        String referencia = String.format("ING-%06d", ingresoRepository.count());
         LocalDate hoy = LocalDate.now();
         List<LoteResponse> lotes = new java.util.ArrayList<>();
         for (IngresoItemRequest item : request.items()) {
@@ -141,7 +142,7 @@ public class AlmacenServiceImpl implements AlmacenService {
             return List.of();
         }
         LocalDate hoy = LocalDate.now();
-        Map<Long, List<LoteResponse>> lotes =
+        Map<UUID, List<LoteResponse>> lotes =
                 loteRepository
                         .findByIngresoIds(ingresos.stream().map(Ingreso::getId).toList())
                         .stream()
@@ -197,7 +198,7 @@ public class AlmacenServiceImpl implements AlmacenService {
 
     @Override
     public List<MovimientoResponse> movimientos(
-            Long productoId, TipoMovimiento tipo, LocalDate desde, LocalDate hasta) {
+            UUID productoId, TipoMovimiento tipo, LocalDate desde, LocalDate hasta) {
         LocalDate fin = hasta == null ? LocalDate.now() : hasta;
         LocalDate inicio = desde == null ? fin.minusDays(DIAS_POR_DEFECTO) : desde;
         if (inicio.isAfter(fin)) {

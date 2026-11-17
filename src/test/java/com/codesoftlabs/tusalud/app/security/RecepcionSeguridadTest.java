@@ -19,6 +19,7 @@ import com.codesoftlabs.tusalud.app.services.ServiceTestFixture;
 import com.jayway.jsonpath.JsonPath;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,16 +82,16 @@ class RecepcionSeguridadTest {
         return "Bearer " + jwtUtils.generateToken(UsuarioPrincipal.from(usuario));
     }
 
-    private long crearTurno(String tokenDe, long pacienteId, String prioridad) throws Exception {
+    private UUID crearTurno(String tokenDe, UUID pacienteId, String prioridad) throws Exception {
         MvcResult resultado = mockMvc.perform(post(BASE + "/turnos")
                         .header(HttpHeaders.AUTHORIZATION, tokenDe)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"pacienteId\":" + pacienteId + ",\"medicoId\":" + medico.getId()
+                        .content("{\"pacienteId\":\"" + pacienteId + "\",\"medicoId\":\"" + medico.getId() + "\""
                                 + ",\"prioridad\":\"" + prioridad + "\",\"motivo\":\"Consulta\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists(HttpHeaders.LOCATION))
                 .andReturn();
-        return ((Number) JsonPath.read(resultado.getResponse().getContentAsString(), "$.id")).longValue();
+        return UUID.fromString(JsonPath.read(resultado.getResponse().getContentAsString(), "$.id"));
     }
 
     @Test
@@ -140,7 +141,7 @@ class RecepcionSeguridadTest {
 
     @Test
     void elFlujoDeColaPorHttpRespetaLosRoles() throws Exception {
-        long turno = crearTurno(tokenRecepcion, paciente.getId(), "URGENTE");
+        UUID turno = crearTurno(tokenRecepcion, paciente.getId(), "URGENTE");
 
         mockMvc.perform(get(BASE + "/cola").header(HttpHeaders.AUTHORIZATION, tokenRecepcion))
                 .andExpect(status().isOk())
@@ -168,14 +169,15 @@ class RecepcionSeguridadTest {
         mockMvc.perform(put(BASE + "/turnos/" + turno + "/finalizar").header(HttpHeaders.AUTHORIZATION, tokenMedico))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estado", is("ATENDIDO")));
-        mockMvc.perform(put(BASE + "/turnos/999999/llamar").header(HttpHeaders.AUTHORIZATION, tokenRecepcion))
+        mockMvc.perform(put(BASE + "/turnos/00000000-0000-0000-0000-000000999999/llamar")
+                        .header(HttpHeaders.AUTHORIZATION, tokenRecepcion))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void ausenteYCancelarSonDeRecepcionAdminYMedico() throws Exception {
-        long uno = crearTurno(tokenRecepcion, paciente.getId(), "NORMAL");
-        long dos = crearTurno(tokenAdmin, fixture.paciente().getId(), "PREFERENTE");
+        UUID uno = crearTurno(tokenRecepcion, paciente.getId(), "NORMAL");
+        UUID dos = crearTurno(tokenAdmin, fixture.paciente().getId(), "PREFERENTE");
 
         mockMvc.perform(put(BASE + "/turnos/" + uno + "/ausente").header(HttpHeaders.AUTHORIZATION, tokenFarmacia))
                 .andExpect(status().isForbidden());
@@ -189,7 +191,7 @@ class RecepcionSeguridadTest {
 
     @Test
     void laPantallaEsDeCualquierUsuarioAutenticado() throws Exception {
-        long turno = crearTurno(tokenRecepcion, paciente.getId(), "NORMAL");
+        UUID turno = crearTurno(tokenRecepcion, paciente.getId(), "NORMAL");
         mockMvc.perform(put(BASE + "/turnos/" + turno + "/llamar").header(HttpHeaders.AUTHORIZATION, tokenRecepcion))
                 .andExpect(status().isOk());
 
@@ -251,9 +253,9 @@ class RecepcionSeguridadTest {
     void laCitaDeMostradorSeValidaYSoloLaReservanRecepcionYAdmin() throws Exception {
         LocalDate lunes =
                 LocalDate.now().plusDays(7 - ((LocalDate.now().getDayOfWeek().getValue() + 6) % 7));
-        String cuerpo = "{\"pacienteId\":" + paciente.getId() + ",\"medicoId\":" + medico.getId()
-                + ",\"especialidadId\":"
-                + medico.getEspecialidades().iterator().next().getId()
+        String cuerpo = "{\"pacienteId\":\"" + paciente.getId() + "\",\"medicoId\":\"" + medico.getId() + "\""
+                + ",\"especialidadId\":\""
+                + medico.getEspecialidades().iterator().next().getId() + "\""
                 + ",\"fechaHora\":\"" + lunes + "T09:00:00\",\"motivo\":\"Control\"}";
 
         mockMvc.perform(post(BASE + "/citas")
@@ -276,7 +278,7 @@ class RecepcionSeguridadTest {
         mockMvc.perform(post(BASE + "/citas")
                         .header(HttpHeaders.AUTHORIZATION, tokenRecepcion)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"pacienteId\":1}"))
+                        .content("{\"pacienteId\":\"00000000-0000-0000-0000-000000000001\"}"))
                 .andExpect(status().isBadRequest());
     }
 }

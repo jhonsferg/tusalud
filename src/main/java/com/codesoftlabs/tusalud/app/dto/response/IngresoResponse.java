@@ -4,9 +4,10 @@ import com.codesoftlabs.tusalud.app.entities.Ingreso;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public record IngresoResponse(
-        Long id,
+        UUID id,
         LocalDateTime fecha,
         String documento,
         String proveedorNombre,

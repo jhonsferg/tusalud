@@ -17,6 +17,7 @@ import com.codesoftlabs.tusalud.app.entities.enums.EstadoCama;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoIngresoHosp;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.util.List;
+import java.util.UUID;
 
 public interface HospitalizacionService {
 
@@ -24,27 +25,27 @@ public interface HospitalizacionService {
 
     CamaResponse crearCama(CamaRequest request);
 
-    CamaResponse actualizarCama(Long id, CamaRequest request);
+    CamaResponse actualizarCama(UUID id, CamaRequest request);
 
-    CamaResponse cambiarEstadoCama(Long id, CamaEstadoRequest request);
+    CamaResponse cambiarEstadoCama(UUID id, CamaEstadoRequest request);
 
     IngresoHospResponse crearIngreso(UsuarioPrincipal actor, IngresoHospCreateRequest request);
 
     List<IngresoHospResponse> listarIngresos(EstadoIngresoHosp estado, String busqueda);
 
-    IngresoHospResponse obtenerIngreso(UsuarioPrincipal actor, Long id);
+    IngresoHospResponse obtenerIngreso(UsuarioPrincipal actor, UUID id);
 
-    IngresoHospResponse trasladar(Long id, CamaAsignacionRequest request);
+    IngresoHospResponse trasladar(UUID id, CamaAsignacionRequest request);
 
-    IngresoHospResponse asignarCama(Long id, CamaAsignacionRequest request);
+    IngresoHospResponse asignarCama(UUID id, CamaAsignacionRequest request);
 
-    IngresoHospResponse darAlta(Long id, AltaHospRequest request);
+    IngresoHospResponse darAlta(UUID id, AltaHospRequest request);
 
-    IngresoHospResponse cancelarIngreso(Long id);
+    IngresoHospResponse cancelarIngreso(UUID id);
 
-    EvolucionHospResponse registrarEvolucion(UsuarioPrincipal actor, Long ingresoId, EvolucionHospRequest request);
+    EvolucionHospResponse registrarEvolucion(UsuarioPrincipal actor, UUID ingresoId, EvolucionHospRequest request);
 
-    List<EvolucionHospResponse> listarEvoluciones(UsuarioPrincipal actor, Long ingresoId);
+    List<EvolucionHospResponse> listarEvoluciones(UsuarioPrincipal actor, UUID ingresoId);
 
     IngresoHospResponse registrarEmergencia(UsuarioPrincipal actor, EmergenciaRequest request);
 

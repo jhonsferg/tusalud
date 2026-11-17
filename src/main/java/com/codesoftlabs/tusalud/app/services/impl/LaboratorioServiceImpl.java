@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -93,7 +94,7 @@ public class LaboratorioServiceImpl implements LaboratorioService {
 
     @Override
     @Transactional(readOnly = true)
-    public ExamenLabResponse obtenerExamen(Long id) {
+    public ExamenLabResponse obtenerExamen(UUID id) {
         return ExamenLabResponse.from(buscarExamen(id));
     }
 
@@ -109,7 +110,7 @@ public class LaboratorioServiceImpl implements LaboratorioService {
     }
 
     @Override
-    public ExamenLabResponse actualizarExamen(Long id, ExamenLabRequest request) {
+    public ExamenLabResponse actualizarExamen(UUID id, ExamenLabRequest request) {
         ExamenLab examen = buscarExamen(id);
         String codigo = normalizarCodigo(request.codigo());
         examenRepository
@@ -157,7 +158,7 @@ public class LaboratorioServiceImpl implements LaboratorioService {
                 .estado(EstadoItemLab.PENDIENTE)
                 .build()));
         OrdenLaboratorio orden = ordenRepository.saveAndFlush(nueva);
-        orden.setCodigo(String.format("LAB-%06d", orden.getId()));
+        orden.setCodigo(String.format("LAB-%06d", ordenRepository.count()));
 
         notificarSolicitud(orden, paciente);
         return OrdenLabResponse.from(orden, false);
@@ -185,7 +186,7 @@ public class LaboratorioServiceImpl implements LaboratorioService {
 
     @Override
     @Transactional(readOnly = true)
-    public OrdenLabResponse obtenerOrden(UsuarioPrincipal actor, Long id) {
+    public OrdenLabResponse obtenerOrden(UsuarioPrincipal actor, UUID id) {
         OrdenLaboratorio orden = buscarOrden(id);
         boolean personal = tieneRol(actor, RolNombre.ROLE_LABORATORIO) || tieneRol(actor, RolNombre.ROLE_ADMIN);
         boolean solicitante = orden.getMedico().getUsuario().getId().equals(actor.getId());
@@ -200,7 +201,7 @@ public class LaboratorioServiceImpl implements LaboratorioService {
     }
 
     @Override
-    public OrdenLabResponse tomarMuestra(UsuarioPrincipal actor, Long ordenId) {
+    public OrdenLabResponse tomarMuestra(UsuarioPrincipal actor, UUID ordenId) {
         OrdenLaboratorio orden = buscarOrden(ordenId);
         if (orden.getEstado() != EstadoOrdenLab.SOLICITADA) {
             throw new ConflictException("Solo se puede tomar la muestra de una orden solicitada");
@@ -212,7 +213,7 @@ public class LaboratorioServiceImpl implements LaboratorioService {
 
     @Override
     public OrdenLabResponse registrarResultados(
-            UsuarioPrincipal actor, Long ordenId, Long itemId, ResultadosLabRequest request) {
+            UsuarioPrincipal actor, UUID ordenId, UUID itemId, ResultadosLabRequest request) {
         OrdenLaboratorio orden = buscarOrden(ordenId);
         if (orden.getEstado() != EstadoOrdenLab.MUESTRA_TOMADA && orden.getEstado() != EstadoOrdenLab.EN_PROCESO) {
             throw new ConflictException(
@@ -225,9 +226,9 @@ public class LaboratorioServiceImpl implements LaboratorioService {
         if (item.getEstado() == EstadoItemLab.VALIDADO) {
             throw new ConflictException("El examen ya fue validado");
         }
-        Map<Long, ParametroExamen> parametros = item.getExamen().getParametros().stream()
+        Map<UUID, ParametroExamen> parametros = item.getExamen().getParametros().stream()
                 .collect(Collectors.toMap(ParametroExamen::getId, Function.identity()));
-        Set<Long> vistos = new HashSet<>();
+        Set<UUID> vistos = new HashSet<>();
         List<ResultadoLab> resultados = new ArrayList<>();
         for (ResultadosLabRequest.ResultadoValor valor : request.resultados()) {
             ParametroExamen parametro = parametros.get(valor.parametroId());
@@ -249,7 +250,7 @@ public class LaboratorioServiceImpl implements LaboratorioService {
     }
 
     @Override
-    public OrdenLabResponse validar(UsuarioPrincipal actor, Long ordenId) {
+    public OrdenLabResponse validar(UsuarioPrincipal actor, UUID ordenId) {
         OrdenLaboratorio orden = buscarOrden(ordenId);
         if (orden.getEstado() != EstadoOrdenLab.EN_PROCESO) {
             throw new ConflictException("Solo se puede validar una orden con resultados en proceso");
@@ -273,7 +274,7 @@ public class LaboratorioServiceImpl implements LaboratorioService {
     }
 
     @Override
-    public OrdenLabResponse cancelar(UsuarioPrincipal actor, Long ordenId, CancelarOrdenLabRequest request) {
+    public OrdenLabResponse cancelar(UsuarioPrincipal actor, UUID ordenId, CancelarOrdenLabRequest request) {
         OrdenLaboratorio orden = buscarOrden(ordenId);
         if (orden.getEstado() == EstadoOrdenLab.COMPLETADA || orden.getEstado() == EstadoOrdenLab.CANCELADA) {
             throw new ConflictException("La orden ya no se puede cancelar");
@@ -374,7 +375,7 @@ public class LaboratorioServiceImpl implements LaboratorioService {
                 .build();
     }
 
-    private Atencion resolverAtencion(Long atencionId, Paciente paciente, Medico medico) {
+    private Atencion resolverAtencion(UUID atencionId, Paciente paciente, Medico medico) {
         if (atencionId == null) {
             return null;
         }
@@ -390,12 +391,12 @@ public class LaboratorioServiceImpl implements LaboratorioService {
         return atencion;
     }
 
-    private List<ExamenLab> resolverExamenes(List<Long> ids) {
-        Set<Long> unicos = new LinkedHashSet<>(ids);
-        Map<Long, ExamenLab> encontrados = examenRepository.findAllByIdConParametros(unicos).stream()
+    private List<ExamenLab> resolverExamenes(List<UUID> ids) {
+        Set<UUID> unicos = new LinkedHashSet<>(ids);
+        Map<UUID, ExamenLab> encontrados = examenRepository.findAllByIdConParametros(unicos).stream()
                 .collect(Collectors.toMap(ExamenLab::getId, Function.identity()));
         List<ExamenLab> examenes = new ArrayList<>();
-        for (Long id : unicos) {
+        for (UUID id : unicos) {
             ExamenLab examen = encontrados.get(id);
             if (examen == null) {
                 throw new ResourceNotFoundException("Examen", "id", id);
@@ -448,13 +449,13 @@ public class LaboratorioServiceImpl implements LaboratorioService {
                 "/laboratorio/ordenes/" + orden.getId());
     }
 
-    private OrdenLaboratorio buscarOrden(Long id) {
+    private OrdenLaboratorio buscarOrden(UUID id) {
         return ordenRepository
                 .findByIdConDetalle(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Orden de laboratorio", "id", id));
     }
 
-    private ExamenLab buscarExamen(Long id) {
+    private ExamenLab buscarExamen(UUID id) {
         return examenRepository
                 .findByIdConParametros(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Examen", "id", id));

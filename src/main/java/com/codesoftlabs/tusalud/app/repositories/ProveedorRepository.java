@@ -2,13 +2,14 @@ package com.codesoftlabs.tusalud.app.repositories;
 
 import com.codesoftlabs.tusalud.app.entities.Proveedor;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProveedorRepository extends JpaRepository<Proveedor, Long> {
+public interface ProveedorRepository extends JpaRepository<Proveedor, UUID> {
 
     @Query("""
             SELECT p FROM Proveedor p
@@ -20,5 +21,5 @@ public interface ProveedorRepository extends JpaRepository<Proveedor, Long> {
 
     boolean existsByRuc(String ruc);
 
-    boolean existsByRucAndIdNot(String ruc, Long id);
+    boolean existsByRucAndIdNot(String ruc, UUID id);
 }

@@ -6,14 +6,15 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
+import java.util.UUID;
 
 @Schema(description = "Solicitud de una orden de laboratorio")
 public record OrdenLabCreateRequest(
         @Schema(example = "1") @NotNull(message = "El paciente es obligatorio")
-        Long pacienteId,
+        UUID pacienteId,
 
         @Schema(example = "10", description = "Atención de la que nace la orden, opcional")
-        Long atencionId,
+        UUID atencionId,
 
         @Schema(example = "NORMAL") @NotNull(message = "La prioridad es obligatoria")
         PrioridadOrden prioridad,
@@ -22,4 +23,4 @@ public record OrdenLabCreateRequest(
         String indicaciones,
 
         @Schema(example = "[1, 2]") @NotEmpty(message = "Debe elegir al menos un examen")
-        List<@NotNull(message = "El examen es obligatorio") Long> examenIds) {}
+        List<@NotNull(message = "El examen es obligatorio") UUID> examenIds) {}

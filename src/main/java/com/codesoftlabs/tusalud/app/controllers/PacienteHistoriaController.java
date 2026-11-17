@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,7 +35,7 @@ public class PacienteHistoriaController {
 
     private final HistoriaClinicaService historiaClinicaService;
 
-    @GetMapping("/pacientes/{pacienteId:\\d+}/historia-clinica")
+    @GetMapping("/pacientes/{pacienteId}/historia-clinica")
     @PreAuthorize("hasAnyRole('MEDICO', 'ADMIN')")
     @Operation(
             summary = "Historia clínica de un paciente",
@@ -52,7 +53,8 @@ public class PacienteHistoriaController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<HistoriaClinicaResponse> historiaDePaciente(
-            @Parameter(description = "ID del paciente", example = "1") @PathVariable Long pacienteId,
+            @Parameter(description = "ID del paciente", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID pacienteId,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(historiaClinicaService.obtenerDePaciente(pacienteId, principal));
     }

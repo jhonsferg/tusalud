@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,8 +48,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 public class OrdenLaboratorio {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(nullable = false, length = 20)
     private String codigo;
@@ -98,7 +99,7 @@ public class OrdenLaboratorio {
     private boolean cobrado = false;
 
     @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("id ASC")
+    @OrderBy("posicion ASC")
     @Builder.Default
     private List<ItemOrdenLab> items = new ArrayList<>();
 
@@ -111,6 +112,7 @@ public class OrdenLaboratorio {
     private LocalDateTime updatedAt;
 
     public void agregarItem(ItemOrdenLab item) {
+        item.setPosicion(items.size());
         items.add(item);
         item.setOrden(this);
     }

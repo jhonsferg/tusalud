@@ -19,6 +19,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -119,7 +120,9 @@ class NotificacionServiceImplTest {
     void listarDevuelveLasMasNuevasPrimero() {
         Usuario usuario = fixture.usuario("notif", RolNombre.ROLE_PACIENTE);
         notificacionService.crear(usuario, TipoNotificacion.SISTEMA, "Primera", "Mensaje 1", null);
+        pausa();
         notificacionService.crear(usuario, TipoNotificacion.SISTEMA, "Segunda", "Mensaje 2", null);
+        pausa();
         notificacionService.crear(usuario, TipoNotificacion.SISTEMA, "Tercera", "Mensaje 3", "/perfil");
 
         assertThat(notificacionesDe(usuario))
@@ -133,7 +136,9 @@ class NotificacionServiceImplTest {
     void soloNoLeidasExcluyeLasLeidas() {
         Usuario usuario = fixture.usuario("leida", RolNombre.ROLE_PACIENTE);
         notificacionService.crear(usuario, TipoNotificacion.SISTEMA, "Uno", "Mensaje", null);
+        pausa();
         notificacionService.crear(usuario, TipoNotificacion.SISTEMA, "Dos", "Mensaje", null);
+        pausa();
         NotificacionResponse primera = notificacionesDe(usuario).get(1);
 
         NotificacionResponse marcada = notificacionService.marcarLeida(fixture.principal(usuario), primera.id());
@@ -151,7 +156,7 @@ class NotificacionServiceImplTest {
         Usuario dueno = fixture.usuario("dueno", RolNombre.ROLE_PACIENTE);
         Usuario otro = fixture.usuario("otro", RolNombre.ROLE_PACIENTE);
         notificacionService.crear(dueno, TipoNotificacion.SISTEMA, "Privada", "Mensaje", null);
-        Long id = notificacionesDe(dueno).get(0).id();
+        UUID id = notificacionesDe(dueno).get(0).id();
 
         assertThatThrownBy(() -> notificacionService.marcarLeida(fixture.principal(otro), id))
                 .isInstanceOf(ResourceNotFoundException.class);
@@ -163,7 +168,9 @@ class NotificacionServiceImplTest {
     void marcarTodasLeidasYEliminarActualizanLaBandeja() {
         Usuario usuario = fixture.usuario("todas", RolNombre.ROLE_PACIENTE);
         notificacionService.crear(usuario, TipoNotificacion.SISTEMA, "Uno", "Mensaje", null);
+        pausa();
         notificacionService.crear(usuario, TipoNotificacion.SISTEMA, "Dos", "Mensaje", null);
+        pausa();
 
         notificacionService.marcarTodasLeidas(fixture.principal(usuario));
         assertThat(notificacionService.resumen(fixture.principal(usuario)).noLeidas())
@@ -172,5 +179,13 @@ class NotificacionServiceImplTest {
         notificacionService.eliminar(
                 fixture.principal(usuario), notificacionesDe(usuario).get(0).id());
         assertThat(notificacionesDe(usuario)).hasSize(1);
+    }
+
+    private static void pausa() {
+        try {
+            Thread.sleep(5);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }

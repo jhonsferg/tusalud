@@ -20,10 +20,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -71,12 +71,11 @@ public class MedicoController {
     public ResponseEntity<List<MedicoResponse>> listar(
             @Parameter(description = "Filtrar por ID de especialidad (opcional)", example = "1")
                     @RequestParam(required = false)
-                    @Positive
-                    Long especialidadId) {
+                    UUID especialidadId) {
         return ResponseEntity.ok(medicoService.listar(especialidadId));
     }
 
-    @GetMapping("/{id:\\d+}")
+    @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtener médico", description = "Devuelve el detalle de un médico por su identificador.")
     @ApiResponses({
@@ -91,7 +90,8 @@ public class MedicoController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<MedicoResponse> obtener(
-            @Parameter(description = "ID del médico", example = "1") @PathVariable @Positive Long id) {
+            @Parameter(description = "ID del médico", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id) {
         return ResponseEntity.ok(medicoService.obtener(id));
     }
 
@@ -133,7 +133,7 @@ public class MedicoController {
         return ResponseEntity.created(location).body(creado);
     }
 
-    @PutMapping("/{id:\\d+}/especialidades")
+    @PutMapping("/{id}/especialidades")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
             summary = "Actualizar las especialidades de un médico",
@@ -154,12 +154,14 @@ public class MedicoController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<MedicoResponse> actualizarEspecialidades(
-            @Parameter(description = "Identificador del médico", example = "1") @PathVariable @Positive Long id,
+            @Parameter(description = "Identificador del médico", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+                    @PathVariable
+                    UUID id,
             @Valid @RequestBody MedicoEspecialidadesRequest request) {
         return ResponseEntity.ok(medicoService.actualizarEspecialidades(id, request));
     }
 
-    @GetMapping("/{id:\\d+}/horarios")
+    @GetMapping("/{id}/horarios")
     @PreAuthorize("isAuthenticated()")
     @Operation(
             summary = "Listar horarios de un médico",
@@ -176,11 +178,12 @@ public class MedicoController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<List<HorarioResponse>> listarHorarios(
-            @Parameter(description = "ID del médico", example = "1") @PathVariable @Positive Long id) {
+            @Parameter(description = "ID del médico", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id) {
         return ResponseEntity.ok(medicoService.listarHorarios(id));
     }
 
-    @PostMapping("/{id:\\d+}/horarios")
+    @PostMapping("/{id}/horarios")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
             summary = "Agregar horario de atención",
@@ -210,7 +213,8 @@ public class MedicoController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<HorarioResponse> agregarHorario(
-            @Parameter(description = "ID del médico", example = "1") @PathVariable @Positive Long id,
+            @Parameter(description = "ID del médico", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Valid @RequestBody HorarioRequest request) {
         HorarioResponse creado = medicoService.agregarHorario(id, request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -220,7 +224,7 @@ public class MedicoController {
         return ResponseEntity.created(location).body(creado);
     }
 
-    @DeleteMapping("/{id:\\d+}/horarios/{horarioId:\\d+}")
+    @DeleteMapping("/{id}/horarios/{horarioId}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
             summary = "Eliminar horario de atención",
@@ -241,13 +245,15 @@ public class MedicoController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Void> eliminarHorario(
-            @Parameter(description = "ID del médico", example = "1") @PathVariable @Positive Long id,
-            @Parameter(description = "ID del horario", example = "1") @PathVariable @Positive Long horarioId) {
+            @Parameter(description = "ID del médico", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
+            @Parameter(description = "ID del horario", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID horarioId) {
         medicoService.eliminarHorario(id, horarioId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id:\\d+}/disponibilidad")
+    @GetMapping("/{id}/disponibilidad")
     @PreAuthorize("isAuthenticated()")
     @Operation(
             summary = "Consultar disponibilidad",
@@ -269,7 +275,8 @@ public class MedicoController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<DisponibilidadResponse> consultarDisponibilidad(
-            @Parameter(description = "ID del médico", example = "1") @PathVariable @Positive Long id,
+            @Parameter(description = "ID del médico", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Parameter(description = "Fecha a consultar (yyyy-MM-dd)", example = "2026-10-20", required = true)
                     @RequestParam
                     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -277,7 +284,7 @@ public class MedicoController {
         return ResponseEntity.ok(citaService.consultarDisponibilidad(id, fecha));
     }
 
-    @GetMapping("/{id:\\d+}/disponibilidad/rango")
+    @GetMapping("/{id}/disponibilidad/rango")
     @PreAuthorize("isAuthenticated()")
     @Operation(
             summary = "Consultar disponibilidad en un rango de fechas",
@@ -299,7 +306,8 @@ public class MedicoController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<List<DisponibilidadRangoResponse>> consultarDisponibilidadRango(
-            @Parameter(description = "ID del médico", example = "1") @PathVariable @Positive Long id,
+            @Parameter(description = "ID del médico", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Parameter(description = "Primer día (yyyy-MM-dd)", example = "2026-10-01", required = true)
                     @RequestParam
                     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -308,7 +316,7 @@ public class MedicoController {
                     @RequestParam
                     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                     LocalDate fin,
-            @Parameter(description = "Reservado; se ignora") @RequestParam(required = false) Long especialidadId) {
+            @Parameter(description = "Reservado; se ignora") @RequestParam(required = false) UUID especialidadId) {
         return ResponseEntity.ok(citaService.consultarDisponibilidadRango(id, inicio, fin));
     }
 

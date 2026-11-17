@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,8 +34,8 @@ import org.hibernate.annotations.CreationTimestamp;
 public class MetodoPago {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)

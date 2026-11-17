@@ -29,6 +29,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,7 +54,7 @@ public class PagoServiceImpl implements PagoService {
 
     @Override
     @Transactional
-    public PagoResponse pagarCita(Long citaId, PagoRequest request, UsuarioPrincipal actor) {
+    public PagoResponse pagarCita(UUID citaId, PagoRequest request, UsuarioPrincipal actor) {
         Cita cita = citaRepository
                 .findByIdWithDetails(citaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cita", "id", citaId));
@@ -151,7 +152,7 @@ public class PagoServiceImpl implements PagoService {
     }
 
     @Override
-    public PagoResponse obtenerMiPago(UsuarioPrincipal actor, Long id) {
+    public PagoResponse obtenerMiPago(UsuarioPrincipal actor, UUID id) {
         Pago pago = pagoRepository
                 .findByIdConDetalle(id)
                 .filter(p -> p.getCita().getPaciente().getUsuario().getId().equals(actor.getId()))

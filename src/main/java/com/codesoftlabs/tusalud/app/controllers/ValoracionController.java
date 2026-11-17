@@ -14,8 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import java.net.URI;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,7 +38,7 @@ public class ValoracionController {
 
     private final ValoracionService valoracionService;
 
-    @PostMapping("/citas/{id:\\d+}/valoracion")
+    @PostMapping("/citas/{id}/valoracion")
     @PreAuthorize("hasRole('PACIENTE')")
     @Operation(
             summary = "Valorar una cita atendida",
@@ -64,7 +64,8 @@ public class ValoracionController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<ValoracionResponse> valorar(
-            @Parameter(description = "ID de la cita", example = "1") @PathVariable @Positive Long id,
+            @Parameter(description = "ID de la cita", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Valid @RequestBody ValoracionRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         ValoracionResponse creada = valoracionService.valorar(id, request, principal);
@@ -72,7 +73,7 @@ public class ValoracionController {
         return ResponseEntity.created(location).body(creada);
     }
 
-    @GetMapping("/citas/{id:\\d+}/valoracion")
+    @GetMapping("/citas/{id}/valoracion")
     @PreAuthorize("hasAnyRole('PACIENTE', 'MEDICO', 'ADMIN')")
     @Operation(
             summary = "Obtener la valoración de una cita",
@@ -89,12 +90,13 @@ public class ValoracionController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<ValoracionResponse> obtener(
-            @Parameter(description = "ID de la cita", example = "1") @PathVariable @Positive Long id,
+            @Parameter(description = "ID de la cita", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(valoracionService.obtenerDeCita(id, principal));
     }
 
-    @GetMapping("/medicos/{id:\\d+}/valoraciones")
+    @GetMapping("/medicos/{id}/valoraciones")
     @PreAuthorize("isAuthenticated()")
     @Operation(
             summary = "Listar las valoraciones de un médico",
@@ -107,7 +109,8 @@ public class ValoracionController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<ValoracionesMedicoResponse> listar(
-            @Parameter(description = "ID del médico", example = "1") @PathVariable @Positive Long id) {
+            @Parameter(description = "ID del médico", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID id) {
         return ResponseEntity.ok(valoracionService.listarDeMedico(id));
     }
 }

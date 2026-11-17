@@ -5,10 +5,13 @@ import com.codesoftlabs.tusalud.app.entities.enums.MarcaTarjeta;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoMetodoPago;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.YearMonth;
+import java.util.UUID;
 
 @Schema(description = "Método de pago guardado (sin número completo ni CVV)")
 public record MetodoPagoResponse(
-        @Schema(example = "1") Long id,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID id,
+
         @Schema(example = "TARJETA_CREDITO") TipoMetodoPago tipo,
         @Schema(example = "JUAN PEREZ") String titular,
         @Schema(example = "VISA") MarcaTarjeta marca,

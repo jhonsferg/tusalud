@@ -5,10 +5,13 @@ import com.codesoftlabs.tusalud.app.entities.enums.ColorEvento;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoEvento;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Schema(description = "Evento del calendario personal")
 public record EventoCalendarioResponse(
-        @Schema(example = "1") Long id,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID id,
+
         @Schema(example = "Reunión de equipo") String titulo,
         String descripcion,
         String ubicacion,

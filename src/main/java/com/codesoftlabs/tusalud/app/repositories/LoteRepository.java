@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -14,7 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface LoteRepository extends JpaRepository<Lote, Long> {
+public interface LoteRepository extends JpaRepository<Lote, UUID> {
 
     @Query("""
             SELECT l.producto.id AS productoId, SUM(l.cantidadActual) AS stock, MIN(l.fechaVencimiento) AS proximo
@@ -22,7 +23,7 @@ public interface LoteRepository extends JpaRepository<Lote, Long> {
             WHERE l.producto.id IN :ids AND l.cantidadActual > 0 AND l.fechaVencimiento >= :hoy
             GROUP BY l.producto.id
             """)
-    List<StockProyeccion> stockDe(@Param("ids") Collection<Long> ids, @Param("hoy") LocalDate hoy);
+    List<StockProyeccion> stockDe(@Param("ids") Collection<UUID> ids, @Param("hoy") LocalDate hoy);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
@@ -30,7 +31,7 @@ public interface LoteRepository extends JpaRepository<Lote, Long> {
             WHERE l.producto.id = :productoId AND l.cantidadActual > 0 AND l.fechaVencimiento >= :hoy
             ORDER BY l.fechaVencimiento ASC, l.id ASC
             """)
-    List<Lote> vigentesParaDescontar(@Param("productoId") Long productoId, @Param("hoy") LocalDate hoy);
+    List<Lote> vigentesParaDescontar(@Param("productoId") UUID productoId, @Param("hoy") LocalDate hoy);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
@@ -38,7 +39,7 @@ public interface LoteRepository extends JpaRepository<Lote, Long> {
             WHERE l.producto.id = :productoId AND l.cantidadActual > 0 AND l.fechaVencimiento < :hoy
             ORDER BY l.fechaVencimiento ASC, l.id ASC
             """)
-    List<Lote> vencidosParaDescontar(@Param("productoId") Long productoId, @Param("hoy") LocalDate hoy);
+    List<Lote> vencidosParaDescontar(@Param("productoId") UUID productoId, @Param("hoy") LocalDate hoy);
 
     @Query("""
             SELECT l FROM Lote l
@@ -47,16 +48,16 @@ public interface LoteRepository extends JpaRepository<Lote, Long> {
             WHERE l.producto.id = :productoId
             ORDER BY l.fechaVencimiento ASC, l.id ASC
             """)
-    List<Lote> findByProductoIdConDetalle(@Param("productoId") Long productoId);
+    List<Lote> findByProductoIdConDetalle(@Param("productoId") UUID productoId);
 
     @Query("""
             SELECT l FROM Lote l
             JOIN FETCH l.producto
             LEFT JOIN FETCH l.proveedor
             WHERE l.ingreso.id IN :ingresoIds
-            ORDER BY l.id ASC
+            ORDER BY l.producto.nombre ASC, l.numeroLote ASC
             """)
-    List<Lote> findByIngresoIds(@Param("ingresoIds") Collection<Long> ingresoIds);
+    List<Lote> findByIngresoIds(@Param("ingresoIds") Collection<UUID> ingresoIds);
 
     @Query("""
             SELECT l FROM Lote l
@@ -82,9 +83,9 @@ public interface LoteRepository extends JpaRepository<Lote, Long> {
             """)
     BigDecimal valorInventario(@Param("hoy") LocalDate hoy);
 
-    boolean existsByProductoIdAndNumeroLote(Long productoId, String numeroLote);
+    boolean existsByProductoIdAndNumeroLote(UUID productoId, String numeroLote);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT l FROM Lote l JOIN FETCH l.producto WHERE l.id = :id")
-    Optional<Lote> findByIdParaActualizar(@Param("id") Long id);
+    Optional<Lote> findByIdParaActualizar(@Param("id") UUID id);
 }

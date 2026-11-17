@@ -92,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional(noRollbackFor = {BadCredentialsException.class, DemasiadosIntentosException.class})
     public AuthResponse verificarMfa(MfaVerificarRequest request, ContextoConexion contexto) {
-        Long usuarioId;
+        UUID usuarioId;
         try {
             usuarioId = jwtUtils.extractMfaUserId(request.mfaToken());
         } catch (JwtException | IllegalArgumentException ex) {

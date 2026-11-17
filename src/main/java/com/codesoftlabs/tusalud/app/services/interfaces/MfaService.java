@@ -4,6 +4,7 @@ import com.codesoftlabs.tusalud.app.dto.response.MfaCodigosRecuperacionResponse;
 import com.codesoftlabs.tusalud.app.dto.response.MfaConfiguracionResponse;
 import com.codesoftlabs.tusalud.app.dto.response.MfaEstadoResponse;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
+import java.util.UUID;
 
 public interface MfaService {
 
@@ -17,7 +18,7 @@ public interface MfaService {
 
     MfaCodigosRecuperacionResponse regenerarCodigos(UsuarioPrincipal actor, String codigo);
 
-    boolean estaActivo(Long usuarioId);
+    boolean estaActivo(UUID usuarioId);
 
-    void validarSegundoPaso(Long usuarioId, String codigo);
+    void validarSegundoPaso(UUID usuarioId, String codigo);
 }

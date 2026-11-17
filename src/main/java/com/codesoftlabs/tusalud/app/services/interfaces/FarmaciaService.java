@@ -9,6 +9,7 @@ import com.codesoftlabs.tusalud.app.entities.enums.EstadoReceta;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public interface FarmaciaService {
 
@@ -20,9 +21,9 @@ public interface FarmaciaService {
 
     List<DispensacionResponse> listar(LocalDate desde, LocalDate hasta, String q);
 
-    DispensacionResponse obtener(Long id);
+    DispensacionResponse obtener(UUID id);
 
-    DispensacionResponse anular(UsuarioPrincipal actor, Long id);
+    DispensacionResponse anular(UsuarioPrincipal actor, UUID id);
 
     List<DispensacionResponse> misDispensaciones(UsuarioPrincipal actor);
 

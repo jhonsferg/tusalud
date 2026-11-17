@@ -15,11 +15,11 @@ public interface SesionService {
 
     List<SesionResponse> listarActivas(UsuarioPrincipal actor, UUID tokenActual);
 
-    void revocar(UsuarioPrincipal actor, Long sesionId);
+    void revocar(UsuarioPrincipal actor, UUID sesionId);
 
     void revocarTodasExceptoActual(UsuarioPrincipal actor, UUID tokenActual);
 
     void cerrarSesion(UUID tokenId);
 
-    void revocarTodasDelUsuario(Long usuarioId);
+    void revocarTodasDelUsuario(UUID usuarioId);
 }

@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,8 +29,8 @@ import lombok.Setter;
 public class PreferenciaUsuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
@@ -39,9 +40,9 @@ public class PreferenciaUsuario {
     @Builder.Default
     private boolean recordatoriosActivos = true;
 
-    @Column(name = "horas_antelacion_recordatorio", nullable = false)
+    @Column(name = "minutos_antelacion_recordatorio", nullable = false)
     @Builder.Default
-    private int horasAntelacionRecordatorio = 24;
+    private int minutosAntelacionRecordatorio = 1440;
 
     @Column(name = "alertas_inicio_sesion", nullable = false)
     @Builder.Default

@@ -26,9 +26,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -94,8 +94,7 @@ public class HospitalizacionController {
                 description = "Cama no encontrada",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<CamaResponse> actualizarCama(
-            @PathVariable @Positive Long id, @Valid @RequestBody CamaRequest request) {
+    public ResponseEntity<CamaResponse> actualizarCama(@PathVariable UUID id, @Valid @RequestBody CamaRequest request) {
         return ResponseEntity.ok(hospitalizacionService.actualizarCama(id, request));
     }
 
@@ -112,7 +111,7 @@ public class HospitalizacionController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<CamaResponse> cambiarEstadoCama(
-            @PathVariable @Positive Long id, @Valid @RequestBody CamaEstadoRequest request) {
+            @PathVariable UUID id, @Valid @RequestBody CamaEstadoRequest request) {
         return ResponseEntity.ok(hospitalizacionService.cambiarEstadoCama(id, request));
     }
 
@@ -164,8 +163,7 @@ public class HospitalizacionController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<IngresoHospResponse> obtenerIngreso(
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
-            @PathVariable @Positive Long id) {
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable UUID id) {
         return ResponseEntity.ok(hospitalizacionService.obtenerIngreso(principal, id));
     }
 
@@ -174,7 +172,7 @@ public class HospitalizacionController {
     @Operation(summary = "Trasladar a otra cama", description = "Libera la cama anterior a limpieza.")
     @ApiResponse(responseCode = "200", description = "Traslado realizado")
     public ResponseEntity<IngresoHospResponse> trasladar(
-            @PathVariable @Positive Long id, @Valid @RequestBody CamaAsignacionRequest request) {
+            @PathVariable UUID id, @Valid @RequestBody CamaAsignacionRequest request) {
         return ResponseEntity.ok(hospitalizacionService.trasladar(id, request));
     }
 
@@ -185,7 +183,7 @@ public class HospitalizacionController {
             description = "Pasa una emergencia a una cama de emergencia, UCI u observación.")
     @ApiResponse(responseCode = "200", description = "Cama asignada")
     public ResponseEntity<IngresoHospResponse> asignarCama(
-            @PathVariable @Positive Long id, @Valid @RequestBody CamaAsignacionRequest request) {
+            @PathVariable UUID id, @Valid @RequestBody CamaAsignacionRequest request) {
         return ResponseEntity.ok(hospitalizacionService.asignarCama(id, request));
     }
 
@@ -194,7 +192,7 @@ public class HospitalizacionController {
     @Operation(summary = "Dar de alta", description = "Cierra el ingreso, liquida la cama y la deja en limpieza.")
     @ApiResponse(responseCode = "200", description = "Alta registrada")
     public ResponseEntity<IngresoHospResponse> darAlta(
-            @PathVariable @Positive Long id, @Valid @RequestBody AltaHospRequest request) {
+            @PathVariable UUID id, @Valid @RequestBody AltaHospRequest request) {
         return ResponseEntity.ok(hospitalizacionService.darAlta(id, request));
     }
 
@@ -202,7 +200,7 @@ public class HospitalizacionController {
     @PreAuthorize("hasAnyRole('MEDICO', 'ADMIN')")
     @Operation(summary = "Cancelar un ingreso", description = "Solo mientras no tenga evoluciones.")
     @ApiResponse(responseCode = "200", description = "Ingreso cancelado")
-    public ResponseEntity<IngresoHospResponse> cancelarIngreso(@PathVariable @Positive Long id) {
+    public ResponseEntity<IngresoHospResponse> cancelarIngreso(@PathVariable UUID id) {
         return ResponseEntity.ok(hospitalizacionService.cancelarIngreso(id));
     }
 
@@ -215,7 +213,7 @@ public class HospitalizacionController {
     @ApiResponse(responseCode = "201", description = "Evolución registrada")
     public ResponseEntity<EvolucionHospResponse> registrarEvolucion(
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
-            @PathVariable @Positive Long id,
+            @PathVariable UUID id,
             @Valid @RequestBody EvolucionHospRequest request) {
         EvolucionHospResponse creada = hospitalizacionService.registrarEvolucion(principal, id, request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
@@ -229,8 +227,7 @@ public class HospitalizacionController {
             description = "El paciente dueño solo ve las evoluciones médicas resumidas.")
     @ApiResponse(responseCode = "200", description = "Evoluciones del ingreso")
     public ResponseEntity<List<EvolucionHospResponse>> listarEvoluciones(
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
-            @PathVariable @Positive Long id) {
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable UUID id) {
         return ResponseEntity.ok(hospitalizacionService.listarEvoluciones(principal, id));
     }
 

@@ -199,7 +199,7 @@ class PerfilServiceImplTest {
         PreferenciasResponse preferencias = perfilService.obtenerPreferencias(fixture.principal(usuario));
 
         assertThat(preferencias.recordatoriosActivos()).isTrue();
-        assertThat(preferencias.horasAntelacionRecordatorio()).isEqualTo(24);
+        assertThat(preferencias.minutosAntelacionRecordatorio()).isEqualTo(1440);
         assertThat(preferencias.alertasInicioSesion()).isTrue();
         assertThat(preferencias.tourCompletado()).isFalse();
     }
@@ -209,9 +209,9 @@ class PerfilServiceImplTest {
         Usuario usuario = fixture.usuario("pref2", RolNombre.ROLE_MEDICO);
 
         perfilService.actualizarPreferencias(
-                fixture.principal(usuario), new PreferenciasRequest(false, 48, false, true));
+                fixture.principal(usuario), new PreferenciasRequest(false, 2880, false, true));
         PreferenciasResponse guardadas = perfilService.obtenerPreferencias(fixture.principal(usuario));
 
-        assertThat(guardadas).isEqualTo(new PreferenciasResponse(false, 48, false, true));
+        assertThat(guardadas).isEqualTo(new PreferenciasResponse(false, 2880, false, true));
     }
 }

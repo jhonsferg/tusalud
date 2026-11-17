@@ -38,6 +38,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +136,7 @@ class FarmaciaServiceTest {
         return producto;
     }
 
-    private DispensacionRequest dispensar(Long atencionId, Long pacienteId, DispensacionItemRequest... items) {
+    private DispensacionRequest dispensar(UUID atencionId, UUID pacienteId, DispensacionItemRequest... items) {
         return new DispensacionRequest(atencionId, pacienteId, List.of(items), MetodoPagoFarmacia.EFECTIVO, null);
     }
 
@@ -239,7 +240,8 @@ class FarmaciaServiceTest {
         assertThat(stock(libre)).isEqualTo(46);
         assertThat(farmaciaService.listar(null, null, venta.comprobante())).hasSize(1);
         assertThat(farmaciaService.obtener(venta.id()).items()).hasSize(1);
-        assertThatThrownBy(() -> farmaciaService.obtener(999999L)).isInstanceOf(ResourceNotFoundException.class);
+        assertThatThrownBy(() -> farmaciaService.obtener(UUID.randomUUID()))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test

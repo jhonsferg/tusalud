@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -96,7 +97,7 @@ public class NotificacionController {
         return ResponseEntity.ok(notificacionService.resumen(principal));
     }
 
-    @PutMapping("/{id:\\d+}/leida")
+    @PutMapping("/{id}/leida")
     @Operation(summary = "Marcar notificación como leída", description = "Solo el dueño de la notificación.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Notificación marcada como leída"),
@@ -106,7 +107,9 @@ public class NotificacionController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<NotificacionResponse> marcarLeida(
-            @Parameter(description = "ID de la notificación", example = "7") @PathVariable Long id,
+            @Parameter(description = "ID de la notificación", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+                    @PathVariable
+                    UUID id,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(notificacionService.marcarLeida(principal, id));
     }
@@ -120,7 +123,7 @@ public class NotificacionController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{id:\\d+}")
+    @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar notificación", description = "Solo el dueño de la notificación.")
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Notificación eliminada"),
@@ -130,7 +133,9 @@ public class NotificacionController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Void> eliminar(
-            @Parameter(description = "ID de la notificación", example = "7") @PathVariable Long id,
+            @Parameter(description = "ID de la notificación", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+                    @PathVariable
+                    UUID id,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         notificacionService.eliminar(principal, id);
         return ResponseEntity.noContent().build();

@@ -13,8 +13,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/pacientes/{pacienteId:\\d+}")
+@RequestMapping("/api/v1/pacientes/{pacienteId}")
 @RequiredArgsConstructor
 @Validated
 @Tag(
@@ -62,14 +62,15 @@ public class PacienteCompartidoController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<PacienteCompartidoResponse> compartir(
-            @Parameter(description = "ID del paciente", example = "1") @PathVariable @Positive Long pacienteId,
+            @Parameter(description = "ID del paciente", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID pacienteId,
             @Valid @RequestBody CompartirPacienteRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(compartidoService.compartir(pacienteId, request, principal));
     }
 
-    @DeleteMapping("/compartir/{medicoId:\\d+}")
+    @DeleteMapping("/compartir/{medicoId}")
     @PreAuthorize("hasAnyRole('MEDICO', 'ADMIN')")
     @Operation(
             summary = "Revocar el acceso compartido",
@@ -86,8 +87,11 @@ public class PacienteCompartidoController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Void> revocar(
-            @Parameter(description = "ID del paciente", example = "1") @PathVariable @Positive Long pacienteId,
-            @Parameter(description = "ID del médico con acceso", example = "3") @PathVariable @Positive Long medicoId,
+            @Parameter(description = "ID del paciente", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID pacienteId,
+            @Parameter(description = "ID del médico con acceso", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+                    @PathVariable
+                    UUID medicoId,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         compartidoService.revocar(pacienteId, medicoId, principal);
         return ResponseEntity.noContent().build();
@@ -110,7 +114,8 @@ public class PacienteCompartidoController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<List<PacienteCompartidoResponse>> listar(
-            @Parameter(description = "ID del paciente", example = "1") @PathVariable @Positive Long pacienteId,
+            @Parameter(description = "ID del paciente", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
+                    UUID pacienteId,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(compartidoService.listar(pacienteId, principal));
     }

@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -88,7 +89,7 @@ public class AlmacenController {
     @PreAuthorize("hasAnyRole('ALMACEN', 'ADMIN')")
     @Operation(summary = "Kardex de movimientos", description = "Los más recientes primero, hasta 200.")
     public ResponseEntity<List<MovimientoResponse>> movimientos(
-            @RequestParam(required = false) Long productoId,
+            @RequestParam(required = false) UUID productoId,
             @RequestParam(required = false) TipoMovimiento tipo,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {

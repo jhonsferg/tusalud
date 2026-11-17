@@ -8,11 +8,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Schema(description = "Datos personales del usuario autenticado y, según su rol, los de paciente o médico")
 public record PerfilResponse(
-        @Schema(example = "4") Long usuarioId,
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID usuarioId,
+
         @Schema(example = "Juan") String nombre,
         @Schema(example = "Pérez") String apellido,
         @Schema(example = "Juan Pérez") String nombreCompleto,
@@ -26,7 +29,10 @@ public record PerfilResponse(
         @Schema(example = "12345678") String dni,
         @Schema(type = "string", example = "1992-04-15") LocalDate fechaNacimiento,
         @Schema(example = "HC-000001") String historialClinicoNumero,
-        @Schema(example = "1") Long medicoId,
+
+        @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+        UUID medicoId,
+
         @Schema(example = "CMP-12345") String colegiatura,
         @Schema(example = "Consultorio 101") String consultorio,
         @Schema(example = "Cardiología") String especialidad,

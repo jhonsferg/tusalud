@@ -58,7 +58,7 @@ JOIN ingresos i ON i.documento = v.documento;
 UPDATE ingresos SET total = (SELECT COALESCE(SUM(l.cantidad_inicial * l.costo_unitario), 0) FROM lotes l WHERE l.ingreso_id = ingresos.id);
 
 INSERT INTO movimientos_inventario (cantidad, fecha, motivo, observaciones, referencia, tipo, lote_id, producto_id, usuario_id)
-SELECT l.cantidad_inicial, i.fecha, 'COMPRA', NULL, 'ING-' || LPAD(i.id::text, 6, '0'), 'ENTRADA', l.id, l.producto_id, i.usuario_id
+SELECT l.cantidad_inicial, i.fecha, 'COMPRA', NULL, 'ING-' || LPAD(DENSE_RANK() OVER (ORDER BY i.fecha, i.documento)::text, 6, '0'), 'ENTRADA', l.id, l.producto_id, i.usuario_id
 FROM lotes l JOIN ingresos i ON i.id = l.ingreso_id;
 
 INSERT INTO dispensaciones (comprobante, estado, fecha, metodo_pago, observaciones, total, atencion_id, paciente_id, usuario_id)

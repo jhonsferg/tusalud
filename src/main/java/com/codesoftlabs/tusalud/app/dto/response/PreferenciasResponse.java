@@ -7,22 +7,22 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record PreferenciasResponse(
         @Schema(example = "true") boolean recordatoriosActivos,
 
-        @Schema(example = "24") int horasAntelacionRecordatorio,
+        @Schema(example = "1440") int minutosAntelacionRecordatorio,
 
         @Schema(example = "true") boolean alertasInicioSesion,
 
         @Schema(example = "false") boolean tourCompletado) {
 
-    public static final int HORAS_POR_DEFECTO = 24;
+    public static final int MINUTOS_POR_DEFECTO = 1440;
 
     public static PreferenciasResponse porDefecto() {
-        return new PreferenciasResponse(true, HORAS_POR_DEFECTO, true, false);
+        return new PreferenciasResponse(true, MINUTOS_POR_DEFECTO, true, false);
     }
 
     public static PreferenciasResponse from(PreferenciaUsuario preferencia) {
         return new PreferenciasResponse(
                 preferencia.isRecordatoriosActivos(),
-                preferencia.getHorasAntelacionRecordatorio(),
+                preferencia.getMinutosAntelacionRecordatorio(),
                 preferencia.isAlertasInicioSesion(),
                 preferencia.isTourCompletado());
     }

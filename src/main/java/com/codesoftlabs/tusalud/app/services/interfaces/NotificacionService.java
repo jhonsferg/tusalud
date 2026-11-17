@@ -6,6 +6,7 @@ import com.codesoftlabs.tusalud.app.entities.Usuario;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.util.List;
+import java.util.UUID;
 
 public interface NotificacionService {
 
@@ -15,9 +16,9 @@ public interface NotificacionService {
 
     NotificacionResumenResponse resumen(UsuarioPrincipal actor);
 
-    NotificacionResponse marcarLeida(UsuarioPrincipal actor, Long id);
+    NotificacionResponse marcarLeida(UsuarioPrincipal actor, UUID id);
 
     void marcarTodasLeidas(UsuarioPrincipal actor);
 
-    void eliminar(UsuarioPrincipal actor, Long id);
+    void eliminar(UsuarioPrincipal actor, UUID id);
 }

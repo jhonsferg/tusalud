@@ -99,8 +99,8 @@ class AdminServiciosTest {
         assertThatThrownBy(() -> usuarioAdminService.cambiarEstado(
                         admin.getId(), EstadoUsuario.INACTIVO, fixture.principal(admin)))
                 .isInstanceOf(BusinessLogicException.class);
-        assertThatThrownBy(
-                        () -> usuarioAdminService.cambiarEstado(-1L, EstadoUsuario.INACTIVO, fixture.principal(admin)))
+        assertThatThrownBy(() -> usuarioAdminService.cambiarEstado(
+                        UUID.randomUUID(), EstadoUsuario.INACTIVO, fixture.principal(admin)))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
@@ -264,8 +264,8 @@ class AdminServiciosTest {
         assertThatThrownBy(() -> usuarioAdminService.asignarRoles(
                         medico.getId(), List.of(RolNombre.ROLE_PACIENTE), fixture.principal(admin)))
                 .isInstanceOf(BusinessLogicException.class);
-        assertThatThrownBy(() ->
-                        usuarioAdminService.asignarRoles(-1L, List.of(RolNombre.ROLE_ADMIN), fixture.principal(admin)))
+        assertThatThrownBy(() -> usuarioAdminService.asignarRoles(
+                        UUID.randomUUID(), List.of(RolNombre.ROLE_ADMIN), fixture.principal(admin)))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 

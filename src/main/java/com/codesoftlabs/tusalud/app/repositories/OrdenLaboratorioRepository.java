@@ -7,6 +7,7 @@ import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,7 +15,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OrdenLaboratorioRepository extends JpaRepository<OrdenLaboratorio, Long> {
+public interface OrdenLaboratorioRepository extends JpaRepository<OrdenLaboratorio, UUID> {
 
     @Query("""
             SELECT o FROM OrdenLaboratorio o
@@ -24,7 +25,7 @@ public interface OrdenLaboratorioRepository extends JpaRepository<OrdenLaborator
             JOIN FETCH m.usuario
             WHERE o.id = :id
             """)
-    Optional<OrdenLaboratorio> findByIdConDetalle(@Param("id") Long id);
+    Optional<OrdenLaboratorio> findByIdConDetalle(@Param("id") UUID id);
 
     @Query("""
             SELECT o FROM OrdenLaboratorio o
@@ -45,7 +46,7 @@ public interface OrdenLaboratorioRepository extends JpaRepository<OrdenLaborator
             WHERE mu.id = :usuarioId
             ORDER BY o.fecha DESC
             """)
-    List<OrdenLaboratorio> findDelSolicitante(@Param("usuarioId") Long usuarioId, Pageable pageable);
+    List<OrdenLaboratorio> findDelSolicitante(@Param("usuarioId") UUID usuarioId, Pageable pageable);
 
     @Query("""
             SELECT o FROM OrdenLaboratorio o
@@ -56,7 +57,7 @@ public interface OrdenLaboratorioRepository extends JpaRepository<OrdenLaborator
             WHERE pu.id = :usuarioId
             ORDER BY o.fecha DESC
             """)
-    List<OrdenLaboratorio> findDelPaciente(@Param("usuarioId") Long usuarioId);
+    List<OrdenLaboratorio> findDelPaciente(@Param("usuarioId") UUID usuarioId);
 
     long countByEstado(EstadoOrdenLab estado);
 

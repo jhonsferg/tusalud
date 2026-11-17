@@ -8,6 +8,7 @@ import com.codesoftlabs.tusalud.app.entities.enums.TipoEvento;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public interface EventoCalendarioService {
 
@@ -15,13 +16,13 @@ public interface EventoCalendarioService {
 
     EventoCalendarioResponse crear(UsuarioPrincipal actor, EventoCalendarioRequest request);
 
-    EventoCalendarioResponse actualizar(UsuarioPrincipal actor, Long id, EventoCalendarioRequest request);
+    EventoCalendarioResponse actualizar(UsuarioPrincipal actor, UUID id, EventoCalendarioRequest request);
 
-    EventoCalendarioResponse mover(UsuarioPrincipal actor, Long id, MoverEventoRequest request);
+    EventoCalendarioResponse mover(UsuarioPrincipal actor, UUID id, MoverEventoRequest request);
 
-    EventoCalendarioResponse completar(UsuarioPrincipal actor, Long id, CompletarEventoRequest request);
+    EventoCalendarioResponse completar(UsuarioPrincipal actor, UUID id, CompletarEventoRequest request);
 
     List<TipoEvento> tiposPermitidos(UsuarioPrincipal actor);
 
-    void eliminar(UsuarioPrincipal actor, Long id);
+    void eliminar(UsuarioPrincipal actor, UUID id);
 }

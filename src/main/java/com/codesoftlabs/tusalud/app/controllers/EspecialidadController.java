@@ -12,9 +12,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -54,7 +54,7 @@ public class EspecialidadController {
         return ResponseEntity.ok(especialidadService.listar());
     }
 
-    @GetMapping("/{id:\\d+}")
+    @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     @Operation(
             summary = "Obtener especialidad",
@@ -71,7 +71,9 @@ public class EspecialidadController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<EspecialidadResponse> obtener(
-            @Parameter(description = "ID de la especialidad", example = "1") @PathVariable @Positive Long id) {
+            @Parameter(description = "ID de la especialidad", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+                    @PathVariable
+                    UUID id) {
         return ResponseEntity.ok(especialidadService.obtener(id));
     }
 
@@ -108,7 +110,7 @@ public class EspecialidadController {
         return ResponseEntity.created(location).body(creada);
     }
 
-    @PutMapping("/{id:\\d+}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
             summary = "Actualizar especialidad",
@@ -137,12 +139,14 @@ public class EspecialidadController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<EspecialidadResponse> actualizar(
-            @Parameter(description = "ID de la especialidad", example = "1") @PathVariable @Positive Long id,
+            @Parameter(description = "ID de la especialidad", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+                    @PathVariable
+                    UUID id,
             @Valid @RequestBody EspecialidadRequest request) {
         return ResponseEntity.ok(especialidadService.actualizar(id, request));
     }
 
-    @DeleteMapping("/{id:\\d+}")
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(
             summary = "Eliminar especialidad",
@@ -167,7 +171,9 @@ public class EspecialidadController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Void> eliminar(
-            @Parameter(description = "ID de la especialidad", example = "1") @PathVariable @Positive Long id) {
+            @Parameter(description = "ID de la especialidad", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+                    @PathVariable
+                    UUID id) {
         especialidadService.eliminar(id);
         return ResponseEntity.noContent().build();
     }

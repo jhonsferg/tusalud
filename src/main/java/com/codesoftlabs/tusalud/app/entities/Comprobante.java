@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,8 +52,8 @@ import lombok.Setter;
 public class Comprobante {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
@@ -108,7 +109,7 @@ public class Comprobante {
     private OrigenComprobante origen;
 
     @Column(name = "referencia_id")
-    private Long referenciaId;
+    private UUID referenciaId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paciente_id")
@@ -119,11 +120,12 @@ public class Comprobante {
     private SesionCaja caja;
 
     @OneToMany(mappedBy = "comprobante", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("id ASC")
+    @OrderBy("posicion ASC")
     @Builder.Default
     private List<ComprobanteItem> items = new ArrayList<>();
 
     public void agregarItem(ComprobanteItem item) {
+        item.setPosicion(items.size());
         items.add(item);
         item.setComprobante(this);
     }

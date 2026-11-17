@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +72,7 @@ public class MetodoPagoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(metodoPagoService.crear(principal, request));
     }
 
-    @PutMapping("/{id:\\d+}/predeterminado")
+    @PutMapping("/{id}/predeterminado")
     @Operation(summary = "Marcar como predeterminado")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Método marcado como predeterminado"),
@@ -81,12 +82,14 @@ public class MetodoPagoController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<MetodoPagoResponse> marcarPredeterminado(
-            @Parameter(description = "ID del método de pago", example = "1") @PathVariable Long id,
+            @Parameter(description = "ID del método de pago", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+                    @PathVariable
+                    UUID id,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         return ResponseEntity.ok(metodoPagoService.marcarPredeterminado(principal, id));
     }
 
-    @DeleteMapping("/{id:\\d+}")
+    @DeleteMapping("/{id}")
     @Operation(
             summary = "Eliminar método de pago",
             description =
@@ -99,7 +102,9 @@ public class MetodoPagoController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Void> eliminar(
-            @Parameter(description = "ID del método de pago", example = "1") @PathVariable Long id,
+            @Parameter(description = "ID del método de pago", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
+                    @PathVariable
+                    UUID id,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
         metodoPagoService.eliminar(principal, id);
         return ResponseEntity.noContent().build();

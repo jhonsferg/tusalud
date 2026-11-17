@@ -68,19 +68,19 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     @Transactional
-    public void revocarDeSesion(Long sesionId) {
+    public void revocarDeSesion(UUID sesionId) {
         repository.revocarDeSesion(sesionId);
     }
 
     @Override
     @Transactional
-    public void revocarDeUsuario(Long usuarioId) {
+    public void revocarDeUsuario(UUID usuarioId) {
         repository.revocarDeUsuario(usuarioId);
     }
 
     @Override
     @Transactional
-    public void revocarDeUsuarioExceptoSesion(Long usuarioId, UUID tokenIdActual) {
+    public void revocarDeUsuarioExceptoSesion(UUID usuarioId, UUID tokenIdActual) {
         if (tokenIdActual == null) {
             repository.revocarDeUsuario(usuarioId);
         } else {
