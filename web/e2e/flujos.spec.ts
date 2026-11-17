@@ -25,7 +25,10 @@ test.describe('paciente', () => {
   test('reserva una cita y la cancela', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
     await page.goto('/medicos');
-    await page.getByRole('button', { name: 'Reservar' }).first().click();
+    await page
+      .locator('article', { hasText: 'Luis García' })
+      .getByRole('button', { name: 'Reservar' })
+      .click();
     await expect(page).toHaveURL(/\/citas\/nueva\?medicoId=/);
 
     await page.locator('#cita-fecha').pressSequentially(formatoFecha(diaHabilAleatorio()));
