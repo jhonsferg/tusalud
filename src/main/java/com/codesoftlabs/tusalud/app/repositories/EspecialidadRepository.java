@@ -17,6 +17,9 @@ public interface EspecialidadRepository extends JpaRepository<Especialidad, Long
     @Query("SELECT e FROM Especialidad e ORDER BY e.nombre ASC")
     List<Especialidad> findAllOrdenadas();
 
-    @Query("SELECT COUNT(m) > 0 FROM Medico m WHERE m.especialidad.id = :especialidadId")
+    @Query("SELECT COUNT(m) > 0 FROM Medico m JOIN m.especialidades e WHERE e.id = :especialidadId")
     boolean tieneMedicosAsignados(@Param("especialidadId") Long especialidadId);
+
+    @Query("SELECT COUNT(c) > 0 FROM Cita c WHERE c.especialidad.id = :especialidadId")
+    boolean tieneCitas(@Param("especialidadId") Long especialidadId);
 }

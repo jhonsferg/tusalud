@@ -7,6 +7,7 @@ import com.codesoftlabs.tusalud.app.dto.request.PreferenciasRequest;
 import com.codesoftlabs.tusalud.app.dto.response.PerfilResponse;
 import com.codesoftlabs.tusalud.app.dto.response.PreferenciasResponse;
 import com.codesoftlabs.tusalud.app.entities.Medico;
+import com.codesoftlabs.tusalud.app.entities.MfaUsuario;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
 import com.codesoftlabs.tusalud.app.entities.PreferenciaUsuario;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
@@ -15,6 +16,7 @@ import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
 import com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.MedicoRepository;
+import com.codesoftlabs.tusalud.app.repositories.MfaUsuarioRepository;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
 import com.codesoftlabs.tusalud.app.repositories.PreferenciaUsuarioRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
@@ -46,6 +48,7 @@ public class PerfilServiceImpl implements PerfilService {
     private final PasswordEncoder passwordEncoder;
     private final PreferenciaUsuarioRepository preferenciaRepository;
     private final NotificacionService notificacionService;
+    private final MfaUsuarioRepository mfaUsuarioRepository;
 
     @Override
     public PerfilResponse obtener(UsuarioPrincipal principal) {
@@ -113,6 +116,9 @@ public class PerfilServiceImpl implements PerfilService {
         preferencia.setRecordatoriosActivos(request.recordatoriosActivos());
         preferencia.setHorasAntelacionRecordatorio(request.horasAntelacionRecordatorio());
         preferencia.setAlertasInicioSesion(request.alertasInicioSesion());
+        if (request.tourCompletado() != null) {
+            preferencia.setTourCompletado(request.tourCompletado());
+        }
         return PreferenciasResponse.from(preferenciaRepository.saveAndFlush(preferencia));
     }
 
@@ -156,7 +162,11 @@ public class PerfilServiceImpl implements PerfilService {
         Paciente paciente =
                 pacienteRepository.findByUsuarioEmail(usuario.getEmail()).orElse(null);
         Medico medico = medicoRepository.findByUsuarioEmail(usuario.getEmail()).orElse(null);
-        return PerfilResponse.from(usuario, principal.getRoles(), paciente, medico);
+        boolean mfaActivo = mfaUsuarioRepository
+                .findByUsuarioId(usuario.getId())
+                .map(MfaUsuario::isActivo)
+                .orElse(false);
+        return PerfilResponse.from(usuario, principal.getRoles(), paciente, medico, mfaActivo);
     }
 
     private static String vacioANulo(String valor) {

@@ -42,6 +42,11 @@ app:
     max-age: 3600
   data-initializer:
     enabled: ${DATA_INITIALIZER_ENABLED:true}
+  mfa:
+    clave-cifrado: ${MFA_CLAVE_CIFRADO:clave-de-desarrollo-para-cifrar-secretos-mfa}
+  pagos:
+    simulacion-habilitada: ${PAGOS_SIMULACION_HABILITADA:true}
+    expiracion-qr-minutos: 5
 
 springdoc:
   api-docs:

@@ -1,13 +1,14 @@
 package com.codesoftlabs.tusalud.app.dto.response;
 
+import com.codesoftlabs.tusalud.app.entities.Especialidad;
 import com.codesoftlabs.tusalud.app.entities.Medico;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Schema(description = "Datos personales del usuario autenticado y, según su rol, los de paciente o médico")
 public record PerfilResponse(
@@ -29,12 +30,15 @@ public record PerfilResponse(
         @Schema(example = "CMP-12345") String colegiatura,
         @Schema(example = "Consultorio 101") String consultorio,
         @Schema(example = "Cardiología") String especialidad,
-        @Schema(example = "150.00") BigDecimal precioConsulta,
+        @Schema(example = "[\"Cardiología\"]") List<String> especialidades,
 
         @Schema(description = "Imagen de perfil como data URL o null", example = "data:image/png;base64,iVBORw0KGgo=")
-        String avatar) {
+        String avatar,
 
-    public static PerfilResponse from(Usuario usuario, List<String> roles, Paciente paciente, Medico medico) {
+        @Schema(example = "false") boolean mfaActivo) {
+
+    public static PerfilResponse from(
+            Usuario usuario, List<String> roles, Paciente paciente, Medico medico, boolean mfaActivo) {
         return new PerfilResponse(
                 usuario.getId(),
                 usuario.getNombre(),
@@ -50,8 +54,17 @@ public record PerfilResponse(
                 medico == null ? null : medico.getId(),
                 medico == null ? null : medico.getColegiatura(),
                 medico == null ? null : medico.getConsultorio(),
-                medico == null ? null : medico.getEspecialidad().getNombre(),
-                medico == null ? null : medico.getPrecioConsulta(),
-                usuario.getAvatar());
+                medico == null
+                        ? null
+                        : medico.getEspecialidades().stream()
+                                .map(Especialidad::getNombre)
+                                .collect(Collectors.joining(", ")),
+                medico == null
+                        ? List.of()
+                        : medico.getEspecialidades().stream()
+                                .map(Especialidad::getNombre)
+                                .toList(),
+                usuario.getAvatar(),
+                mfaActivo);
     }
 }

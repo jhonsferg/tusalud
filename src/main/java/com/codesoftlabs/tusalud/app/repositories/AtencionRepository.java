@@ -18,7 +18,7 @@ public interface AtencionRepository extends JpaRepository<Atencion, Long> {
             JOIN FETCH a.cita c
             JOIN FETCH a.medico m
             JOIN FETCH m.usuario
-            JOIN FETCH m.especialidad
+            JOIN FETCH c.especialidad
             JOIN FETCH a.paciente pa
             JOIN FETCH pa.usuario
             WHERE c.id = :citaId
@@ -30,7 +30,7 @@ public interface AtencionRepository extends JpaRepository<Atencion, Long> {
             JOIN FETCH a.cita c
             JOIN FETCH a.medico m
             JOIN FETCH m.usuario
-            JOIN FETCH m.especialidad
+            JOIN FETCH c.especialidad
             JOIN FETCH a.paciente pa
             JOIN FETCH pa.usuario
             WHERE pa.id = :pacienteId

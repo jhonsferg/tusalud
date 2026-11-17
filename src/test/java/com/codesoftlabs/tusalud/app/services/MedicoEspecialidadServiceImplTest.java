@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.codesoftlabs.tusalud.app.dto.request.EspecialidadRequest;
 import com.codesoftlabs.tusalud.app.dto.request.HorarioRequest;
 import com.codesoftlabs.tusalud.app.dto.request.MedicoCreateRequest;
+import com.codesoftlabs.tusalud.app.dto.request.MedicoEspecialidadesRequest;
 import com.codesoftlabs.tusalud.app.dto.response.EspecialidadResponse;
 import com.codesoftlabs.tusalud.app.dto.response.HorarioResponse;
 import com.codesoftlabs.tusalud.app.dto.response.MedicoResponse;
@@ -18,6 +19,7 @@ import com.codesoftlabs.tusalud.app.services.interfaces.MedicoService;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,15 +45,18 @@ class MedicoEspecialidadServiceImplTest {
     @Test
     void especialidadCrudConValidaciones() {
         String nombre = "SvcTest Neurologia " + ServiceTestFixture.siguiente();
-        EspecialidadResponse creada = especialidadService.crear(new EspecialidadRequest("  " + nombre + " ", "Desc"));
+        EspecialidadResponse creada = especialidadService.crear(
+                new EspecialidadRequest("  " + nombre + " ", "Desc", new BigDecimal("95.50")));
 
         assertThat(creada.nombre()).isEqualTo(nombre);
-        assertThatThrownBy(() -> especialidadService.crear(new EspecialidadRequest(nombre.toUpperCase(), null)))
+        assertThat(creada.precioConsulta()).isEqualByComparingTo("95.50");
+        assertThatThrownBy(() ->
+                        especialidadService.crear(new EspecialidadRequest(nombre.toUpperCase(), null, BigDecimal.TEN)))
                 .isInstanceOf(ConflictException.class);
-        assertThat(especialidadService
-                        .actualizar(creada.id(), new EspecialidadRequest(nombre, "Nueva"))
-                        .descripcion())
-                .isEqualTo("Nueva");
+        EspecialidadResponse actualizada = especialidadService.actualizar(
+                creada.id(), new EspecialidadRequest(nombre, "Nueva", new BigDecimal("110.00")));
+        assertThat(actualizada.descripcion()).isEqualTo("Nueva");
+        assertThat(actualizada.precioConsulta()).isEqualByComparingTo("110.00");
 
         especialidadService.eliminar(creada.id());
         assertThatThrownBy(() -> especialidadService.obtener(creada.id()))
@@ -62,8 +67,8 @@ class MedicoEspecialidadServiceImplTest {
     void noSeEliminaEspecialidadConMedicos() {
         Medico medico = fixture.medicoConHorarioLunes(BigDecimal.TEN);
 
-        assertThatThrownBy(() ->
-                        especialidadService.eliminar(medico.getEspecialidad().getId()))
+        assertThatThrownBy(() -> especialidadService.eliminar(
+                        medico.getEspecialidades().iterator().next().getId()))
                 .isInstanceOf(ConflictException.class);
     }
 
@@ -79,18 +84,38 @@ class MedicoEspecialidadServiceImplTest {
                 "912345678",
                 "SVC-CMP-" + n,
                 "204",
-                new BigDecimal("120.00"),
-                especialidadId);
+                List.of(especialidadId));
 
         MedicoResponse medico = medicoService.crear(request);
 
         assertThat(medico.id()).isNotNull();
-        assertThat(medico.especialidadId()).isEqualTo(especialidadId);
+        assertThat(medico.especialidades()).extracting(EspecialidadResponse::id).containsExactly(especialidadId);
         assertThat(medicoService.listar(especialidadId))
                 .extracting(MedicoResponse::id)
                 .containsExactly(medico.id());
         assertThatThrownBy(() -> medicoService.crear(request)).isInstanceOf(ConflictException.class);
         assertThatThrownBy(() -> medicoService.listar(-1L)).isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
+    void actualizarEspecialidadesReemplazaLasDelMedico() {
+        Medico medico = fixture.medicoConHorarioLunes(BigDecimal.TEN);
+        Long nueva = fixture.especialidad().getId();
+        Long otra = fixture.especialidad().getId();
+
+        MedicoResponse actualizado = medicoService.actualizarEspecialidades(
+                medico.getId(), new MedicoEspecialidadesRequest(List.of(nueva, otra, nueva)));
+
+        assertThat(actualizado.especialidades())
+                .extracting(EspecialidadResponse::id)
+                .containsExactlyInAnyOrder(nueva, otra);
+        assertThat(medicoService.listar(nueva)).extracting(MedicoResponse::id).contains(medico.getId());
+        assertThatThrownBy(() -> medicoService.actualizarEspecialidades(
+                        medico.getId(), new MedicoEspecialidadesRequest(List.of(-5L))))
+                .isInstanceOf(ResourceNotFoundException.class);
+        assertThatThrownBy(() ->
+                        medicoService.actualizarEspecialidades(-1L, new MedicoEspecialidadesRequest(List.of(nueva))))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test

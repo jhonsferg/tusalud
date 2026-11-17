@@ -14,19 +14,19 @@ import org.springframework.stereotype.Repository;
 public interface MedicoRepository extends JpaRepository<Medico, Long> {
 
     @Query("""
-            SELECT m FROM Medico m
+            SELECT DISTINCT m FROM Medico m
             JOIN FETCH m.usuario u
-            JOIN FETCH m.especialidad e
-            WHERE e.id = :especialidadId
+            LEFT JOIN FETCH m.especialidades
+            WHERE EXISTS (SELECT 1 FROM m.especialidades e WHERE e.id = :especialidadId)
               AND u.estado = com.codesoftlabs.tusalud.app.entities.enums.EstadoUsuario.ACTIVO
             ORDER BY u.apellido ASC, u.nombre ASC
             """)
     List<Medico> findByEspecialidadId(@Param("especialidadId") Long especialidadId);
 
     @Query("""
-            SELECT m FROM Medico m
+            SELECT DISTINCT m FROM Medico m
             JOIN FETCH m.usuario u
-            JOIN FETCH m.especialidad e
+            LEFT JOIN FETCH m.especialidades
             ORDER BY u.apellido ASC, u.nombre ASC
             """)
     List<Medico> findAllWithDetails();
@@ -34,7 +34,7 @@ public interface MedicoRepository extends JpaRepository<Medico, Long> {
     @Query("""
             SELECT m FROM Medico m
             JOIN FETCH m.usuario
-            JOIN FETCH m.especialidad
+            LEFT JOIN FETCH m.especialidades
             WHERE m.id = :id
             """)
     Optional<Medico> findByIdWithDetails(@Param("id") Long id);
@@ -42,7 +42,7 @@ public interface MedicoRepository extends JpaRepository<Medico, Long> {
     @Query("""
             SELECT m FROM Medico m
             JOIN FETCH m.usuario u
-            JOIN FETCH m.especialidad
+            LEFT JOIN FETCH m.especialidades
             WHERE LOWER(u.email) = LOWER(:email)
             """)
     Optional<Medico> findByUsuarioEmail(@Param("email") String email);

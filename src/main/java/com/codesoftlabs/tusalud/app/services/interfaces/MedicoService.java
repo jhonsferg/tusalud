@@ -2,6 +2,7 @@ package com.codesoftlabs.tusalud.app.services.interfaces;
 
 import com.codesoftlabs.tusalud.app.dto.request.HorarioRequest;
 import com.codesoftlabs.tusalud.app.dto.request.MedicoCreateRequest;
+import com.codesoftlabs.tusalud.app.dto.request.MedicoEspecialidadesRequest;
 import com.codesoftlabs.tusalud.app.dto.response.HorarioResponse;
 import com.codesoftlabs.tusalud.app.dto.response.MedicoResponse;
 import java.util.List;
@@ -13,6 +14,8 @@ public interface MedicoService {
     MedicoResponse obtener(Long id);
 
     MedicoResponse crear(MedicoCreateRequest request);
+
+    MedicoResponse actualizarEspecialidades(Long medicoId, MedicoEspecialidadesRequest request);
 
     List<HorarioResponse> listarHorarios(Long medicoId);
 

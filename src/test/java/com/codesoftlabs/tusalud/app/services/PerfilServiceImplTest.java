@@ -70,8 +70,8 @@ class PerfilServiceImplTest {
         PerfilResponse perfil = perfilService.obtener(fixture.principal(medico.getUsuario()));
 
         assertThat(perfil.colegiatura()).isEqualTo(medico.getColegiatura());
-        assertThat(perfil.especialidad()).isEqualTo(medico.getEspecialidad().getNombre());
-        assertThat(perfil.precioConsulta()).isEqualByComparingTo("120.00");
+        assertThat(perfil.especialidad())
+                .isEqualTo(medico.getEspecialidades().iterator().next().getNombre());
         assertThat(perfil.dni()).isNull();
     }
 
@@ -201,15 +201,17 @@ class PerfilServiceImplTest {
         assertThat(preferencias.recordatoriosActivos()).isTrue();
         assertThat(preferencias.horasAntelacionRecordatorio()).isEqualTo(24);
         assertThat(preferencias.alertasInicioSesion()).isTrue();
+        assertThat(preferencias.tourCompletado()).isFalse();
     }
 
     @Test
     void actualizarPreferenciasGuardaLosValores() {
         Usuario usuario = fixture.usuario("pref2", RolNombre.ROLE_MEDICO);
 
-        perfilService.actualizarPreferencias(fixture.principal(usuario), new PreferenciasRequest(false, 48, false));
+        perfilService.actualizarPreferencias(
+                fixture.principal(usuario), new PreferenciasRequest(false, 48, false, true));
         PreferenciasResponse guardadas = perfilService.obtenerPreferencias(fixture.principal(usuario));
 
-        assertThat(guardadas).isEqualTo(new PreferenciasResponse(false, 48, false));
+        assertThat(guardadas).isEqualTo(new PreferenciasResponse(false, 48, false, true));
     }
 }

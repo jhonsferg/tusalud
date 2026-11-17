@@ -38,7 +38,8 @@ public class PacienteHistoriaController {
     @PreAuthorize("hasAnyRole('MEDICO', 'ADMIN')")
     @Operation(
             summary = "Historia clínica de un paciente",
-            description = "Disponible para ADMIN y para médicos que tienen o tuvieron alguna cita con el paciente.")
+            description =
+                    "Disponible para ADMIN y para médicos que atienden al paciente o a quienes otro médico se lo compartió.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Historia clínica"),
         @ApiResponse(

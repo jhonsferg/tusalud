@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -269,8 +270,8 @@ public class DemoDataInitializer implements CommandLineRunner {
             Medico medico = Medico.builder()
                     .colegiatura(seed.colegiatura())
                     .consultorio(seed.consultorio())
-                    .precioConsulta(new BigDecimal(seed.precio()))
-                    .especialidad(obtenerOCrearEspecialidad(seed.especialidad(), seed.descripcionEspecialidad()))
+                    .especialidades(new LinkedHashSet<>(List.of(obtenerOCrearEspecialidad(
+                            seed.especialidad(), seed.descripcionEspecialidad(), seed.precio()))))
                     .usuario(nuevoUsuario(
                             seed.nombre(), seed.apellido(), seed.email(), MEDICO_PASSWORD, seed.telefono(), rolMedico))
                     .build();
@@ -328,13 +329,16 @@ public class DemoDataInitializer implements CommandLineRunner {
             if (existe || !ocupadas.add(clave)) {
                 continue;
             }
+            Especialidad especialidadCita =
+                    medico.getEspecialidades().iterator().next();
             citaRepository.save(Cita.builder()
                     .medico(medico)
                     .paciente(paciente)
                     .fechaHora(fechaHora)
                     .motivo(seed.motivo())
                     .estado(seed.estado())
-                    .monto(medico.getPrecioConsulta())
+                    .monto(especialidadCita.getPrecioConsulta())
+                    .especialidad(especialidadCita)
                     .build());
             nuevasCitas++;
         }
@@ -357,13 +361,14 @@ public class DemoDataInitializer implements CommandLineRunner {
         return fecha;
     }
 
-    private Especialidad obtenerOCrearEspecialidad(String nombre, String descripcion) {
+    private Especialidad obtenerOCrearEspecialidad(String nombre, String descripcion, String precio) {
         return especialidadRepository.findAll().stream()
                 .filter(e -> e.getNombre().equalsIgnoreCase(nombre))
                 .findFirst()
                 .orElseGet(() -> especialidadRepository.save(Especialidad.builder()
                         .nombre(nombre)
                         .descripcion(descripcion)
+                        .precioConsulta(new BigDecimal(precio))
                         .build()));
     }
 

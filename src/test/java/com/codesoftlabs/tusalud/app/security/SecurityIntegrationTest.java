@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -102,6 +105,58 @@ class SecurityIntegrationTest {
         mockMvc.perform(get("/api/v1/especialidades").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    void losEndpointsDeMfaExigenTokenSalvoElSegundoPaso() throws Exception {
+        mockMvc.perform(get("/api/v1/auth/mfa/estado")).andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/v1/auth/mfa/estado").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.activo").value(false));
+        mockMvc.perform(post("/api/v1/auth/mfa/verificar")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"mfaToken\":\"abc\",\"codigo\":\"123456\"}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void unTokenDeVerificacionMfaNoAutenticaComoTokenDeAcceso() throws Exception {
+        String mfaToken = jwtUtils.generateMfaToken(UsuarioPrincipal.from(
+                usuarioRepository.findByEmailWithRoles("paciente.sec@test.com").orElseThrow()));
+
+        mockMvc.perform(get("/api/v1/especialidades").header(HttpHeaders.AUTHORIZATION, "Bearer " + mfaToken))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void losEndpointsDeAdministracionDeRolesSoloLosVeElAdministrador() throws Exception {
+        mockMvc.perform(get("/api/v1/admin/roles").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/v1/admin/usuarios/1/roles")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"roles\":[\"ROLE_ADMIN\"]}"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/v1/medicos/1/especialidades")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"especialidadIds\":[1]}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void losPagosConBilleteraSonDelPacienteYLosPacientesCompartidosDelMedico() throws Exception {
+        mockMvc.perform(post("/api/v1/pagos/qr")).andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/v1/pacientes/1/compartir")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"medicoId\":1}"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/v1/pagos/qr")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"citaId\":1}"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

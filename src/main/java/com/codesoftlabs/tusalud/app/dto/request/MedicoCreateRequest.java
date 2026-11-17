@@ -1,14 +1,13 @@
 package com.codesoftlabs.tusalud.app.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.math.BigDecimal;
+import java.util.List;
 
 @Schema(description = "Alta de un médico (crea también su usuario con ROLE_MEDICO)")
 public record MedicoCreateRequest(
@@ -44,11 +43,5 @@ public record MedicoCreateRequest(
         @Schema(example = "Consultorio 204") @Size(max = 50, message = "El consultorio no debe superar 50 caracteres")
         String consultorio,
 
-        @Schema(example = "150.00")
-        @NotNull(message = "El precio de la consulta es obligatorio")
-        @DecimalMin(value = "0.0", inclusive = false, message = "El precio debe ser mayor a 0")
-        @Digits(integer = 8, fraction = 2, message = "El precio admite como máximo 8 enteros y 2 decimales")
-        BigDecimal precioConsulta,
-
-        @Schema(example = "1") @NotNull(message = "La especialidad es obligatoria")
-        Long especialidadId) {}
+        @Schema(example = "[1, 3]") @NotEmpty(message = "Indique al menos una especialidad")
+        List<@NotNull(message = "La especialidad es obligatoria") Long> especialidadIds) {}

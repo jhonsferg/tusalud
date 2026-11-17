@@ -19,7 +19,7 @@ public interface PagoRepository extends JpaRepository<Pago, Long> {
             JOIN FETCH p.cita c
             JOIN FETCH c.medico m
             JOIN FETCH m.usuario
-            JOIN FETCH m.especialidad
+            JOIN FETCH c.especialidad
             JOIN FETCH c.paciente pa
             JOIN FETCH pa.usuario
             WHERE p.id = :id
@@ -31,7 +31,7 @@ public interface PagoRepository extends JpaRepository<Pago, Long> {
             JOIN FETCH p.cita c
             JOIN FETCH c.medico m
             JOIN FETCH m.usuario
-            JOIN FETCH m.especialidad
+            JOIN FETCH c.especialidad
             JOIN FETCH c.paciente pa
             JOIN FETCH pa.usuario
             WHERE pa.usuario.id = :usuarioId
@@ -44,7 +44,7 @@ public interface PagoRepository extends JpaRepository<Pago, Long> {
             JOIN FETCH p.cita c
             JOIN FETCH c.medico m
             JOIN FETCH m.usuario
-            JOIN FETCH m.especialidad
+            JOIN FETCH c.especialidad
             JOIN FETCH c.paciente pa
             JOIN FETCH pa.usuario
             WHERE p.fechaPago >= :inicio AND p.fechaPago < :fin

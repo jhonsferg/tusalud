@@ -73,11 +73,14 @@ public class DataInitializer implements CommandLineRunner {
         Especialidad cardiologia = obtenerOCrearEspecialidad(
                 "Cardiología",
                 "Diagnóstico y tratamiento de enfermedades del corazón y del sistema circulatorio",
+                "150.00",
                 creados);
-        Especialidad pediatria =
-                obtenerOCrearEspecialidad("Pediatría", "Atención médica de bebés, niños y adolescentes", creados);
-        obtenerOCrearEspecialidad("Medicina General", "Atención primaria, prevención y diagnóstico general", creados);
-        obtenerOCrearEspecialidad("Dermatología", "Diagnóstico y tratamiento de enfermedades de la piel", creados);
+        Especialidad pediatria = obtenerOCrearEspecialidad(
+                "Pediatría", "Atención médica de bebés, niños y adolescentes", "120.00", creados);
+        obtenerOCrearEspecialidad(
+                "Medicina General", "Atención primaria, prevención y diagnóstico general", "90.00", creados);
+        obtenerOCrearEspecialidad(
+                "Dermatología", "Diagnóstico y tratamiento de enfermedades de la piel", "130.00", creados);
 
         if (!usuarioRepository.existsByEmailIgnoreCase(ADMIN_EMAIL)) {
             usuarioRepository.save(
@@ -91,8 +94,7 @@ public class DataInitializer implements CommandLineRunner {
             drGarcia = Medico.builder()
                     .colegiatura("CMP-12345")
                     .consultorio("Consultorio 101")
-                    .precioConsulta(new BigDecimal("150.00"))
-                    .especialidad(cardiologia)
+                    .especialidades(new java.util.LinkedHashSet<>(List.of(cardiologia)))
                     .usuario(nuevoUsuario("Luis", "García", MEDICO1_EMAIL, MEDICO_PASSWORD, "912345678", rolMedico))
                     .build();
             for (DayOfWeek dia : LUNES_A_VIERNES) {
@@ -108,8 +110,7 @@ public class DataInitializer implements CommandLineRunner {
             draLopez = Medico.builder()
                     .colegiatura("CMP-67890")
                     .consultorio("Consultorio 205")
-                    .precioConsulta(new BigDecimal("120.00"))
-                    .especialidad(pediatria)
+                    .especialidades(new java.util.LinkedHashSet<>(List.of(pediatria)))
                     .usuario(nuevoUsuario("Carmen", "López", MEDICO2_EMAIL, MEDICO_PASSWORD, "923456789", rolMedico))
                     .build();
             for (DayOfWeek dia : LUNES_A_VIERNES) {
@@ -150,6 +151,7 @@ public class DataInitializer implements CommandLineRunner {
                     .motivo("Control de presión arterial")
                     .estado(EstadoCita.PENDIENTE)
                     .monto(new BigDecimal("150.00"))
+                    .especialidad(cardiologia)
                     .build());
             creados.add("Cita de ejemplo " + proximoDiaHabil + " 09:00 (Juan Pérez - Dr. García, PENDIENTE)");
         }
@@ -161,6 +163,7 @@ public class DataInitializer implements CommandLineRunner {
                     .motivo("Control pediátrico de su hijo")
                     .estado(EstadoCita.CONFIRMADA)
                     .monto(new BigDecimal("120.00"))
+                    .especialidad(pediatria)
                     .build());
             creados.add("Cita de ejemplo " + proximoDiaHabil + " 15:00 (María Rodríguez - Dra. López, CONFIRMADA)");
         }
@@ -202,7 +205,8 @@ public class DataInitializer implements CommandLineRunner {
         });
     }
 
-    private Especialidad obtenerOCrearEspecialidad(String nombre, String descripcion, List<String> creados) {
+    private Especialidad obtenerOCrearEspecialidad(
+            String nombre, String descripcion, String precio, List<String> creados) {
         return especialidadRepository.findAll().stream()
                 .filter(e -> e.getNombre().equalsIgnoreCase(nombre))
                 .findFirst()
@@ -211,6 +215,7 @@ public class DataInitializer implements CommandLineRunner {
                     return especialidadRepository.save(Especialidad.builder()
                             .nombre(nombre)
                             .descripcion(descripcion)
+                            .precioConsulta(new BigDecimal(precio))
                             .build());
                 });
     }

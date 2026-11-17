@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,4 +34,7 @@ public class Especialidad {
 
     @Column(length = 500)
     private String descripcion;
+
+    @Column(name = "precio_consulta", nullable = false, precision = 10, scale = 2)
+    private BigDecimal precioConsulta;
 }

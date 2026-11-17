@@ -54,7 +54,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String email = claims.getSubject();
             String jti = claims.getId();
 
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (claims.get(JwtUtils.CLAIM_PROPOSITO) != null) {
+                request.setAttribute(AUTH_ERROR_ATTRIBUTE, "Token inválido");
+            } else if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
                 if (!userDetails.isEnabled()) {

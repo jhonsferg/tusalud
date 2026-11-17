@@ -7,11 +7,13 @@ import com.codesoftlabs.tusalud.app.dto.response.PacienteHistoriaResponse;
 import com.codesoftlabs.tusalud.app.dto.response.PacienteMedicoResponse;
 import com.codesoftlabs.tusalud.app.entities.Cita;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
+import com.codesoftlabs.tusalud.app.entities.PacienteCompartido;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import com.codesoftlabs.tusalud.app.exceptions.ForbiddenOperationException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.AtencionRepository;
 import com.codesoftlabs.tusalud.app.repositories.CitaRepository;
+import com.codesoftlabs.tusalud.app.repositories.PacienteCompartidoRepository;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.HistoriaClinicaService;
@@ -33,6 +35,7 @@ public class HistoriaClinicaServiceImpl implements HistoriaClinicaService {
     private final PacienteRepository pacienteRepository;
     private final CitaRepository citaRepository;
     private final AtencionRepository atencionRepository;
+    private final PacienteCompartidoRepository compartidoRepository;
 
     @Override
     public HistoriaClinicaResponse obtenerMia(UsuarioPrincipal actor) {
@@ -57,9 +60,11 @@ public class HistoriaClinicaServiceImpl implements HistoriaClinicaService {
     @Override
     public HistoriaClinicaResponse obtenerDePaciente(Long pacienteId, UsuarioPrincipal actor) {
         boolean admin = actor.getRoles().contains(RolNombre.ROLE_ADMIN.name());
-        if (!admin && !citaRepository.existsRelacionMedicoPaciente(actor.getId(), pacienteId)) {
+        boolean acceso = citaRepository.existsRelacionMedicoPaciente(actor.getId(), pacienteId)
+                || compartidoRepository.existsParaUsuario(pacienteId, actor.getId());
+        if (!admin && !acceso) {
             throw new ForbiddenOperationException(
-                    "Solo puede consultar la historia clínica de pacientes que tienen o tuvieron citas con usted");
+                    "Solo puede consultar la historia clínica de pacientes que atiende o que otro médico compartió con usted");
         }
         Paciente paciente = pacienteRepository
                 .findByIdWithUsuario(pacienteId)
@@ -75,7 +80,7 @@ public class HistoriaClinicaServiceImpl implements HistoriaClinicaService {
                     .computeIfAbsent(cita.getPaciente().getId(), id -> new ArrayList<>())
                     .add(cita);
         }
-        return citasPorPaciente.values().stream()
+        List<PacienteMedicoResponse> propios = citasPorPaciente.values().stream()
                 .map(citas -> {
                     Paciente paciente = citas.get(0).getPaciente();
                     return new PacienteMedicoResponse(
@@ -87,8 +92,26 @@ public class HistoriaClinicaServiceImpl implements HistoriaClinicaService {
                                     .map(Cita::getFechaHora)
                                     .max(LocalDateTime::compareTo)
                                     .orElse(null),
-                            citas.size());
+                            citas.size(),
+                            null);
                 })
+                .toList();
+        List<PacienteMedicoResponse> todos = new ArrayList<>(propios);
+        for (PacienteCompartido compartido : compartidoRepository.findParaUsuarioConDetalle(medico.getId())) {
+            Paciente paciente = compartido.getPaciente();
+            if (citasPorPaciente.containsKey(paciente.getId())) {
+                continue;
+            }
+            todos.add(new PacienteMedicoResponse(
+                    paciente.getId(),
+                    paciente.getUsuario().getNombreCompleto(),
+                    paciente.getDni(),
+                    paciente.getHistorialClinicoNumero(),
+                    null,
+                    0,
+                    compartido.getMedicoOrigen().getUsuario().getNombreCompleto()));
+        }
+        return todos.stream()
                 .sorted(Comparator.comparing(PacienteMedicoResponse::nombreCompleto))
                 .toList();
     }

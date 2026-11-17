@@ -4,9 +4,9 @@ import com.codesoftlabs.tusalud.app.entities.Medico;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoUsuario;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.math.BigDecimal;
+import java.util.List;
 
-@Schema(description = "Médico con su especialidad")
+@Schema(description = "Médico con sus especialidades")
 public record MedicoResponse(
         @Schema(example = "1") Long id,
 
@@ -26,11 +26,8 @@ public record MedicoResponse(
 
         @Schema(example = "Consultorio 101") String consultorio,
 
-        @Schema(example = "150.00") BigDecimal precioConsulta,
-
-        @Schema(example = "1") Long especialidadId,
-
-        @Schema(example = "Cardiología") String especialidadNombre,
+        @Schema(description = "Especialidades que atiende, con el precio de su consulta")
+        List<EspecialidadResponse> especialidades,
 
         @Schema(example = "ACTIVO") EstadoUsuario estado) {
 
@@ -46,9 +43,9 @@ public record MedicoResponse(
                 usuario.getTelefono(),
                 medico.getColegiatura(),
                 medico.getConsultorio(),
-                medico.getPrecioConsulta(),
-                medico.getEspecialidad().getId(),
-                medico.getEspecialidad().getNombre(),
+                medico.getEspecialidades().stream()
+                        .map(EspecialidadResponse::from)
+                        .toList(),
                 usuario.getEstado());
     }
 }

@@ -30,23 +30,23 @@ INSERT INTO usuario_roles (usuario_id, rol_id)
 SELECT u.id, r.id FROM usuarios u JOIN roles r ON r.nombre = 'ROLE_PACIENTE'
 WHERE u.email IN ('juan.perez@correo.com', 'maria.rodriguez@correo.com', 'sofia.ramirez@correo.com', 'carlos.mendoza@correo.com', 'valeria.castillo@correo.com', 'diego.herrera@correo.com', 'camila.torres@correo.com', 'luis.vargas@correo.com', 'ana.paredes@correo.com', 'jorge.medina@correo.com');
 
-INSERT INTO medicos (colegiatura, consultorio, precio_consulta, usuario_id, especialidad_id)
-SELECT 'CMP-12345', 'Consultorio 101', 150.00, u.id, e.id FROM usuarios u, especialidades e
-WHERE u.email = 'dr.garcia@tusalud.com' AND e.nombre = 'Cardiología';
+INSERT INTO medicos (colegiatura, consultorio, usuario_id)
+SELECT 'CMP-12345', 'Consultorio 101', u.id FROM usuarios u
+WHERE u.email = 'dr.garcia@tusalud.com';
 INSERT INTO horarios_atencion (dia_semana, duracion_cita_minutos, hora_fin, hora_inicio, medico_id)
 SELECT d.dia, 30, TIME '13:00', TIME '08:00', m.id FROM medicos m
 CROSS JOIN (VALUES ('MONDAY'), ('TUESDAY'), ('WEDNESDAY'), ('THURSDAY'), ('FRIDAY')) AS d(dia) WHERE m.colegiatura = 'CMP-12345';
 
-INSERT INTO medicos (colegiatura, consultorio, precio_consulta, usuario_id, especialidad_id)
-SELECT 'CMP-67890', 'Consultorio 205', 120.00, u.id, e.id FROM usuarios u, especialidades e
-WHERE u.email = 'dra.lopez@tusalud.com' AND e.nombre = 'Pediatría';
+INSERT INTO medicos (colegiatura, consultorio, usuario_id)
+SELECT 'CMP-67890', 'Consultorio 205', u.id FROM usuarios u
+WHERE u.email = 'dra.lopez@tusalud.com';
 INSERT INTO horarios_atencion (dia_semana, duracion_cita_minutos, hora_fin, hora_inicio, medico_id)
 SELECT d.dia, 30, TIME '19:00', TIME '14:00', m.id FROM medicos m
 CROSS JOIN (VALUES ('MONDAY'), ('TUESDAY'), ('WEDNESDAY'), ('THURSDAY'), ('FRIDAY')) AS d(dia) WHERE m.colegiatura = 'CMP-67890';
 
-INSERT INTO medicos (colegiatura, consultorio, precio_consulta, usuario_id, especialidad_id)
-SELECT 'CMP-23456', 'Consultorio 102', 90.00, u.id, e.id FROM usuarios u, especialidades e
-WHERE u.email = 'dr.salazar@tusalud.com' AND e.nombre = 'Medicina General';
+INSERT INTO medicos (colegiatura, consultorio, usuario_id)
+SELECT 'CMP-23456', 'Consultorio 102', u.id FROM usuarios u
+WHERE u.email = 'dr.salazar@tusalud.com';
 INSERT INTO horarios_atencion (dia_semana, duracion_cita_minutos, hora_fin, hora_inicio, medico_id)
 SELECT d.dia, 30, TIME '12:00', TIME '08:00', m.id FROM medicos m
 CROSS JOIN (VALUES ('MONDAY'), ('TUESDAY'), ('WEDNESDAY'), ('THURSDAY'), ('FRIDAY')) AS d(dia) WHERE m.colegiatura = 'CMP-23456';
@@ -54,36 +54,51 @@ INSERT INTO horarios_atencion (dia_semana, duracion_cita_minutos, hora_fin, hora
 SELECT d.dia, 30, TIME '18:00', TIME '15:00', m.id FROM medicos m
 CROSS JOIN (VALUES ('MONDAY'), ('TUESDAY'), ('WEDNESDAY'), ('THURSDAY'), ('FRIDAY')) AS d(dia) WHERE m.colegiatura = 'CMP-23456';
 
-INSERT INTO medicos (colegiatura, consultorio, precio_consulta, usuario_id, especialidad_id)
-SELECT 'CMP-34567', 'Consultorio 310', 130.00, u.id, e.id FROM usuarios u, especialidades e
-WHERE u.email = 'dra.vega@tusalud.com' AND e.nombre = 'Dermatología';
+INSERT INTO medicos (colegiatura, consultorio, usuario_id)
+SELECT 'CMP-34567', 'Consultorio 310', u.id FROM usuarios u
+WHERE u.email = 'dra.vega@tusalud.com';
 INSERT INTO horarios_atencion (dia_semana, duracion_cita_minutos, hora_fin, hora_inicio, medico_id)
 SELECT d.dia, 30, TIME '14:00', TIME '09:00', m.id FROM medicos m
 CROSS JOIN (VALUES ('TUESDAY'), ('THURSDAY')) AS d(dia) WHERE m.colegiatura = 'CMP-34567';
 
-INSERT INTO medicos (colegiatura, consultorio, precio_consulta, usuario_id, especialidad_id)
-SELECT 'CMP-45678', 'Consultorio 215', 160.00, u.id, e.id FROM usuarios u, especialidades e
-WHERE u.email = 'dr.quispe@tusalud.com' AND e.nombre = 'Traumatología';
+INSERT INTO medicos (colegiatura, consultorio, usuario_id)
+SELECT 'CMP-45678', 'Consultorio 215', u.id FROM usuarios u
+WHERE u.email = 'dr.quispe@tusalud.com';
 INSERT INTO horarios_atencion (dia_semana, duracion_cita_minutos, hora_fin, hora_inicio, medico_id)
 SELECT d.dia, 30, TIME '16:00', TIME '10:00', m.id FROM medicos m
 CROSS JOIN (VALUES ('MONDAY'), ('WEDNESDAY'), ('FRIDAY')) AS d(dia) WHERE m.colegiatura = 'CMP-45678';
 
-INSERT INTO medicos (colegiatura, consultorio, precio_consulta, usuario_id, especialidad_id)
-SELECT 'CMP-56789', 'Consultorio 402', 140.00, u.id, e.id FROM usuarios u, especialidades e
-WHERE u.email = 'dra.fernandez@tusalud.com' AND e.nombre = 'Ginecología';
+INSERT INTO medicos (colegiatura, consultorio, usuario_id)
+SELECT 'CMP-56789', 'Consultorio 402', u.id FROM usuarios u
+WHERE u.email = 'dra.fernandez@tusalud.com';
 INSERT INTO horarios_atencion (dia_semana, duracion_cita_minutos, hora_fin, hora_inicio, medico_id)
 SELECT d.dia, 30, TIME '19:00', TIME '14:00', m.id FROM medicos m
 CROSS JOIN (VALUES ('MONDAY'), ('TUESDAY'), ('WEDNESDAY'), ('THURSDAY'), ('FRIDAY')) AS d(dia) WHERE m.colegiatura = 'CMP-56789';
 
-INSERT INTO medicos (colegiatura, consultorio, precio_consulta, usuario_id, especialidad_id)
-SELECT 'CMP-67801', 'Consultorio 118', 110.00, u.id, e.id FROM usuarios u, especialidades e
-WHERE u.email = 'dr.delgado@tusalud.com' AND e.nombre = 'Oftalmología';
+INSERT INTO medicos (colegiatura, consultorio, usuario_id)
+SELECT 'CMP-67801', 'Consultorio 118', u.id FROM usuarios u
+WHERE u.email = 'dr.delgado@tusalud.com';
 INSERT INTO horarios_atencion (dia_semana, duracion_cita_minutos, hora_fin, hora_inicio, medico_id)
 SELECT d.dia, 30, TIME '13:00', TIME '08:00', m.id FROM medicos m
 CROSS JOIN (VALUES ('WEDNESDAY'), ('THURSDAY'), ('FRIDAY'), ('SATURDAY')) AS d(dia) WHERE m.colegiatura = 'CMP-67801';
 
 INSERT INTO horarios_atencion (dia_semana, duracion_cita_minutos, hora_fin, hora_inicio, medico_id)
 SELECT 'SATURDAY', 30, TIME '12:00', TIME '08:00', id FROM medicos WHERE colegiatura = 'CMP-67890';
+
+INSERT INTO medico_especialidades (medico_id, especialidad_id)
+SELECT m.id, e.id FROM medicos m
+JOIN (VALUES
+    ('CMP-12345', 'Cardiología'),
+    ('CMP-12345', 'Medicina General'),
+    ('CMP-67890', 'Pediatría'),
+    ('CMP-23456', 'Medicina General'),
+    ('CMP-34567', 'Dermatología'),
+    ('CMP-45678', 'Traumatología'),
+    ('CMP-56789', 'Ginecología'),
+    ('CMP-67801', 'Oftalmología'),
+    ('CMP-67801', 'Medicina General')
+) AS v(colegiatura, especialidad) ON v.colegiatura = m.colegiatura
+JOIN especialidades e ON e.nombre = v.especialidad;
 
 INSERT INTO pacientes (dni, fecha_nacimiento, historial_clinico_numero, grupo_sanguineo, alergias, antecedentes, usuario_id) VALUES
     ('12345678', DATE '1990-05-15', 'HC-000001', 'O+', 'Penicilina', 'Hipertensión leve diagnosticada en 2022', (SELECT id FROM usuarios WHERE email = 'juan.perez@correo.com')),
@@ -119,30 +134,30 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-INSERT INTO citas (created_at, estado, fecha_hora, monto, motivo, recordatorio_enviado, updated_at, version, medico_id, paciente_id) VALUES
-    (NOW(), 'CONFIRMADA', pg_temp.fecha_atencion(1, ARRAY[1, 2, 3, 4, 5, 6]) + TIME '15:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-67890'), 'Control pediátrico de su hijo', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-67890'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'maria.rodriguez@correo.com')),
-    (NOW(), 'PENDIENTE', pg_temp.fecha_atencion(1, ARRAY[1, 2, 3, 4, 5]) + TIME '09:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-12345'), 'Control de presión arterial', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-12345'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'juan.perez@correo.com')),
-    (NOW() - INTERVAL '30 days', 'ATENDIDA', pg_temp.fecha_atencion(-21, ARRAY[1, 2, 3, 4, 5]) + TIME '08:30', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-23456'), 'Chequeo general anual', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-23456'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'sofia.ramirez@correo.com')),
-    (NOW() - INTERVAL '30 days', 'ATENDIDA', pg_temp.fecha_atencion(-14, ARRAY[1, 2, 3, 4, 5]) + TIME '09:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-12345'), 'Seguimiento de hipertensión', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-12345'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'carlos.mendoza@correo.com')),
-    (NOW() - INTERVAL '30 days', 'ATENDIDA', pg_temp.fecha_atencion(-10, ARRAY[2, 4]) + TIME '10:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-34567'), 'Control de acné', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-34567'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'valeria.castillo@correo.com')),
-    (NOW() - INTERVAL '30 days', 'ATENDIDA', pg_temp.fecha_atencion(-9, ARRAY[1, 3, 5]) + TIME '11:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-45678'), 'Dolor de rodilla tras una lesión deportiva', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-45678'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'diego.herrera@correo.com')),
-    (NOW() - INTERVAL '30 days', 'ATENDIDA', pg_temp.fecha_atencion(-7, ARRAY[1, 2, 3, 4, 5]) + TIME '15:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-56789'), 'Control ginecológico anual', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-56789'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'camila.torres@correo.com')),
-    (NOW() - INTERVAL '30 days', 'ATENDIDA', pg_temp.fecha_atencion(-6, ARRAY[3, 4, 5, 6]) + TIME '09:30', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-67801'), 'Revisión de la vista por fatiga visual', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-67801'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'luis.vargas@correo.com')),
-    (NOW() - INTERVAL '30 days', 'CANCELADA', pg_temp.fecha_atencion(-5, ARRAY[1, 2, 3, 4, 5, 6]) + TIME '14:30', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-67890'), 'Control de crecimiento de mi hija', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-67890'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'ana.paredes@correo.com')),
-    (NOW() - INTERVAL '30 days', 'CANCELADA', pg_temp.fecha_atencion(-4, ARRAY[1, 2, 3, 4, 5]) + TIME '16:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-23456'), 'Certificado médico laboral', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-23456'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'jorge.medina@correo.com')),
-    (NOW() - INTERVAL '30 days', 'ATENDIDA', pg_temp.fecha_atencion(-3, ARRAY[2, 4]) + TIME '11:30', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-34567'), 'Revisión de manchas en la piel', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-34567'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'sofia.ramirez@correo.com')),
-    (NOW(), 'CONFIRMADA', pg_temp.fecha_atencion(2, ARRAY[1, 2, 3, 4, 5]) + TIME '10:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-12345'), 'Palpitaciones ocasionales', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-12345'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'sofia.ramirez@correo.com')),
-    (NOW(), 'PENDIENTE', pg_temp.fecha_atencion(2, ARRAY[1, 2, 3, 4, 5]) + TIME '11:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-12345'), 'Dolor en el pecho al caminar rápido', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-12345'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'camila.torres@correo.com')),
-    (NOW(), 'CONFIRMADA', pg_temp.fecha_atencion(2, ARRAY[1, 2, 3, 4, 5]) + TIME '12:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-12345'), 'Chequeo cardiológico preventivo', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-12345'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'diego.herrera@correo.com')),
-    (NOW(), 'PENDIENTE', pg_temp.fecha_atencion(2, ARRAY[1, 2, 3, 4, 5]) + TIME '09:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-23456'), 'Resfriado persistente', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-23456'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'carlos.mendoza@correo.com')),
-    (NOW(), 'CONFIRMADA', pg_temp.fecha_atencion(3, ARRAY[1, 2, 3, 4, 5]) + TIME '16:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-56789'), 'Control prenatal', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-56789'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'valeria.castillo@correo.com')),
-    (NOW(), 'PENDIENTE', pg_temp.fecha_atencion(4, ARRAY[3, 4, 5, 6]) + TIME '10:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-67801'), 'Cambio de lentes', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-67801'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'diego.herrera@correo.com')),
-    (NOW(), 'CONFIRMADA', pg_temp.fecha_atencion(5, ARRAY[2, 4]) + TIME '10:30', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-34567'), 'Revisión de lunares', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-34567'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'camila.torres@correo.com')),
-    (NOW(), 'PENDIENTE', pg_temp.fecha_atencion(5, ARRAY[1, 3, 5]) + TIME '12:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-45678'), 'Dolor lumbar persistente', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-45678'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'luis.vargas@correo.com')),
-    (NOW(), 'CONFIRMADA', pg_temp.fecha_atencion(6, ARRAY[1, 2, 3, 4, 5, 6]) + TIME '16:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-67890'), 'Vacunación de refuerzo', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-67890'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'ana.paredes@correo.com')),
-    (NOW(), 'PENDIENTE', pg_temp.fecha_atencion(7, ARRAY[1, 2, 3, 4, 5]) + TIME '11:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-12345'), 'Control de colesterol', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-12345'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'jorge.medina@correo.com')),
-    (NOW(), 'PENDIENTE', pg_temp.fecha_atencion(8, ARRAY[1, 2, 3, 4, 5]) + TIME '15:30', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-23456'), 'Dolor de garganta', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-23456'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'juan.perez@correo.com')),
-    (NOW(), 'CONFIRMADA', pg_temp.fecha_atencion(9, ARRAY[2, 4]) + TIME '12:00', (SELECT precio_consulta FROM medicos WHERE colegiatura = 'CMP-34567'), 'Dermatitis en las manos', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-34567'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'maria.rodriguez@correo.com'));
+INSERT INTO citas (created_at, estado, fecha_hora, monto, motivo, recordatorio_enviado, updated_at, version, medico_id, paciente_id, especialidad_id) VALUES
+    (NOW(), 'CONFIRMADA', pg_temp.fecha_atencion(1, ARRAY[1, 2, 3, 4, 5, 6]) + TIME '15:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Pediatría'), 'Control pediátrico de su hijo', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-67890'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'maria.rodriguez@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Pediatría')),
+    (NOW(), 'PENDIENTE', pg_temp.fecha_atencion(1, ARRAY[1, 2, 3, 4, 5]) + TIME '09:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Cardiología'), 'Control de presión arterial', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-12345'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'juan.perez@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Cardiología')),
+    (NOW() - INTERVAL '30 days', 'ATENDIDA', pg_temp.fecha_atencion(-21, ARRAY[1, 2, 3, 4, 5]) + TIME '08:30', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Medicina General'), 'Chequeo general anual', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-23456'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'sofia.ramirez@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Medicina General')),
+    (NOW() - INTERVAL '30 days', 'ATENDIDA', pg_temp.fecha_atencion(-14, ARRAY[1, 2, 3, 4, 5]) + TIME '09:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Cardiología'), 'Seguimiento de hipertensión', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-12345'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'carlos.mendoza@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Cardiología')),
+    (NOW() - INTERVAL '30 days', 'ATENDIDA', pg_temp.fecha_atencion(-10, ARRAY[2, 4]) + TIME '10:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Dermatología'), 'Control de acné', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-34567'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'valeria.castillo@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Dermatología')),
+    (NOW() - INTERVAL '30 days', 'ATENDIDA', pg_temp.fecha_atencion(-9, ARRAY[1, 3, 5]) + TIME '11:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Traumatología'), 'Dolor de rodilla tras una lesión deportiva', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-45678'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'diego.herrera@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Traumatología')),
+    (NOW() - INTERVAL '30 days', 'ATENDIDA', pg_temp.fecha_atencion(-7, ARRAY[1, 2, 3, 4, 5]) + TIME '15:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Ginecología'), 'Control ginecológico anual', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-56789'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'camila.torres@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Ginecología')),
+    (NOW() - INTERVAL '30 days', 'ATENDIDA', pg_temp.fecha_atencion(-6, ARRAY[3, 4, 5, 6]) + TIME '09:30', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Oftalmología'), 'Revisión de la vista por fatiga visual', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-67801'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'luis.vargas@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Oftalmología')),
+    (NOW() - INTERVAL '30 days', 'CANCELADA', pg_temp.fecha_atencion(-5, ARRAY[1, 2, 3, 4, 5, 6]) + TIME '14:30', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Pediatría'), 'Control de crecimiento de mi hija', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-67890'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'ana.paredes@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Pediatría')),
+    (NOW() - INTERVAL '30 days', 'CANCELADA', pg_temp.fecha_atencion(-4, ARRAY[1, 2, 3, 4, 5]) + TIME '16:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Medicina General'), 'Certificado médico laboral', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-23456'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'jorge.medina@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Medicina General')),
+    (NOW() - INTERVAL '30 days', 'ATENDIDA', pg_temp.fecha_atencion(-3, ARRAY[2, 4]) + TIME '11:30', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Dermatología'), 'Revisión de manchas en la piel', false, NOW() - INTERVAL '30 days', 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-34567'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'sofia.ramirez@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Dermatología')),
+    (NOW(), 'CONFIRMADA', pg_temp.fecha_atencion(2, ARRAY[1, 2, 3, 4, 5]) + TIME '10:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Cardiología'), 'Palpitaciones ocasionales', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-12345'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'sofia.ramirez@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Cardiología')),
+    (NOW(), 'PENDIENTE', pg_temp.fecha_atencion(2, ARRAY[1, 2, 3, 4, 5]) + TIME '11:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Cardiología'), 'Dolor en el pecho al caminar rápido', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-12345'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'camila.torres@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Cardiología')),
+    (NOW(), 'CONFIRMADA', pg_temp.fecha_atencion(2, ARRAY[1, 2, 3, 4, 5]) + TIME '12:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Cardiología'), 'Chequeo cardiológico preventivo', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-12345'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'diego.herrera@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Cardiología')),
+    (NOW(), 'PENDIENTE', pg_temp.fecha_atencion(2, ARRAY[1, 2, 3, 4, 5]) + TIME '09:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Medicina General'), 'Resfriado persistente', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-23456'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'carlos.mendoza@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Medicina General')),
+    (NOW(), 'CONFIRMADA', pg_temp.fecha_atencion(3, ARRAY[1, 2, 3, 4, 5]) + TIME '16:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Ginecología'), 'Control prenatal', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-56789'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'valeria.castillo@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Ginecología')),
+    (NOW(), 'PENDIENTE', pg_temp.fecha_atencion(4, ARRAY[3, 4, 5, 6]) + TIME '10:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Oftalmología'), 'Cambio de lentes', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-67801'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'diego.herrera@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Oftalmología')),
+    (NOW(), 'CONFIRMADA', pg_temp.fecha_atencion(5, ARRAY[2, 4]) + TIME '10:30', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Dermatología'), 'Revisión de lunares', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-34567'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'camila.torres@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Dermatología')),
+    (NOW(), 'PENDIENTE', pg_temp.fecha_atencion(5, ARRAY[1, 3, 5]) + TIME '12:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Traumatología'), 'Dolor lumbar persistente', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-45678'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'luis.vargas@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Traumatología')),
+    (NOW(), 'CONFIRMADA', pg_temp.fecha_atencion(6, ARRAY[1, 2, 3, 4, 5, 6]) + TIME '16:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Pediatría'), 'Vacunación de refuerzo', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-67890'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'ana.paredes@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Pediatría')),
+    (NOW(), 'PENDIENTE', pg_temp.fecha_atencion(7, ARRAY[1, 2, 3, 4, 5]) + TIME '11:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Cardiología'), 'Control de colesterol', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-12345'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'jorge.medina@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Cardiología')),
+    (NOW(), 'PENDIENTE', pg_temp.fecha_atencion(8, ARRAY[1, 2, 3, 4, 5]) + TIME '15:30', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Medicina General'), 'Dolor de garganta', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-23456'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'juan.perez@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Medicina General')),
+    (NOW(), 'CONFIRMADA', pg_temp.fecha_atencion(9, ARRAY[2, 4]) + TIME '12:00', (SELECT precio_consulta FROM especialidades WHERE nombre = 'Dermatología'), 'Dermatitis en las manos', false, NOW(), 0, (SELECT id FROM medicos WHERE colegiatura = 'CMP-34567'), (SELECT p.id FROM pacientes p JOIN usuarios u ON u.id = p.usuario_id WHERE u.email = 'maria.rodriguez@correo.com'), (SELECT id FROM especialidades WHERE nombre = 'Dermatología'));
 
 INSERT INTO atenciones (diagnostico, fecha, frecuencia_cardiaca, indicaciones, peso_kg, presion_arterial, talla_cm, temperatura_c, tratamiento, cita_id, medico_id, paciente_id)
 SELECT 'Paciente sana, sin hallazgos patológicos', c.fecha_hora + INTERVAL '25 minutes', 72, 'Mantener actividad física regular y control anual', 62.00, '110/70', 165.0, 36.6, 'No requiere tratamiento', c.id, c.medico_id, c.paciente_id
@@ -204,6 +219,19 @@ FROM (
 ) b
 JOIN pacientes pa ON pa.id = b.paciente_id
 LEFT JOIN metodos_pago mp ON mp.usuario_id = pa.usuario_id AND mp.predeterminado;
+
+INSERT INTO paciente_compartido (paciente_id, medico_origen_id, medico_destino_id, nota, created_at)
+SELECT p.id, mo.id, md.id, 'Se solicita valoración complementaria por dolor torácico y control clínico general', NOW() - INTERVAL '2 days'
+FROM pacientes p
+JOIN usuarios up ON up.id = p.usuario_id AND up.email = 'camila.torres@correo.com'
+JOIN medicos mo ON mo.colegiatura = 'CMP-12345'
+JOIN medicos md ON md.colegiatura = 'CMP-23456';
+
+INSERT INTO notificaciones (created_at, enlace, leida, mensaje, tipo, titulo, usuario_id)
+SELECT NOW() - INTERVAL '2 days', '/pacientes/' || p.id || '/historia-clinica', false,
+       'Luis García compartió contigo a Camila Torres.', 'PACIENTE_COMPARTIDO', 'Paciente compartido contigo',
+       (SELECT id FROM usuarios WHERE email = 'dr.salazar@tusalud.com')
+FROM pacientes p JOIN usuarios up ON up.id = p.usuario_id AND up.email = 'camila.torres@correo.com';
 
 UPDATE cupones SET usos_actuales = (SELECT COUNT(*) FROM pagos WHERE codigo_cupon = 'BIENVENIDA10') WHERE codigo = 'BIENVENIDA10';
 

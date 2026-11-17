@@ -8,6 +8,7 @@ import com.codesoftlabs.tusalud.app.dto.response.CitaResponse;
 import com.codesoftlabs.tusalud.app.dto.response.CitasPorEstadoResponse;
 import com.codesoftlabs.tusalud.app.dto.response.DisponibilidadResponse;
 import com.codesoftlabs.tusalud.app.entities.Cita;
+import com.codesoftlabs.tusalud.app.entities.Especialidad;
 import com.codesoftlabs.tusalud.app.entities.Medico;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoCita;
@@ -71,7 +72,11 @@ class CitaServiceImplTest {
     }
 
     private CitaCreateRequest solicitud(LocalDateTime fechaHora) {
-        return new CitaCreateRequest(medico.getId(), fechaHora, "  Dolor de cabeza  ");
+        return new CitaCreateRequest(medico.getId(), fechaHora, "  Dolor de cabeza  ", primeraEspecialidad(medico));
+    }
+
+    private static Long primeraEspecialidad(Medico medico) {
+        return medico.getEspecialidades().iterator().next().getId();
     }
 
     private long citasDelMedico() {
@@ -135,7 +140,7 @@ class CitaServiceImplTest {
 
     @Test
     void crearCitaConMedicoInexistenteLanzaResourceNotFound() {
-        CitaCreateRequest request = new CitaCreateRequest(-1L, proximoLunes.atTime(9, 0), "Control");
+        CitaCreateRequest request = new CitaCreateRequest(-1L, proximoLunes.atTime(9, 0), "Control", 1L);
 
         assertThatThrownBy(() -> citaService.crearCita(request, pacientePrincipal))
                 .isInstanceOf(ResourceNotFoundException.class);
@@ -307,5 +312,30 @@ class CitaServiceImplTest {
         assertThat(citas).filteredOn(c -> c.medicoId().equals(medico.getId())).hasSize(2);
         assertThatThrownBy(() -> auditoriaService.listarCitas(proximoLunes, proximoLunes.minusDays(1)))
                 .isInstanceOf(BusinessLogicException.class);
+    }
+
+    @Test
+    void crearCitaConEspecialidadQueElMedicoNoAtiendeLanzaBusinessLogicException() {
+        Long ajena = fixture.especialidad().getId();
+        CitaCreateRequest request = new CitaCreateRequest(medico.getId(), proximoLunes.atTime(9, 0), "Control", ajena);
+
+        assertThatThrownBy(() -> citaService.crearCita(request, pacientePrincipal))
+                .isInstanceOf(BusinessLogicException.class)
+                .hasMessageContaining("no atiende la especialidad");
+        assertThat(citasDelMedico()).isZero();
+    }
+
+    @Test
+    void crearCitaFijaElPrecioDeLaEspecialidadElegidaAunqueLuegoCambie() {
+        CitaResponse cita = citaService.crearCita(solicitud(proximoLunes.atTime(9, 0)), pacientePrincipal);
+        Especialidad especialidad = medico.getEspecialidades().iterator().next();
+
+        especialidad.setPrecioConsulta(new BigDecimal("999.00"));
+
+        assertThat(cita.especialidadId()).isEqualTo(especialidad.getId());
+        assertThat(cita.especialidadNombre()).isEqualTo(especialidad.getNombre());
+        assertThat(cita.precio()).isEqualByComparingTo(PRECIO);
+        assertThat(citaService.obtenerCita(cita.id(), pacientePrincipal).monto())
+                .isEqualByComparingTo(PRECIO);
     }
 }

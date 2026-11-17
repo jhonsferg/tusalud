@@ -1,0 +1,21 @@
+package com.codesoftlabs.tusalud.app.repositories;
+
+import com.codesoftlabs.tusalud.app.entities.MfaCodigoRecuperacion;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface MfaCodigoRecuperacionRepository extends JpaRepository<MfaCodigoRecuperacion, Long> {
+
+    List<MfaCodigoRecuperacion> findByUsuarioIdAndUsadoFalse(Long usuarioId);
+
+    long countByUsuarioIdAndUsadoFalse(Long usuarioId);
+
+    @Modifying
+    @Query("DELETE FROM MfaCodigoRecuperacion c WHERE c.usuario.id = :usuarioId")
+    void eliminarDeUsuario(@Param("usuarioId") Long usuarioId);
+}

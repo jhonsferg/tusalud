@@ -44,19 +44,22 @@ class CitaRepositoryTest {
 
     private Medico medico;
     private Paciente paciente;
+    private Especialidad cardiologia;
     private final LocalDateTime lunes10 = LocalDate.of(2030, 1, 7).atTime(10, 0);
 
     @BeforeEach
     void setUp() {
-        Especialidad cardio =
-                em.persist(Especialidad.builder().nombre("Cardiología").build());
+        Especialidad cardio = em.persist(Especialidad.builder()
+                .nombre("Cardiología")
+                .precioConsulta(new BigDecimal("120.00"))
+                .build());
+        cardiologia = cardio;
 
         medico = Medico.builder()
                 .colegiatura("CMP-001")
                 .consultorio("101")
-                .precioConsulta(new BigDecimal("120.00"))
                 .usuario(usuario("medico@test.com"))
-                .especialidad(cardio)
+                .especialidades(new java.util.LinkedHashSet<>(java.util.Set.of(cardio)))
                 .build();
         medico.agregarHorario(HorarioAtencion.builder()
                 .diaSemana(DayOfWeek.MONDAY)
@@ -118,7 +121,9 @@ class CitaRepositoryTest {
         Long especialidadId = medicoRepository
                 .findById(medico.getId())
                 .orElseThrow()
-                .getEspecialidad()
+                .getEspecialidades()
+                .iterator()
+                .next()
                 .getId();
         assertThat(medicoRepository.findByEspecialidadId(especialidadId)).hasSize(1);
         assertThat(medicoRepository.findByIdForUpdate(medico.getId())).isPresent();
@@ -153,7 +158,8 @@ class CitaRepositoryTest {
                 .fechaHora(fechaHora)
                 .motivo("Control")
                 .estado(estado)
-                .monto(medico.getPrecioConsulta())
+                .monto(cardiologia.getPrecioConsulta())
+                .especialidad(cardiologia)
                 .medico(medico)
                 .paciente(paciente)
                 .build();

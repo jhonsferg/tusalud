@@ -62,6 +62,10 @@ public class Cita {
     private boolean recordatorioEnviado = false;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "especialidad_id", nullable = false)
+    private Especialidad especialidad;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "medico_id", nullable = false)
     private Medico medico;
 

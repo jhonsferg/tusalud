@@ -77,7 +77,7 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             SELECT c FROM Cita c
             JOIN FETCH c.medico m
             JOIN FETCH m.usuario
-            JOIN FETCH m.especialidad
+            JOIN FETCH c.especialidad
             JOIN FETCH c.paciente p
             JOIN FETCH p.usuario
             WHERE c.paciente.id = :pacienteId
@@ -95,7 +95,7 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             JOIN FETCH p.usuario
             JOIN FETCH c.medico m
             JOIN FETCH m.usuario
-            JOIN FETCH m.especialidad
+            JOIN FETCH c.especialidad
             WHERE m.id = :medicoId
               AND c.fechaHora >= :inicio
               AND c.fechaHora < :fin
@@ -123,7 +123,7 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             SELECT c FROM Cita c
             JOIN FETCH c.medico m
             JOIN FETCH m.usuario
-            JOIN FETCH m.especialidad
+            JOIN FETCH c.especialidad
             JOIN FETCH c.paciente p
             JOIN FETCH p.usuario
             WHERE c.id = :id
@@ -142,7 +142,7 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             SELECT c FROM Cita c
             JOIN FETCH c.medico m
             JOIN FETCH m.usuario
-            JOIN FETCH m.especialidad
+            JOIN FETCH c.especialidad
             JOIN FETCH c.paciente p
             JOIN FETCH p.usuario
             WHERE c.fechaHora BETWEEN :inicio AND :fin
@@ -193,7 +193,7 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             SELECT new com.codesoftlabs.tusalud.app.dto.response.CitasEspecialidadResponse(e.nombre, COUNT(c))
             FROM Cita c
             JOIN c.medico m
-            JOIN m.especialidad e
+            JOIN c.especialidad e
             WHERE c.estado <> com.codesoftlabs.tusalud.app.entities.enums.EstadoCita.CANCELADA
             GROUP BY e.nombre
             ORDER BY COUNT(c) DESC, e.nombre ASC

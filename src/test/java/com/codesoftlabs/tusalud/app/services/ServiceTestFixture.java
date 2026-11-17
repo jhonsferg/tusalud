@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -83,8 +84,13 @@ public class ServiceTestFixture {
     }
 
     public Especialidad especialidad() {
+        return especialidad(new BigDecimal("100.00"));
+    }
+
+    public Especialidad especialidad(BigDecimal precio) {
         return especialidadRepository.save(Especialidad.builder()
                 .nombre("SvcTest Especialidad " + siguiente())
+                .precioConsulta(precio)
                 .build());
     }
 
@@ -92,9 +98,8 @@ public class ServiceTestFixture {
         Medico medico = Medico.builder()
                 .colegiatura("SVC-" + siguiente())
                 .consultorio("Consultorio 1")
-                .precioConsulta(precio)
                 .usuario(usuario("medico", RolNombre.ROLE_MEDICO))
-                .especialidad(especialidad())
+                .especialidades(new LinkedHashSet<>(Set.of(especialidad(precio))))
                 .build();
         medico.agregarHorario(HorarioAtencion.builder()
                 .diaSemana(DayOfWeek.MONDAY)
@@ -116,11 +121,13 @@ public class ServiceTestFixture {
     }
 
     public Cita cita(Medico medico, Paciente paciente, LocalDateTime fechaHora, EstadoCita estado) {
+        Especialidad especialidad = medico.getEspecialidades().iterator().next();
         return citaRepository.save(Cita.builder()
                 .fechaHora(fechaHora)
                 .motivo("Control")
                 .estado(estado)
-                .monto(medico.getPrecioConsulta())
+                .monto(especialidad.getPrecioConsulta())
+                .especialidad(especialidad)
                 .medico(medico)
                 .paciente(paciente)
                 .build());

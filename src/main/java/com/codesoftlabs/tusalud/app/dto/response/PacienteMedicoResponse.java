@@ -13,4 +13,9 @@ public record PacienteMedicoResponse(
         @Schema(type = "string", example = "2026-10-19T09:00:00")
         LocalDateTime ultimaCita,
 
-        @Schema(example = "3") long totalCitas) {}
+        @Schema(example = "3") long totalCitas,
+
+        @Schema(
+                example = "Ricardo Salazar",
+                description = "Médico que compartió al paciente; null si lo atiende directamente")
+        String compartidoPor) {}

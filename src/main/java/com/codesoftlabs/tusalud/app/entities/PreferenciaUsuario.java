@@ -46,4 +46,8 @@ public class PreferenciaUsuario {
     @Column(name = "alertas_inicio_sesion", nullable = false)
     @Builder.Default
     private boolean alertasInicioSesion = true;
+
+    @Column(name = "tour_completado", nullable = false)
+    @Builder.Default
+    private boolean tourCompletado = false;
 }

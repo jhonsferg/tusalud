@@ -96,7 +96,8 @@ class SesionServiceImplTest {
     @Test
     void alertasDesactivadasNoGeneranNotificacion() {
         Usuario usuario = fixture.usuario("sinalerta", RolNombre.ROLE_PACIENTE);
-        perfilService.actualizarPreferencias(fixture.principal(usuario), new PreferenciasRequest(true, 24, false));
+        perfilService.actualizarPreferencias(
+                fixture.principal(usuario), new PreferenciasRequest(true, 24, false, null));
         sesionService.iniciarSesion(usuario, new ContextoConexion("190.1.2.3", UA_CHROME_WINDOWS));
 
         sesionService.iniciarSesion(usuario, new ContextoConexion("200.1.1.1", UA_SAFARI_IPHONE));

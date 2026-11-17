@@ -36,7 +36,7 @@ public record PagoResponse(
                 cita.getId(),
                 cita.getPaciente().getUsuario().getNombreCompleto(),
                 cita.getMedico().getUsuario().getNombreCompleto(),
-                cita.getMedico().getEspecialidad().getNombre(),
+                cita.getEspecialidad().getNombre(),
                 cita.getFechaHora(),
                 pago.getMonto(),
                 pago.getDescuento(),

@@ -20,4 +20,8 @@ public record CitaCreateRequest(
         @Schema(example = "Dolor de pecho al hacer esfuerzo")
         @NotBlank(message = "El motivo es obligatorio")
         @Size(max = 500, message = "El motivo no debe superar 500 caracteres")
-        String motivo) {}
+        String motivo,
+
+        @Schema(example = "1", description = "Especialidad de la consulta; debe pertenecer al médico")
+        @NotNull(message = "La especialidad es obligatoria")
+        Long especialidadId) {}

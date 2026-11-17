@@ -8,14 +8,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,16 +49,18 @@ public class Medico {
     @Column(length = 50)
     private String consultorio;
 
-    @Column(name = "precio_consulta", nullable = false, precision = 10, scale = 2)
-    private BigDecimal precioConsulta;
-
     @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "especialidad_id", nullable = false)
-    private Especialidad especialidad;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "medico_especialidades",
+            joinColumns = @JoinColumn(name = "medico_id"),
+            inverseJoinColumns = @JoinColumn(name = "especialidad_id"))
+    @OrderBy("nombre ASC")
+    @Builder.Default
+    private Set<Especialidad> especialidades = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "medico", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

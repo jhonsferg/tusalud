@@ -17,4 +17,7 @@ public record PreferenciasRequest(
         Integer horasAntelacionRecordatorio,
 
         @Schema(example = "true") @NotNull(message = "Indique si desea alertas de inicio de sesión")
-        Boolean alertasInicioSesion) {}
+        Boolean alertasInicioSesion,
+
+        @Schema(example = "true", description = "Si se omite, no cambia")
+        Boolean tourCompletado) {}

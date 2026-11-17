@@ -29,6 +29,13 @@ public record CitaResponse(
 
         @Schema(example = "Cardiología") String especialidad,
 
+        @Schema(example = "1") Long especialidadId,
+
+        @Schema(example = "Cardiología") String especialidadNombre,
+
+        @Schema(example = "150.00", description = "Precio de la consulta fijado al reservar")
+        BigDecimal precio,
+
         @Schema(example = "Consultorio 101") String consultorio,
 
         @Schema(example = "1") Long pacienteId,
@@ -55,7 +62,10 @@ public record CitaResponse(
                 cita.getMonto(),
                 medico.getId(),
                 medico.getUsuario().getNombreCompleto(),
-                medico.getEspecialidad().getNombre(),
+                cita.getEspecialidad().getNombre(),
+                cita.getEspecialidad().getId(),
+                cita.getEspecialidad().getNombre(),
+                cita.getMonto(),
                 medico.getConsultorio(),
                 paciente.getId(),
                 paciente.getUsuario().getNombreCompleto(),

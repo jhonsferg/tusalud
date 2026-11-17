@@ -9,18 +9,21 @@ public record PreferenciasResponse(
 
         @Schema(example = "24") int horasAntelacionRecordatorio,
 
-        @Schema(example = "true") boolean alertasInicioSesion) {
+        @Schema(example = "true") boolean alertasInicioSesion,
+
+        @Schema(example = "false") boolean tourCompletado) {
 
     public static final int HORAS_POR_DEFECTO = 24;
 
     public static PreferenciasResponse porDefecto() {
-        return new PreferenciasResponse(true, HORAS_POR_DEFECTO, true);
+        return new PreferenciasResponse(true, HORAS_POR_DEFECTO, true, false);
     }
 
     public static PreferenciasResponse from(PreferenciaUsuario preferencia) {
         return new PreferenciasResponse(
                 preferencia.isRecordatoriosActivos(),
                 preferencia.getHorasAntelacionRecordatorio(),
-                preferencia.isAlertasInicioSesion());
+                preferencia.isAlertasInicioSesion(),
+                preferencia.isTourCompletado());
     }
 }

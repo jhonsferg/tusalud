@@ -7,6 +7,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +24,9 @@ public class JwtUtils {
     public static final String CLAIM_ROLES = "roles";
     public static final String CLAIM_USER_ID = "uid";
     public static final String CLAIM_NOMBRE = "nombre";
+    public static final String CLAIM_PROPOSITO = "proposito";
+    public static final String PROPOSITO_MFA = "mfa";
+    private static final Duration MFA_TOKEN_TTL = Duration.ofMinutes(5);
 
     private final SecretKey signingKey;
     private final JwtProperties properties;
@@ -50,6 +54,27 @@ public class JwtUtils {
             builder.id(tokenId.toString());
         }
         return builder.signWith(signingKey).compact();
+    }
+
+    public String generateMfaToken(UsuarioPrincipal principal) {
+        Instant now = Instant.now();
+        return Jwts.builder()
+                .subject(principal.getEmail())
+                .issuer(properties.issuer())
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plus(MFA_TOKEN_TTL)))
+                .claim(CLAIM_USER_ID, principal.getId())
+                .claim(CLAIM_PROPOSITO, PROPOSITO_MFA)
+                .signWith(signingKey)
+                .compact();
+    }
+
+    public Long extractMfaUserId(String token) {
+        Claims claims = parseClaims(token);
+        if (!PROPOSITO_MFA.equals(claims.get(CLAIM_PROPOSITO, String.class))) {
+            throw new JwtException("El token no corresponde a una verificación en dos pasos");
+        }
+        return claims.get(CLAIM_USER_ID, Long.class);
     }
 
     public Claims parseClaims(String token) {

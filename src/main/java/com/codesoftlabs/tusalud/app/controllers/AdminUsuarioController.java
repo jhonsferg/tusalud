@@ -1,6 +1,7 @@
 package com.codesoftlabs.tusalud.app.controllers;
 
 import com.codesoftlabs.tusalud.app.dto.request.CambioEstadoUsuarioRequest;
+import com.codesoftlabs.tusalud.app.dto.request.RolesUsuarioRequest;
 import com.codesoftlabs.tusalud.app.dto.response.ErrorResponse;
 import com.codesoftlabs.tusalud.app.dto.response.UsuarioAdminResponse;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
@@ -58,6 +59,30 @@ public class AdminUsuarioController {
                     @RequestParam(required = false)
                     String q) {
         return ResponseEntity.ok(usuarioAdminService.listar(rol, q));
+    }
+
+    @PutMapping("/{id:\\d+}/roles")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+            summary = "Asignar roles a un usuario",
+            description =
+                    "Reemplaza los roles de una cuenta. Exige un perfil de médico o de paciente para los roles correspondientes, no permite que un administrador se quite su propio rol ni dejar el sistema sin administradores, y cierra las sesiones del usuario. Requiere rol ADMIN.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Roles actualizados"),
+        @ApiResponse(
+                responseCode = "404",
+                description = "Usuario no encontrado",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(
+                responseCode = "409",
+                description = "Combinación de roles no permitida",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<UsuarioAdminResponse> asignarRoles(
+            @Parameter(description = "ID del usuario", example = "4") @PathVariable @Positive Long id,
+            @Valid @RequestBody RolesUsuarioRequest request,
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
+        return ResponseEntity.ok(usuarioAdminService.asignarRoles(id, request.roles(), principal));
     }
 
     @PutMapping("/{id:\\d+}/estado")

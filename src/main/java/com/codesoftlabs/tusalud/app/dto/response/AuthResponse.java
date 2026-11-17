@@ -20,4 +20,10 @@ public record AuthResponse(
 
         @Schema(example = "Administrador General") String nombreCompleto,
 
-        @Schema(example = "[\"ROLE_ADMIN\"]") List<String> roles) {}
+        @Schema(example = "[\"ROLE_ADMIN\"]") List<String> roles,
+
+        @Schema(description = "Si es true, falta el segundo paso en /auth/mfa/verificar", example = "false")
+        boolean mfaRequerido,
+
+        @Schema(description = "Token temporal (5 min) para el segundo paso; solo si mfaRequerido")
+        String mfaToken) {}

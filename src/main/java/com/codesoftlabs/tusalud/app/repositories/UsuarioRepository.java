@@ -17,6 +17,12 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     @Query("SELECT COUNT(u) > 0 FROM Usuario u WHERE LOWER(u.email) = LOWER(:email)")
     boolean existsByEmailIgnoreCase(@Param("email") String email);
 
+    @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.roles WHERE u.id = :id")
+    Optional<Usuario> findByIdConRoles(@Param("id") Long id);
+
+    @Query("SELECT COUNT(u) FROM Usuario u JOIN u.roles r WHERE r.nombre = :rol")
+    long contarPorRol(@Param("rol") com.codesoftlabs.tusalud.app.entities.enums.RolNombre rol);
+
     @Query("SELECT DISTINCT u FROM Usuario u LEFT JOIN FETCH u.roles ORDER BY u.apellido ASC, u.nombre ASC")
     List<Usuario> findAllConRoles();
 }

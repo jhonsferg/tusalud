@@ -88,8 +88,9 @@ class DataInitializerTest {
                 medicoRepository.findByUsuarioEmail("dr.garcia@tusalud.com").orElseThrow();
         assertThat(garcia.getColegiatura()).isEqualTo("CMP-12345");
         assertThat(garcia.getConsultorio()).isEqualTo("Consultorio 101");
-        assertThat(garcia.getPrecioConsulta()).isEqualByComparingTo(new BigDecimal("150.00"));
-        assertThat(garcia.getEspecialidad().getNombre()).isEqualTo("Cardiología");
+        assertThat(garcia.getEspecialidades().iterator().next().getPrecioConsulta())
+                .isEqualByComparingTo(new BigDecimal("150.00"));
+        assertThat(garcia.getEspecialidades().iterator().next().getNombre()).isEqualTo("Cardiología");
         List<HorarioAtencion> horariosGarcia = horarioRepository.findByMedicoId(garcia.getId());
         assertThat(horariosGarcia).hasSize(5).allSatisfy(h -> {
             assertThat(h.getHoraInicio()).isEqualTo(LocalTime.of(8, 0));
@@ -100,7 +101,7 @@ class DataInitializerTest {
         Medico lopez =
                 medicoRepository.findByUsuarioEmail("dra.lopez@tusalud.com").orElseThrow();
         assertThat(lopez.getColegiatura()).isEqualTo("CMP-67890");
-        assertThat(lopez.getEspecialidad().getNombre()).isEqualTo("Pediatría");
+        assertThat(lopez.getEspecialidades().iterator().next().getNombre()).isEqualTo("Pediatría");
         List<HorarioAtencion> horariosLopez = horarioRepository.findByMedicoId(lopez.getId());
         assertThat(horariosLopez).hasSize(6);
         assertThat(horarioRepository.findByMedicoAndDia(lopez.getId(), DayOfWeek.SATURDAY))

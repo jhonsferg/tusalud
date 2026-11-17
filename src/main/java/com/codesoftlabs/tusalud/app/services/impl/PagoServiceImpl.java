@@ -110,6 +110,40 @@ public class PagoServiceImpl implements PagoService {
     }
 
     @Override
+    @Transactional
+    public Pago registrarPagoBilletera(
+            Cita cita, String descripcion, BigDecimal monto, BigDecimal descuento, String codigoCupon) {
+        if (cita.getPago() != null) {
+            throw new ConflictException("La cita ya tiene un pago registrado");
+        }
+        if (codigoCupon != null) {
+            cuponService.consumir(codigoCupon);
+        }
+        BigDecimal total = monto.subtract(descuento).setScale(2, RoundingMode.HALF_UP);
+        Pago pago = pagoRepository.save(Pago.builder()
+                .cita(cita)
+                .metodoDescripcion(descripcion)
+                .monto(monto)
+                .descuento(descuento)
+                .total(total)
+                .codigoCupon(codigoCupon)
+                .estado(EstadoPago.PAGADO)
+                .comprobante(siguienteComprobante())
+                .fechaPago(LocalDateTime.now())
+                .build());
+        cita.setPago(pago);
+        notificacionService.crear(
+                cita.getPaciente().getUsuario(),
+                TipoNotificacion.PAGO_REGISTRADO,
+                "Pago registrado",
+                "Se registró el pago de S/ " + total.toPlainString() + " con " + descripcion + " por su cita del "
+                        + cita.getFechaHora().format(FORMATO_FECHA) + ". Comprobante " + pago.getComprobante() + ".",
+                "/citas/" + cita.getId());
+        log.info("Pago {} con {} registrado para la cita {}", pago.getComprobante(), descripcion, cita.getId());
+        return pago;
+    }
+
+    @Override
     public List<PagoResponse> listarMisPagos(UsuarioPrincipal actor) {
         return pagoRepository.findDelPaciente(actor.getId()).stream()
                 .map(PagoResponse::from)

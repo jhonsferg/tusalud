@@ -35,7 +35,7 @@ public record AtencionResponse(
                 atencion.getCita().getId(),
                 atencion.getFecha(),
                 atencion.getMedico().getUsuario().getNombreCompleto(),
-                atencion.getMedico().getEspecialidad().getNombre(),
+                atencion.getCita().getEspecialidad().getNombre(),
                 atencion.getPaciente().getId(),
                 atencion.getPaciente().getUsuario().getNombreCompleto(),
                 atencion.getDiagnostico(),

@@ -62,7 +62,11 @@ class NotificacionServiceImplTest {
         prepararMedicoYPaciente();
 
         CitaResponse cita = citaService.crearCita(
-                new CitaCreateRequest(medico.getId(), proximoLunes().atTime(9, 0), "Control general"),
+                new CitaCreateRequest(
+                        medico.getId(),
+                        proximoLunes().atTime(9, 0),
+                        "Control general",
+                        medico.getEspecialidades().iterator().next().getId()),
                 fixture.principal(paciente.getUsuario()));
 
         assertThat(notificacionesDe(medico.getUsuario())).singleElement().satisfies(n -> {
@@ -79,7 +83,11 @@ class NotificacionServiceImplTest {
     void confirmarCitaNotificaAlPaciente() {
         prepararMedicoYPaciente();
         CitaResponse cita = citaService.crearCita(
-                new CitaCreateRequest(medico.getId(), proximoLunes().atTime(10, 0), "Dolor de cabeza"),
+                new CitaCreateRequest(
+                        medico.getId(),
+                        proximoLunes().atTime(10, 0),
+                        "Dolor de cabeza",
+                        medico.getEspecialidades().iterator().next().getId()),
                 fixture.principal(paciente.getUsuario()));
 
         citaService.confirmarCita(cita.id(), fixture.principal(medico.getUsuario()));
@@ -93,7 +101,11 @@ class NotificacionServiceImplTest {
     void cancelarCitaNotificaAlMedico() {
         prepararMedicoYPaciente();
         CitaResponse cita = citaService.crearCita(
-                new CitaCreateRequest(medico.getId(), proximoLunes().atTime(11, 0), "Revisión"),
+                new CitaCreateRequest(
+                        medico.getId(),
+                        proximoLunes().atTime(11, 0),
+                        "Revisión",
+                        medico.getEspecialidades().iterator().next().getId()),
                 fixture.principal(paciente.getUsuario()));
 
         citaService.cancelarCita(cita.id(), fixture.principal(paciente.getUsuario()));

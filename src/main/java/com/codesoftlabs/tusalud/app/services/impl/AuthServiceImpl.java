@@ -1,6 +1,7 @@
 package com.codesoftlabs.tusalud.app.services.impl;
 
 import com.codesoftlabs.tusalud.app.dto.request.LoginRequest;
+import com.codesoftlabs.tusalud.app.dto.request.MfaVerificarRequest;
 import com.codesoftlabs.tusalud.app.dto.request.RegisterRequest;
 import com.codesoftlabs.tusalud.app.dto.response.AuthResponse;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
@@ -9,6 +10,7 @@ import com.codesoftlabs.tusalud.app.entities.Usuario;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoUsuario;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
+import com.codesoftlabs.tusalud.app.exceptions.DemasiadosIntentosException;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
 import com.codesoftlabs.tusalud.app.repositories.RolRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
@@ -16,7 +18,9 @@ import com.codesoftlabs.tusalud.app.security.ContextoConexion;
 import com.codesoftlabs.tusalud.app.security.JwtUtils;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.AuthService;
+import com.codesoftlabs.tusalud.app.services.interfaces.MfaService;
 import com.codesoftlabs.tusalud.app.services.interfaces.SesionService;
+import io.jsonwebtoken.JwtException;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -24,6 +28,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +50,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final SesionService sesionService;
+    private final MfaService mfaService;
 
     @Override
     @Transactional
@@ -55,9 +61,40 @@ public class AuthServiceImpl implements AuthService {
         Usuario usuario = usuarioRepository
                 .findById(principal.getId())
                 .orElseThrow(() -> new IllegalStateException("Usuario autenticado inexistente: " + principal.getId()));
+        if (mfaService.estaActivo(usuario.getId())) {
+            log.info("Inicio de sesión pendiente de verificación en dos pasos para {}", principal.getEmail());
+            return AuthResponse.builder()
+                    .tokenType(TOKEN_TYPE)
+                    .usuarioId(principal.getId())
+                    .email(principal.getEmail())
+                    .nombreCompleto(principal.getNombreCompleto())
+                    .roles(principal.getRoles())
+                    .mfaRequerido(true)
+                    .mfaToken(jwtUtils.generateMfaToken(principal))
+                    .build();
+        }
         UUID tokenId = sesionService.iniciarSesion(usuario, contexto);
         log.info("Inicio de sesión exitoso para {}", principal.getEmail());
         return construirRespuesta(principal, tokenId);
+    }
+
+    @Override
+    @Transactional(noRollbackFor = {BadCredentialsException.class, DemasiadosIntentosException.class})
+    public AuthResponse verificarMfa(MfaVerificarRequest request, ContextoConexion contexto) {
+        Long usuarioId;
+        try {
+            usuarioId = jwtUtils.extractMfaUserId(request.mfaToken());
+        } catch (JwtException | IllegalArgumentException ex) {
+            throw new BadCredentialsException("El token de verificación no es válido o expiró");
+        }
+        Usuario usuario = usuarioRepository
+                .findById(usuarioId)
+                .filter(Usuario::isActivo)
+                .orElseThrow(() -> new BadCredentialsException("El token de verificación no es válido o expiró"));
+        mfaService.validarSegundoPaso(usuarioId, request.codigo());
+        UUID tokenId = sesionService.iniciarSesion(usuario, contexto);
+        log.info("Inicio de sesión con verificación en dos pasos para {}", usuario.getEmail());
+        return construirRespuesta(UsuarioPrincipal.from(usuario), tokenId);
     }
 
     @Override
@@ -121,6 +158,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(principal.getEmail())
                 .nombreCompleto(principal.getNombreCompleto())
                 .roles(principal.getRoles())
+                .mfaRequerido(false)
                 .build();
     }
 

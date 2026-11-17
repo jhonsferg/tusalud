@@ -43,6 +43,7 @@ public class EspecialidadServiceImpl implements EspecialidadService {
         Especialidad especialidad = Especialidad.builder()
                 .nombre(nombre)
                 .descripcion(limpiar(request.descripcion()))
+                .precioConsulta(request.precioConsulta())
                 .build();
         especialidad = especialidadRepository.save(especialidad);
         log.info("Especialidad creada: {} (id {})", nombre, especialidad.getId());
@@ -59,6 +60,7 @@ public class EspecialidadServiceImpl implements EspecialidadService {
         }
         especialidad.setNombre(nombre);
         especialidad.setDescripcion(limpiar(request.descripcion()));
+        especialidad.setPrecioConsulta(request.precioConsulta());
         log.info("Especialidad actualizada: id {}", id);
         return EspecialidadResponse.from(especialidad);
     }
@@ -70,6 +72,10 @@ public class EspecialidadServiceImpl implements EspecialidadService {
         if (especialidadRepository.tieneMedicosAsignados(id)) {
             throw new ConflictException("No se puede eliminar la especialidad " + especialidad.getNombre()
                     + " porque tiene médicos asignados");
+        }
+        if (especialidadRepository.tieneCitas(id)) {
+            throw new ConflictException("No se puede eliminar la especialidad " + especialidad.getNombre()
+                    + " porque tiene citas registradas");
         }
         especialidadRepository.delete(especialidad);
         log.info("Especialidad eliminada: id {}", id);

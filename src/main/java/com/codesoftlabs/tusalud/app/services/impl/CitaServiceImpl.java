@@ -5,6 +5,7 @@ import com.codesoftlabs.tusalud.app.dto.request.ReprogramarRequest;
 import com.codesoftlabs.tusalud.app.dto.response.CitaResponse;
 import com.codesoftlabs.tusalud.app.dto.response.DisponibilidadResponse;
 import com.codesoftlabs.tusalud.app.entities.Cita;
+import com.codesoftlabs.tusalud.app.entities.Especialidad;
 import com.codesoftlabs.tusalud.app.entities.HorarioAtencion;
 import com.codesoftlabs.tusalud.app.entities.Medico;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
@@ -78,6 +79,12 @@ public class CitaServiceImpl implements CitaService {
             throw new BusinessLogicException("El médico seleccionado no se encuentra activo");
         }
 
+        Especialidad especialidad = medico.getEspecialidades().stream()
+                .filter(e -> e.getId().equals(request.especialidadId()))
+                .findFirst()
+                .orElseThrow(
+                        () -> new BusinessLogicException("El médico seleccionado no atiende la especialidad indicada"));
+
         LocalDateTime fechaHora = request.fechaHora().truncatedTo(ChronoUnit.MINUTES);
         if (!fechaHora.isAfter(LocalDateTime.now())) {
             throw new BusinessLogicException("La fecha y hora de la cita debe ser futura");
@@ -89,7 +96,8 @@ public class CitaServiceImpl implements CitaService {
                 .fechaHora(fechaHora)
                 .motivo(request.motivo().trim())
                 .estado(EstadoCita.PENDIENTE)
-                .monto(medico.getPrecioConsulta())
+                .monto(especialidad.getPrecioConsulta())
+                .especialidad(especialidad)
                 .medico(medico)
                 .paciente(paciente)
                 .build();

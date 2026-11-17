@@ -31,6 +31,10 @@ app:
     secret: ${JWT_SECRET:}
   data-initializer:
     enabled: ${DATA_INITIALIZER_ENABLED:false}
+  mfa:
+    clave-cifrado: ${MFA_CLAVE_CIFRADO:}
+  pagos:
+    simulacion-habilitada: ${PAGOS_SIMULACION_HABILITADA:false}
 
 logging:
   level:

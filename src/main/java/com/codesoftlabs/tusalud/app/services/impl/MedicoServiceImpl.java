@@ -2,6 +2,7 @@ package com.codesoftlabs.tusalud.app.services.impl;
 
 import com.codesoftlabs.tusalud.app.dto.request.HorarioRequest;
 import com.codesoftlabs.tusalud.app.dto.request.MedicoCreateRequest;
+import com.codesoftlabs.tusalud.app.dto.request.MedicoEspecialidadesRequest;
 import com.codesoftlabs.tusalud.app.dto.response.HorarioResponse;
 import com.codesoftlabs.tusalud.app.dto.response.MedicoResponse;
 import com.codesoftlabs.tusalud.app.entities.Especialidad;
@@ -22,6 +23,7 @@ import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.services.interfaces.MedicoService;
 import java.time.Duration;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -69,9 +71,7 @@ public class MedicoServiceImpl implements MedicoService {
     @Override
     @Transactional
     public MedicoResponse crear(MedicoCreateRequest request) {
-        Especialidad especialidad = especialidadRepository
-                .findById(request.especialidadId())
-                .orElseThrow(() -> new ResourceNotFoundException("Especialidad", "id", request.especialidadId()));
+        Set<Especialidad> especialidades = resolverEspecialidades(request.especialidadIds());
 
         String email = request.email().trim().toLowerCase(Locale.ROOT);
         String colegiatura = request.colegiatura().trim().toUpperCase(Locale.ROOT);
@@ -105,13 +105,25 @@ public class MedicoServiceImpl implements MedicoService {
                         request.consultorio() == null
                                 ? null
                                 : request.consultorio().trim())
-                .precioConsulta(request.precioConsulta())
-                .especialidad(especialidad)
+                .especialidades(especialidades)
                 .usuario(usuario)
                 .build();
         medico = medicoRepository.save(medico);
 
         log.info("Médico creado: {} (id {}, {})", email, medico.getId(), colegiatura);
+        return MedicoResponse.from(medico);
+    }
+
+    @Override
+    @Transactional
+    public MedicoResponse actualizarEspecialidades(Long medicoId, MedicoEspecialidadesRequest request) {
+        Medico medico = medicoRepository
+                .findByIdWithDetails(medicoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Médico", "id", medicoId));
+        Set<Especialidad> especialidades = resolverEspecialidades(request.especialidadIds());
+        medico.getEspecialidades().clear();
+        medico.getEspecialidades().addAll(especialidades);
+        log.info("Especialidades del médico {} actualizadas: {}", medicoId, request.especialidadIds());
         return MedicoResponse.from(medico);
     }
 
@@ -177,6 +189,21 @@ public class MedicoServiceImpl implements MedicoService {
         medico.quitarHorario(horario);
         horarioRepository.delete(horario);
         log.info("Horario {} eliminado del médico {}", horarioId, medicoId);
+    }
+
+    private Set<Especialidad> resolverEspecialidades(List<Long> ids) {
+        Set<Long> unicos = new LinkedHashSet<>(ids);
+        List<Especialidad> encontradas = especialidadRepository.findAllById(unicos);
+        if (encontradas.size() != unicos.size()) {
+            Set<Long> existentes = new HashSet<>();
+            encontradas.forEach(e -> existentes.add(e.getId()));
+            Long faltante = unicos.stream()
+                    .filter(id -> !existentes.contains(id))
+                    .findFirst()
+                    .orElseThrow();
+            throw new ResourceNotFoundException("Especialidad", "id", faltante);
+        }
+        return new LinkedHashSet<>(encontradas);
     }
 
     private void verificarMedicoExiste(Long medicoId) {
