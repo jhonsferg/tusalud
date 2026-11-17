@@ -1,0 +1,179 @@
+<p-dialog
+  [header]="editando() ? 'Editar evento' : 'Nuevo evento'"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '34rem', maxWidth: '96vw' }"
+>
+  <form
+    class="evento-form"
+    [formGroup]="form"
+    (submit)="$event.preventDefault(); guardar()"
+    novalidate
+  >
+    @if (error(); as mensaje) {
+      <p class="error" role="alert"><i class="pi pi-exclamation-circle"></i> {{ mensaje }}</p>
+    }
+
+    <input
+      pInputText
+      id="ev-titulo"
+      class="titulo"
+      formControlName="titulo"
+      placeholder="Añade un título"
+      aria-label="Título"
+      maxlength="120"
+    />
+    @if (form.controls.titulo.touched && form.controls.titulo.invalid) {
+      <small class="text-red-600">El título es obligatorio.</small>
+    }
+
+    <div class="fila">
+      <label for="ev-tipo">Tipo</label>
+      <p-select
+        inputId="ev-tipo"
+        formControlName="tipo"
+        [options]="tipos()"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="fila">
+      <label for="ev-todo">Todo el día</label>
+      <p-toggleswitch inputId="ev-todo" formControlName="todoElDia" />
+    </div>
+
+    <div class="fila">
+      <label for="ev-inicio">Inicio</label>
+      <p-datepicker
+        inputId="ev-inicio"
+        formControlName="inicio"
+        [showTime]="!todoElDia()"
+        hourFormat="24"
+        [stepMinute]="5"
+        dateFormat="dd/mm/yy"
+        [showIcon]="true"
+        [fluid]="true"
+        appendTo="body"
+      />
+    </div>
+
+    <div class="fila">
+      <label for="ev-fin">Fin</label>
+      <p-datepicker
+        inputId="ev-fin"
+        formControlName="fin"
+        [showTime]="!todoElDia()"
+        hourFormat="24"
+        [stepMinute]="5"
+        dateFormat="dd/mm/yy"
+        [showIcon]="true"
+        [fluid]="true"
+        appendTo="body"
+      />
+    </div>
+    @if (rangoInvalido()) {
+      <small class="text-red-600">El fin debe ser posterior al inicio.</small>
+    }
+
+    <div class="fila">
+      <label for="ev-ubicacion">Lugar</label>
+      <input
+        pInputText
+        id="ev-ubicacion"
+        formControlName="ubicacion"
+        maxlength="120"
+        class="w-full"
+      />
+    </div>
+
+    <div class="fila">
+      <label for="ev-descripcion">Notas</label>
+      <textarea
+        pTextarea
+        id="ev-descripcion"
+        formControlName="descripcion"
+        rows="3"
+        maxlength="500"
+        class="w-full"
+      ></textarea>
+    </div>
+
+    <div class="fila">
+      <label for="ev-recordatorio">Aviso</label>
+      <p-select
+        inputId="ev-recordatorio"
+        formControlName="recordatorioMinutos"
+        [options]="recordatorios"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="fila">
+      <label>Color</label>
+      <div class="colores" role="radiogroup" aria-label="Color del evento">
+        <button
+          type="button"
+          class="color automatico"
+          role="radio"
+          [attr.aria-checked]="form.controls.color.value === null"
+          aria-label="Color según el tipo"
+          [class.activo]="form.controls.color.value === null"
+          (click)="elegirColor(null)"
+        >
+          <i class="pi pi-sparkles"></i>
+        </button>
+        @for (color of colores; track color) {
+          <button
+            type="button"
+            class="color"
+            role="radio"
+            [attr.aria-checked]="form.controls.color.value === color"
+            [attr.aria-label]="color"
+            [class.activo]="form.controls.color.value === color"
+            [style.background]="colorHex[color]"
+            (click)="elegirColor(color)"
+          ></button>
+        }
+      </div>
+    </div>
+  </form>
+
+  <ng-template #footer>
+    <div class="pie">
+      @if (editando()) {
+        <p-button
+          icon="pi pi-trash"
+          severity="danger"
+          [text]="true"
+          ariaLabel="Eliminar evento"
+          (onClick)="eliminar()"
+        />
+        @if (esTarea()) {
+          <p-button
+            [label]="evento()?.completado ? 'Marcar pendiente' : 'Marcar completada'"
+            icon="pi pi-check"
+            [outlined]="true"
+            severity="secondary"
+            (onClick)="alternarCompletado()"
+          />
+        }
+      }
+      <span class="espacio"></span>
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="visible.set(false)"
+      />
+      <p-button label="Guardar" icon="pi pi-check" [loading]="guardando()" (onClick)="guardar()" />
+    </div>
+  </ng-template>
+</p-dialog>

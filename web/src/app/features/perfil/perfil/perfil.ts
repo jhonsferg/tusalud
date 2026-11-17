@@ -8,6 +8,7 @@ import {
   inject,
   input,
   signal,
+  untracked,
 } from '@angular/core';
 import {
   AbstractControl,
@@ -202,7 +203,7 @@ export class Perfil implements OnInit {
   constructor() {
     effect(() => {
       const perfil = this.store.perfil.value();
-      if (perfil) {
+      if (perfil && !untracked(() => this.datos.dirty)) {
         this.restablecer();
       }
     });
@@ -257,6 +258,7 @@ export class Perfil implements OnInit {
       .subscribe({
         next: () => {
           this.guardando.set(false);
+          this.datos.markAsPristine();
           this.notifications.success('Tus datos fueron actualizados.');
         },
         error: (error: ApiError) => {

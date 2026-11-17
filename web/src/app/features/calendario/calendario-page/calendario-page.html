@@ -1,0 +1,37 @@
+<app-page-header
+  title="Calendario"
+  subtitle="Tus citas, reuniones, tareas y recordatorios en un solo lugar"
+  icon="pi-calendar"
+>
+  <p-button label="Nuevo evento" icon="pi pi-plus" (onClick)="nuevo()" />
+</app-page-header>
+
+<section class="panel">
+  <app-calendario
+    [eventos]="eventos()"
+    [categorias]="categorias()"
+    [horarioLaboral]="laboral()"
+    [vistas]="vistas"
+    [editable]="true"
+    [cargando]="store.eventos.loading()"
+    textoVacio="No tienes eventos en este periodo."
+    [(vista)]="vista"
+    [(fecha)]="fecha"
+    (rangoCambiado)="cargarRango($event)"
+    (eventoElegido)="abrir($event)"
+    (crear)="abrirNuevo($event)"
+    (eventoCambiado)="cambiar($event)"
+  />
+  <p class="atajos text-muted">
+    <i class="pi pi-info-circle"></i>
+    Arrastra sobre el calendario para crear un evento, mueve o estira los eventos para
+    reprogramarlos y usa las teclas T, M, S, D y A para cambiar de vista.
+  </p>
+</section>
+
+<app-evento-dialog
+  [(visible)]="dialogoVisible"
+  [evento]="seleccionado()"
+  [borrador]="borrador()"
+  [permitirBloqueo]="auth.isMedico()"
+/>

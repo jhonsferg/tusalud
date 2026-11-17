@@ -34,6 +34,10 @@ import {
   VistaCalendario,
 } from '@tusalud/app/shared/components/calendario/calendario.utils';
 import { citaAEvento } from '@tusalud/app/shared/utils/cita-calendario';
+import {
+  construirHuecos,
+  horarioLaboral,
+} from '@tusalud/app/shared/utils/disponibilidad-calendario';
 import { FormField } from '@tusalud/app/shared/components/form-field/form-field';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
 
@@ -129,33 +133,13 @@ export class CitaForm {
     })),
   );
 
-  protected readonly huecos = computed<CalHueco[] | null>(() => {
-    if (!this.valores().medicoId) {
-      return null;
-    }
-    const resultado: CalHueco[] = [];
-    for (const dia of this.medicos.disponibilidadRango.value() ?? []) {
-      const base = parseIsoDate(dia.fecha);
-      if (!base) {
-        continue;
-      }
-      const inicios = dia.horariosDisponibles.map((hora) => {
-        const [h, m] = hora.split(':').map(Number);
-        return new Date(base.getFullYear(), base.getMonth(), base.getDate(), h, m);
-      });
-      let paso = 30;
-      for (let i = 1; i < inicios.length; i++) {
-        const diferencia = (inicios[i].getTime() - inicios[i - 1].getTime()) / 60_000;
-        if (diferencia > 0) {
-          paso = Math.min(paso, diferencia);
-        }
-      }
-      inicios.forEach((inicio) =>
-        resultado.push({ inicio, fin: new Date(inicio.getTime() + paso * 60_000) }),
-      );
-    }
-    return resultado;
-  });
+  protected readonly huecos = computed<CalHueco[] | null>(() =>
+    this.valores().medicoId
+      ? construirHuecos(this.medicos.disponibilidadRango.value() ?? [])
+      : null,
+  );
+
+  protected readonly laboral = computed(() => horarioLaboral(this.medicos.horarios.value() ?? []));
 
   protected readonly seleccionActual = computed(() => {
     const { fecha, hora } = this.valores();
@@ -214,6 +198,13 @@ export class CitaForm {
     });
 
     this.citas.loadMisCitas();
+
+    effect(() => {
+      const id = this.valores().medicoId;
+      if (id) {
+        untracked(() => this.medicos.loadHorarios(id));
+      }
+    });
 
     effect(() => {
       const medicoId = this.valores().medicoId;

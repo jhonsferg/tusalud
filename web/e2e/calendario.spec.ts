@@ -5,7 +5,7 @@ import { iniciarSesion } from './support';
 test.describe('calendario', () => {
   test('el paciente ve sus citas en las vistas de mes, semana y día', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
-    await page.getByText('Calendario', { exact: true }).click();
+    await page.getByRole('button', { name: 'Calendario' }).click();
 
     const vistas = page.getByRole('group', { name: 'Vista del calendario' });
     await vistas.getByRole('button', { name: 'Mes' }).click();
@@ -18,7 +18,7 @@ test.describe('calendario', () => {
     await page.getByRole('button', { name: 'Hoy' }).click();
     await expect(page.locator('.ahora')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Siguiente' }).click();
+    await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
     await expect(page.locator('.ahora')).toHaveCount(0);
   });
 
@@ -27,7 +27,7 @@ test.describe('calendario', () => {
     await page.goto('/citas/nueva?medicoId=1');
     await expect(page.getByText('Por elegir')).toBeVisible();
 
-    await page.getByRole('button', { name: 'Siguiente' }).click();
+    await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
     const huecos = page.getByRole('button', { name: /^Elegir / });
     await expect(huecos.first()).toBeVisible();
     await huecos.first().click();
@@ -52,7 +52,7 @@ test.describe('calendario', () => {
 
   test('el médico alterna entre el día y el calendario de su agenda', async ({ page }) => {
     await iniciarSesion(page, 'medico');
-    await page.getByText('Calendario', { exact: true }).click();
+    await page.getByRole('button', { name: 'Calendario' }).click();
     await page
       .getByRole('group', { name: 'Vista del calendario' })
       .getByRole('button', { name: 'Mes' })

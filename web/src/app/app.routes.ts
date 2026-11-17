@@ -76,6 +76,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'calendario',
+        loadChildren: () =>
+          import('@tusalud/app/features/calendario/calendario.routes').then(
+            (m) => m.CALENDARIO_ROUTES,
+          ),
+      },
+      {
         path: 'notificaciones',
         loadChildren: () =>
           import('@tusalud/app/features/notificaciones/notificaciones.routes').then(

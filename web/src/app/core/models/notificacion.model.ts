@@ -9,6 +9,12 @@ export type TipoNotificacion =
   | 'CONTRASENA_CAMBIADA'
   | 'PAGO_REGISTRADO'
   | 'PAGO_REEMBOLSADO'
+  | 'MFA_ACTIVADO'
+  | 'MFA_DESACTIVADO'
+  | 'PACIENTE_COMPARTIDO'
+  | 'ROLES_ACTUALIZADOS'
+  | 'SESION_SOSPECHOSA'
+  | 'RECORDATORIO_EVENTO'
   | 'SISTEMA';
 
 export interface NotificacionResponse {

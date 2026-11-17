@@ -9,3 +9,4 @@ export * from './seguridad.model';
 export * from './pagos.model';
 export * from './clinica.model';
 export * from './admin.model';
+export * from './calendario.model';

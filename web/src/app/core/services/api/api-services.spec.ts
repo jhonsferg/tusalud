@@ -11,6 +11,7 @@ import { PerfilApiService } from './perfil-api.service';
 import { AdminApiService } from './admin-api.service';
 import { ClinicaApiService } from './clinica-api.service';
 import { NotificacionesApiService } from './notificaciones-api.service';
+import { CalendarioApiService } from './calendario-api.service';
 import { PagosApiService } from './pagos-api.service';
 
 interface Expected {
@@ -409,5 +410,40 @@ describe('servicios de la API', () => {
       url: '/api/v1/citas/8/reprogramar',
       body: { fechaHora: '2026-12-01T10:00:00' },
     });
+  });
+
+  it('CalendarioApiService cubre los eventos del calendario', () => {
+    const api = TestBed.inject(CalendarioApiService);
+    const evento = {
+      titulo: 'Reunión',
+      tipo: 'REUNION' as const,
+      inicio: '2026-11-18T10:00:00',
+      fin: '2026-11-18T11:00:00',
+      todoElDia: false,
+    };
+    api.listar('2026-11-01', '2026-11-30').subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/calendario/eventos',
+      params: { inicio: '2026-11-01', fin: '2026-11-30' },
+    });
+    api.crear(evento).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/calendario/eventos', body: evento });
+    api.actualizar(4, evento).subscribe();
+    expectRequest({ method: 'PUT', url: '/api/v1/calendario/eventos/4', body: evento });
+    api.mover(4, { inicio: '2026-11-18T12:00:00', fin: '2026-11-18T13:00:00' }).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: '/api/v1/calendario/eventos/4/mover',
+      body: { inicio: '2026-11-18T12:00:00', fin: '2026-11-18T13:00:00' },
+    });
+    api.completar(4, true).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: '/api/v1/calendario/eventos/4/completado',
+      body: { completado: true },
+    });
+    api.eliminar(4).subscribe();
+    expectRequest({ method: 'DELETE', url: '/api/v1/calendario/eventos/4' });
   });
 });

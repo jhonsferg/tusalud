@@ -1,0 +1,82 @@
+import { ColorEventoApi, EventoCalendarioResponse, TipoEvento } from '@tusalud/app/core/models';
+import { parseIsoDateTime } from '@tusalud/app/core/utils/date';
+import {
+  CalCategoria,
+  CalEvento,
+  ColorEvento,
+} from '@tusalud/app/shared/components/calendario/calendario.utils';
+
+export const COLOR_API: Readonly<Record<ColorEventoApi, ColorEvento>> = {
+  AZUL: 'info',
+  VERDE: 'success',
+  ROJO: 'danger',
+  NARANJA: 'warn',
+  MORADO: 'purple',
+  GRIS: 'secondary',
+};
+
+export const COLOR_POR_TIPO: Readonly<Record<TipoEvento, ColorEvento>> = {
+  REUNION: 'purple',
+  TAREA: 'success',
+  RECORDATORIO: 'warn',
+  PERSONAL: 'info',
+  BLOQUEO: 'danger',
+};
+
+export const ETIQUETA_TIPO: Readonly<Record<TipoEvento, string>> = {
+  REUNION: 'Reunión',
+  TAREA: 'Tarea',
+  RECORDATORIO: 'Recordatorio',
+  PERSONAL: 'Personal',
+  BLOQUEO: 'Bloqueo de agenda',
+};
+
+export const ICONO_TIPO: Readonly<Record<TipoEvento, string>> = {
+  REUNION: 'pi-users',
+  TAREA: 'pi-check-square',
+  RECORDATORIO: 'pi-bell',
+  PERSONAL: 'pi-user',
+  BLOQUEO: 'pi-ban',
+};
+
+export const CATEGORIAS_BASE: readonly CalCategoria[] = [
+  { clave: 'CITA', nombre: 'Citas médicas', color: 'info' },
+  { clave: 'REUNION', nombre: 'Reuniones', color: 'purple' },
+  { clave: 'TAREA', nombre: 'Tareas', color: 'success' },
+  { clave: 'RECORDATORIO', nombre: 'Recordatorios', color: 'warn' },
+  { clave: 'PERSONAL', nombre: 'Personal', color: 'secondary' },
+];
+
+export const CATEGORIA_BLOQUEO: CalCategoria = {
+  clave: 'BLOQUEO',
+  nombre: 'Bloqueos de agenda',
+  color: 'danger',
+};
+
+export interface DatosEvento {
+  readonly origen: 'evento';
+  readonly evento: EventoCalendarioResponse;
+}
+
+export function eventoApiACalendario(evento: EventoCalendarioResponse): CalEvento | null {
+  const inicio = parseIsoDateTime(evento.inicio);
+  const fin = parseIsoDateTime(evento.fin);
+  if (!inicio || !fin) {
+    return null;
+  }
+  const datos: DatosEvento = { origen: 'evento', evento };
+  return {
+    id: `e-${evento.id}`,
+    inicio,
+    fin: fin.getTime() > inicio.getTime() ? fin : new Date(inicio.getTime() + 30 * 60_000),
+    titulo: evento.titulo,
+    detalle: evento.ubicacion ?? undefined,
+    color: evento.color ? COLOR_API[evento.color] : COLOR_POR_TIPO[evento.tipo],
+    categoria: evento.tipo,
+    todoElDia: evento.todoElDia,
+    completado: evento.completado,
+    ignoraCruce: true,
+    editable: true,
+    datos,
+  };
+}

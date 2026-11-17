@@ -89,6 +89,12 @@ const PASOS: readonly TourStep[] = [
     roles: ['ROLE_PACIENTE'],
   },
   {
+    target: 'nav:/calendario',
+    icon: 'pi-calendar-plus',
+    title: 'Calendario',
+    text: 'Mira tus citas por mes, semana o día, arrastra para crear reuniones y tareas y recibe avisos antes de que empiecen.',
+  },
+  {
     target: 'bell',
     icon: 'pi-bell',
     title: 'Notificaciones en vivo',

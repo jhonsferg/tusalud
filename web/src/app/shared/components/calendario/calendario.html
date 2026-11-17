@@ -1,13 +1,13 @@
-<section class="cal" [attr.aria-busy]="cargando()">
+<section class="cal" tabindex="-1" [attr.aria-busy]="cargando()">
   <header class="cal-bar">
     <div class="cal-nav">
+      <button type="button" class="hoy" (click)="irAHoy()">Hoy</button>
       <button type="button" class="icono" aria-label="Anterior" (click)="mover(-1)">
         <i class="pi pi-chevron-left"></i>
       </button>
       <button type="button" class="icono" aria-label="Siguiente" (click)="mover(1)">
         <i class="pi pi-chevron-right"></i>
       </button>
-      <button type="button" class="hoy" (click)="irAHoy()">Hoy</button>
     </div>
 
     <h2 class="cal-titulo" aria-live="polite">
@@ -15,12 +15,15 @@
         @case ('mes') {
           {{ titulo().inicio | date: 'LLLL y' }}
         }
-        @case ('semana') {
-          {{ titulo().inicio | date: 'd MMM' }} al {{ titulo().fin | date: 'd MMM y' }}
-        }
-        @default {
+        @case ('dia') {
           {{ titulo().inicio | date: 'EEEE d MMMM y' }}
         }
+        @default {
+          {{ titulo().inicio | date: 'd MMM' }} al {{ titulo().fin | date: 'd MMM y' }}
+        }
+      }
+      @if (vista() === 'semana') {
+        <small class="semana">Semana {{ semana() }}</small>
       }
     </h2>
 
@@ -46,130 +49,305 @@
     </div>
   </header>
 
-  @if (vista() === 'mes') {
-    <div class="mes" role="grid" aria-label="Calendario mensual">
-      @for (dia of diasCortos; track dia) {
-        <div class="mes-cabecera" role="columnheader">{{ dia }}</div>
-      }
-      @for (celda of celdas(); track celda.fecha.getTime()) {
-        <div
-          class="mes-celda"
-          role="gridcell"
-          [class.fuera]="!celda.delMes"
-          [class.hoy]="celda.esHoy"
-        >
-          <button
-            type="button"
-            class="mes-numero"
-            [attr.aria-label]="'Abrir ' + (celda.fecha | date: 'EEEE d MMMM')"
-            (click)="abrirDia(celda.fecha)"
-          >
-            {{ celda.fecha.getDate() }}
-          </button>
-          @if (celda.cruces > 0) {
-            <i class="pi pi-exclamation-triangle cruce-icono" title="Hay citas con cruce"></i>
-          }
-          @if (modoSeleccion() && celda.libres > 0) {
-            <button type="button" class="libres" (click)="abrirDia(celda.fecha)">
-              {{ celda.libres }} libres
-            </button>
-          }
-          @for (evento of celda.eventos; track evento.id) {
-            <button
-              type="button"
-              class="chip"
-              [attr.data-color]="evento.color"
-              [title]="evento.titulo + (evento.detalle ? ' · ' + evento.detalle : '')"
-              (click)="eventoElegido.emit(evento)"
-            >
-              <b>{{ evento.inicio | date: 'HH:mm' }}</b> {{ evento.titulo }}
-            </button>
-          }
-          @if (celda.extra > 0) {
-            <button type="button" class="mas" (click)="abrirDia(celda.fecha)">
-              +{{ celda.extra }} más
-            </button>
-          }
+  <div class="cal-cuerpo" [class.con-lateral]="lateral()">
+    @if (lateral()) {
+      <aside class="lateral" aria-label="Navegación del calendario">
+        <div class="mini">
+          <div class="mini-cabecera">
+            <strong>{{ miMes() | date: 'LLLL y' }}</strong>
+            <span>
+              <button type="button" aria-label="Mes anterior" (click)="moverMini(-1)">
+                <i class="pi pi-chevron-left"></i>
+              </button>
+              <button type="button" aria-label="Mes siguiente" (click)="moverMini(1)">
+                <i class="pi pi-chevron-right"></i>
+              </button>
+            </span>
+          </div>
+          <div class="mini-rejilla">
+            @for (letra of letrasDias; track $index) {
+              <span class="mini-letra">{{ letra }}</span>
+            }
+            @for (celda of celdasMini(); track celda.fecha.getTime()) {
+              <button
+                type="button"
+                class="mini-dia"
+                [class.fuera]="!celda.delMes"
+                [class.hoy]="celda.esHoy"
+                [class.en-rango]="celda.enRango"
+                [class.con-eventos]="celda.conEventos"
+                [attr.aria-label]="celda.fecha | date: 'EEEE d MMMM'"
+                (click)="elegirFechaMini(celda.fecha)"
+              >
+                {{ celda.fecha.getDate() }}
+              </button>
+            }
+          </div>
         </div>
-      }
-    </div>
-  } @else {
-    <div class="tiempo" [class.dia]="vista() === 'dia'">
-      <div class="tiempo-cabecera">
-        <span></span>
-        @for (columna of columnas(); track columna.fecha.getTime()) {
-          <button
-            type="button"
-            class="cabecera-dia"
-            [class.hoy]="columna.esHoy"
-            [attr.aria-label]="'Abrir ' + (columna.fecha | date: 'EEEE d MMMM')"
-            (click)="abrirDia(columna.fecha)"
-          >
-            <small>{{ columna.fecha | date: 'EEE' }}</small>
-            <strong>{{ columna.fecha.getDate() }}</strong>
-          </button>
-        }
-      </div>
 
-      <div class="tiempo-cuerpo" [style.height.px]="horasVisibles().horas.length * altoHora">
-        <div class="horas">
-          @for (hora of horasVisibles().horas; track hora) {
-            <span [style.height.px]="altoHora">{{ claveHora(hora) }}</span>
-          }
-        </div>
-        @for (columna of columnas(); track columna.fecha.getTime()) {
-          <div
-            class="columna"
-            [class.hoy]="columna.esHoy"
-            [style.background-size]="'100% ' + altoHora + 'px'"
-          >
-            @for (hueco of columna.huecos; track hueco.hueco.inicio.getTime()) {
-              <button
-                type="button"
-                class="hueco"
-                [class.elegido]="hueco.elegido"
-                [style.top.px]="hueco.top"
-                [style.height.px]="hueco.alto"
-                [attr.aria-pressed]="hueco.elegido"
-                [attr.aria-label]="'Elegir ' + (hueco.hueco.inicio | date: 'EEEE d MMMM, HH:mm')"
-                (click)="elegirHueco(hueco.hueco)"
-              >
-                <i class="pi" [class.pi-check]="hueco.elegido" [class.pi-plus]="!hueco.elegido"></i>
-                {{ hueco.hueco.inicio | date: 'HH:mm' }}
-              </button>
+        @if (categorias().length > 0) {
+          <div class="categorias">
+            <strong>Calendarios</strong>
+            @for (categoria of categorias(); track categoria.clave) {
+              <label class="categoria" [attr.data-color]="categoria.color">
+                <input
+                  type="checkbox"
+                  [checked]="!ocultas().has(categoria.clave)"
+                  (change)="alternarCategoria(categoria.clave)"
+                />
+                <span class="casilla"></span>
+                {{ categoria.nombre }}
+              </label>
             }
-            @for (item of columna.eventos; track item.evento.id) {
-              <button
-                type="button"
-                class="evento"
-                [class.conflicto]="item.conflicto"
-                [attr.data-color]="item.evento.color"
-                [style.top.px]="item.top"
-                [style.height.px]="item.alto"
-                [style.left.%]="item.izquierda"
-                [style.width.%]="item.ancho"
-                (click)="eventoElegido.emit(item.evento)"
-              >
-                @if (item.conflicto) {
-                  <i class="pi pi-exclamation-triangle" title="Cruce de horario"></i>
-                }
-                <b>{{ item.evento.inicio | date: 'HH:mm' }}</b>
-                <span>{{ item.evento.titulo }}</span>
-                @if (item.evento.detalle && item.alto > 40) {
-                  <small>{{ item.evento.detalle }}</small>
-                }
-              </button>
+          </div>
+        }
+      </aside>
+    }
+
+    <div class="principal">
+      @switch (vista()) {
+        @case ('mes') {
+          <div class="mes" role="grid" aria-label="Calendario mensual">
+            @for (dia of diasCortos; track dia) {
+              <div class="mes-cabecera" role="columnheader">{{ dia }}</div>
             }
-            @if (columna.esHoy && lineaAhora() !== null) {
-              <div class="ahora" [style.top.px]="lineaAhora()" aria-hidden="true">
-                <span>{{ ahora() | date: 'HH:mm' }}</span>
+            @for (celda of celdas(); track celda.fecha.getTime()) {
+              <div
+                class="mes-celda"
+                role="gridcell"
+                [class.fuera]="!celda.delMes"
+                [class.hoy]="celda.esHoy"
+                [class.editable]="puedeEditar()"
+                (dblclick)="crearEnDia(celda.fecha)"
+              >
+                <button
+                  type="button"
+                  class="mes-numero"
+                  [attr.aria-label]="'Abrir ' + (celda.fecha | date: 'EEEE d MMMM')"
+                  (click)="abrirDia(celda.fecha)"
+                >
+                  {{ celda.fecha.getDate() }}
+                </button>
+                @if (celda.cruces > 0) {
+                  <i class="pi pi-exclamation-triangle cruce-icono" title="Hay citas con cruce"></i>
+                }
+                @if (modoSeleccion() && celda.libres > 0) {
+                  <button type="button" class="libres" (click)="abrirDia(celda.fecha)">
+                    {{ celda.libres }} libres
+                  </button>
+                }
+                @for (evento of celda.eventos; track evento.id) {
+                  <button
+                    type="button"
+                    class="chip"
+                    [class.todo]="evento.todoElDia"
+                    [class.hecho]="evento.completado"
+                    [attr.data-color]="evento.color"
+                    [title]="evento.titulo + (evento.detalle ? ' · ' + evento.detalle : '')"
+                    (click)="eventoElegido.emit(evento)"
+                  >
+                    @if (!evento.todoElDia) {
+                      <b>{{ evento.inicio | date: 'HH:mm' }}</b>
+                    }
+                    {{ evento.titulo }}
+                  </button>
+                }
+                @if (celda.extra > 0) {
+                  <button type="button" class="mas" (click)="abrirDia(celda.fecha)">
+                    +{{ celda.extra }} más
+                  </button>
+                }
               </div>
             }
           </div>
         }
-      </div>
+        @case ('agenda') {
+          <div class="agenda">
+            @for (grupo of agenda(); track grupo.fecha.getTime()) {
+              <section class="agenda-grupo">
+                <h3 [class.hoy]="esHoy(grupo.fecha)">
+                  <b>{{ grupo.fecha | date: 'd' }}</b>
+                  <span>{{ grupo.fecha | date: 'EEEE, MMMM y' }}</span>
+                </h3>
+                <ul>
+                  @for (evento of grupo.eventos; track evento.id) {
+                    <li>
+                      <button
+                        type="button"
+                        class="agenda-evento"
+                        [attr.data-color]="evento.color"
+                        [class.hecho]="evento.completado"
+                        (click)="eventoElegido.emit(evento)"
+                      >
+                        <span class="punto"></span>
+                        <span class="hora">
+                          @if (evento.todoElDia) {
+                            Todo el día
+                          } @else {
+                            {{ evento.inicio | date: 'HH:mm' }} - {{ evento.fin | date: 'HH:mm' }}
+                          }
+                        </span>
+                        <span class="texto">
+                          <strong>{{ evento.titulo }}</strong>
+                          @if (evento.detalle) {
+                            <small>{{ evento.detalle }}</small>
+                          }
+                        </span>
+                      </button>
+                    </li>
+                  }
+                </ul>
+              </section>
+            } @empty {
+              <p class="vacio"><i class="pi pi-calendar"></i> {{ textoVacio() }}</p>
+            }
+          </div>
+        }
+        @default {
+          <div class="tiempo" [class.dia]="vista() === 'dia'" #desplazable>
+            <div class="tiempo-cabecera">
+              <span></span>
+              @for (columna of columnas(); track columna.fecha.getTime()) {
+                <button
+                  type="button"
+                  class="cabecera-dia"
+                  [class.hoy]="columna.esHoy"
+                  [attr.aria-label]="'Abrir ' + (columna.fecha | date: 'EEEE d MMMM')"
+                  (click)="abrirDia(columna.fecha)"
+                >
+                  <small>{{ columna.fecha | date: 'EEE' }}</small>
+                  <strong>{{ columna.fecha.getDate() }}</strong>
+                </button>
+              }
+            </div>
+
+            @if (hayTodoElDia() || puedeEditar()) {
+              <div class="todo-el-dia">
+                <span class="etiqueta-todo">Todo el día</span>
+                @for (columna of columnas(); track columna.fecha.getTime()) {
+                  <div class="todo-celda" (dblclick)="crearTodoElDia(columna.fecha)">
+                    @for (evento of columna.todoElDia; track evento.id) {
+                      <button
+                        type="button"
+                        class="chip todo"
+                        [class.hecho]="evento.completado"
+                        [attr.data-color]="evento.color"
+                        (click)="eventoElegido.emit(evento)"
+                      >
+                        {{ evento.titulo }}
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+            <div
+              class="tiempo-cuerpo"
+              #cuerpo
+              [class.editable]="puedeEditar()"
+              [class.arrastrando]="arrastre() !== null"
+              [style.height.px]="horasVisibles().horas.length * altoHora"
+              (pointerdown)="iniciarArrastre($event)"
+              (pointermove)="moverArrastre($event)"
+              (pointerup)="terminarArrastre($event)"
+              (pointercancel)="cancelarArrastre()"
+            >
+              <div class="horas">
+                @for (hora of horasVisibles().horas; track hora) {
+                  <span [style.height.px]="altoHora">{{ claveHora(hora) }}</span>
+                }
+              </div>
+              @for (columna of columnas(); track columna.fecha.getTime(); let indice = $index) {
+                <div
+                  class="columna"
+                  [class.hoy]="columna.esHoy"
+                  [style.background-size]="'100% ' + altoHora + 'px'"
+                >
+                  @for (bloque of columna.noLaboral; track $index) {
+                    <div
+                      class="no-laboral"
+                      [style.top.px]="bloque.top"
+                      [style.height.px]="bloque.alto"
+                      aria-hidden="true"
+                    ></div>
+                  }
+                  @for (hueco of columna.huecos; track hueco.hueco.inicio.getTime()) {
+                    <button
+                      type="button"
+                      class="hueco"
+                      [class.elegido]="hueco.elegido"
+                      [style.top.px]="hueco.top"
+                      [style.height.px]="hueco.alto"
+                      [attr.aria-pressed]="hueco.elegido"
+                      [attr.aria-label]="
+                        'Elegir ' + (hueco.hueco.inicio | date: 'EEEE d MMMM, HH:mm')
+                      "
+                      (click)="elegirHueco(hueco.hueco)"
+                    >
+                      <i
+                        class="pi"
+                        [class.pi-check]="hueco.elegido"
+                        [class.pi-plus]="!hueco.elegido"
+                      ></i>
+                      {{ hueco.hueco.inicio | date: 'HH:mm' }}
+                    </button>
+                  }
+                  @for (item of columna.eventos; track item.evento.id) {
+                    <button
+                      type="button"
+                      class="evento"
+                      [class.conflicto]="item.conflicto"
+                      [class.editable]="item.editable"
+                      [class.hecho]="item.evento.completado"
+                      [class.moviendo]="arrastre()?.evento === item.evento && arrastre()?.movido"
+                      [attr.data-color]="item.evento.color"
+                      [attr.data-id]="item.evento.id"
+                      [style.top.px]="item.top"
+                      [style.height.px]="item.alto"
+                      [style.left.%]="item.izquierda"
+                      [style.width.%]="item.ancho"
+                      (click)="clickEvento(item.evento, $event)"
+                    >
+                      @if (item.conflicto) {
+                        <i class="pi pi-exclamation-triangle" title="Cruce de horario"></i>
+                      }
+                      <b>{{ item.evento.inicio | date: 'HH:mm' }}</b>
+                      <span>{{ item.evento.titulo }}</span>
+                      @if (item.evento.detalle && item.alto > 40) {
+                        <small>{{ item.evento.detalle }}</small>
+                      }
+                      @if (item.editable) {
+                        <span class="resize" aria-hidden="true"></span>
+                      }
+                    </button>
+                  }
+                  @if (fantasma(); as fantasma) {
+                    @if (fantasma.columna === indice) {
+                      <div
+                        class="fantasma"
+                        [attr.data-color]="fantasma.evento?.color ?? 'info'"
+                        [style.top.px]="fantasma.top"
+                        [style.height.px]="fantasma.alto"
+                        aria-hidden="true"
+                      >
+                        <b>{{ horaDe(fantasma.desde) }}</b> - {{ horaDe(fantasma.hasta) }}
+                      </div>
+                    }
+                  }
+                  @if (columna.esHoy && lineaAhora() !== null) {
+                    <div class="ahora" [style.top.px]="lineaAhora()" aria-hidden="true">
+                      <span>{{ ahora() | date: 'HH:mm' }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
     </div>
-  }
+  </div>
 
   @if (cargando()) {
     <div class="cal-cargando" aria-hidden="true"></div>

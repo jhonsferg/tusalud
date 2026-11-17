@@ -11,6 +11,12 @@ export const ICONO_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   CONTRASENA_CAMBIADA: 'pi-key',
   PAGO_REGISTRADO: 'pi-credit-card',
   PAGO_REEMBOLSADO: 'pi-replay',
+  MFA_ACTIVADO: 'pi-lock',
+  MFA_DESACTIVADO: 'pi-lock-open',
+  PACIENTE_COMPARTIDO: 'pi-share-alt',
+  ROLES_ACTUALIZADOS: 'pi-id-card',
+  SESION_SOSPECHOSA: 'pi-exclamation-triangle',
+  RECORDATORIO_EVENTO: 'pi-bell',
   SISTEMA: 'pi-info-circle',
 };
 
@@ -25,5 +31,11 @@ export const COLOR_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   CONTRASENA_CAMBIADA: '#f59e0b',
   PAGO_REGISTRADO: '#10b981',
   PAGO_REEMBOLSADO: '#0ea5e9',
+  MFA_ACTIVADO: '#10b981',
+  MFA_DESACTIVADO: '#f59e0b',
+  PACIENTE_COMPARTIDO: '#3b82f6',
+  ROLES_ACTUALIZADOS: '#8b5cf6',
+  SESION_SOSPECHOSA: '#ef4444',
+  RECORDATORIO_EVENTO: '#8b5cf6',
   SISTEMA: '#64748b',
 };

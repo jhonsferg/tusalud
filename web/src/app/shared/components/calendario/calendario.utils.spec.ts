@@ -1,5 +1,10 @@
 import {
   CalEvento,
+  ajustarMinutos,
+  fechaConMinutos,
+  minutosDeHora,
+  numeroDeSemana,
+  recortarAlDia,
   contarCruces,
   distribuir,
   inicioDeSemana,
@@ -73,5 +78,39 @@ describe('calendario.utils', () => {
     ];
     expect(contarCruces(eventos)).toBe(0);
     expect(contarCruces([evento(1, '09:00', '10:00'), evento(2, '09:30', '10:30')])).toBe(2);
+  });
+
+  it('calcula el rango de la vista de agenda', () => {
+    const rango = rangoVisible('agenda', new Date(2026, 10, 18));
+    expect(rango.inicio.getDate()).toBe(18);
+    expect(Math.round((rango.fin.getTime() - rango.inicio.getTime()) / 86_400_000)).toBe(29);
+    expect(moverFecha('agenda', new Date(2026, 10, 18), 1).getMonth()).toBe(11);
+  });
+
+  it('recorta los eventos que cruzan la medianoche', () => {
+    const noche = {
+      ...evento(1, '22:00', '23:00'),
+      fin: new Date('2026-11-19T02:00:00'),
+    };
+    const primero = recortarAlDia(noche, new Date(2026, 10, 18))!;
+    const segundo = recortarAlDia(noche, new Date(2026, 10, 19))!;
+    expect(primero.fin.getHours()).toBe(0);
+    expect(primero.fin.getDate()).toBe(19);
+    expect(segundo.inicio.getHours()).toBe(0);
+    expect(segundo.fin.getHours()).toBe(2);
+    expect(recortarAlDia(noche, new Date(2026, 10, 20))).toBeNull();
+  });
+
+  it('ajusta minutos al paso y construye fechas desde los minutos del día', () => {
+    expect(ajustarMinutos(67, 15)).toBe(60);
+    expect(ajustarMinutos(68, 15)).toBe(75);
+    const fecha = fechaConMinutos(new Date(2026, 10, 18), 14 * 60 + 30);
+    expect([fecha.getHours(), fecha.getMinutes()]).toEqual([14, 30]);
+    expect(minutosDeHora('08:15')).toBe(495);
+  });
+
+  it('numera las semanas del año según ISO 8601', () => {
+    expect(numeroDeSemana(new Date(2026, 0, 1))).toBe(1);
+    expect(numeroDeSemana(new Date(2026, 10, 18))).toBe(47);
   });
 });

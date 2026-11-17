@@ -49,6 +49,7 @@ const NAV_GROUPS: readonly NavGroup[] = [
       { label: 'Panel', icon: 'pi-th-large', link: '/admin/panel', roles: ['ROLE_ADMIN'] },
       { label: 'Auditoría', icon: 'pi-chart-bar', link: '/admin/auditoria', roles: ['ROLE_ADMIN'] },
       { label: 'Mi agenda', icon: 'pi-calendar', link: '/agenda', roles: ['ROLE_MEDICO'] },
+      { label: 'Calendario', icon: 'pi-calendar-plus', link: '/calendario', roles: TODOS },
       { label: 'Mis pacientes', icon: 'pi-users', link: '/pacientes', roles: ['ROLE_MEDICO'] },
       {
         label: 'Mis citas',

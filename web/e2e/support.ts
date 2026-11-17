@@ -37,13 +37,13 @@ export async function iniciarSesion(page: Page, rol: keyof typeof CUENTAS): Prom
 export async function reservarPrimeraHoraLibre(page: Page, motivo: string): Promise<void> {
   const huecos = page.getByRole('button', { name: /^Elegir / });
   const semanas = 1 + Math.floor(Math.random() * 12);
-  await expect(page.getByRole('button', { name: 'Siguiente' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Siguiente', exact: true })).toBeVisible();
   for (let i = 0; i < semanas; i++) {
-    await page.getByRole('button', { name: 'Siguiente' }).click();
+    await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
   }
   for (let intento = 0; intento < 20; intento++) {
     if (!(await huecos.count())) {
-      await page.getByRole('button', { name: 'Siguiente' }).click();
+      await page.getByRole('button', { name: 'Siguiente', exact: true }).click();
       await page.waitForTimeout(400);
       continue;
     }

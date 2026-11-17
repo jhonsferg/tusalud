@@ -1,6 +1,6 @@
-export type VistaCalendario = 'mes' | 'semana' | 'dia';
+export type VistaCalendario = 'mes' | 'semana' | 'dia' | 'agenda';
 
-export type ColorEvento = 'info' | 'success' | 'warn' | 'danger' | 'secondary';
+export type ColorEvento = 'info' | 'success' | 'warn' | 'danger' | 'secondary' | 'purple';
 
 export interface CalEvento {
   readonly id: string | number;
@@ -10,7 +10,36 @@ export interface CalEvento {
   readonly detalle?: string;
   readonly color: ColorEvento;
   readonly ignoraCruce?: boolean;
+  readonly todoElDia?: boolean;
+  readonly categoria?: string;
+  readonly editable?: boolean;
+  readonly completado?: boolean;
   readonly datos?: unknown;
+}
+
+export interface CalCategoria {
+  readonly clave: string;
+  readonly nombre: string;
+  readonly color: ColorEvento;
+}
+
+export interface HorarioDia {
+  readonly dia: number;
+  readonly inicio: string;
+  readonly fin: string;
+}
+
+export interface CrearEvento {
+  readonly inicio: Date;
+  readonly fin: Date;
+  readonly todoElDia: boolean;
+}
+
+export interface CambioEvento {
+  readonly evento: CalEvento;
+  readonly inicio: Date;
+  readonly fin: Date;
+  readonly todoElDia: boolean;
 }
 
 export interface CalHueco {
@@ -31,6 +60,7 @@ export interface EventoPosicionado {
 }
 
 const MS_MINUTO = 60_000;
+export const DIAS_AGENDA = 30;
 
 export function inicioDelDia(fecha: Date): Date {
   return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
@@ -62,6 +92,10 @@ export function rangoVisible(vista: VistaCalendario, fecha: Date): RangoVisible 
     const dia = inicioDelDia(fecha);
     return { inicio: dia, fin: dia };
   }
+  if (vista === 'agenda') {
+    const dia = inicioDelDia(fecha);
+    return { inicio: dia, fin: sumarDias(dia, DIAS_AGENDA - 1) };
+  }
   if (vista === 'semana') {
     const inicio = inicioDeSemana(fecha);
     return { inicio, fin: sumarDias(inicio, 6) };
@@ -76,6 +110,9 @@ export function rangoVisible(vista: VistaCalendario, fecha: Date): RangoVisible 
 export function moverFecha(vista: VistaCalendario, fecha: Date, pasos: number): Date {
   if (vista === 'dia') {
     return sumarDias(fecha, pasos);
+  }
+  if (vista === 'agenda') {
+    return sumarDias(fecha, pasos * DIAS_AGENDA);
   }
   if (vista === 'semana') {
     return sumarDias(fecha, pasos * 7);
@@ -143,4 +180,41 @@ export function distribuir(eventos: readonly CalEvento[]): EventoPosicionado[] {
 
 export function contarCruces(eventos: readonly CalEvento[]): number {
   return distribuir(eventos).filter((item) => item.conflicto).length;
+}
+
+export function recortarAlDia(evento: CalEvento, dia: Date): CalEvento | null {
+  const desde = inicioDelDia(dia);
+  const hasta = sumarDias(desde, 1);
+  if (evento.inicio >= hasta || evento.fin <= desde) {
+    return null;
+  }
+  if (evento.inicio >= desde && evento.fin <= hasta) {
+    return evento;
+  }
+  return {
+    ...evento,
+    inicio: evento.inicio < desde ? desde : evento.inicio,
+    fin: evento.fin > hasta ? hasta : evento.fin,
+  };
+}
+
+export function ajustarMinutos(minutos: number, paso: number): number {
+  return Math.round(minutos / paso) * paso;
+}
+
+export function fechaConMinutos(dia: Date, minutos: number): Date {
+  return new Date(dia.getFullYear(), dia.getMonth(), dia.getDate(), 0, minutos);
+}
+
+export function minutosDeHora(hora: string): number {
+  const [h, m] = hora.split(':').map(Number);
+  return h * 60 + (m || 0);
+}
+
+export function numeroDeSemana(fecha: Date): number {
+  const objetivo = new Date(Date.UTC(fecha.getFullYear(), fecha.getMonth(), fecha.getDate()));
+  const dia = objetivo.getUTCDay() || 7;
+  objetivo.setUTCDate(objetivo.getUTCDate() + 4 - dia);
+  const inicioAnio = new Date(Date.UTC(objetivo.getUTCFullYear(), 0, 1));
+  return Math.ceil(((objetivo.getTime() - inicioAnio.getTime()) / 86_400_000 + 1) / 7);
 }

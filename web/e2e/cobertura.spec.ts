@@ -120,7 +120,9 @@ test.describe('ciclo de vida de una cita', () => {
   test('el paciente revisa la disponibilidad pública de un médico', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
     await page.goto('/medicos/2/disponibilidad');
-    await expect(page.getByRole('heading', { name: /Horas libres/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Disponibilidad' })).toBeVisible();
+    await expect(page.getByRole('grid', { name: 'Calendario mensual' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Siguiente', exact: true })).toBeVisible();
     await page.goto('/especialidades');
     await expect(
       page.getByRole('cell', { name: 'Cardiología', exact: true }).first(),

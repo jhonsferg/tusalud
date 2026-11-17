@@ -1,30 +1,38 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
+import { Router } from '@angular/router';
 import { Button } from 'primeng/button';
-import { DatePicker } from 'primeng/datepicker';
-import { Skeleton } from 'primeng/skeleton';
 
 import { AuthService } from '@tusalud/app/core/services/auth.service';
+import { CitasStore } from '@tusalud/app/core/state/citas.store';
 import { MedicosStore } from '@tusalud/app/core/state/medicos.store';
 import { toIsoDate } from '@tusalud/app/core/utils/date';
 import { optionalNumberAttribute } from '@tusalud/app/core/utils/route-input';
-import { EmptyState } from '@tusalud/app/shared/components/empty-state/empty-state';
+import { Calendario } from '@tusalud/app/shared/components/calendario/calendario';
+import {
+  CalEvento,
+  RangoVisible,
+  VistaCalendario,
+} from '@tusalud/app/shared/components/calendario/calendario.utils';
 import { PageHeader } from '@tusalud/app/shared/components/page-header/page-header';
+import { citaAEvento } from '@tusalud/app/shared/utils/cita-calendario';
+import {
+  construirHuecos,
+  horarioLaboral,
+} from '@tusalud/app/shared/utils/disponibilidad-calendario';
 
 @Component({
   selector: 'app-medico-disponibilidad',
-  imports: [
-    DatePipe,
-    FormsModule,
-    RouterLink,
-    Button,
-    DatePicker,
-    Skeleton,
-    EmptyState,
-    PageHeader,
-  ],
+  imports: [DatePipe, Button, Calendario, PageHeader],
   templateUrl: './medico-disponibilidad.html',
   styleUrl: './medico-disponibilidad.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,9 +42,28 @@ export class MedicoDisponibilidad {
 
   protected readonly store = inject(MedicosStore);
   protected readonly auth = inject(AuthService);
+  private readonly citas = inject(CitasStore);
+  private readonly router = inject(Router);
 
-  protected readonly minimo = new Date();
-  protected readonly fecha = signal<Date>(new Date());
+  protected readonly vista = signal<VistaCalendario>('semana');
+  protected readonly fecha = signal(new Date());
+  protected readonly elegido = signal<Date | null>(null);
+  private readonly rango = signal<RangoVisible | null>(null);
+
+  protected readonly huecos = computed(() =>
+    construirHuecos(this.store.disponibilidadRango.value() ?? []),
+  );
+  protected readonly laboral = computed(() => horarioLaboral(this.store.horarios.value() ?? []));
+  protected readonly propios = computed<CalEvento[]>(() =>
+    this.auth.isPaciente()
+      ? this.citas.proximas().map((cita) => ({
+          ...citaAEvento(cita, 'medico'),
+          titulo: 'Tu cita',
+          detalle: cita.medicoNombre,
+          color: 'secondary' as const,
+        }))
+      : [],
+  );
 
   constructor() {
     effect(() => {
@@ -44,30 +71,42 @@ export class MedicoDisponibilidad {
       if (id !== undefined) {
         this.store.selected.reset();
         this.store.loadOne(id);
+        this.store.loadHorarios(id);
+        this.elegido.set(null);
+      }
+    });
+    effect(() => {
+      if (this.auth.isPaciente()) {
+        untracked(() => this.citas.loadMisCitas());
       }
     });
     effect(() => {
       const id = this.id();
-      if (id !== undefined) {
-        this.store.loadDisponibilidad(id, toIsoDate(this.fecha()));
+      const rango = this.rango();
+      if (id !== undefined && rango) {
+        untracked(() =>
+          this.store.loadDisponibilidadRango(id, toIsoDate(rango.inicio), toIsoDate(rango.fin)),
+        );
       }
     });
   }
 
-  protected cambiarFecha(valor: Date | null): void {
-    if (valor) {
-      this.fecha.set(valor);
-    }
+  protected cargarRango(rango: RangoVisible): void {
+    this.rango.set(rango);
   }
 
-  protected fechaIso(): string {
-    return toIsoDate(this.fecha());
-  }
-
-  protected recargar(): void {
+  protected reservar(): void {
+    const inicio = this.elegido();
     const id = this.id();
-    if (id !== undefined) {
-      this.store.loadDisponibilidad(id, this.fechaIso());
+    if (!inicio || id === undefined) {
+      return;
     }
+    void this.router.navigate(['/citas/nueva'], {
+      queryParams: {
+        medicoId: id,
+        fecha: toIsoDate(inicio),
+        hora: `${String(inicio.getHours()).padStart(2, '0')}:${String(inicio.getMinutes()).padStart(2, '0')}`,
+      },
+    });
   }
 }
