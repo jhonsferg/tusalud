@@ -41,8 +41,6 @@ app:
     allowed-headers: Authorization,Content-Type,Accept,Origin,X-Requested-With
     exposed-headers: Authorization
     max-age: 3600
-  data-initializer:
-    enabled: ${DATA_INITIALIZER_ENABLED:true}
   mfa:
     clave-cifrado: ${MFA_CLAVE_CIFRADO:clave-de-desarrollo-para-cifrar-secretos-mfa}
   pagos:

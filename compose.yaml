@@ -69,7 +69,6 @@ services:
       MFA_CLAVE_CIFRADO: ${MFA_CLAVE_CIFRADO:-}
       PAGOS_SIMULACION_HABILITADA: ${PAGOS_SIMULACION_HABILITADA:-false}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:4200}
-      DATA_INITIALIZER_ENABLED: ${DATA_INITIALIZER_ENABLED:-false}
       JDK_JAVA_OPTIONS: ${JDK_JAVA_OPTIONS:--XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError}
       OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME:-tusalud-api}
       OTEL_RESOURCE_ATTRIBUTES: service.namespace=tusalud,deployment.environment.name=prod
