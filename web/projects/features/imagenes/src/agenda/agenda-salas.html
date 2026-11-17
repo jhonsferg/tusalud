@@ -1,0 +1,81 @@
+<app-page-header
+  title="Agenda de salas"
+  subtitle="Estudios programados por sala"
+  icon="pi-calendar"
+  [backLink]="puedeAbrir() ? '/imagenes' : undefined"
+  backLabel="Volver a la cola"
+/>
+
+<div class="panel barra">
+  <p-button
+    icon="pi pi-chevron-left"
+    [text]="true"
+    [rounded]="true"
+    ariaLabel="Día anterior"
+    (onClick)="mover(-1)"
+  />
+  <p-datepicker
+    [ngModel]="fecha()"
+    (ngModelChange)="elegir($event)"
+    [showIcon]="true"
+    dateFormat="DD, d 'de' MM 'de' yy"
+    inputId="agenda-fecha"
+    appendTo="body"
+    [readonlyInput]="true"
+  />
+  <p-button
+    icon="pi pi-chevron-right"
+    [text]="true"
+    [rounded]="true"
+    ariaLabel="Día siguiente"
+    (onClick)="mover(1)"
+  />
+  <p-button label="Hoy" [outlined]="true" size="small" (onClick)="hoy()" />
+  <span class="text-muted total">{{ totalCitas() }} estudios este día</span>
+</div>
+
+@if (store.agenda.loading() && !store.agenda.hasValue()) {
+  <div class="panel"><p>Cargando la agenda…</p></div>
+} @else if (totalCitas() === 0) {
+  <div class="panel">
+    <app-empty-state
+      icon="pi-calendar"
+      title="Sin estudios programados"
+      message="No hay estudios programados para este día."
+    />
+  </div>
+} @else {
+  <div class="salas">
+    @for (columna of columnas(); track columna.sala) {
+      <section class="sala panel">
+        <h3>{{ columna.sala }}</h3>
+        @for (cita of columna.citas; track cita.id) {
+          <article class="cita" [class.urgente]="cita.prioridad === 'URGENTE'">
+            <header>
+              <strong
+                >{{ cita.programadaPara | date: 'HH:mm' }} a {{ fin(cita) | date: 'HH:mm' }}</strong
+              >
+              <p-tag [value]="etiquetaEstado[cita.estado]" [severity]="severidad[cita.estado]" />
+            </header>
+            <span>{{ cita.pacienteNombre }}</span>
+            <small class="text-muted">
+              {{ cita.codigo }} ·
+              @for (modalidad of cita.modalidades; track modalidad; let ultimo = $last) {
+                {{ etiquetaModalidad[modalidad] }}{{ ultimo ? '' : ', ' }}
+              }
+            </small>
+            @if (puedeAbrir()) {
+              <a
+                [routerLink]="['/imagenes/ordenes', cita.id]"
+                [attr.aria-label]="'Abrir ' + cita.codigo"
+                >Abrir orden</a
+              >
+            }
+          </article>
+        } @empty {
+          <p class="text-muted vacia">Sin estudios</p>
+        }
+      </section>
+    }
+  </div>
+}

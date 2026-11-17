@@ -41,6 +41,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         roles: ['ROLE_PACIENTE'],
       },
       {
+        label: 'Mis estudios',
+        icon: 'pi-image',
+        link: '/mis-estudios',
+        roles: ['ROLE_PACIENTE'],
+      },
+      {
         label: 'Mis hospitalizaciones',
         icon: 'pi-building',
         link: '/mis-ingresos',

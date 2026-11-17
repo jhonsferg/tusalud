@@ -7,6 +7,7 @@ public interface AuditoriaClinicaService {
 
     String HISTORIA_CONSULTADA = "HISTORIA_CONSULTADA";
     String DATOS_MEDICOS_ACTUALIZADOS = "DATOS_MEDICOS_ACTUALIZADOS";
+    String IMAGENES_CONSULTADAS = "IMAGENES_CONSULTADAS";
 
     void registrar(UsuarioPrincipal actor, UUID pacienteId, String accion, String detalle);
 }

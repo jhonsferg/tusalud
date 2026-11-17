@@ -43,6 +43,17 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Imágenes diagnósticas',
+    items: [
+      {
+        label: 'Agenda de salas',
+        icon: 'pi-calendar',
+        link: '/imagenes/agenda',
+        roles: ['ROLE_RECEPCION'],
+      },
+    ],
+  },
+  {
     title: 'Hospitalización',
     items: [
       {

@@ -24,6 +24,9 @@ export type TipoNotificacion =
   | 'CAJA_DIFERENCIA'
   | 'SOLICITUD_AUSENCIA'
   | 'AUSENCIA_RESUELTA'
+  | 'ORDEN_IMAGEN'
+  | 'ESTUDIO_INFORMADO'
+  | 'HALLAZGO_CRITICO'
   | 'SISTEMA';
 
 export interface NotificacionResponse {

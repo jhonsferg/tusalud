@@ -184,6 +184,15 @@ describe('ruta oculta', () => {
     expect(serializador.parse('/caja/cobrar').toString()).toBe('/caja/cobrar');
   });
 
+  it('lleva al personal de imágenes a su módulo y lo ordena junto a los demás', () => {
+    expect(moduloPrincipal(['ROLE_IMAGENES'])?.app).toBe('imagenes');
+    expect(moduloPrincipal(['ROLE_IMAGENES', 'ROLE_LABORATORIO'])?.app).toBe('laboratorio');
+    expect(modulosDe(['ROLE_PACIENTE', 'ROLE_IMAGENES']).map((m) => m.app)).toEqual([
+      'imagenes',
+      'paciente',
+    ]);
+  });
+
   it('asigna a cada rol gerencial su módulo con la prioridad esperada', () => {
     expect(moduloPrincipal(['ROLE_GERENCIA'])?.app).toBe('gerencia');
     expect(moduloPrincipal(['ROLE_FINANZAS'])?.app).toBe('finanzas');

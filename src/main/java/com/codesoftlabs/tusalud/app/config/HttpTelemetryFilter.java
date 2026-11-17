@@ -54,20 +54,27 @@ public class HttpTelemetryFilter extends OncePerRequestFilter {
             return;
         }
 
-        CachedBodyHttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(request);
+        String tipo = request.getContentType();
+        boolean multipart = tipo != null && tipo.toLowerCase(Locale.ROOT).startsWith("multipart/");
+        CachedBodyHttpServletRequest cachedRequest = multipart ? null : new CachedBodyHttpServletRequest(request);
+        HttpServletRequest solicitud = multipart ? request : cachedRequest;
         ContentCachingResponseWrapper cachedResponse = new ContentCachingResponseWrapper(response);
 
-        registrarHeadersRequest(span, cachedRequest);
+        registrarHeadersRequest(span, solicitud);
         String ruta = request.getRequestURI();
-        String cuerpoSolicitud = TelemetryRedactor.cuerpoSeguro(
-                ruta, request.getContentType(), cachedRequest.getBody(), cachedRequest.getBodyCharset());
-        if (cuerpoSolicitud != null) {
-            span.setAttribute(REQUEST_BODY, cuerpoSolicitud);
+        if (cachedRequest != null) {
+            String cuerpoSolicitud = TelemetryRedactor.cuerpoSeguro(
+                    ruta, request.getContentType(), cachedRequest.getBody(), cachedRequest.getBodyCharset());
+            if (cuerpoSolicitud != null) {
+                span.setAttribute(REQUEST_BODY, cuerpoSolicitud);
+            }
+            span.setAttribute(REQUEST_BODY_SIZE, (long) cachedRequest.getBody().length);
+        } else {
+            span.setAttribute(REQUEST_BODY_SIZE, Math.max(request.getContentLengthLong(), 0L));
         }
-        span.setAttribute(REQUEST_BODY_SIZE, (long) cachedRequest.getBody().length);
 
         try {
-            filterChain.doFilter(cachedRequest, cachedResponse);
+            filterChain.doFilter(solicitud, cachedResponse);
         } finally {
             byte[] responseBody = cachedResponse.getContentAsByteArray();
             String cuerpoRespuesta = TelemetryRedactor.cuerpoSeguro(

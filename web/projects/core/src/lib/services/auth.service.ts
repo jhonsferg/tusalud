@@ -32,6 +32,7 @@ const HOME_BY_ROLE: readonly (readonly [Rol, string])[] = [
   ['ROLE_MEDICO', '/agenda'],
   ['ROLE_PACIENTE', '/citas'],
   ['ROLE_LABORATORIO', '/laboratorio'],
+  ['ROLE_IMAGENES', '/imagenes'],
   ['ROLE_FARMACIA', '/farmacia'],
   ['ROLE_ALMACEN', '/almacen'],
   ['ROLE_RECEPCION', '/recepcion'],
@@ -120,6 +121,7 @@ export class AuthService {
   readonly isOperaciones = computed(() => this.roles().includes('ROLE_OPERACIONES'));
   readonly isRrhh = computed(() => this.roles().includes('ROLE_RRHH'));
   readonly isCalidad = computed(() => this.roles().includes('ROLE_CALIDAD'));
+  readonly isImagenes = computed(() => this.roles().includes('ROLE_IMAGENES'));
   readonly homeUrl = computed(() => {
     const roles = this.roles();
     const delApp = this.app ? rolesDeApp(this.app) : null;

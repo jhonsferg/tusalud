@@ -46,6 +46,10 @@ export const routes: Routes = [
           import('@tusalud/features/laboratorio').then((m) => m.LABORATORIO_ROUTES),
       },
       {
+        path: 'imagenes',
+        loadChildren: () => import('@tusalud/features/imagenes').then((m) => m.IMAGENES_ROUTES),
+      },
+      {
         path: 'hospitalizacion',
         loadChildren: () =>
           import('@tusalud/features/hospitalizacion').then((m) => m.HOSPITALIZACION_ROUTES),

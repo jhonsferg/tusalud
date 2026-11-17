@@ -1,0 +1,141 @@
+<app-page-header
+  title="Mis estudios"
+  subtitle="Tus estudios de imagen, su preparación y sus informes"
+  icon="pi-image"
+/>
+
+@if (store.misEstudios.error(); as problema) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar tus estudios"
+      [message]="problema.message"
+    />
+  </div>
+} @else if (store.misEstudios.value(); as lista) {
+  @if (lista.length === 0) {
+    <div class="panel">
+      <app-empty-state
+        icon="pi-image"
+        title="Sin estudios"
+        message="Aquí verás tus radiografías, ecografías y otros estudios cuando tu médico los solicite."
+      />
+    </div>
+  } @else {
+    <div class="grid">
+      @for (orden of lista; track orden.id) {
+        <article class="panel estudio">
+          <header>
+            <div>
+              <strong>{{ orden.codigo }}</strong>
+              <small class="text-muted block"
+                >Solicitado {{ orden.fecha | date: 'd MMM y' }} por {{ orden.medicoNombre }}</small
+              >
+            </div>
+            <p-tag
+              [value]="etiquetaEstado[orden.estado]"
+              [severity]="severidad[orden.estado]"
+              [icon]="'pi ' + icono[orden.estado]"
+            />
+          </header>
+
+          <ul class="lista">
+            @for (estudio of orden.estudios; track estudio.id) {
+              <li>
+                <i [class]="'pi ' + iconoModalidad[estudio.modalidad]"></i>
+                <div>
+                  <span>{{ estudio.nombre }}</span>
+                  <small class="text-muted block"
+                    >{{ etiquetaModalidad[estudio.modalidad] }} · {{ estudio.region }}</small
+                  >
+                  @if (estudio.preparacion) {
+                    <small class="preparacion"
+                      ><i class="pi pi-info-circle"></i> {{ estudio.preparacion }}</small
+                    >
+                  }
+                </div>
+              </li>
+            }
+          </ul>
+
+          @if (orden.estado === 'PROGRAMADA' && orden.programadaPara) {
+            <p class="cita">
+              <i class="pi pi-calendar"></i>
+              {{ orden.programadaPara | date: "EEEE d 'de' MMMM, HH:mm" }} · {{ orden.sala }}
+            </p>
+          } @else if (orden.estado === 'SOLICITADA') {
+            <p class="text-muted">Te avisaremos cuando el estudio tenga fecha y hora.</p>
+          } @else if (orden.estado === 'REALIZADA') {
+            <p class="text-muted">
+              El estudio ya se realizó. Te avisaremos cuando el informe esté listo.
+            </p>
+          }
+
+          @if (orden.estado === 'INFORMADA') {
+            <div class="acciones">
+              <p-button
+                [label]="informeAbierto() === orden.id ? 'Ocultar informe' : 'Ver informe'"
+                icon="pi pi-file"
+                size="small"
+                (onClick)="alternarInforme(orden)"
+              />
+              <p-button
+                label="Imprimir"
+                icon="pi pi-print"
+                size="small"
+                [outlined]="true"
+                severity="secondary"
+                (onClick)="imprimir(orden)"
+              />
+            </div>
+            @if (informeAbierto() === orden.id && orden.informe; as informe) {
+              <section class="informe">
+                <h4>Hallazgos</h4>
+                <p>{{ informe.hallazgos }}</p>
+                <h4>Conclusión</h4>
+                <p>{{ informe.conclusion }}</p>
+                <small class="text-muted">
+                  {{ informe.firmaNombre }} · Colegiatura {{ informe.firmaColegiatura }}
+                </small>
+              </section>
+            }
+            @if (orden.archivos.length > 0) {
+              <ul class="imagenes">
+                @for (archivo of orden.archivos; track archivo.id; let i = $index) {
+                  <li>
+                    <i
+                      [class]="
+                        archivo.tipoContenido === 'application/pdf'
+                          ? 'pi pi-file-pdf'
+                          : 'pi pi-image'
+                      "
+                    ></i>
+                    <span>{{ archivo.nombre }}</span>
+                    <p-button
+                      label="Ver"
+                      icon="pi pi-eye"
+                      size="small"
+                      [outlined]="true"
+                      [ariaLabel]="'Ver ' + archivo.nombre"
+                      (onClick)="verImagen(orden, i)"
+                    />
+                  </li>
+                }
+              </ul>
+            }
+          }
+        </article>
+      }
+    </div>
+  }
+}
+
+@if (visorOrden(); as seleccionada) {
+  <app-visor-imagen
+    [ordenId]="seleccionada.id"
+    [archivos]="seleccionada.archivos"
+    [(visible)]="visorVisible"
+    [(indice)]="visorIndice"
+  />
+}

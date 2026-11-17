@@ -1,0 +1,82 @@
+<app-page-header
+  title="Estudios de imagen del paciente"
+  subtitle="Órdenes, imágenes e informes de este paciente"
+  icon="pi-image"
+  backLink="/pacientes"
+  backLabel="Volver a mis pacientes"
+>
+  @if (pacienteId(); as id) {
+    <p-button
+      label="Solicitar estudio"
+      icon="pi pi-plus"
+      routerLink="/imagenes/solicitar"
+      [queryParams]="{ pacienteId: id }"
+    />
+  }
+</app-page-header>
+
+@if (store.ordenesDePaciente.error(); as problema) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar los estudios"
+      [message]="problema.message"
+    />
+  </div>
+} @else {
+  <div class="panel">
+    <p-table
+      [value]="store.ordenesDePaciente.value() ?? []"
+      [loading]="store.ordenesDePaciente.loading()"
+      [rowHover]="true"
+      responsiveLayout="scroll"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Orden</th>
+          <th>Estudios</th>
+          <th>Médico</th>
+          <th>Estado</th>
+          <th style="width: 7rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-orden>
+        <tr>
+          <td>
+            <div class="font-semibold">{{ orden.codigo }}</div>
+            <small class="text-muted">{{ orden.fecha | date: 'd MMM y' }}</small>
+          </td>
+          <td>{{ resumirEstudios(orden) }}</td>
+          <td>{{ orden.medicoNombre }}</td>
+          <td>
+            <p-tag
+              [value]="etiqueta[orden.estado]"
+              [severity]="severidad[orden.estado]"
+              [icon]="'pi ' + icono[orden.estado]"
+            />
+          </td>
+          <td class="text-right">
+            <p-button
+              label="Abrir"
+              size="small"
+              [outlined]="true"
+              [routerLink]="['/imagenes/ordenes', orden.id]"
+            />
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="5">
+            <app-empty-state
+              icon="pi-image"
+              title="Sin estudios"
+              message="Este paciente aún no tiene estudios de imagen."
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+}

@@ -90,6 +90,14 @@
               [queryParams]="{ pacienteId: paciente.pacienteId }"
             />
             <p-button
+              icon="pi pi-image"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              [ariaLabel]="'Estudios de imagen de ' + paciente.nombreCompleto"
+              [routerLink]="['/imagenes/paciente', paciente.pacienteId]"
+            />
+            <p-button
               label="Historia"
               icon="pi pi-folder-open"
               size="small"

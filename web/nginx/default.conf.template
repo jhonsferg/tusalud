@@ -57,17 +57,18 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_connect_timeout 5s;
         proxy_read_timeout 60s;
+        client_max_body_size 40m;
     }
 
     location ~* \.map$ {
         return 404;
     }
 
-    location ~ ^/(paciente|medico|admin|gerencia|finanzas|operaciones|calidad|rrhh|recepcion|caja|enfermeria|laboratorio|farmacia|almacen)$ {
+    location ~ ^/(paciente|medico|admin|gerencia|finanzas|operaciones|calidad|rrhh|recepcion|caja|enfermeria|laboratorio|imagenes|farmacia|almacen)$ {
         return 301 /$1/$is_args$args;
     }
 
-    location ~ ^/(?:paciente|medico|admin|gerencia|finanzas|operaciones|calidad|rrhh|recepcion|caja|enfermeria|laboratorio|farmacia|almacen)/index\.html$ {
+    location ~ ^/(?:paciente|medico|admin|gerencia|finanzas|operaciones|calidad|rrhh|recepcion|caja|enfermeria|laboratorio|imagenes|farmacia|almacen)/index\.html$ {
         include /etc/nginx/snippets/security-headers.conf;
         add_header Cache-Control "no-cache";
         try_files $uri =404;
@@ -90,7 +91,7 @@ server {
         try_files $uri =404;
     }
 
-    location ~ ^/(paciente|medico|admin|gerencia|finanzas|operaciones|calidad|rrhh|recepcion|caja|enfermeria|laboratorio|farmacia|almacen)/ {
+    location ~ ^/(paciente|medico|admin|gerencia|finanzas|operaciones|calidad|rrhh|recepcion|caja|enfermeria|laboratorio|imagenes|farmacia|almacen)/ {
         include /etc/nginx/snippets/security-headers.conf;
         add_header Cache-Control "no-cache";
         try_files $uri /$1/index.html;

@@ -26,6 +26,9 @@ export const ICONO_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   CAJA_DIFERENCIA: 'pi-calculator',
   SOLICITUD_AUSENCIA: 'pi-calendar-minus',
   AUSENCIA_RESUELTA: 'pi-calendar-clock',
+  ORDEN_IMAGEN: 'pi-image',
+  ESTUDIO_INFORMADO: 'pi-file-check',
+  HALLAZGO_CRITICO: 'pi-exclamation-triangle',
   SISTEMA: 'pi-info-circle',
 };
 
@@ -55,5 +58,8 @@ export const COLOR_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   CAJA_DIFERENCIA: '#f59e0b',
   SOLICITUD_AUSENCIA: '#8b5cf6',
   AUSENCIA_RESUELTA: '#14b8a6',
+  ORDEN_IMAGEN: '#0ea5e9',
+  ESTUDIO_INFORMADO: '#10b981',
+  HALLAZGO_CRITICO: '#dc2626',
   SISTEMA: '#64748b',
 };

@@ -65,7 +65,8 @@ public class EventoCalendarioServiceImpl implements EventoCalendarioService {
             Map.entry(RolNombre.ROLE_FINANZAS, TIPOS_PERSONAL),
             Map.entry(RolNombre.ROLE_OPERACIONES, TIPOS_PERSONAL),
             Map.entry(RolNombre.ROLE_RRHH, TIPOS_PERSONAL),
-            Map.entry(RolNombre.ROLE_CALIDAD, TIPOS_PERSONAL));
+            Map.entry(RolNombre.ROLE_CALIDAD, TIPOS_PERSONAL),
+            Map.entry(RolNombre.ROLE_IMAGENES, TIPOS_PERSONAL));
 
     private static final List<TipoEvento> ORDEN_TIPOS = List.of(
             TipoEvento.PERSONAL, TipoEvento.RECORDATORIO, TipoEvento.REUNION, TipoEvento.TAREA, TipoEvento.BLOQUEO);

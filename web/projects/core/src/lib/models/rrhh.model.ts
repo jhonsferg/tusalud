@@ -2,6 +2,7 @@ export type AreaLaboral =
   | 'MEDICA'
   | 'ENFERMERIA'
   | 'LABORATORIO'
+  | 'IMAGENES'
   | 'FARMACIA'
   | 'ALMACEN'
   | 'RECEPCION'
@@ -17,6 +18,7 @@ export const AREAS_LABORALES: readonly AreaLaboral[] = [
   'MEDICA',
   'ENFERMERIA',
   'LABORATORIO',
+  'IMAGENES',
   'FARMACIA',
   'ALMACEN',
   'RECEPCION',
@@ -33,6 +35,7 @@ export const ETIQUETA_AREA_LABORAL: Readonly<Record<string, string>> = {
   MEDICA: 'Médica',
   ENFERMERIA: 'Enfermería',
   LABORATORIO: 'Laboratorio',
+  IMAGENES: 'Imágenes diagnósticas',
   FARMACIA: 'Farmacia',
   ALMACEN: 'Almacén',
   RECEPCION: 'Recepción',

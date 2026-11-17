@@ -1,7 +1,7 @@
 export type TipoComprobante = 'BOLETA' | 'FACTURA';
 export type TipoDocumento = 'DNI' | 'RUC' | 'SIN_DOC';
 export type MetodoPagoCaja = 'EFECTIVO' | 'TARJETA' | 'YAPE' | 'PLIN' | 'TRANSFERENCIA';
-export type OrigenCobro = 'CITA' | 'FARMACIA' | 'LABORATORIO' | 'SERVICIO' | 'OTRO';
+export type OrigenCobro = 'CITA' | 'FARMACIA' | 'LABORATORIO' | 'IMAGEN' | 'SERVICIO' | 'OTRO';
 
 export const METODOS_CAJA: readonly MetodoPagoCaja[] = [
   'EFECTIVO',
@@ -23,6 +23,7 @@ export const ETIQUETA_ORIGEN: Readonly<Record<string, string>> = {
   CITA: 'Consulta',
   FARMACIA: 'Farmacia',
   LABORATORIO: 'Laboratorio',
+  IMAGEN: 'Imágenes',
   SERVICIO: 'Servicio',
   OTRO: 'Otro',
 };

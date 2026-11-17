@@ -78,6 +78,23 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Imágenes diagnósticas',
+    items: [
+      {
+        label: 'Agenda de salas',
+        icon: 'pi-calendar',
+        link: '/imagenes/agenda',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Catálogo de estudios',
+        icon: 'pi-book',
+        link: '/imagenes/catalogo',
+        roles: ['ROLE_ADMIN'],
+      },
+    ],
+  },
+  {
     title: 'Hospitalización',
     items: [
       {

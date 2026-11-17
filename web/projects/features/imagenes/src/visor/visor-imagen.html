@@ -1,0 +1,112 @@
+<p-dialog
+  header="Visor de imágenes"
+  [visible]="visible()"
+  (visibleChange)="cambiarVisible($event)"
+  [modal]="true"
+  [maximizable]="true"
+  [draggable]="false"
+  [style]="{ width: '60rem', maxWidth: '98vw' }"
+  [contentStyle]="{ padding: 0 }"
+>
+  <div class="visor">
+    <div class="barra" role="toolbar" aria-label="Herramientas del visor">
+      @if (archivos().length > 1) {
+        <p-button
+          icon="pi pi-chevron-left"
+          [text]="true"
+          [rounded]="true"
+          ariaLabel="Imagen anterior"
+          (onClick)="anterior()"
+        />
+        <p-button
+          icon="pi pi-chevron-right"
+          [text]="true"
+          [rounded]="true"
+          ariaLabel="Imagen siguiente"
+          (onClick)="siguiente()"
+        />
+      }
+      <span class="nombre">{{ titulo() }}</span>
+      @if (!esPdf()) {
+        <p-button
+          icon="pi pi-search-minus"
+          [text]="true"
+          [rounded]="true"
+          ariaLabel="Alejar"
+          (onClick)="alejar()"
+        />
+        <span class="zoom" aria-live="polite">{{ zoomPorcentaje() }}%</span>
+        <p-button
+          icon="pi pi-search-plus"
+          [text]="true"
+          [rounded]="true"
+          ariaLabel="Acercar"
+          (onClick)="acercar()"
+        />
+        <p-button
+          icon="pi pi-refresh"
+          [text]="true"
+          [rounded]="true"
+          ariaLabel="Restablecer"
+          (onClick)="ajustar()"
+        />
+      }
+    </div>
+
+    <div class="escena" (wheel)="rueda($event)">
+      @if (cargando()) {
+        <p class="estado"><i class="pi pi-spin pi-spinner"></i> Cargando…</p>
+      } @else if (error(); as mensaje) {
+        <p class="estado error" role="alert">{{ mensaje }}</p>
+      } @else if (urlSegura(); as segura) {
+        @if (esPdf()) {
+          <iframe class="pdf" [src]="segura" title="Documento PDF"></iframe>
+        } @else {
+          @if (url(); as directa) {
+            <img
+              class="imagen"
+              [src]="directa"
+              [alt]="actual()?.nombre ?? 'Imagen del estudio'"
+              [style.transform]="'scale(' + zoom() + ')'"
+              [style.filter]="filtro()"
+              draggable="false"
+            />
+          }
+        }
+      }
+    </div>
+
+    @if (!esPdf()) {
+      <div class="ajustes">
+        <label>
+          Brillo {{ brillo() }}%
+          <p-slider
+            [ngModel]="brillo()"
+            (ngModelChange)="brillo.set($event)"
+            [min]="20"
+            [max]="250"
+            ariaLabelledBy="Brillo"
+          />
+        </label>
+        <label>
+          Contraste {{ contraste() }}%
+          <p-slider
+            [ngModel]="contraste()"
+            (ngModelChange)="contraste.set($event)"
+            [min]="20"
+            [max]="300"
+            ariaLabelledBy="Contraste"
+          />
+        </label>
+        <label class="inversion">
+          <p-toggleswitch
+            [ngModel]="invertido()"
+            (ngModelChange)="invertido.set($event)"
+            ariaLabel="Invertir colores"
+          />
+          Invertir
+        </label>
+      </div>
+    }
+  </div>
+</p-dialog>

@@ -12,6 +12,7 @@ export * from './admin.model';
 export * from './calendario.model';
 export * from './almacen.model';
 export * from './farmacia.model';
+export * from './imagenes.model';
 export * from './laboratorio.model';
 export * from './recepcion.model';
 export * from './caja.model';

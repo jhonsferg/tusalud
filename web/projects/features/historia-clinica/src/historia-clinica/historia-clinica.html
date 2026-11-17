@@ -4,7 +4,16 @@
   icon="pi-folder-open"
   [backLink]="esPropia() ? undefined : volver"
   backLabel="Volver"
-/>
+>
+  @if (puedeEditar() && id(); as pacienteId) {
+    <p-button
+      label="Estudios de imagen"
+      icon="pi pi-image"
+      [outlined]="true"
+      [routerLink]="['/imagenes/paciente', pacienteId]"
+    />
+  }
+</app-page-header>
 
 @if (store.historia.error(); as error) {
   <div class="panel">

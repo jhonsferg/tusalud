@@ -1,0 +1,60 @@
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.total {
+  margin-left: auto;
+}
+
+.salas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+}
+
+.sala {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
+.cita {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.7rem 0.85rem;
+  border-left: 4px solid var(--p-blue-500);
+  border-radius: 8px;
+  background: var(--p-content-hover-background);
+
+  &.urgente {
+    border-left-color: var(--p-red-500);
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  a {
+    margin-top: 0.2rem;
+    color: var(--p-primary-color);
+    font-size: 0.85rem;
+  }
+}
+
+.vacia {
+  margin: 0;
+  font-size: 0.9rem;
+}

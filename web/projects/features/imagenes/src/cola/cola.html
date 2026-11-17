@@ -1,0 +1,168 @@
+<app-page-header
+  [title]="esPersonal() ? 'Imágenes diagnósticas' : 'Mis estudios de imagen'"
+  [subtitle]="
+    esPersonal()
+      ? 'Cola de trabajo, tomas e informes'
+      : 'Estudios que solicitaste para tus pacientes'
+  "
+  icon="pi-image"
+>
+  @if (!esPersonal()) {
+    <p-button label="Solicitar estudio" icon="pi pi-plus" routerLink="/imagenes/solicitar" />
+  }
+  <p-button
+    label="Catálogo"
+    icon="pi pi-book"
+    [outlined]="true"
+    severity="secondary"
+    routerLink="/imagenes/catalogo"
+  />
+  @if (esPersonal()) {
+    <p-button
+      label="Agenda de salas"
+      icon="pi pi-calendar"
+      [outlined]="true"
+      routerLink="/imagenes/agenda"
+    />
+  }
+</app-page-header>
+
+@if (esPersonal() && store.resumen.value(); as resumen) {
+  <div class="kpis">
+    <app-kpi
+      etiqueta="Por programar"
+      [valor]="resumen.solicitadas"
+      icono="pi-clock"
+      [tono]="resumen.solicitadas > 0 ? 'alerta' : 'exito'"
+    />
+    <app-kpi etiqueta="Programados" [valor]="resumen.programadas" icono="pi-calendar" />
+    <app-kpi
+      etiqueta="Por informar"
+      [valor]="resumen.porInformar"
+      icono="pi-hourglass"
+      [tono]="resumen.porInformar > 0 ? 'alerta' : 'exito'"
+    />
+    <app-kpi
+      etiqueta="Informados hoy"
+      [valor]="resumen.informadasHoy"
+      icono="pi-check-circle"
+      tono="exito"
+    />
+    <app-kpi
+      etiqueta="Urgentes"
+      [valor]="resumen.urgentes"
+      icono="pi-exclamation-triangle"
+      [tono]="resumen.urgentes > 0 ? 'peligro' : 'exito'"
+    />
+  </div>
+}
+
+<div class="panel">
+  <div class="filtros">
+    <p-iconfield class="w-full md:w-20rem">
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        type="search"
+        class="w-full"
+        placeholder="Buscar por código, DNI o paciente"
+        aria-label="Buscar orden"
+        [ngModel]="busqueda()"
+        (ngModelChange)="buscar($event)"
+      />
+    </p-iconfield>
+    <p-select
+      [options]="estados"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="estado()"
+      (ngModelChange)="estado.set($event); cargar()"
+      placeholder="Todos los estados"
+      [showClear]="true"
+      ariaLabel="Filtrar por estado"
+      appendTo="body"
+      styleClass="w-full md:w-14rem"
+    />
+  </div>
+
+  <p-table
+    [value]="store.ordenes.value() ?? []"
+    [loading]="store.ordenes.loading()"
+    [paginator]="(store.ordenes.value() ?? []).length > 12"
+    [rows]="12"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+  >
+    <ng-template #header>
+      <tr>
+        <th>Orden</th>
+        <th>Paciente</th>
+        <th>Estudios</th>
+        <th>Programación</th>
+        <th>Estado</th>
+        <th style="width: 7rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-orden>
+      <tr>
+        <td>
+          <div class="font-semibold">{{ orden.codigo }}</div>
+          <small class="text-muted">{{ orden.fecha | date: 'd MMM y, HH:mm' }}</small>
+          @if (orden.prioridad === 'URGENTE') {
+            <p-tag value="Urgente" severity="danger" styleClass="ml-2" />
+          }
+          @if (orden.hallazgoCritico) {
+            <p-tag
+              value="Crítico"
+              severity="danger"
+              icon="pi pi-exclamation-triangle"
+              styleClass="ml-2"
+            />
+          }
+        </td>
+        <td>
+          {{ orden.pacienteNombre }}
+          @if (orden.dni) {
+            <small class="text-muted block">DNI {{ orden.dni }}</small>
+          }
+        </td>
+        <td class="estudios">{{ resumirEstudios(orden) }}</td>
+        <td>
+          @if (orden.programadaPara) {
+            {{ orden.programadaPara | date: 'd MMM, HH:mm' }}
+            <small class="text-muted block">{{ orden.sala }}</small>
+          } @else {
+            <span class="text-muted">Sin programar</span>
+          }
+        </td>
+        <td>
+          <p-tag
+            [value]="etiqueta[orden.estado]"
+            [severity]="severidad[orden.estado]"
+            [icon]="'pi ' + icono[orden.estado]"
+          />
+        </td>
+        <td class="text-right">
+          <p-button
+            label="Abrir"
+            size="small"
+            [outlined]="true"
+            [ariaLabel]="'Abrir la orden ' + orden.codigo"
+            [routerLink]="['/imagenes/ordenes', orden.id]"
+          />
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="6">
+          <app-empty-state
+            icon="pi-image"
+            title="Sin órdenes"
+            message="No hay órdenes de imagen con esos filtros."
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

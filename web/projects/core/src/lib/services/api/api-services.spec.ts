@@ -14,6 +14,7 @@ import { NotificacionesApiService } from './notificaciones-api.service';
 import { AlmacenApiService } from './almacen-api.service';
 import { CalendarioApiService } from './calendario-api.service';
 import { FarmaciaApiService } from './farmacia-api.service';
+import { ImagenesApiService } from './imagenes-api.service';
 import { LaboratorioApiService } from './laboratorio-api.service';
 import { CajaApiService } from './caja-api.service';
 import { HospitalizacionApiService } from './hospitalizacion-api.service';
@@ -516,6 +517,89 @@ describe('servicios de la API', () => {
     expectRequest({ method: 'PUT', url: `/api/v1/farmacia/dispensaciones/${u(9)}/anular` });
     api.misDispensaciones().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/farmacia/mis-dispensaciones' });
+  });
+
+  it('ImagenesApiService cubre catálogo, órdenes, archivos e informes', () => {
+    const api = TestBed.inject(ImagenesApiService);
+    api.listarEstudios({ modalidad: 'RX', q: 'torax' }).subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/imagenes/estudios',
+      params: { modalidad: 'RX', q: 'torax' },
+    });
+    const orden = {
+      pacienteId: u(1),
+      prioridad: 'URGENTE' as const,
+      indicacionClinica: 'Tos persistente',
+      estudioIds: [u(2)],
+    };
+    api.crearOrden(orden).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/imagenes/ordenes', body: orden });
+    api.listarOrdenes({ estado: 'PROGRAMADA' }).subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/imagenes/ordenes',
+      params: { estado: 'PROGRAMADA' },
+    });
+    api.programar(u(5), { programadaPara: '2026-11-20T09:30:00', sala: 'Sala 1' }).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: `/api/v1/imagenes/ordenes/${u(5)}/programar`,
+      body: { programadaPara: '2026-11-20T09:30:00', sala: 'Sala 1' },
+    });
+    api.realizar(u(5), { observaciones: 'Sin incidencias' }).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: `/api/v1/imagenes/ordenes/${u(5)}/realizar`,
+      body: { observaciones: 'Sin incidencias' },
+    });
+    const informe = {
+      hallazgos: 'Sin lesiones',
+      conclusion: 'Normal',
+      hallazgoCritico: false,
+      firmaColegiatura: 'CMP-1234',
+    };
+    api.informar(u(5), informe).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: `/api/v1/imagenes/ordenes/${u(5)}/informe`,
+      body: informe,
+    });
+    api.historialInformes(u(5)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/imagenes/ordenes/${u(5)}/informes` });
+    api.cancelar(u(5), 'Error').subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: `/api/v1/imagenes/ordenes/${u(5)}/cancelar`,
+      body: { motivo: 'Error' },
+    });
+    api.subirArchivos(u(5), [new File([new Uint8Array([1, 2, 3])], 'toma.png')]).subscribe();
+    const subida = controller.expectOne('/api/v1/imagenes/ordenes/' + u(5) + '/archivos');
+    expect(subida.request.method).toBe('POST');
+    expect(subida.request.body instanceof FormData).toBe(true);
+    expect((subida.request.body as FormData).getAll('archivos').length).toBe(1);
+    subida.flush([]);
+    api.descargarArchivo(u(5), u(6)).subscribe();
+    const descarga = controller.expectOne('/api/v1/imagenes/ordenes/' + u(5) + '/archivos/' + u(6));
+    expect(descarga.request.responseType).toBe('blob');
+    descarga.flush(new Blob(['x']));
+    api.eliminarArchivo(u(5), u(6)).subscribe();
+    expectRequest({
+      method: 'DELETE',
+      url: `/api/v1/imagenes/ordenes/${u(5)}/archivos/${u(6)}`,
+    });
+    api.agenda('2026-11-20', '2026-11-21').subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/imagenes/agenda',
+      params: { desde: '2026-11-20', hasta: '2026-11-21' },
+    });
+    api.misEstudios().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/imagenes/mis-estudios' });
+    api.ordenesDePaciente(u(1)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/imagenes/pacientes/${u(1)}/ordenes` });
+    api.miFirma().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/imagenes/mi-firma' });
   });
 
   it('LaboratorioApiService cubre exámenes, órdenes y resultados', () => {

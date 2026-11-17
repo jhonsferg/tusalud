@@ -56,6 +56,19 @@
               [routerLink]="['/citas', cita.id, 'atencion']"
             />
           }
+          @if (puedeAtender(cita)) {
+            <p-button
+              label="Solicitar estudio de imagen"
+              icon="pi pi-image"
+              severity="secondary"
+              [outlined]="true"
+              routerLink="/imagenes/solicitar"
+              [queryParams]="{
+                pacienteId: cita.pacienteId,
+                atencionId: clinica.atencion.value()?.id,
+              }"
+            />
+          }
           @if (puedeReprogramar(cita)) {
             <p-button
               label="Reprogramar"

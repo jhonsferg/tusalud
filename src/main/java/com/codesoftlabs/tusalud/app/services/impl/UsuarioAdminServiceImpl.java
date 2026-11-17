@@ -168,6 +168,7 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
             case ROLE_OPERACIONES -> "Consulta la ocupación, las esperas, la demanda y el inventario crítico";
             case ROLE_RRHH -> "Gestiona las fichas del personal, sus turnos, ausencias y vacaciones";
             case ROLE_CALIDAD -> "Consulta las valoraciones, las cancelaciones y los indicadores de calidad";
+            case ROLE_IMAGENES -> "Programa estudios de imagen, registra las tomas y emite los informes";
         };
     }
 

@@ -58,6 +58,7 @@ public final class TelemetryRedactor {
             + "|historia-clinica(/.*)?"
             + "|pacientes/[^/]+/(historia-clinica|datos-medicos)(/.*)?"
             + "|laboratorio(/.*)?"
+            + "|imagenes(/.*)?"
             + "|hospitalizacion(/.*)?"
             + "|farmacia(/.*)?"
             + "|citas/[^/]+/(atencion|pagos?)(/.*)?"

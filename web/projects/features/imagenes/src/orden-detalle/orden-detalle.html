@@ -1,0 +1,505 @@
+<app-page-header
+  [title]="orden()?.codigo ?? 'Orden de imagen'"
+  subtitle="Programación, toma, imágenes e informe"
+  icon="pi-image"
+  backLink="/imagenes"
+  backLabel="Volver a las órdenes"
+/>
+
+@if (store.orden.error(); as problema) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar la orden"
+      [message]="problema.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="recargar()" />
+    </app-empty-state>
+  </div>
+} @else if (orden(); as o) {
+  <section class="panel cabecera">
+    <div>
+      <h2>{{ o.pacienteNombre }}</h2>
+      <p class="text-muted">
+        @if (o.dni) {
+          DNI {{ o.dni }} ·
+        }
+        Solicitada {{ o.fecha | date: 'd MMM y, HH:mm' }} por {{ o.medicoNombre }}
+      </p>
+      @if (o.indicacionClinica) {
+        <p><strong>Indicación clínica:</strong> {{ o.indicacionClinica }}</p>
+      }
+      @if (o.motivoCancelacion) {
+        <p class="cancelada"><strong>Cancelada:</strong> {{ o.motivoCancelacion }}</p>
+      }
+    </div>
+    <dl class="datos">
+      <div>
+        <dt>Estado</dt>
+        <dd>
+          <p-tag
+            [value]="etiquetaEstado[o.estado]"
+            [severity]="severidad[o.estado]"
+            [icon]="'pi ' + iconoEstado[o.estado]"
+          />
+          @if (o.prioridad === 'URGENTE') {
+            <p-tag value="Urgente" severity="danger" styleClass="ml-2" />
+          }
+          @if (o.hallazgoCritico) {
+            <p-tag
+              value="Hallazgo crítico"
+              severity="danger"
+              icon="pi pi-exclamation-triangle"
+              styleClass="ml-2"
+            />
+          }
+        </dd>
+      </div>
+      <div>
+        <dt>Programado</dt>
+        <dd>
+          @if (o.programadaPara) {
+            {{ o.programadaPara | date: 'd MMM y, HH:mm' }} · {{ o.sala }}
+          } @else {
+            Sin programar
+          }
+        </dd>
+      </div>
+      @if (o.realizadaEn) {
+        <div>
+          <dt>Toma realizada</dt>
+          <dd>{{ o.realizadaEn | date: 'd MMM y, HH:mm' }} por {{ o.realizadaPor }}</dd>
+        </div>
+      }
+      @if (o.total != null && esPersonal()) {
+        <div>
+          <dt>Total</dt>
+          <dd>{{ o.total | currency: 'PEN' : 'symbol-narrow' }}</dd>
+        </div>
+      }
+    </dl>
+  </section>
+
+  <div class="acciones">
+    @if (puedeProgramar()) {
+      <p-button
+        [label]="o.estado === 'PROGRAMADA' ? 'Reprogramar' : 'Programar'"
+        icon="pi pi-calendar"
+        (onClick)="abrirProgramar(o)"
+      />
+    }
+    @if (puedeRealizar()) {
+      <p-button
+        label="Registrar toma realizada"
+        icon="pi pi-check"
+        severity="success"
+        [disabled]="o.archivos.length === 0"
+        (onClick)="abrirRealizar()"
+      />
+    }
+    @if (puedeInformar()) {
+      <p-button
+        label="Redactar informe"
+        icon="pi pi-file-edit"
+        (onClick)="abrirInforme(false, o)"
+      />
+    }
+    @if (puedeCorregir()) {
+      <p-button
+        label="Corregir informe"
+        icon="pi pi-pencil"
+        [outlined]="true"
+        (onClick)="abrirInforme(true, o)"
+      />
+    }
+    @if (o.estado === 'INFORMADA') {
+      <p-button
+        label="Imprimir informe"
+        icon="pi pi-print"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="imprimir(o)"
+      />
+    }
+    @if (puedeCancelar()) {
+      <p-button
+        label="Cancelar orden"
+        icon="pi pi-times"
+        severity="danger"
+        [text]="true"
+        (onClick)="cancelarVisible.set(true)"
+      />
+    }
+  </div>
+
+  <section class="panel">
+    <h3>Estudios solicitados</h3>
+    <ul class="estudios">
+      @for (estudio of o.estudios; track estudio.id) {
+        <li>
+          <i [class]="'pi ' + iconoModalidad[estudio.modalidad]"></i>
+          <div>
+            <strong>{{ estudio.nombre }}</strong>
+            <small class="text-muted block">
+              {{ etiquetaModalidad[estudio.modalidad] }} · {{ estudio.region }} ·
+              {{ estudio.duracionMinutos }} min
+            </small>
+            @if (estudio.preparacion) {
+              <small class="preparacion"
+                ><i class="pi pi-info-circle"></i> {{ estudio.preparacion }}</small
+              >
+            }
+          </div>
+        </li>
+      }
+    </ul>
+  </section>
+
+  @if (o.observacionesToma) {
+    <section class="panel">
+      <h3>Observaciones de la toma</h3>
+      <p>{{ o.observacionesToma }}</p>
+    </section>
+  }
+
+  @if (o.archivos.length > 0 || puedeCargar()) {
+    <section class="panel">
+      <h3>Imágenes</h3>
+      @if (errorCarga(); as mensaje) {
+        <p-message severity="error" styleClass="w-full mb-3">{{ mensaje }}</p-message>
+      }
+      @if (puedeCargar()) {
+        <label
+          class="carga"
+          [class.activa]="arrastrando()"
+          (dragover)="sobre($event)"
+          (dragleave)="arrastrando.set(false)"
+          (drop)="soltar($event, o)"
+        >
+          <i class="pi pi-cloud-upload"></i>
+          <span>{{
+            subiendo() ? 'Cargando…' : 'Arrastra las imágenes aquí o haz clic para elegirlas'
+          }}</span>
+          <small class="text-muted">JPEG, PNG o PDF de hasta 5 MB, máximo 12 por orden</small>
+          <input
+            id="img-archivos"
+            type="file"
+            multiple
+            accept="image/jpeg,image/png,application/pdf"
+            [disabled]="subiendo()"
+            (change)="seleccionados($event, o)"
+          />
+        </label>
+      }
+      @if (o.archivos.length > 0) {
+        <ul class="archivos">
+          @for (archivo of o.archivos; track archivo.id; let i = $index) {
+            <li>
+              <i
+                [class]="
+                  archivo.tipoContenido === 'application/pdf' ? 'pi pi-file-pdf' : 'pi pi-image'
+                "
+              ></i>
+              <div>
+                <strong>{{ archivo.nombre }}</strong>
+                <small class="text-muted block">{{ tamano(archivo.tamano) }}</small>
+              </div>
+              <p-button
+                label="Ver"
+                icon="pi pi-eye"
+                size="small"
+                [outlined]="true"
+                [ariaLabel]="'Ver ' + archivo.nombre"
+                (onClick)="abrirVisor(i)"
+              />
+              @if (puedeCargar()) {
+                <p-button
+                  icon="pi pi-trash"
+                  size="small"
+                  [text]="true"
+                  severity="danger"
+                  [ariaLabel]="'Quitar ' + archivo.nombre"
+                  (onClick)="quitar(o, archivo)"
+                />
+              }
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="text-muted">Aún no hay imágenes cargadas.</p>
+      }
+    </section>
+  }
+
+  @if (o.informe; as informe) {
+    <section class="panel informe">
+      <header>
+        <h3>Informe</h3>
+        <span class="text-muted">
+          Versión {{ informe.version }} · {{ informe.fecha | date: 'd MMM y, HH:mm' }}
+        </span>
+      </header>
+      @if (informe.motivoCorreccion) {
+        <p class="correccion">
+          <i class="pi pi-pencil"></i> Corregido: {{ informe.motivoCorreccion }}
+        </p>
+      }
+      <h4>Hallazgos</h4>
+      <p class="texto">{{ informe.hallazgos }}</p>
+      <h4>Conclusión</h4>
+      <p class="texto">{{ informe.conclusion }}</p>
+      <footer>
+        <strong>{{ informe.firmaNombre }}</strong>
+        <span class="text-muted">Colegiatura {{ informe.firmaColegiatura }}</span>
+      </footer>
+
+      @if (store.informes.value(); as versiones) {
+        @if (versiones.length > 1) {
+          <p-button
+            [label]="
+              versionesVisibles() ? 'Ocultar versiones anteriores' : 'Ver versiones anteriores'
+            "
+            [text]="true"
+            size="small"
+            icon="pi pi-history"
+            (onClick)="versionesVisibles.set(!versionesVisibles())"
+          />
+          @if (versionesVisibles()) {
+            <ul class="versiones">
+              @for (version of versiones; track version.id) {
+                <li>
+                  <strong>Versión {{ version.version }}</strong>
+                  <small class="text-muted">
+                    {{ version.fecha | date: 'd MMM y, HH:mm' }} · {{ version.firmaNombre }}
+                  </small>
+                  @if (version.motivoCorreccion) {
+                    <small>Motivo: {{ version.motivoCorreccion }}</small>
+                  }
+                  <p class="texto">{{ version.conclusion }}</p>
+                </li>
+              }
+            </ul>
+          }
+        }
+      }
+    </section>
+  }
+
+  <app-visor-imagen
+    [ordenId]="o.id"
+    [archivos]="o.archivos"
+    [(visible)]="visorVisible"
+    [(indice)]="visorIndice"
+  />
+
+  <p-dialog
+    header="Programar estudio"
+    [visible]="programarVisible()"
+    (visibleChange)="programarVisible.set($event)"
+    [modal]="true"
+    [draggable]="false"
+    [style]="{ width: '30rem', maxWidth: '96vw' }"
+  >
+    <div class="form">
+      @if (errorProgramar(); as mensaje) {
+        <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+      }
+      <label>
+        Fecha y hora
+        <p-datepicker
+          inputId="img-fecha"
+          [ngModel]="programarFecha()"
+          (ngModelChange)="programarFecha.set($event)"
+          [showTime]="true"
+          [stepMinute]="5"
+          [minDate]="ahora"
+          dateFormat="dd/mm/yy"
+          hourFormat="24"
+          [showIcon]="true"
+          appendTo="body"
+          [fluid]="true"
+        />
+      </label>
+      <label>
+        Sala
+        <p-select
+          inputId="img-sala"
+          [options]="salas"
+          [editable]="true"
+          [ngModel]="programarSala()"
+          (ngModelChange)="programarSala.set($event)"
+          placeholder="Elige o escribe la sala"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </label>
+    </div>
+    <ng-template #footer>
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="programarVisible.set(false)"
+      />
+      <p-button label="Guardar" icon="pi pi-check" (onClick)="programar(o)" />
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog
+    header="Registrar la toma"
+    [visible]="realizarVisible()"
+    (visibleChange)="realizarVisible.set($event)"
+    [modal]="true"
+    [draggable]="false"
+    [style]="{ width: '30rem', maxWidth: '96vw' }"
+  >
+    <div class="form">
+      @if (errorRealizar(); as mensaje) {
+        <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+      }
+      <p class="text-muted">
+        El estudio pasará a la cola de informes con las {{ o.archivos.length }} imágenes cargadas.
+      </p>
+      <label>
+        Observaciones de la toma
+        <textarea
+          pTextarea
+          id="img-observaciones"
+          rows="3"
+          class="w-full"
+          [ngModel]="observaciones()"
+          (ngModelChange)="observaciones.set($event)"
+        ></textarea>
+      </label>
+    </div>
+    <ng-template #footer>
+      <p-button
+        label="Volver"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="realizarVisible.set(false)"
+      />
+      <p-button
+        label="Confirmar toma"
+        icon="pi pi-check"
+        severity="success"
+        (onClick)="realizar(o)"
+      />
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog
+    [header]="o.estado === 'INFORMADA' ? 'Corregir informe' : 'Redactar informe'"
+    [visible]="informeVisible()"
+    (visibleChange)="informeVisible.set($event)"
+    [modal]="true"
+    [draggable]="false"
+    [style]="{ width: '40rem', maxWidth: '96vw' }"
+  >
+    <form
+      class="form"
+      [formGroup]="formInforme"
+      (submit)="$event.preventDefault(); guardarInforme(o)"
+      novalidate
+    >
+      @if (errorInforme(); as mensaje) {
+        <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+      }
+      @if (o.estado === 'INFORMADA') {
+        <label>
+          Motivo de la corrección
+          <textarea
+            pTextarea
+            id="inf-motivo"
+            formControlName="motivoCorreccion"
+            rows="2"
+            class="w-full"
+          ></textarea>
+        </label>
+      }
+      <label>
+        Hallazgos
+        <textarea
+          pTextarea
+          id="inf-hallazgos"
+          formControlName="hallazgos"
+          rows="6"
+          class="w-full"
+        ></textarea>
+      </label>
+      <label>
+        Conclusión
+        <textarea
+          pTextarea
+          id="inf-conclusion"
+          formControlName="conclusion"
+          rows="3"
+          class="w-full"
+        ></textarea>
+      </label>
+      <label class="critico">
+        <p-toggleswitch formControlName="hallazgoCritico" ariaLabel="Hallazgo crítico" />
+        Hallazgo crítico: se avisa de inmediato al médico solicitante
+      </label>
+      <label>
+        Colegiatura del radiólogo
+        <input
+          pInputText
+          id="inf-colegiatura"
+          formControlName="firmaColegiatura"
+          class="p-inputtext w-full"
+        />
+      </label>
+    </form>
+    <ng-template #footer>
+      <p-button
+        label="Cancelar"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="informeVisible.set(false)"
+      />
+      <p-button
+        [label]="o.estado === 'INFORMADA' ? 'Guardar corrección' : 'Emitir informe'"
+        icon="pi pi-check"
+        [loading]="guardandoInforme()"
+        (onClick)="guardarInforme(o)"
+      />
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog
+    header="Cancelar la orden"
+    [visible]="cancelarVisible()"
+    (visibleChange)="cancelarVisible.set($event)"
+    [modal]="true"
+    [draggable]="false"
+    [style]="{ width: '28rem', maxWidth: '96vw' }"
+  >
+    <label class="form">
+      Motivo, opcional
+      <textarea
+        pTextarea
+        id="img-motivo"
+        rows="3"
+        class="w-full"
+        [ngModel]="motivoCancelacion()"
+        (ngModelChange)="motivoCancelacion.set($event)"
+      ></textarea>
+    </label>
+    <ng-template #footer>
+      <p-button
+        label="Volver"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="cancelarVisible.set(false)"
+      />
+      <p-button
+        label="Cancelar orden"
+        icon="pi pi-times"
+        severity="danger"
+        (onClick)="cancelar(o)"
+      />
+    </ng-template>
+  </p-dialog>
+}

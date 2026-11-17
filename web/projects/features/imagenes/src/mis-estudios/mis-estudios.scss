@@ -1,0 +1,78 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+  gap: 1.1rem;
+}
+
+.estudio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+
+  header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.lista,
+.imagenes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+
+  li > i {
+    color: var(--p-primary-color);
+  }
+
+  li > span {
+    flex: 1;
+  }
+}
+
+.preparacion {
+  color: var(--p-orange-700);
+}
+
+.cita {
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--p-blue-500) 10%, transparent);
+  font-weight: 600;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.informe {
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  background: var(--p-content-hover-background);
+
+  h4 {
+    margin: 0.4rem 0 0.15rem;
+    font-size: 0.85rem;
+  }
+
+  p {
+    white-space: pre-wrap;
+  }
+}

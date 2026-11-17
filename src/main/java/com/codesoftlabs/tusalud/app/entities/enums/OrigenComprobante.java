@@ -4,6 +4,7 @@ public enum OrigenComprobante {
     CITA,
     FARMACIA,
     LABORATORIO,
+    IMAGEN,
     SERVICIO,
     OTRO
 }

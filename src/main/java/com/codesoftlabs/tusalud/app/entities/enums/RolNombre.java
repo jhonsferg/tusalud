@@ -14,5 +14,6 @@ public enum RolNombre {
     ROLE_FINANZAS,
     ROLE_OPERACIONES,
     ROLE_RRHH,
-    ROLE_CALIDAD
+    ROLE_CALIDAD,
+    ROLE_IMAGENES
 }

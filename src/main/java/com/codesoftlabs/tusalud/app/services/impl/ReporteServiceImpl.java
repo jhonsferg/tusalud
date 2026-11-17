@@ -195,12 +195,16 @@ public class ReporteServiceImpl implements ReporteService {
         BigDecimal servicios = suma(fuentes.comprobantes().stream()
                 .filter(c -> c.origen() == OrigenComprobante.SERVICIO || c.origen() == OrigenComprobante.OTRO)
                 .map(ComprobanteDia::total));
+        BigDecimal imagenes = suma(fuentes.comprobantes().stream()
+                .filter(c -> c.origen() == OrigenComprobante.IMAGEN)
+                .map(ComprobanteDia::total));
         BigDecimal farmacia = suma(fuentes.dispensaciones().stream().map(DispensacionDia::total));
         Cantidad hospital = repositorio.hospitalizacionDevengada(r.inicio(), r.fin());
         List<ReporteFinancieroResponse.Origen> porOrigen = List.of(
                 new ReporteFinancieroResponse.Origen("CONSULTA", escala(consulta), false),
                 new ReporteFinancieroResponse.Origen("FARMACIA", escala(farmacia), false),
                 new ReporteFinancieroResponse.Origen("LABORATORIO", escala(laboratorio), false),
+                new ReporteFinancieroResponse.Origen("IMAGENES", escala(imagenes), false),
                 new ReporteFinancieroResponse.Origen("SERVICIOS", escala(servicios), false),
                 new ReporteFinancieroResponse.Origen("HOSPITALIZACION", escala(hospital.monto()), true));
 

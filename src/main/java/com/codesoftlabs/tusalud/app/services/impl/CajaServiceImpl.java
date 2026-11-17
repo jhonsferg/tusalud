@@ -13,7 +13,9 @@ import com.codesoftlabs.tusalud.app.dto.response.SesionCajaResponse;
 import com.codesoftlabs.tusalud.app.entities.Cita;
 import com.codesoftlabs.tusalud.app.entities.Comprobante;
 import com.codesoftlabs.tusalud.app.entities.ComprobanteItem;
+import com.codesoftlabs.tusalud.app.entities.ItemOrdenImagen;
 import com.codesoftlabs.tusalud.app.entities.ItemOrdenLab;
+import com.codesoftlabs.tusalud.app.entities.OrdenImagen;
 import com.codesoftlabs.tusalud.app.entities.OrdenLaboratorio;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
 import com.codesoftlabs.tusalud.app.entities.Pago;
@@ -22,6 +24,7 @@ import com.codesoftlabs.tusalud.app.entities.Usuario;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoCaja;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoCita;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoComprobante;
+import com.codesoftlabs.tusalud.app.entities.enums.EstadoOrdenImagen;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoOrdenLab;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoPago;
 import com.codesoftlabs.tusalud.app.entities.enums.MetodoPagoCaja;
@@ -36,6 +39,7 @@ import com.codesoftlabs.tusalud.app.exceptions.ForbiddenOperationException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.CitaCobroRepository;
 import com.codesoftlabs.tusalud.app.repositories.ComprobanteRepository;
+import com.codesoftlabs.tusalud.app.repositories.OrdenImagenCobroRepository;
 import com.codesoftlabs.tusalud.app.repositories.OrdenLabCobroRepository;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
 import com.codesoftlabs.tusalud.app.repositories.PagoRepository;
@@ -80,6 +84,7 @@ public class CajaServiceImpl implements CajaService {
     private final ComprobanteRepository comprobanteRepository;
     private final CitaCobroRepository citaRepository;
     private final OrdenLabCobroRepository ordenRepository;
+    private final OrdenImagenCobroRepository ordenImagenRepository;
     private final PacienteRepository pacienteRepository;
     private final PagoRepository pagoRepository;
     private final UsuarioRepository usuarioRepository;
@@ -180,6 +185,7 @@ public class CajaServiceImpl implements CajaService {
         SesionCaja caja = cajaAbierta(actor);
         Cita cita = null;
         OrdenLaboratorio orden = null;
+        OrdenImagen ordenImagen = null;
         Paciente paciente = null;
         List<LineaCobro> lineas;
         switch (request.origen()) {
@@ -196,6 +202,11 @@ public class CajaServiceImpl implements CajaService {
                 orden = ordenParaCobrar(request.referenciaId());
                 paciente = orden.getPaciente();
                 lineas = lineasDeOrden(orden);
+            }
+            case IMAGEN -> {
+                ordenImagen = ordenImagenParaCobrar(request.referenciaId());
+                paciente = ordenImagen.getPaciente();
+                lineas = lineasDeOrdenImagen(ordenImagen);
             }
             default -> {
                 if (request.items() == null || request.items().isEmpty()) {
@@ -253,6 +264,9 @@ public class CajaServiceImpl implements CajaService {
         if (orden != null) {
             orden.setCobrado(true);
         }
+        if (ordenImagen != null) {
+            ordenImagen.setCobrado(true);
+        }
         if (paciente != null) {
             notificacionService.crear(
                     paciente.getUsuario(),
@@ -292,6 +306,18 @@ public class CajaServiceImpl implements CajaService {
                     "Orden de laboratorio " + orden.getCodigo(),
                     orden.getTotal(),
                     orden.getFecha()));
+        }
+        for (OrdenImagen ordenImagen :
+                ordenImagenRepository.pendientesDeCobro(termino, PageRequest.of(0, LIMITE_PENDIENTES))) {
+            cuentas.add(new CuentaPorCobrarResponse(
+                    OrigenComprobante.IMAGEN,
+                    ordenImagen.getId(),
+                    ordenImagen.getPaciente().getId(),
+                    ordenImagen.getPaciente().getUsuario().getNombreCompleto(),
+                    ordenImagen.getPaciente().getDni(),
+                    "Estudios de imagen " + ordenImagen.getCodigo(),
+                    ordenImagen.getTotal(),
+                    ordenImagen.getFecha()));
         }
         cuentas.sort(Comparator.comparing(CuentaPorCobrarResponse::fecha).reversed());
         return cuentas;
@@ -407,6 +433,8 @@ public class CajaServiceImpl implements CajaService {
             });
         } else if (comprobante.getOrigen() == OrigenComprobante.LABORATORIO) {
             ordenRepository.findParaCobro(referencia).ifPresent(orden -> orden.setCobrado(false));
+        } else if (comprobante.getOrigen() == OrigenComprobante.IMAGEN) {
+            ordenImagenRepository.findParaCobro(referencia).ifPresent(orden -> orden.setCobrado(false));
         }
     }
 
@@ -466,6 +494,39 @@ public class CajaServiceImpl implements CajaService {
             throw new BusinessLogicException("La orden ya tiene un comprobante emitido");
         }
         return orden;
+    }
+
+    private OrdenImagen ordenImagenParaCobrar(UUID ordenId) {
+        if (ordenId == null) {
+            throw new DatosInvalidosException("Debe indicar la orden de imagen a cobrar");
+        }
+        OrdenImagen orden = ordenImagenRepository
+                .findParaCobro(ordenId)
+                .orElseThrow(() -> new ResourceNotFoundException("Orden de imagen", "id", ordenId));
+        if (orden.getEstado() != EstadoOrdenImagen.REALIZADA && orden.getEstado() != EstadoOrdenImagen.INFORMADA) {
+            throw new BusinessLogicException("Solo se cobra un estudio de imagen ya realizado");
+        }
+        if (orden.isCobrado()
+                || comprobanteRepository.existsByOrigenAndReferenciaIdAndEstado(
+                        OrigenComprobante.IMAGEN, ordenId, EstadoComprobante.EMITIDO)) {
+            throw new BusinessLogicException("La orden ya tiene un comprobante emitido");
+        }
+        return orden;
+    }
+
+    private List<LineaCobro> lineasDeOrdenImagen(OrdenImagen orden) {
+        List<LineaCobro> lineas = new ArrayList<>();
+        BigDecimal suma = BigDecimal.ZERO;
+        for (ItemOrdenImagen item : orden.getItems()) {
+            LineaCobro linea = new LineaCobro(
+                    item.getEstudio().getNombre(), 1, item.getEstudio().getPrecio());
+            lineas.add(linea);
+            suma = suma.add(linea.subtotal());
+        }
+        if (lineas.isEmpty() || suma.compareTo(escala(orden.getTotal())) != 0) {
+            return List.of(new LineaCobro("Estudios de imagen " + orden.getCodigo(), 1, orden.getTotal()));
+        }
+        return lineas;
     }
 
     private List<LineaCobro> lineasDeOrden(OrdenLaboratorio orden) {

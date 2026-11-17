@@ -12,7 +12,8 @@ export type Rol =
   | 'ROLE_FINANZAS'
   | 'ROLE_OPERACIONES'
   | 'ROLE_RRHH'
-  | 'ROLE_CALIDAD';
+  | 'ROLE_CALIDAD'
+  | 'ROLE_IMAGENES';
 
 export const ROLES: readonly Rol[] = [
   'ROLE_ADMIN',
@@ -29,6 +30,7 @@ export const ROLES: readonly Rol[] = [
   'ROLE_OPERACIONES',
   'ROLE_RRHH',
   'ROLE_CALIDAD',
+  'ROLE_IMAGENES',
 ];
 
 export const ROLES_PERSONAL: readonly Rol[] = [
@@ -44,6 +46,7 @@ export const ROLES_PERSONAL: readonly Rol[] = [
   'ROLE_OPERACIONES',
   'ROLE_RRHH',
   'ROLE_CALIDAD',
+  'ROLE_IMAGENES',
 ];
 
 export const ETIQUETA_ROL: Readonly<Record<string, string>> = {
@@ -61,6 +64,7 @@ export const ETIQUETA_ROL: Readonly<Record<string, string>> = {
   ROLE_OPERACIONES: 'Operaciones',
   ROLE_RRHH: 'Recursos humanos',
   ROLE_CALIDAD: 'Calidad',
+  ROLE_IMAGENES: 'Imágenes diagnósticas',
 };
 
 export const DESCRIPCION_ROL: Readonly<Record<string, string>> = {
@@ -79,6 +83,7 @@ export const DESCRIPCION_ROL: Readonly<Record<string, string>> = {
   ROLE_OPERACIONES: 'Consulta la ocupación, las esperas, la demanda y el inventario crítico.',
   ROLE_RRHH: 'Administra las fichas laborales, los turnos y las ausencias del personal.',
   ROLE_CALIDAD: 'Consulta las valoraciones, las cancelaciones y los tiempos de entrega.',
+  ROLE_IMAGENES: 'Programa estudios de imagen, registra las tomas y emite los informes.',
 };
 
 export interface LoginRequest {

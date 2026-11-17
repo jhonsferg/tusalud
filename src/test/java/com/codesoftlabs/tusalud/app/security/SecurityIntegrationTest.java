@@ -285,7 +285,7 @@ class SecurityIntegrationTest {
         }
         mockMvc.perform(get("/api/v1/admin/roles").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenAdmin))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(14));
+                .andExpect(jsonPath("$.length()").value(15));
         mockMvc.perform(get("/api/v1/admin/roles").header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenPaciente))
                 .andExpect(status().isForbidden());
     }

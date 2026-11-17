@@ -75,6 +75,13 @@ export const MODULOS: readonly Modulo[] = [
     icono: 'pi-filter',
   },
   {
+    app: 'imagenes',
+    rol: 'ROLE_IMAGENES',
+    base: '/imagenes/',
+    etiqueta: 'Imágenes diagnósticas',
+    icono: 'pi-image',
+  },
+  {
     app: 'farmacia',
     rol: 'ROLE_FARMACIA',
     base: '/farmacia/',

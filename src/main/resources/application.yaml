@@ -4,6 +4,10 @@ spring:
       enabled: true
   application:
     name: tusalud-api
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 40MB
   profiles:
     active: "@spring.profiles.active@"
   jpa:

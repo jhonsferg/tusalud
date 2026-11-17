@@ -107,6 +107,27 @@ export const PASOS_TOUR_PREDETERMINADOS: readonly TourStep[] = [
     roles: ['ROLE_MEDICO', 'ROLE_LABORATORIO', 'ROLE_ADMIN'],
   },
   {
+    target: 'nav:/imagenes',
+    icon: 'pi-image',
+    title: 'Imágenes diagnósticas',
+    text: 'Programa los estudios, registra la toma con sus imágenes y emite el informe firmado.',
+    roles: ['ROLE_IMAGENES'],
+  },
+  {
+    target: 'nav:/imagenes/solicitar',
+    icon: 'pi-image',
+    title: 'Estudios de imagen',
+    text: 'Solicita radiografías, ecografías, tomografías o resonancias y revisa sus informes.',
+    roles: ['ROLE_MEDICO'],
+  },
+  {
+    target: 'nav:/mis-estudios',
+    icon: 'pi-image',
+    title: 'Mis estudios',
+    text: 'Aquí ves la preparación de tus estudios de imagen y, cuando están listos, su informe y sus imágenes.',
+    roles: ['ROLE_PACIENTE'],
+  },
+  {
     target: 'nav:/mis-resultados',
     icon: 'pi-filter',
     title: 'Mis resultados',
@@ -223,6 +244,7 @@ export const PASOS_TOUR_PREDETERMINADOS: readonly TourStep[] = [
       'ROLE_OPERACIONES',
       'ROLE_RRHH',
       'ROLE_CALIDAD',
+      'ROLE_IMAGENES',
     ],
   },
   {

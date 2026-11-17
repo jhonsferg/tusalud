@@ -10,6 +10,7 @@ import { ESPECIALIDADES_ROUTES } from '@tusalud/features/especialidades';
 import { FARMACIA_ROUTES, MEDICAMENTOS_ROUTES } from '@tusalud/features/farmacia';
 import { HISTORIA_CLINICA_ROUTES, PACIENTES_ROUTES } from '@tusalud/features/historia-clinica';
 import { HOSPITALIZACION_ROUTES, MIS_INGRESOS_ROUTES } from '@tusalud/features/hospitalizacion';
+import { ESTUDIOS_ROUTES, IMAGENES_ROUTES } from '@tusalud/features/imagenes';
 import { LABORATORIO_ROUTES, RESULTADOS_ROUTES } from '@tusalud/features/laboratorio';
 import { MEDICOS_ROUTES } from '@tusalud/features/medicos';
 import { NOTIFICACIONES_ROUTES } from '@tusalud/features/notificaciones';
@@ -33,6 +34,8 @@ const DOMINIOS: Record<string, Routes> = {
   PACIENTES_ROUTES,
   HOSPITALIZACION_ROUTES,
   MIS_INGRESOS_ROUTES,
+  IMAGENES_ROUTES,
+  ESTUDIOS_ROUTES,
   LABORATORIO_ROUTES,
   RESULTADOS_ROUTES,
   MEDICOS_ROUTES,

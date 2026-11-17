@@ -14,6 +14,7 @@ const todas = [
   'caja',
   'enfermeria',
   'laboratorio',
+  'imagenes',
   'farmacia',
   'almacen',
 ];

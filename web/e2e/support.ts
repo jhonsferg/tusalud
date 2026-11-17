@@ -9,6 +9,13 @@ export const CUENTAS = {
     home: /\/paciente\/citas$/,
   },
   medico: { email: 'dr.garcia@tusalud.com', password: 'Medico123!', home: /\/medico\/agenda$/ },
+  medico2: { email: 'dra.lopez@tusalud.com', password: 'Medico123!', home: /\/medico\/agenda$/ },
+  paciente2: {
+    email: 'maria.rodriguez@correo.com',
+    password: 'Paciente123!',
+    home: /\/paciente\/citas$/,
+  },
+  imagenes: { email: 'imagenes@tusalud.com', password: 'Personal123!', home: /\/imagenes\/$/ },
   admin: { email: 'admin@tusalud.com', password: 'Admin123!', home: /\/admin\/panel$/ },
   laboratorio: { email: 'lab@tusalud.com', password: 'Personal123!', home: /\/laboratorio\/$/ },
   farmacia: { email: 'farmacia@tusalud.com', password: 'Personal123!', home: /\/farmacia\/$/ },
@@ -50,6 +57,7 @@ const PREFIJO_OCULTO: Readonly<Record<string, string>> = {
   rrhh: 'rrhh',
   enfermeria: 'hospitalizacion',
   laboratorio: 'laboratorio',
+  imagenes: 'imagenes',
   farmacia: 'farmacia',
   almacen: 'almacen',
 };
@@ -67,6 +75,7 @@ const APPS = [
   'caja',
   'enfermeria',
   'laboratorio',
+  'imagenes',
   'farmacia',
   'almacen',
 ];

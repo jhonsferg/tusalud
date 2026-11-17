@@ -1,0 +1,186 @@
+<app-page-header
+  title="Catálogo de estudios"
+  subtitle="Radiografías, ecografías, tomografías y resonancias"
+  icon="pi-book"
+  [backLink]="volver()"
+  backLabel="Volver"
+>
+  @if (puedeEditar()) {
+    <p-button label="Nuevo estudio" icon="pi pi-plus" (onClick)="abrir(null)" />
+  }
+</app-page-header>
+
+<div class="panel">
+  <div class="filtros">
+    <p-iconfield class="w-full md:w-20rem">
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        type="search"
+        class="w-full"
+        placeholder="Buscar estudio"
+        aria-label="Buscar estudio"
+        [ngModel]="busqueda()"
+        (ngModelChange)="buscar($event)"
+      />
+    </p-iconfield>
+    <p-select
+      [options]="modalidades"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="modalidad()"
+      (ngModelChange)="modalidad.set($event); cargar()"
+      placeholder="Todas las modalidades"
+      [showClear]="true"
+      ariaLabel="Filtrar por modalidad"
+      appendTo="body"
+      styleClass="w-full md:w-14rem"
+    />
+  </div>
+
+  <p-table
+    [value]="store.estudios.value() ?? []"
+    [loading]="store.estudios.loading()"
+    [paginator]="(store.estudios.value() ?? []).length > 12"
+    [rows]="12"
+    [rowHover]="true"
+    responsiveLayout="scroll"
+  >
+    <ng-template #header>
+      <tr>
+        <th>Estudio</th>
+        <th>Modalidad</th>
+        <th>Región</th>
+        <th class="text-right">Duración</th>
+        <th class="text-right">Precio</th>
+        <th>Estado</th>
+        <th style="width: 5rem"></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-e>
+      <tr>
+        <td>
+          <div class="font-semibold">{{ e.nombre }}</div>
+          <small class="text-muted">{{ e.codigo }}</small>
+          @if (e.preparacion) {
+            <small class="text-muted block">{{ e.preparacion }}</small>
+          }
+        </td>
+        <td>{{ etiquetaModalidad[e.modalidad] }}</td>
+        <td>{{ e.region }}</td>
+        <td class="text-right">{{ e.duracionMinutos }} min</td>
+        <td class="text-right">{{ e.precio | currency: 'PEN' : 'symbol-narrow' }}</td>
+        <td>
+          <p-tag
+            [value]="e.activo ? 'Activo' : 'Inactivo'"
+            [severity]="e.activo ? 'success' : 'secondary'"
+          />
+        </td>
+        <td class="text-right">
+          @if (puedeEditar()) {
+            <p-button
+              icon="pi pi-pencil"
+              [text]="true"
+              [rounded]="true"
+              severity="secondary"
+              [ariaLabel]="'Editar ' + e.nombre"
+              (onClick)="abrir(e)"
+            />
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="7">
+          <app-empty-state
+            icon="pi-book"
+            title="Sin estudios"
+            message="No hay estudios con esos filtros."
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog
+  [header]="editando() ? 'Editar estudio' : 'Nuevo estudio'"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '36rem', maxWidth: '96vw' }"
+>
+  <form class="form" [formGroup]="form" (submit)="$event.preventDefault(); guardar()" novalidate>
+    @if (error(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+    <div class="dos">
+      <label
+        >Código <input pInputText id="est-codigo" formControlName="codigo" class="w-full"
+      /></label>
+      <label>
+        Modalidad
+        <p-select
+          formControlName="modalidad"
+          [options]="modalidades"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+        />
+      </label>
+    </div>
+    <label
+      >Nombre <input pInputText id="est-nombre" formControlName="nombre" class="w-full"
+    /></label>
+    <label
+      >Región <input pInputText id="est-region" formControlName="region" class="w-full"
+    /></label>
+    <label>
+      Preparación para el paciente
+      <textarea
+        pTextarea
+        id="est-preparacion"
+        formControlName="preparacion"
+        rows="2"
+        class="w-full"
+      ></textarea>
+    </label>
+    <div class="dos">
+      <label>
+        Precio
+        <p-inputnumber
+          inputId="est-precio"
+          formControlName="precio"
+          mode="currency"
+          currency="PEN"
+          locale="es-PE"
+          [min]="0"
+          [fluid]="true"
+        />
+      </label>
+      <label>
+        Duración en minutos
+        <p-inputnumber
+          inputId="est-duracion"
+          formControlName="duracionMinutos"
+          [min]="5"
+          [max]="240"
+          [fluid]="true"
+        />
+      </label>
+    </div>
+    <label class="check"><p-toggleswitch formControlName="activo" /> Estudio disponible</label>
+  </form>
+  <ng-template #footer>
+    <p-button
+      label="Cancelar"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="visible.set(false)"
+    />
+    <p-button label="Guardar" icon="pi pi-check" [loading]="guardando()" (onClick)="guardar()" />
+  </ng-template>
+</p-dialog>

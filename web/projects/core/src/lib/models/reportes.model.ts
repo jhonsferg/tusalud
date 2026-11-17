@@ -207,6 +207,7 @@ export const ETIQUETA_ORIGEN_INGRESO: Readonly<Record<string, string>> = {
   CONSULTA: 'Consultas',
   FARMACIA: 'Farmacia',
   LABORATORIO: 'Laboratorio',
+  IMAGENES: 'Imágenes',
   SERVICIOS: 'Servicios',
   HOSPITALIZACION: 'Hospitalización',
 };

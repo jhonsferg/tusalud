@@ -252,4 +252,33 @@ class HttpTelemetryFilterTest {
                 .isNull();
         assertThat(List.of(exporter.getFinishedSpanItems().size())).containsExactly(1);
     }
+
+    @Test
+    void lasPeticionesMultipartPasanSinLeerNiGuardarSuCuerpo() throws Exception {
+        byte[] contenido = "--limite contenido binario --limite--".getBytes(StandardCharsets.UTF_8);
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/api/v1/imagenes/ordenes/1/archivos");
+        request.setContentType("multipart/form-data; boundary=limite");
+        request.setContent(contenido);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        java.util.concurrent.atomic.AtomicReference<jakarta.servlet.ServletRequest> recibida =
+                new java.util.concurrent.atomic.AtomicReference<>();
+        FilterChain chain = (req, res) -> {
+            recibida.set(req);
+            assertThat(req.getInputStream().readAllBytes()).isEqualTo(contenido);
+        };
+
+        Span span =
+                tracer.spanBuilder("POST archivos").setSpanKind(SpanKind.SERVER).startSpan();
+        try (Scope ignored = span.makeCurrent()) {
+            filter.doFilter(request, response, chain);
+        } finally {
+            span.end();
+        }
+
+        assertThat(recibida.get()).isSameAs(request);
+        SpanData data = exporter.getFinishedSpanItems().get(0);
+        assertThat(data.getAttributes().get(HttpTelemetryFilter.REQUEST_BODY)).isNull();
+        assertThat(data.getAttributes().get(HttpTelemetryFilter.REQUEST_BODY_SIZE))
+                .isEqualTo((long) contenido.length);
+    }
 }

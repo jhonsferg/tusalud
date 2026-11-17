@@ -85,6 +85,24 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Imágenes diagnósticas',
+    items: [
+      {
+        label: 'Mis estudios de imagen',
+        icon: 'pi-image',
+        link: '/imagenes',
+        roles: ['ROLE_MEDICO'],
+        exact: true,
+      },
+      {
+        label: 'Solicitar estudio',
+        icon: 'pi-send',
+        link: '/imagenes/solicitar',
+        roles: ['ROLE_MEDICO'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

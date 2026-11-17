@@ -142,8 +142,9 @@ class AdminServiciosTest {
                         "ROLE_FINANZAS",
                         "ROLE_OPERACIONES",
                         "ROLE_RRHH",
-                        "ROLE_CALIDAD");
-        assertThat(roles).hasSize(14);
+                        "ROLE_CALIDAD",
+                        "ROLE_IMAGENES");
+        assertThat(roles).hasSize(15);
         assertThat(roles).allSatisfy(rol -> assertThat(rol.descripcion()).isNotBlank());
         assertThat(roles.get(2).usuarios()).isPositive();
     }

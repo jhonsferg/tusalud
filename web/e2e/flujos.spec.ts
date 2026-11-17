@@ -91,12 +91,14 @@ test.describe('administrador', () => {
     await page.locator('#esp-descripcion').fill('Creada por e2e');
     await page.locator('#esp-precio').pressSequentially('100');
     await page.getByRole('button', { name: 'Crear especialidad' }).click();
+    await page.getByPlaceholder('Buscar especialidad').fill(nombre);
     await expect(page.getByRole('cell', { name: nombre, exact: true })).toBeVisible();
 
     await page.getByRole('button', { name: `Editar ${nombre}` }).click();
     await expect(page.locator('#esp-nombre')).toHaveValue(nombre);
     await page.locator('#esp-descripcion').fill('Editada por e2e');
     await page.getByRole('button', { name: 'Guardar cambios' }).click();
+    await page.getByPlaceholder('Buscar especialidad').fill(nombre);
     await expect(page.getByText('Editada por e2e')).toBeVisible();
 
     await page.getByRole('button', { name: `Eliminar ${nombre}` }).click();
