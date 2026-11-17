@@ -119,6 +119,12 @@ export class AuthService {
     );
   }
 
+  updateNombreCompleto(nombreCompleto: string): void {
+    this.state.update((session) =>
+      session ? { ...session, user: { ...session.user, nombreCompleto } } : session,
+    );
+  }
+
   hasAnyRole(roles: readonly Rol[]): boolean {
     const current = this.roles();
     return roles.some((rol) => current.includes(rol));

@@ -52,6 +52,11 @@ export const routes: Routes = [
           import('@tusalud/app/features/citas/citas.routes').then((m) => m.CITAS_ROUTES),
       },
       {
+        path: 'perfil',
+        loadChildren: () =>
+          import('@tusalud/app/features/perfil/perfil.routes').then((m) => m.PERFIL_ROUTES),
+      },
+      {
         path: 'agenda',
         title: 'Mi agenda',
         canMatch: [roleGuard('ROLE_MEDICO')],

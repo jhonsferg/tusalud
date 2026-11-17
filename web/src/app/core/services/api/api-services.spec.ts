@@ -7,6 +7,7 @@ import { AuthApiService } from './auth-api.service';
 import { CitasApiService } from './citas-api.service';
 import { EspecialidadesApiService } from './especialidades-api.service';
 import { MedicosApiService } from './medicos-api.service';
+import { PerfilApiService } from './perfil-api.service';
 
 interface Expected {
   method: string;
@@ -37,6 +38,18 @@ describe('servicios de la API', () => {
     expect(request.request.body).toEqual(body);
     request.flush(method === 'DELETE' ? null : {});
   }
+
+  it('PerfilApiService cubre perfil y cambio de contraseña', () => {
+    const api = TestBed.inject(PerfilApiService);
+    const perfil = { nombre: 'Rosa', apellido: 'Quispe', telefono: '987654321' };
+    const password = { passwordActual: 'Paciente123!', passwordNueva: 'NuevaClave456!' };
+    api.obtener().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/perfil' });
+    api.actualizar(perfil).subscribe();
+    expectRequest({ method: 'PUT', url: '/api/v1/perfil', body: perfil });
+    api.cambiarPassword(password).subscribe();
+    expectRequest({ method: 'PUT', url: '/api/v1/perfil/password', body: password });
+  });
 
   it('AuthApiService cubre login y registro', () => {
     const api = TestBed.inject(AuthApiService);

@@ -45,6 +45,12 @@ const NAV_ITEMS: readonly NavItem[] = [
     link: '/especialidades',
     roles: ['ROLE_ADMIN', 'ROLE_MEDICO', 'ROLE_PACIENTE'],
   },
+  {
+    label: 'Mi perfil',
+    icon: 'pi-user',
+    link: '/perfil',
+    roles: ['ROLE_ADMIN', 'ROLE_MEDICO', 'ROLE_PACIENTE'],
+  },
 ];
 
 const ETIQUETA_ROL: Readonly<Record<Rol, string>> = {

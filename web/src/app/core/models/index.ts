@@ -3,3 +3,4 @@ export * from './auth.model';
 export * from './cita.model';
 export * from './especialidad.model';
 export * from './medico.model';
+export * from './perfil.model';

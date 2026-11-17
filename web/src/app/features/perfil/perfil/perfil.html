@@ -1,0 +1,262 @@
+<app-page-header
+  title="Mi perfil"
+  subtitle="Consulta y actualiza tus datos personales y tu contraseña"
+  icon="pi-user"
+/>
+
+@if (store.perfil.error(); as error) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar tu perfil"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="recargar()" />
+    </app-empty-state>
+  </div>
+} @else if (store.perfil.value(); as perfil) {
+  <div class="layout">
+    <aside class="panel resumen">
+      <p-avatar [label]="iniciales()" size="xlarge" shape="circle" styleClass="avatar" />
+      <h2>{{ perfil.nombreCompleto }}</h2>
+      <div class="roles">
+        @for (rol of roles(); track rol) {
+          <p-tag [value]="rol" severity="info" [rounded]="true" />
+        }
+      </div>
+      <dl>
+        <div>
+          <dt>Email</dt>
+          <dd>{{ perfil.email }}</dd>
+        </div>
+        <div>
+          <dt>Miembro desde</dt>
+          <dd>{{ perfil.createdAt | date: 'longDate' }}</dd>
+        </div>
+        @if (esPaciente()) {
+          <div>
+            <dt>Historia clínica</dt>
+            <dd>{{ perfil.historialClinicoNumero }}</dd>
+          </div>
+        }
+        @if (esMedico()) {
+          <div>
+            <dt>Especialidad</dt>
+            <dd>{{ perfil.especialidad }}</dd>
+          </div>
+          <div>
+            <dt>Precio de consulta</dt>
+            <dd>{{ perfil.precioConsulta | currency: 'PEN' : 'symbol-narrow' }}</dd>
+          </div>
+        }
+      </dl>
+    </aside>
+
+    <section class="panel">
+      <p-tabs value="datos">
+        <p-tablist>
+          <p-tab value="datos"><i class="pi pi-id-card"></i> Datos personales</p-tab>
+          <p-tab value="seguridad"><i class="pi pi-lock"></i> Seguridad</p-tab>
+        </p-tablist>
+        <p-tabpanels>
+          <p-tabpanel value="datos">
+            <form [formGroup]="datos" (ngSubmit)="guardar()" novalidate>
+              <div class="form-grid">
+                <app-form-field
+                  label="Nombre"
+                  [control]="datos.controls.nombre"
+                  inputId="per-nombre"
+                  [required]="true"
+                >
+                  <input pInputText id="per-nombre" formControlName="nombre" class="w-full" />
+                </app-form-field>
+
+                <app-form-field
+                  label="Apellido"
+                  [control]="datos.controls.apellido"
+                  inputId="per-apellido"
+                  [required]="true"
+                >
+                  <input pInputText id="per-apellido" formControlName="apellido" class="w-full" />
+                </app-form-field>
+
+                <app-form-field
+                  label="Teléfono"
+                  [control]="datos.controls.telefono"
+                  inputId="per-telefono"
+                  hint="Opcional, 9 dígitos"
+                >
+                  <input
+                    pInputText
+                    id="per-telefono"
+                    formControlName="telefono"
+                    inputmode="tel"
+                    maxlength="9"
+                    class="w-full"
+                  />
+                </app-form-field>
+
+                <div class="solo-lectura">
+                  <label for="per-email">Email</label>
+                  <input pInputText id="per-email" [value]="perfil.email" readonly class="w-full" />
+                  <small>El email identifica tu cuenta y no se puede cambiar.</small>
+                </div>
+
+                @if (esPaciente()) {
+                  <div class="solo-lectura">
+                    <label for="per-dni">DNI</label>
+                    <input pInputText id="per-dni" [value]="perfil.dni" readonly class="w-full" />
+                  </div>
+
+                  <app-form-field
+                    label="Fecha de nacimiento"
+                    [control]="datos.controls.fechaNacimiento"
+                    inputId="per-nacimiento"
+                  >
+                    <p-datepicker
+                      inputId="per-nacimiento"
+                      formControlName="fechaNacimiento"
+                      dateFormat="dd/mm/yy"
+                      [maxDate]="ayer"
+                      [showIcon]="true"
+                      [fluid]="true"
+                      appendTo="body"
+                    />
+                  </app-form-field>
+                }
+
+                @if (esMedico()) {
+                  <div class="solo-lectura">
+                    <label for="per-colegiatura">Colegiatura</label>
+                    <input
+                      pInputText
+                      id="per-colegiatura"
+                      [value]="perfil.colegiatura"
+                      readonly
+                      class="w-full"
+                    />
+                  </div>
+
+                  <app-form-field
+                    label="Consultorio"
+                    [control]="datos.controls.consultorio"
+                    inputId="per-consultorio"
+                  >
+                    <input
+                      pInputText
+                      id="per-consultorio"
+                      formControlName="consultorio"
+                      class="w-full"
+                    />
+                  </app-form-field>
+                }
+              </div>
+
+              <div class="acciones">
+                <p-button
+                  label="Descartar cambios"
+                  severity="secondary"
+                  [outlined]="true"
+                  [disabled]="!datos.dirty"
+                  (onClick)="descartar()"
+                />
+                <p-button
+                  type="submit"
+                  label="Guardar cambios"
+                  icon="pi pi-check"
+                  [loading]="guardando()"
+                  [disabled]="!datos.dirty"
+                />
+              </div>
+            </form>
+          </p-tabpanel>
+
+          <p-tabpanel value="seguridad">
+            <form
+              [formGroup]="seguridad"
+              (ngSubmit)="cambiarPassword()"
+              class="seguridad"
+              novalidate
+            >
+              @if (errorPassword(); as mensaje) {
+                <p-message severity="error" icon="pi pi-exclamation-circle">{{
+                  mensaje
+                }}</p-message>
+              }
+
+              <app-form-field
+                label="Contraseña actual"
+                [control]="seguridad.controls.passwordActual"
+                inputId="per-actual"
+                [required]="true"
+              >
+                <p-password
+                  inputId="per-actual"
+                  formControlName="passwordActual"
+                  [feedback]="false"
+                  [toggleMask]="true"
+                  autocomplete="current-password"
+                  styleClass="w-full"
+                  inputStyleClass="w-full"
+                />
+              </app-form-field>
+
+              <app-form-field
+                label="Nueva contraseña"
+                [control]="seguridad.controls.passwordNueva"
+                inputId="per-nueva"
+                hint="Entre 8 y 72 caracteres"
+                [required]="true"
+              >
+                <p-password
+                  inputId="per-nueva"
+                  formControlName="passwordNueva"
+                  [toggleMask]="true"
+                  autocomplete="new-password"
+                  promptLabel="Ingresa una contraseña"
+                  weakLabel="Débil"
+                  mediumLabel="Media"
+                  strongLabel="Fuerte"
+                  styleClass="w-full"
+                  inputStyleClass="w-full"
+                />
+              </app-form-field>
+
+              <app-form-field
+                label="Confirmar nueva contraseña"
+                [control]="seguridad.controls.confirmar"
+                inputId="per-confirmar"
+                [required]="true"
+              >
+                <p-password
+                  inputId="per-confirmar"
+                  formControlName="confirmar"
+                  [feedback]="false"
+                  [toggleMask]="true"
+                  autocomplete="new-password"
+                  styleClass="w-full"
+                  inputStyleClass="w-full"
+                />
+              </app-form-field>
+
+              <div class="acciones">
+                <p-button
+                  type="submit"
+                  label="Cambiar contraseña"
+                  icon="pi pi-key"
+                  [loading]="cambiando()"
+                />
+              </div>
+            </form>
+          </p-tabpanel>
+        </p-tabpanels>
+      </p-tabs>
+    </section>
+  </div>
+} @else {
+  <div class="layout">
+    <div class="panel"><p-skeleton height="18rem" /></div>
+    <div class="panel"><p-skeleton height="18rem" /></div>
+  </div>
+}
