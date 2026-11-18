@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 
 import {
+  EvolucionPendienteResponse,
   AltaRequest,
   CamaRequest,
   CamaResponse,
@@ -22,6 +23,7 @@ export class HospitalizacionStore {
   private readonly api = inject(HospitalizacionApiService);
 
   readonly resumen = new AsyncState<ResumenHospResponse>();
+  readonly pendientes = new AsyncState<EvolucionPendienteResponse[]>();
   readonly mapa = new AsyncState<MapaCamasResponse[]>();
   readonly camas = new AsyncState<CamaResponse[]>();
   readonly ingresos = new AsyncState<IngresoHospResponse[]>();
@@ -32,6 +34,19 @@ export class HospitalizacionStore {
 
   constructor() {
     resetOnLogout(() => this.reset());
+  }
+
+  cargarPendientes(horas?: number | null): void {
+    this.pendientes.load(this.api.evolucionesPendientes(horas));
+  }
+
+  cancelarIngreso(id: string, motivo: string): Observable<IngresoHospResponse> {
+    return this.api.cancelarIngreso(id, motivo).pipe(
+      tap((ingreso) => {
+        this.ingreso.set(ingreso);
+        this.refrescar();
+      }),
+    );
   }
 
   cargarResumen(): void {

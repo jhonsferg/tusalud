@@ -22,6 +22,7 @@ import { HospitalizacionApiService } from './hospitalizacion-api.service';
 import { PagosApiService } from './pagos-api.service';
 import { RecepcionApiService } from './recepcion-api.service';
 import { ReportesApiService } from './reportes-api.service';
+import { SeguridadOperativaApiService } from './seguridad-operativa-api.service';
 import { RrhhApiService } from './rrhh-api.service';
 
 function u(n: number): string {
@@ -170,8 +171,12 @@ describe('servicios de la API', () => {
     });
     api.obtener(u(7)).subscribe();
     expectRequest({ method: 'GET', url: `/api/v1/citas/${u(7)}` });
-    api.cancelar(u(7)).subscribe();
-    expectRequest({ method: 'PUT', url: `/api/v1/citas/${u(7)}/cancelar` });
+    api.cancelar(u(7), 'Viaje imprevisto').subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: `/api/v1/citas/${u(7)}/cancelar`,
+      body: { motivo: 'Viaje imprevisto' },
+    });
     api.confirmar(u(7)).subscribe();
     expectRequest({ method: 'PUT', url: `/api/v1/citas/${u(7)}/confirmar` });
     api.atender(u(7)).subscribe();
@@ -517,8 +522,12 @@ describe('servicios de la API', () => {
     const request = { items: [], metodoPago: 'YAPE' as const };
     api.dispensar(request).subscribe();
     expectRequest({ method: 'POST', url: '/api/v1/farmacia/dispensaciones', body: request });
-    api.anular(u(9)).subscribe();
-    expectRequest({ method: 'PUT', url: `/api/v1/farmacia/dispensaciones/${u(9)}/anular` });
+    api.anular(u(9), 'Producto entregado por error').subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: `/api/v1/farmacia/dispensaciones/${u(9)}/anular`,
+      body: { motivo: 'Producto entregado por error' },
+    });
     api.misDispensaciones().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/farmacia/mis-dispensaciones' });
   });
@@ -728,6 +737,20 @@ describe('servicios de la API', () => {
       url: `/api/v1/hospitalizacion/ingresos/${u(8)}/trasladar`,
       body: { camaId: u(5) },
     });
+    api.cancelarIngreso(u(8), 'Ingreso registrado por error').subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: `/api/v1/hospitalizacion/ingresos/${u(8)}/cancelar`,
+      body: { motivo: 'Ingreso registrado por error' },
+    });
+    api.evolucionesPendientes(6).subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/hospitalizacion/evoluciones-pendientes',
+      params: { horas: '6' },
+    });
+    api.evolucionesPendientes().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/hospitalizacion/evoluciones-pendientes' });
     api.alta(u(8), { diagnosticoAlta: 'Recuperado', indicacionesAlta: 'Reposo' }).subscribe();
     expectRequest({
       method: 'PUT',
@@ -895,5 +918,41 @@ describe('servicios de la API', () => {
     expect(formulario.has('referenciaId')).toBe(false);
     expect(formulario.has('referenciaTipo')).toBe(false);
     subida.flush({});
+  });
+
+  it('SeguridadOperativaApiService cubre eventos, resumen, estado y uso del almacenamiento', () => {
+    const api = TestBed.inject(SeguridadOperativaApiService);
+    api.eventos().subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/admin/seguridad/eventos',
+      params: { pagina: '0', tamano: '20' },
+    });
+    api
+      .eventos({
+        tipo: 'LOGIN_FALLIDO',
+        severidad: 'ALTA',
+        desde: '2026-11-01',
+        pagina: 2,
+        tamano: 10,
+      })
+      .subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/admin/seguridad/eventos',
+      params: {
+        tipo: 'LOGIN_FALLIDO',
+        severidad: 'ALTA',
+        desde: '2026-11-01',
+        pagina: '2',
+        tamano: '10',
+      },
+    });
+    api.resumen().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/admin/seguridad/resumen' });
+    api.estadoSistema().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/admin/sistema/estado' });
+    api.usoAlmacenamiento().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/admin/almacenamiento/uso' });
   });
 });

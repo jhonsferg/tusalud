@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { MotivoService } from '@tusalud/ui/dialogo-motivo';
 import { Observable } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 
@@ -15,16 +16,6 @@ interface Accion {
 }
 
 const ACCIONES = {
-  cancelar: {
-    header: 'Cancelar cita',
-    message: (cita) =>
-      `¿Seguro que deseas cancelar la cita de ${cita.pacienteNombre} con ${cita.medicoNombre}? El horario quedará libre para otros pacientes.`,
-    acceptLabel: 'Sí, cancelar cita',
-    severity: 'danger',
-    icon: 'pi pi-times-circle',
-    success: 'La cita fue cancelada.',
-    run: (store, id) => store.cancelar(id),
-  },
   confirmar: {
     header: 'Confirmar cita',
     message: (cita) => `¿Confirmas la cita de ${cita.pacienteNombre}?`,
@@ -52,6 +43,28 @@ export class CitaActions {
   private readonly confirmation = inject(ConfirmationService);
   private readonly notifications = inject(NotificationService);
   private readonly store = inject(CitasStore);
+  private readonly motivos = inject(MotivoService);
+
+  cancelar(cita: CitaResponse, onDone?: (actualizada: CitaResponse) => void): void {
+    this.motivos
+      .solicitar({
+        titulo: 'Cancelar cita',
+        descripcion: `Se cancelará la cita de ${cita.pacienteNombre} con ${cita.medicoNombre}. El horario quedará libre para otros pacientes.`,
+        etiqueta: 'Motivo de la cancelación',
+        confirmar: 'Cancelar cita',
+        severidad: 'danger',
+        icono: 'pi pi-times-circle',
+      })
+      .subscribe((motivo) =>
+        this.store.cancelar(cita.id, motivo).subscribe({
+          next: (actualizada) => {
+            this.notifications.success('La cita fue cancelada.');
+            onDone?.(actualizada);
+          },
+          error: () => undefined,
+        }),
+      );
+  }
 
   ejecutar(
     accion: AccionCita,

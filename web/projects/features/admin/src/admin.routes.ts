@@ -13,6 +13,11 @@ export const ADMIN_ROUTES: Routes = [
     loadComponent: () => import('./auditoria/auditoria').then((m) => m.Auditoria),
   },
   {
+    path: 'seguridad',
+    title: 'Seguridad',
+    loadComponent: () => import('./seguridad/seguridad').then((m) => m.Seguridad),
+  },
+  {
     path: 'usuarios',
     title: 'Usuarios',
     loadComponent: () => import('./usuarios/usuarios').then((m) => m.Usuarios),

@@ -54,9 +54,9 @@ export class FarmaciaStore {
     this.dispensaciones.load(this.api.listarDispensaciones(filtro));
   }
 
-  anular(id: string): Observable<DispensacionResponse> {
+  anular(id: string, motivo: string): Observable<DispensacionResponse> {
     return this.api
-      .anular(id)
+      .anular(id, motivo)
       .pipe(
         tap((anulada) =>
           this.dispensaciones.update((items) =>

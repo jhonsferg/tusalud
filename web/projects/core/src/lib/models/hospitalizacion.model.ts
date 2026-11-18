@@ -95,6 +95,7 @@ export interface IngresoHospResponse {
   cargoCama: number;
   triaje?: TriajeResponse | null;
   esperaMinutos?: number | null;
+  motivoCancelacion?: string | null;
 }
 
 export interface IngresoHospRequest {

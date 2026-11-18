@@ -1,4 +1,5 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
+import { MotivoService } from '@tusalud/ui/dialogo-motivo';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -76,6 +77,7 @@ export class OrdenImagenDetalle {
   protected readonly store = inject(ImagenesStore);
   private readonly auth = inject(AuthService);
   private readonly notifications = inject(NotificationService);
+  private readonly motivos = inject(MotivoService);
   private readonly fb = inject(FormBuilder).nonNullable;
 
   protected readonly orden = this.store.orden.value;
@@ -123,9 +125,6 @@ export class OrdenImagenDetalle {
   protected readonly realizarVisible = signal(false);
   protected readonly observaciones = signal('');
   protected readonly errorRealizar = signal<string | null>(null);
-
-  protected readonly cancelarVisible = signal(false);
-  protected readonly motivoCancelacion = signal('');
 
   protected readonly subiendo = signal(false);
   protected readonly errorCarga = signal<string | null>(null);
@@ -312,13 +311,21 @@ export class OrdenImagenDetalle {
   }
 
   protected cancelar(orden: OrdenImagenResponse): void {
-    this.store.cancelar(orden.id, this.motivoCancelacion().trim() || null).subscribe({
-      next: () => {
-        this.cancelarVisible.set(false);
-        this.notifications.success('La orden fue cancelada.');
-      },
-      error: () => this.cancelarVisible.set(false),
-    });
+    this.motivos
+      .solicitar({
+        titulo: 'Cancelar la orden',
+        descripcion: `Se cancelará la orden ${orden.codigo}.`,
+        etiqueta: 'Motivo de la cancelación',
+        confirmar: 'Cancelar orden',
+        severidad: 'danger',
+        icono: 'pi pi-times',
+      })
+      .subscribe((motivo) =>
+        this.store.cancelar(orden.id, motivo).subscribe({
+          next: () => this.notifications.success('La orden fue cancelada.'),
+          error: () => undefined,
+        }),
+      );
   }
 
   protected recargar(): void {

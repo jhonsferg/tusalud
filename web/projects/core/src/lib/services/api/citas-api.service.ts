@@ -25,8 +25,8 @@ export class CitasApiService {
     return this.http.get<CitaResponse>(`${this.baseUrl}/${id}`);
   }
 
-  cancelar(id: string): Observable<CitaResponse> {
-    return this.http.put<CitaResponse>(`${this.baseUrl}/${id}/cancelar`, null);
+  cancelar(id: string, motivo: string): Observable<CitaResponse> {
+    return this.http.put<CitaResponse>(`${this.baseUrl}/${id}/cancelar`, { motivo });
   }
 
   confirmar(id: string): Observable<CitaResponse> {

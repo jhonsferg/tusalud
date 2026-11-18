@@ -1,8 +1,8 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
+import { MotivoService } from '@tusalud/ui/dialogo-motivo';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { ConfirmationService } from 'primeng/api';
 import { Button } from 'primeng/button';
 import { DatePicker } from 'primeng/datepicker';
 import { Dialog } from 'primeng/dialog';
@@ -46,7 +46,7 @@ import { PageHeader } from '@tusalud/ui/page-header';
 })
 export class HistorialFarmacia implements OnInit {
   protected readonly store = inject(FarmaciaStore);
-  private readonly confirmation = inject(ConfirmationService);
+  private readonly motivos = inject(MotivoService);
   private readonly notifications = inject(NotificationService);
 
   protected readonly busqueda = signal('');
@@ -86,21 +86,22 @@ export class HistorialFarmacia implements OnInit {
   }
 
   protected anular(dispensacion: DispensacionResponse): void {
-    this.confirmation.confirm({
-      header: 'Anular dispensación',
-      message: `Se anulará ${dispensacion.comprobante} y los productos volverán al stock.`,
-      icon: 'pi pi-undo',
-      acceptLabel: 'Anular',
-      rejectLabel: 'Cancelar',
-      acceptButtonProps: { severity: 'danger' },
-      rejectButtonProps: { severity: 'secondary', outlined: true },
-      accept: () =>
-        this.store.anular(dispensacion.id).subscribe({
+    this.motivos
+      .solicitar({
+        titulo: 'Anular dispensación',
+        descripcion: `Se anulará ${dispensacion.comprobante} y los productos volverán al stock.`,
+        etiqueta: 'Motivo de la anulación',
+        confirmar: 'Anular dispensación',
+        severidad: 'danger',
+        icono: 'pi pi-undo',
+      })
+      .subscribe((motivo) =>
+        this.store.anular(dispensacion.id, motivo).subscribe({
           next: () =>
             this.notifications.success('La dispensación fue anulada y el stock devuelto.'),
           error: () => undefined,
         }),
-    });
+      );
   }
 
   protected imprimir(): void {

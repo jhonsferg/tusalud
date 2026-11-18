@@ -85,6 +85,7 @@ export interface DispensacionResponse {
   total: number;
   observaciones?: string | null;
   items: DispensacionItemResponse[];
+  motivoAnulacion?: string | null;
 }
 
 export interface ResumenFarmaciaResponse {

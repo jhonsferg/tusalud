@@ -10,6 +10,8 @@ import {
   CitasPorEstadoResponse,
   EstadisticasResponse,
   ETIQUETA_ROL,
+  EventoSeguridadResponse,
+  SeguridadOperativaStore,
   RolResumenResponse,
   UsuarioAdminResponse,
 } from '@tusalud/core';
@@ -22,6 +24,7 @@ import {
   QuickActions,
   SectionCard,
   StatCard,
+  StatusBadge,
   TaskList,
   TonoTablero,
   fechaLarga,
@@ -46,6 +49,7 @@ const TONO_ESTADO: Readonly<Record<string, TonoTablero>> = {
     BarList,
     TaskList,
     QuickActions,
+    StatusBadge,
   ],
   template: `
     <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-cog" />
@@ -121,26 +125,98 @@ const TONO_ESTADO: Readonly<Record<string, TonoTablero>> = {
         <app-section-card
           titulo="Seguridad"
           icono="pi-lock"
-          subtitulo="Estado de las protecciones activas"
+          subtitulo="Eventos de las últimas 24 horas y accesos inusuales de la semana"
+          [cargando]="seguridad.resumen.loading() && !seguridad.resumen.hasValue()"
+          [error]="seguridad.resumen.error()?.message ?? null"
         >
-          <ul class="seguridad">
-            <li>
-              <i class="pi pi-check-circle" aria-hidden="true"></i> Bloqueo por inactividad y modo
-              privacidad en todas las aplicaciones
-            </li>
-            <li>
-              <i class="pi pi-check-circle" aria-hidden="true"></i> Acceso a datos clínicos solo con
-              relación asistencial
-            </li>
-            <li>
-              <i class="pi pi-check-circle" aria-hidden="true"></i> Consultas de historias ajenas
-              auditadas
-            </li>
-            <li>
-              <i class="pi pi-info-circle" aria-hidden="true"></i> Eventos de inicio de sesión
-              inusuales y estado de servicios: requieren un endpoint del backend
-            </li>
-          </ul>
+          @if (seguridad.resumen.value(); as resumen) {
+            <div
+              class="conteos"
+              role="group"
+              aria-label="Eventos de seguridad de las últimas 24 horas"
+            >
+              <div class="conteo" data-tono="peligro">
+                <strong>{{ resumen.ultimas24Horas.altas }}</strong>
+                <span>Alta severidad</span>
+              </div>
+              <div class="conteo" data-tono="aviso">
+                <strong>{{ resumen.ultimas24Horas.avisos }}</strong>
+                <span>Avisos</span>
+              </div>
+              <div class="conteo" data-tono="neutro">
+                <strong>{{ resumen.ultimas24Horas.total }}</strong>
+                <span>Eventos en total</span>
+              </div>
+            </div>
+            @if (inusuales().length === 0) {
+              <p class="sin-eventos">
+                <i class="pi pi-check-circle" aria-hidden="true"></i> Sin inicios de sesión
+                inusuales esta semana.
+              </p>
+            } @else {
+              <app-task-list [items]="inusuales()" />
+            }
+          }
+          <a pie routerLink="/admin/seguridad">Ver todos los eventos</a>
+        </app-section-card>
+      </div>
+
+      <div class="c6">
+        <app-section-card
+          titulo="Estado del sistema"
+          icono="pi-server"
+          [subtitulo]="subtituloEstado()"
+          [cargando]="seguridad.estado.loading() && !seguridad.estado.hasValue()"
+          [error]="seguridad.estado.error()?.message ?? null"
+        >
+          @if (seguridad.estado.value(); as estado) {
+            <ul class="servicios">
+              @for (componente of estado.componentes; track componente.nombre) {
+                <li>
+                  <span>{{ componente.nombre }}</span>
+                  <span class="latencia">
+                    @if (componente.latenciaMs !== null && componente.latenciaMs !== undefined) {
+                      {{ componente.latenciaMs }} ms
+                    }
+                  </span>
+                  <app-status-badge
+                    [etiqueta]="componente.estado === 'OK' ? 'Operativo' : 'Sin respuesta'"
+                    [tono]="componente.estado === 'OK' ? 'exito' : 'peligro'"
+                  />
+                </li>
+              }
+              <li>
+                <span>Migraciones de base de datos</span>
+                <span class="latencia">
+                  @if (estado.migraciones.disponible) {
+                    {{ estado.migraciones.aplicadas }} aplicadas
+                  }
+                </span>
+                <app-status-badge
+                  [etiqueta]="
+                    estado.migraciones.disponible
+                      ? 'Versión ' + estado.migraciones.ultima
+                      : 'Sin dato'
+                  "
+                  [tono]="estado.migraciones.disponible ? 'info' : 'neutro'"
+                />
+              </li>
+            </ul>
+          }
+        </app-section-card>
+      </div>
+
+      <div class="c6">
+        <app-section-card
+          titulo="Almacenamiento"
+          icono="pi-database"
+          [subtitulo]="subtituloUso()"
+          [cargando]="seguridad.uso.loading() && !seguridad.uso.hasValue()"
+          [error]="seguridad.uso.error()?.message ?? null"
+          [vacio]="usoBuckets().length === 0 && seguridad.uso.hasValue()"
+          textoVacio="Aún no hay archivos guardados."
+        >
+          <app-bar-list [items]="usoBuckets()" etiqueta="Almacenamiento por bucket" />
         </app-section-card>
       </div>
 
@@ -154,7 +230,52 @@ const TONO_ESTADO: Readonly<Record<string, TonoTablero>> = {
       margin-bottom: var(--sp-4);
     }
 
-    .seguridad {
+    .conteos {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--sp-2);
+      margin-bottom: var(--sp-3);
+    }
+
+    .conteo {
+      display: flex;
+      flex-direction: column;
+      padding: var(--sp-2) var(--sp-3);
+      border-radius: 10px;
+      background: var(--estado-neutro-fondo);
+
+      strong {
+        font-size: 1.5rem;
+        font-variant-numeric: tabular-nums;
+      }
+
+      span {
+        color: var(--p-text-muted-color);
+        font-size: 0.8125rem;
+      }
+
+      &[data-tono='peligro'] {
+        background: var(--estado-peligro-fondo);
+      }
+
+      &[data-tono='aviso'] {
+        background: var(--estado-aviso-fondo);
+      }
+    }
+
+    .sin-eventos {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+      margin: 0;
+      color: var(--p-text-muted-color);
+
+      .pi-check-circle {
+        color: var(--estado-exito);
+      }
+    }
+
+    .servicios {
       display: grid;
       gap: var(--sp-2);
       margin: 0;
@@ -162,19 +283,16 @@ const TONO_ESTADO: Readonly<Record<string, TonoTablero>> = {
       list-style: none;
 
       li {
-        display: flex;
-        align-items: flex-start;
-        gap: var(--sp-2);
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: var(--sp-3);
       }
 
-      .pi-check-circle {
-        margin-top: 0.2rem;
-        color: var(--estado-exito);
-      }
-
-      .pi-info-circle {
-        margin-top: 0.2rem;
-        color: var(--estado-info);
+      .latencia {
+        color: var(--p-text-muted-color);
+        font-size: 0.8125rem;
+        font-variant-numeric: tabular-nums;
       }
     }
   `,
@@ -184,6 +302,7 @@ export class InicioAdmin implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly adminApi = inject(AdminApiService);
   private readonly auditoriaApi = inject(AuditoriaApiService);
+  protected readonly seguridad = inject(SeguridadOperativaStore);
 
   protected readonly estadisticas = new AsyncState<EstadisticasResponse>();
   protected readonly usuarios = new AsyncState<UsuarioAdminResponse[]>();
@@ -252,6 +371,44 @@ export class InicioAdmin implements OnInit {
       })),
   );
 
+  protected readonly inusuales = computed<ItemTarea[]>(() =>
+    (this.seguridad.resumen.value()?.iniciosInusuales ?? []).map(
+      (e: EventoSeguridadResponse): ItemTarea => ({
+        id: e.id,
+        titulo: e.etiqueta,
+        detalle: `${e.usuarioNombre ?? 'Cuenta desconocida'} · ${new Date(e.creadoEn).toLocaleString('es-PE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false })}${e.ip ? ' · ' + e.ip : ''}`,
+        tono: e.severidad === 'ALTA' ? 'peligro' : e.severidad === 'AVISO' ? 'aviso' : 'info',
+        icono: 'pi-exclamation-triangle',
+        sensible: true,
+      }),
+    ),
+  );
+
+  protected readonly subtituloEstado = computed(() => {
+    const estado = this.seguridad.estado.value();
+    if (!estado) {
+      return 'Servicios de la plataforma';
+    }
+    const horas = Math.floor(estado.segundosEnMarcha / 3600);
+    const minutos = Math.floor((estado.segundosEnMarcha % 3600) / 60);
+    return `Versión ${estado.version} · en marcha ${horas > 0 ? horas + ' h ' : ''}${minutos} min`;
+  });
+
+  protected readonly subtituloUso = computed(() => {
+    const uso = this.seguridad.uso.value();
+    return uso
+      ? `${uso.totalObjetos} archivos · ${this.formatoBytes(uso.totalBytes)}`
+      : 'Uso por bucket';
+  });
+
+  protected readonly usoBuckets = computed<ItemBarra[]>(() =>
+    (this.seguridad.uso.value()?.buckets ?? []).map((b): ItemBarra => ({
+      etiqueta: b.bucket.charAt(0).toUpperCase() + b.bucket.slice(1),
+      valor: b.bytes,
+      texto: `${this.formatoBytes(b.bytes)} · ${b.objetos} archivos`,
+    })),
+  );
+
   protected readonly porRol = computed<ItemBarra[]>(() =>
     (this.roles.value() ?? [])
       .filter((r) => r.usuarios > 0)
@@ -275,5 +432,18 @@ export class InicioAdmin implements OnInit {
     this.usuarios.load(this.adminApi.listarUsuarios());
     this.roles.load(this.adminApi.listarRoles());
     this.citasEstado.load(this.auditoriaApi.citasPorEstado());
+    this.seguridad.cargarResumen();
+    this.seguridad.cargarEstado();
+    this.seguridad.cargarUso();
+  }
+
+  private formatoBytes(bytes: number): string {
+    if (bytes < 1024) {
+      return `${bytes} B`;
+    }
+    if (bytes < 1024 * 1024) {
+      return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 }

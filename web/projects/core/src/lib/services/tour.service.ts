@@ -43,6 +43,13 @@ export const PASOS_TOUR_PREDETERMINADOS: readonly TourStep[] = [
     roles: ['ROLE_ADMIN'],
   },
   {
+    target: 'nav:/admin/seguridad',
+    icon: 'pi-shield',
+    title: 'Seguridad',
+    text: 'Revisa los inicios de sesión fallidos o inusuales, los cambios de roles y los accesos denegados repetidos. Los eventos no guardan contraseñas ni correos intentados.',
+    roles: ['ROLE_ADMIN'],
+  },
+  {
     target: 'nav:/admin/usuarios',
     icon: 'pi-id-card',
     title: 'Usuarios y roles',
@@ -186,7 +193,7 @@ export const PASOS_TOUR_PREDETERMINADOS: readonly TourStep[] = [
     target: 'nav:/hospitalizacion',
     icon: 'pi-building',
     title: 'Hospitalización',
-    text: 'Consulta el mapa de camas, registra triajes de emergencia, evoluciones y altas.',
+    text: 'Consulta el mapa de camas, registra triajes de emergencia, las evoluciones del turno y las altas. En tu inicio verás qué pacientes llevan horas sin evolución.',
     roles: ['ROLE_ENFERMERIA', 'ROLE_MEDICO'],
   },
   {

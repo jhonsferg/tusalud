@@ -106,7 +106,10 @@ export class CitaDetail {
     if (this.auth.isAdmin()) {
       return true;
     }
-    return this.auth.isPaciente() && new Date(cita.fechaHora).getTime() > Date.now();
+    return (
+      (this.auth.isPaciente() || this.auth.isMedico()) &&
+      new Date(cita.fechaHora).getTime() > Date.now()
+    );
   }
 
   protected puedeReprogramar(cita: CitaResponse): boolean {
@@ -140,7 +143,7 @@ export class CitaDetail {
   }
 
   protected cancelar(cita: CitaResponse): void {
-    this.acciones.ejecutar('cancelar', cita);
+    this.acciones.cancelar(cita);
   }
 
   protected confirmar(cita: CitaResponse): void {

@@ -1,6 +1,6 @@
 import { Page, expect, test } from '@playwright/test';
 
-import { cerrarSesion, iniciarSesion, omitirGuia, ir } from './support';
+import { cerrarSesion, iniciarSesion, omitirGuia, ir, confirmarMotivo } from './support';
 
 async function entrarCon(page: Page, email: string, password: string, home: RegExp) {
   await omitirGuia(page);
@@ -152,7 +152,12 @@ test.describe('farmacia', () => {
     await ir(page, '/farmacia/historial');
     await expect(page.getByRole('cell', { name: numero, exact: true })).toBeVisible();
     await page.getByRole('button', { name: `Anular ${numero}` }).click();
-    await page.locator('.p-confirmdialog').getByRole('button', { name: 'Anular' }).click();
+    await confirmarMotivo(
+      page,
+      'Anular dispensación',
+      'Producto entregado por error',
+      'Anular dispensación',
+    );
     await expect(page.getByText('La dispensación fue anulada y el stock devuelto.')).toBeVisible();
   });
 

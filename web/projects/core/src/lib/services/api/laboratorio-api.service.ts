@@ -76,7 +76,7 @@ export class LaboratorioApiService {
     return this.http.put<OrdenResponse>(`${this.baseUrl}/ordenes/${id}/validar`, null);
   }
 
-  cancelar(id: string, motivo?: string | null): Observable<OrdenResponse> {
+  cancelar(id: string, motivo: string): Observable<OrdenResponse> {
     return this.http.put<OrdenResponse>(`${this.baseUrl}/ordenes/${id}/cancelar`, { motivo });
   }
 

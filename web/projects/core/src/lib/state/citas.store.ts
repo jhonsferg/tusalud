@@ -88,8 +88,8 @@ export class CitasStore {
     );
   }
 
-  cancelar(id: string): Observable<CitaResponse> {
-    return this.api.cancelar(id).pipe(tap((cita) => this.sincronizar(cita)));
+  cancelar(id: string, motivo: string): Observable<CitaResponse> {
+    return this.api.cancelar(id, motivo).pipe(tap((cita) => this.sincronizar(cita)));
   }
 
   confirmar(id: string): Observable<CitaResponse> {

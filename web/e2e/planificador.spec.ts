@@ -131,18 +131,24 @@ test.describe('planificador', () => {
     const evento = page.locator('.evento', { hasText: titulo });
     await evento.scrollIntoViewIfNeeded();
     const antes = (await evento.boundingBox())!;
+    const cuerpo = (await page.locator('.tiempo-cuerpo').boundingBox())!;
+    const haciaAbajo = antes.y - cuerpo.y < 2 * 56;
+    const desplazamiento = haciaAbajo ? 56 : -56;
     const x = antes.x + antes.width / 2;
     const respuesta = page.waitForResponse(
       (r) => r.url().includes('/calendario/eventos/') && r.url().endsWith('/mover'),
     );
     await page.mouse.move(x, antes.y + 10);
     await page.mouse.down();
-    await page.mouse.move(x, antes.y + 10 - 56, { steps: 8 });
+    await page.mouse.move(x, antes.y + 10 + desplazamiento, { steps: 8 });
     await page.mouse.up();
     expect((await respuesta).status()).toBe(200);
     await expect
-      .poll(async () => (await page.locator('.evento', { hasText: titulo }).boundingBox())!.y)
-      .toBeLessThan(antes.y - 40);
+      .poll(async () => {
+        const y = (await page.locator('.evento', { hasText: titulo }).boundingBox())!.y;
+        return haciaAbajo ? y - antes.y : antes.y - y;
+      })
+      .toBeGreaterThan(40);
 
     const movido = (await page.locator('.evento', { hasText: titulo }).boundingBox())!;
     const redimension = page.waitForResponse(

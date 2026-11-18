@@ -29,6 +29,7 @@ export interface CitaResponse {
   pagado?: boolean;
   duracionMinutos?: number;
   conflicto?: boolean;
+  motivoCancelacion?: string | null;
 }
 
 export interface CitaCreateRequest {

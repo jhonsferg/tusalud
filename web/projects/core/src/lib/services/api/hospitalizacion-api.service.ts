@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 
 import { API_URL } from '../../config/api.config';
 import {
+  EvolucionPendienteResponse,
   AltaRequest,
   CamaRequest,
   CamaResponse,
@@ -24,6 +25,18 @@ export class HospitalizacionApiService {
 
   resumen(): Observable<ResumenHospResponse> {
     return this.http.get<ResumenHospResponse>(`${this.baseUrl}/resumen`);
+  }
+
+  evolucionesPendientes(horas?: number | null): Observable<EvolucionPendienteResponse[]> {
+    return this.http.get<EvolucionPendienteResponse[]>(`${this.baseUrl}/evoluciones-pendientes`, {
+      params: toHttpParams({ horas }),
+    });
+  }
+
+  cancelarIngreso(id: string, motivo: string): Observable<IngresoHospResponse> {
+    return this.http.put<IngresoHospResponse>(`${this.baseUrl}/ingresos/${id}/cancelar`, {
+      motivo,
+    });
   }
 
   mapa(): Observable<MapaCamasResponse[]> {

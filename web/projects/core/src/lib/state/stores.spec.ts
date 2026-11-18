@@ -14,6 +14,7 @@ import { EspecialidadesStore } from './especialidades.store';
 import { MedicosStore, ordenarHorarios } from './medicos.store';
 import { ReportesStore } from './reportes.store';
 import { RrhhStore } from './rrhh.store';
+import { SeguridadOperativaStore } from './seguridad-operativa.store';
 
 function u(n: number): string {
   return `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
@@ -188,7 +189,7 @@ describe('stores', () => {
       CANCELADA: 0,
     });
 
-    store.cancelar(u(2)).subscribe();
+    store.cancelar(u(2), 'Viaje imprevisto').subscribe();
     controller
       .expectOne(`/api/v1/citas/${u(2)}/cancelar`)
       .flush(cita(u(2), '2026-10-21T09:00:00', 'CANCELADA'));
@@ -349,5 +350,55 @@ describe('ordenarHorarios', () => {
       horario(u(2), 'WEDNESDAY', '09:00'),
     ]);
     expect(ordenados.map((h) => h.diaSemana)).toEqual(['WEDNESDAY', 'SUNDAY']);
+  });
+});
+
+describe('SeguridadOperativaStore', () => {
+  it('carga el resumen, los eventos filtrados, el estado y el uso del almacenamiento', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
+    const controller = TestBed.inject(HttpTestingController);
+    const store = TestBed.inject(SeguridadOperativaStore);
+
+    store.cargarResumen();
+    controller.expectOne('/api/v1/admin/seguridad/resumen').flush({
+      ultimas24Horas: { total: 3, altas: 1, avisos: 1, porTipo: [] },
+      ultimos7Dias: { total: 9, altas: 2, avisos: 3, porTipo: [] },
+      iniciosInusuales: [],
+    });
+    expect(store.resumen.value()?.ultimas24Horas.altas).toBe(1);
+
+    store.cargarEventos({ tipo: 'LOGIN_FALLIDO', pagina: 1 });
+    controller
+      .expectOne(
+        (r) =>
+          r.url === '/api/v1/admin/seguridad/eventos' &&
+          r.params.get('tipo') === 'LOGIN_FALLIDO' &&
+          r.params.get('pagina') === '1',
+      )
+      .flush({ contenido: [], pagina: 1, tamano: 20, total: 0, totalPaginas: 0 });
+    expect(store.eventos.value()?.pagina).toBe(1);
+
+    store.cargarEstado();
+    controller.expectOne('/api/v1/admin/sistema/estado').flush({
+      estadoGeneral: 'OK',
+      version: '1.0',
+      iniciadoEn: '2026-11-17T00:00:00',
+      segundosEnMarcha: 5,
+      componentes: [],
+      migraciones: { disponible: true, aplicadas: 19, ultima: '19' },
+    });
+    expect(store.estado.value()?.migraciones.ultima).toBe('19');
+
+    store.cargarUso();
+    controller
+      .expectOne('/api/v1/admin/almacenamiento/uso')
+      .flush({ totalObjetos: 2, totalBytes: 2048, buckets: [] });
+    expect(store.uso.value()?.totalBytes).toBe(2048);
+
+    store.reset();
+    expect(store.resumen.hasValue()).toBe(false);
   });
 });

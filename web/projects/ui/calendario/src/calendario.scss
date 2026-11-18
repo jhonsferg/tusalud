@@ -251,6 +251,7 @@
 .tiempo {
   overflow: auto;
   max-height: 38rem;
+  scroll-padding-top: 6rem;
   border: 1px solid var(--p-content-border-color);
   border-radius: 12px;
 }

@@ -24,6 +24,9 @@
       @if (i.diagnosticoIngreso) {
         <p><strong>Diagnóstico de ingreso:</strong> {{ i.diagnosticoIngreso }}</p>
       }
+      @if (i.estado === 'CANCELADO' && i.motivoCancelacion) {
+        <p><strong>Motivo de la cancelación:</strong> {{ i.motivoCancelacion }}</p>
+      }
       @if (i.estado === 'ALTA') {
         <p class="alta">
           <strong>Alta {{ i.fechaAlta | date: 'd MMM y, HH:mm' }}:</strong> {{ i.diagnosticoAlta }}
@@ -100,6 +103,15 @@
         icon="pi pi-arrows-h"
         [outlined]="true"
         (onClick)="abrirTraslado()"
+      />
+    }
+    @if (puedeCancelar()) {
+      <p-button
+        label="Cancelar ingreso"
+        icon="pi pi-times"
+        severity="danger"
+        [text]="true"
+        (onClick)="cancelarIngreso()"
       />
     }
     @if (puedeAlta()) {

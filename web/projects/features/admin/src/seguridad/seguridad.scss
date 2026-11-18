@@ -1,0 +1,43 @@
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--sp-3);
+  margin: var(--sp-3) 0;
+}
+
+.dato {
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: 12px;
+  background: var(--estado-neutro-fondo);
+
+  strong {
+    font-size: 1.75rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  span {
+    color: var(--p-text-muted-color);
+    font-size: 0.875rem;
+  }
+
+  &[data-tono='peligro'] {
+    background: var(--estado-peligro-fondo);
+  }
+
+  &[data-tono='aviso'] {
+    background: var(--estado-aviso-fondo);
+  }
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.nowrap {
+  white-space: nowrap;
+}

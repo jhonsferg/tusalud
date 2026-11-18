@@ -1,4 +1,5 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
+import { MotivoService } from '@tusalud/ui/dialogo-motivo';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -60,6 +61,7 @@ export class OrdenDetalle {
   private readonly auth = inject(AuthService);
   private readonly notifications = inject(NotificationService);
   private readonly confirmation = inject(ConfirmationService);
+  private readonly motivos = inject(MotivoService);
   private readonly fb = inject(FormBuilder);
 
   protected readonly etiqueta: Readonly<Record<string, string>> = ETIQUETA_ESTADO_ORDEN;
@@ -204,16 +206,18 @@ export class OrdenDetalle {
     if (!orden) {
       return;
     }
-    this.confirmation.confirm({
-      header: 'Cancelar orden',
-      message: `Se cancelará la orden ${orden.codigo}.`,
-      icon: 'pi pi-times-circle',
-      acceptLabel: 'Cancelar orden',
-      rejectLabel: 'Volver',
-      acceptButtonProps: { severity: 'danger' },
-      rejectButtonProps: { severity: 'secondary', outlined: true },
-      accept: () => this.ejecutar(this.store.cancelar(orden.id), 'La orden fue cancelada.'),
-    });
+    this.motivos
+      .solicitar({
+        titulo: 'Cancelar orden',
+        descripcion: `Se cancelará la orden ${orden.codigo}.`,
+        etiqueta: 'Motivo de la cancelación',
+        confirmar: 'Cancelar orden',
+        severidad: 'danger',
+        icono: 'pi pi-times-circle',
+      })
+      .subscribe((motivo) =>
+        this.ejecutar(this.store.cancelar(orden.id, motivo), 'La orden fue cancelada.'),
+      );
   }
 
   protected imprimir(): void {

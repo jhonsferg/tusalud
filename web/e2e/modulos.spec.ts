@@ -181,12 +181,14 @@ test.describe('especialidades y roles', () => {
     await iniciarSesion(admin, 'admin');
     await ir(admin, '/especialidades');
     await expect(admin.getByRole('columnheader', { name: 'Consulta' })).toBeVisible();
+    await admin.getByPlaceholder('Buscar especialidad').fill('Oftalmología');
     await admin.getByRole('button', { name: 'Editar Oftalmología' }).click();
     await expect(admin.locator('#esp-precio')).not.toHaveValue('');
     await admin.locator('#esp-precio').click();
     await admin.keyboard.press('Control+a');
     await admin.locator('#esp-precio').pressSequentially('115', { delay: 60 });
     await admin.getByRole('button', { name: 'Guardar cambios' }).click();
+    await admin.getByPlaceholder('Buscar especialidad').fill('Oftalmología');
     await expect(
       admin.getByRole('row', { name: /Oftalmología/ }).getByText(/115\.00/),
     ).toBeVisible();

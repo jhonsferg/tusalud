@@ -113,7 +113,7 @@ export class ImagenesStore {
     );
   }
 
-  cancelar(id: string, motivo: string | null): Observable<OrdenImagenResponse> {
+  cancelar(id: string, motivo: string): Observable<OrdenImagenResponse> {
     return this.api.cancelar(id, motivo).pipe(tap((orden) => this.orden.set(orden)));
   }
 

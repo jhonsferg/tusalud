@@ -1,4 +1,6 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
+import { MotivoService } from '@tusalud/ui/dialogo-motivo';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -58,6 +60,8 @@ export class IngresoDetalle {
   protected readonly store = inject(HospitalizacionStore);
   private readonly auth = inject(AuthService);
   private readonly notifications = inject(NotificationService);
+  private readonly motivos = inject(MotivoService);
+  private readonly router = inject(Router);
 
   protected readonly colores = COLOR_TRIAJE;
   protected readonly ingreso = this.store.ingreso.value;
@@ -66,6 +70,10 @@ export class IngresoDetalle {
     this.auth.isMedico() ? 'MEDICA' : this.auth.isEnfermeria() ? 'ENFERMERIA' : null,
   );
   protected readonly puedeAlta = computed(() => this.activo() && this.auth.isMedico());
+  protected readonly puedeCancelar = computed(
+    () =>
+      this.activo() && this.auth.isMedico() && (this.store.evoluciones.value() ?? []).length === 0,
+  );
   protected readonly veEvoluciones = computed(
     () => this.auth.isMedico() || this.auth.isEnfermeria(),
   );
@@ -139,6 +147,31 @@ export class IngresoDetalle {
           this.errorEvolucion.set(error.message);
         },
       });
+  }
+
+  protected cancelarIngreso(): void {
+    const ingreso = this.ingreso();
+    if (!ingreso) {
+      return;
+    }
+    this.motivos
+      .solicitar({
+        titulo: 'Cancelar ingreso',
+        descripcion: `Se cancelará el ingreso ${ingreso.codigo} y la cama quedará libre. Solo es posible mientras no tenga evoluciones.`,
+        etiqueta: 'Motivo de la cancelación',
+        confirmar: 'Cancelar ingreso',
+        severidad: 'danger',
+        icono: 'pi pi-times-circle',
+      })
+      .subscribe((motivo) =>
+        this.store.cancelarIngreso(ingreso.id, motivo).subscribe({
+          next: () => {
+            this.notifications.success('El ingreso fue cancelado y la cama quedó libre.');
+            void this.router.navigate(['/hospitalizacion/ingresos']);
+          },
+          error: () => undefined,
+        }),
+      );
   }
 
   protected abrirAlta(): void {

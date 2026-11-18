@@ -234,3 +234,15 @@ export async function tokenDe(page: Page, rol: keyof typeof CUENTAS): Promise<st
   const { token } = (await respuesta.json()) as { token: string };
   return token;
 }
+
+export async function confirmarMotivo(
+  page: Page,
+  titulo: string,
+  motivo: string,
+  boton: string | RegExp,
+): Promise<void> {
+  const dialogo = page.getByRole('dialog', { name: titulo });
+  await expect(dialogo).toBeVisible();
+  await dialogo.getByRole('textbox').fill(motivo);
+  await dialogo.getByRole('button', { name: boton }).click();
+}

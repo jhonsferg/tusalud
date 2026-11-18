@@ -84,7 +84,7 @@ export class LaboratorioStore {
     return this.api.validar(id).pipe(tap((orden) => this.aplicar(orden)));
   }
 
-  cancelar(id: string, motivo?: string | null): Observable<OrdenResponse> {
+  cancelar(id: string, motivo: string): Observable<OrdenResponse> {
     return this.api.cancelar(id, motivo).pipe(tap((orden) => this.aplicar(orden)));
   }
 

@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-import { iniciarSesion, reservarPrimeraHoraLibre, idDeGarcia, ir } from './support';
+import {
+  iniciarSesion,
+  reservarPrimeraHoraLibre,
+  idDeGarcia,
+  ir,
+  confirmarMotivo,
+} from './support';
 
 test.describe('calendario', () => {
   test('el paciente ve sus citas en las vistas de mes, semana y día', async ({ page }) => {
@@ -175,7 +181,7 @@ test.describe('reprogramación', () => {
     await reservarPrimeraHoraLibre(page, 'Cita para cancelar y no reprogramar');
     const url = new URL(page.url()).pathname;
     await page.getByRole('button', { name: 'Cancelar cita' }).click();
-    await page.getByRole('button', { name: 'Sí, cancelar cita' }).click();
+    await confirmarMotivo(page, 'Cancelar cita', 'Ya no necesito la consulta', 'Cancelar cita');
     await expect(page.getByText('Cancelada', { exact: true })).toBeVisible();
     await page.goto(`${url}/reprogramar`);
     await expect(page.getByText('Esta cita no se puede reprogramar')).toBeVisible();

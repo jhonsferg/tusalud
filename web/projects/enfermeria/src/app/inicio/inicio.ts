@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import {
   AsyncState,
   AuthService,
+  EvolucionPendienteResponse,
   HospitalizacionApiService,
   IngresoHospResponse,
   MapaCamasResponse,
@@ -113,6 +114,21 @@ const NIVEL: Readonly<Record<number, { texto: string; tono: TonoTablero }>> = {
 
       <div class="c12">
         <app-section-card
+          titulo="Evoluciones pendientes"
+          icono="pi-clock"
+          subtitulo="Ingresos con cama sin evolución de enfermería en las últimas 8 horas"
+          [cargando]="pendientes.loading() && !pendientes.hasValue()"
+          [error]="pendientes.error()?.message ?? null"
+          [vacio]="lineaPendientes().length === 0 && pendientes.hasValue()"
+          textoVacio="Las evoluciones de enfermería están al día."
+        >
+          <app-task-list [items]="lineaPendientes()" />
+          <a pie routerLink="/hospitalizacion/ingresos">Abrir ingresos para registrarlas</a>
+        </app-section-card>
+      </div>
+
+      <div class="c12">
+        <app-section-card
           titulo="Pacientes hospitalizados"
           icono="pi-list"
           subtitulo="Ingresos activos, abre la ficha para registrar la evolución del turno"
@@ -144,6 +160,7 @@ export class InicioEnfermeria implements OnInit {
   protected readonly mapa = new AsyncState<MapaCamasResponse[]>();
   protected readonly emergencias = new AsyncState<IngresoHospResponse[]>();
   protected readonly ingresos = new AsyncState<IngresoHospResponse[]>();
+  protected readonly pendientes = new AsyncState<EvolucionPendienteResponse[]>();
 
   protected readonly saludo = computed(() => saludoDelDia(this.auth.user()?.nombreCompleto ?? ''));
   protected readonly fecha = computed(() => {
@@ -215,6 +232,19 @@ export class InicioEnfermeria implements OnInit {
       }),
   );
 
+  protected readonly lineaPendientes = computed<ItemTarea[]>(() =>
+    (this.pendientes.value() ?? []).slice(0, 10).map((pendiente): ItemTarea => ({
+      id: pendiente.ingresoId,
+      titulo: pendiente.paciente,
+      detalle: `Cama ${pendiente.cama} · ${AREAS[pendiente.area] ?? pendiente.area} · ${pendiente.ultimaEvolucion ? 'sin registro hace ' : 'sin ninguna evolución hace '}${pendiente.horasSinRegistro} h`,
+      cantidad: pendiente.horasSinRegistro,
+      tono: pendiente.horasSinRegistro >= 12 ? 'peligro' : 'aviso',
+      icono: 'pi-clock',
+      enlace: ['/hospitalizacion/ingresos', pendiente.ingresoId],
+      sensible: true,
+    })),
+  );
+
   protected readonly lineaIngresos = computed<ItemTarea[]>(() =>
     (this.ingresos.value() ?? [])
       .filter((ingreso) => ingreso.estado === 'ACTIVO')
@@ -235,5 +265,6 @@ export class InicioEnfermeria implements OnInit {
     this.mapa.load(this.api.mapa());
     this.emergencias.load(this.api.emergencias());
     this.ingresos.load(this.api.ingresos('ACTIVO'));
+    this.pendientes.load(this.api.evolucionesPendientes());
   }
 }

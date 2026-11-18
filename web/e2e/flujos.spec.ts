@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { iniciarSesion, reservarPrimeraHoraLibre, ir } from './support';
+import { iniciarSesion, reservarPrimeraHoraLibre, ir, confirmarMotivo } from './support';
 
 test.describe('paciente', () => {
   test('ve el catálogo de especialidades y médicos', async ({ page }) => {
@@ -33,8 +33,14 @@ test.describe('paciente', () => {
     await expect(page.getByText('Pendiente', { exact: true })).toBeVisible();
 
     await page.getByRole('button', { name: 'Cancelar cita' }).click();
-    await page.getByRole('button', { name: 'Sí, cancelar cita' }).click();
+    const dialogo = page.getByRole('dialog', { name: 'Cancelar cita' });
+    await dialogo.getByRole('textbox').fill('abc');
+    await dialogo.getByRole('button', { name: 'Cancelar cita' }).click();
+    await expect(dialogo.getByText('Escribe al menos 5 caracteres.')).toBeVisible();
+    await confirmarMotivo(page, 'Cancelar cita', 'No puedo asistir por un viaje', 'Cancelar cita');
     await expect(page.getByText('Cancelada', { exact: true })).toBeVisible();
+    await expect(page.getByText('Motivo de la cancelación')).toBeVisible();
+    await expect(page.getByText('No puedo asistir por un viaje')).toBeVisible();
   });
 
   test('elegir un solo día en el filtro de fechas ya filtra las citas', async ({ page }) => {

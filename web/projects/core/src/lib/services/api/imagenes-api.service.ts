@@ -83,7 +83,7 @@ export class ImagenesApiService {
     return this.http.get<InformeImagenResponse[]>(`${this.baseUrl}/ordenes/${id}/informes`);
   }
 
-  cancelar(id: string, motivo: string | null): Observable<OrdenImagenResponse> {
+  cancelar(id: string, motivo: string): Observable<OrdenImagenResponse> {
     return this.http.put<OrdenImagenResponse>(`${this.baseUrl}/ordenes/${id}/cancelar`, {
       motivo,
     });

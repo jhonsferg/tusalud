@@ -133,7 +133,7 @@
         icon="pi pi-times"
         severity="danger"
         [text]="true"
-        (onClick)="cancelarVisible.set(true)"
+        (onClick)="cancelar(o)"
       />
     }
   </div>
@@ -459,41 +459,6 @@
         icon="pi pi-check"
         [loading]="guardandoInforme()"
         (onClick)="guardarInforme(o)"
-      />
-    </ng-template>
-  </p-dialog>
-
-  <p-dialog
-    header="Cancelar la orden"
-    [visible]="cancelarVisible()"
-    (visibleChange)="cancelarVisible.set($event)"
-    [modal]="true"
-    [draggable]="false"
-    [style]="{ width: '28rem', maxWidth: '96vw' }"
-  >
-    <label class="form">
-      Motivo, opcional
-      <textarea
-        pTextarea
-        id="img-motivo"
-        rows="3"
-        class="w-full"
-        [ngModel]="motivoCancelacion()"
-        (ngModelChange)="motivoCancelacion.set($event)"
-      ></textarea>
-    </label>
-    <ng-template #footer>
-      <p-button
-        label="Volver"
-        severity="secondary"
-        [outlined]="true"
-        (onClick)="cancelarVisible.set(false)"
-      />
-      <p-button
-        label="Cancelar orden"
-        icon="pi pi-times"
-        severity="danger"
-        (onClick)="cancelar(o)"
       />
     </ng-template>
   </p-dialog>

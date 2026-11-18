@@ -37,6 +37,11 @@
         <h4>Motivo de la consulta</h4>
         <p class="motivo">{{ cita.motivo }}</p>
 
+        @if (cita.estado === 'CANCELADA' && cita.motivoCancelacion) {
+          <h4>Motivo de la cancelación</h4>
+          <p class="motivo">{{ cita.motivoCancelacion }}</p>
+        }
+
         <div class="actions">
           @if (puedeConstancia(cita)) {
             <app-boton-documento

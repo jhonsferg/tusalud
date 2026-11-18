@@ -53,8 +53,10 @@ export class FarmaciaApiService {
     return this.http.get<DispensacionResponse>(`${this.baseUrl}/dispensaciones/${id}`);
   }
 
-  anular(id: string): Observable<DispensacionResponse> {
-    return this.http.put<DispensacionResponse>(`${this.baseUrl}/dispensaciones/${id}/anular`, null);
+  anular(id: string, motivo: string): Observable<DispensacionResponse> {
+    return this.http.put<DispensacionResponse>(`${this.baseUrl}/dispensaciones/${id}/anular`, {
+      motivo,
+    });
   }
 
   misDispensaciones(): Observable<DispensacionResponse[]> {

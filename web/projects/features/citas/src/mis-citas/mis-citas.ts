@@ -108,6 +108,6 @@ export class MisCitas implements OnInit {
   }
 
   protected cancelar(cita: CitaResponse): void {
-    this.acciones.ejecutar('cancelar', cita);
+    this.acciones.cancelar(cita);
   }
 }

@@ -24,6 +24,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         roles: ['ROLE_ADMIN'],
       },
       {
+        label: 'Seguridad',
+        icon: 'pi-shield',
+        link: '/admin/seguridad',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
         label: 'Calendario',
         icon: 'pi-calendar-plus',
         link: '/calendario',
