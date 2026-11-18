@@ -12,6 +12,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ArchivoRepository extends JpaRepository<Archivo, UUID> {
 
+    @Query("""
+            SELECT a.bucket, a.proposito, COUNT(a), COALESCE(SUM(a.tamano), 0) FROM Archivo a
+            WHERE a.eliminado = false
+            GROUP BY a.bucket, a.proposito
+            ORDER BY a.bucket, a.proposito
+            """)
+    List<Object[]> usoPorBucketYProposito();
+
     @Query("SELECT a FROM Archivo a WHERE a.id = :id AND a.eliminado = false")
     Optional<Archivo> findActivo(@Param("id") UUID id);
 

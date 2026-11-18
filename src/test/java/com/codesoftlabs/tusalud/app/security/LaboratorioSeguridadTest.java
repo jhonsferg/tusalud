@@ -280,12 +280,15 @@ class LaboratorioSeguridadTest {
                         .header(HttpHeaders.AUTHORIZATION, tokenMedico))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].id", hasItem(ordenId.toString())));
-        mockMvc.perform(put(BASE + "/ordenes/" + ordenId + "/cancelar").header(HttpHeaders.AUTHORIZATION, tokenAdmin))
+        mockMvc.perform(put(BASE + "/ordenes/" + ordenId + "/cancelar")
+                        .header(HttpHeaders.AUTHORIZATION, tokenAdmin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"motivo\":\"Cancelado por una prueba\"}"))
                 .andExpect(status().isConflict());
     }
 
     @Test
-    void elMedicoCancelaSinCuerpoUnaOrdenSolicitada() throws Exception {
+    void elMedicoCancelaConMotivoUnaOrdenSolicitadaYSinMotivoRecibe400() throws Exception {
         UUID examenId = crearExamen("HTTP-CAN");
         MvcResult creada = mockMvc.perform(post(BASE + "/ordenes")
                         .header(HttpHeaders.AUTHORIZATION, tokenMedico)
@@ -296,7 +299,15 @@ class LaboratorioSeguridadTest {
                 .andReturn();
         UUID ordenId = UUID.fromString(JsonPath.read(creada.getResponse().getContentAsString(), "$.id"));
 
-        mockMvc.perform(put(BASE + "/ordenes/" + ordenId + "/cancelar").header(HttpHeaders.AUTHORIZATION, tokenMedico))
+        mockMvc.perform(put(BASE + "/ordenes/" + ordenId + "/cancelar")
+                        .header(HttpHeaders.AUTHORIZATION, tokenMedico)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"motivo\":\"abc\"}"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(put(BASE + "/ordenes/" + ordenId + "/cancelar")
+                        .header(HttpHeaders.AUTHORIZATION, tokenMedico)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"motivo\":\"Cancelado por una prueba\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estado", is("CANCELADA")));
     }

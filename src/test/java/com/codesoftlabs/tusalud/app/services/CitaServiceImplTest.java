@@ -185,7 +185,7 @@ class CitaServiceImplTest {
         Cita cita = fixture.cita(medico, paciente, proximoLunes.atTime(9, 0), EstadoCita.PENDIENTE);
         UsuarioPrincipal intruso = fixture.principal(fixture.paciente().getUsuario());
 
-        assertThatThrownBy(() -> citaService.cancelarCita(cita.getId(), intruso))
+        assertThatThrownBy(() -> citaService.cancelarCita(cita.getId(), "Cancelación por prueba", intruso))
                 .isInstanceOf(ForbiddenOperationException.class);
         assertThatThrownBy(() -> citaService.obtenerCita(cita.getId(), intruso))
                 .isInstanceOf(ForbiddenOperationException.class);
@@ -195,9 +195,33 @@ class CitaServiceImplTest {
     void pacienteDuenoCancelaSuCita() {
         Cita cita = fixture.cita(medico, paciente, proximoLunes.atTime(9, 0), EstadoCita.CONFIRMADA);
 
-        CitaResponse cancelada = citaService.cancelarCita(cita.getId(), pacientePrincipal);
+        CitaResponse cancelada = citaService.cancelarCita(cita.getId(), "Cancelación por prueba", pacientePrincipal);
 
         assertThat(cancelada.estado()).isEqualTo(EstadoCita.CANCELADA);
+    }
+
+    @Test
+    void cancelarGuardaElMotivoLimpioYElMedicoDeLaCitaPuedeCancelar() {
+        Cita cita = fixture.cita(medico, paciente, proximoLunes.atTime(9, 0), EstadoCita.CONFIRMADA);
+        UsuarioPrincipal medicoPrincipal = fixture.principal(medico.getUsuario());
+
+        CitaResponse cancelada =
+                citaService.cancelarCita(cita.getId(), "  Emergencia   en el consultorio ", medicoPrincipal);
+
+        assertThat(cancelada.estado()).isEqualTo(EstadoCita.CANCELADA);
+        assertThat(cancelada.motivoCancelacion()).isEqualTo("Emergencia en el consultorio");
+    }
+
+    @Test
+    void cancelarExigeUnMotivoValido() {
+        Cita cita = fixture.cita(medico, paciente, proximoLunes.atTime(9, 0), EstadoCita.PENDIENTE);
+
+        assertThatThrownBy(() -> citaService.cancelarCita(cita.getId(), "abc", pacientePrincipal))
+                .isInstanceOf(com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException.class);
+        assertThatThrownBy(() -> citaService.cancelarCita(cita.getId(), null, pacientePrincipal))
+                .isInstanceOf(com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException.class);
+        assertThatThrownBy(() -> citaService.cancelarCita(cita.getId(), "x".repeat(301), pacientePrincipal))
+                .isInstanceOf(com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException.class);
     }
 
     @Test
@@ -208,9 +232,12 @@ class CitaServiceImplTest {
         Cita cita = fixture.cita(medico, paciente, pasado, EstadoCita.PENDIENTE);
         UsuarioPrincipal admin = fixture.principal(fixture.usuario("admin", RolNombre.ROLE_ADMIN));
 
-        assertThatThrownBy(() -> citaService.cancelarCita(cita.getId(), pacientePrincipal))
+        assertThatThrownBy(() -> citaService.cancelarCita(cita.getId(), "Cancelación por prueba", pacientePrincipal))
                 .isInstanceOf(BusinessLogicException.class);
-        assertThat(citaService.cancelarCita(cita.getId(), admin).estado()).isEqualTo(EstadoCita.CANCELADA);
+        assertThat(citaService
+                        .cancelarCita(cita.getId(), "Cancelación por prueba", admin)
+                        .estado())
+                .isEqualTo(EstadoCita.CANCELADA);
     }
 
     @Test
@@ -219,10 +246,12 @@ class CitaServiceImplTest {
         Cita atendida = fixture.cita(medico, paciente, proximoLunes.atTime(10, 0), EstadoCita.ATENDIDA);
         Cita confirmada = fixture.cita(medico, paciente, proximoLunes.atTime(11, 0), EstadoCita.CONFIRMADA);
 
-        assertThatThrownBy(() -> citaService.cancelarCita(cancelada.getId(), pacientePrincipal))
+        assertThatThrownBy(
+                        () -> citaService.cancelarCita(cancelada.getId(), "Cancelación por prueba", pacientePrincipal))
                 .isInstanceOf(BusinessLogicException.class)
                 .hasMessage("No se puede cancelar una cita en estado CANCELADA");
-        assertThatThrownBy(() -> citaService.cancelarCita(atendida.getId(), pacientePrincipal))
+        assertThatThrownBy(
+                        () -> citaService.cancelarCita(atendida.getId(), "Cancelación por prueba", pacientePrincipal))
                 .isInstanceOf(BusinessLogicException.class);
         assertThatThrownBy(() -> citaService.confirmarCita(confirmada.getId(), medicoPrincipal))
                 .isInstanceOf(BusinessLogicException.class);

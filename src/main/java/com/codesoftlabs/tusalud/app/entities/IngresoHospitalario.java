@@ -73,6 +73,9 @@ public class IngresoHospitalario {
     @Column(nullable = false, length = 300)
     private String motivo;
 
+    @Column(name = "motivo_cancelacion", length = 300)
+    private String motivoCancelacion;
+
     @Column(name = "diagnostico_ingreso", length = 300)
     private String diagnosticoIngreso;
 

@@ -50,6 +50,13 @@ public class Cita {
     @Column(nullable = false, length = 500)
     private String motivo;
 
+    @Column(name = "motivo_cancelacion", length = 300)
+    private String motivoCancelacion;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cancelada_por_id")
+    private Usuario canceladaPor;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 15)
     @Builder.Default

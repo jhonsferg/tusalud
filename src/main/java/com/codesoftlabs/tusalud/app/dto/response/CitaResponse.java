@@ -59,7 +59,10 @@ public record CitaResponse(
         int duracionMinutos,
 
         @Schema(example = "false", description = "Reservado para marcar cruces; el servidor siempre devuelve false")
-        boolean conflicto) {
+        boolean conflicto,
+
+        @Schema(example = "Viaje imprevisto", description = "Motivo de la cancelación, solo en citas canceladas")
+        String motivoCancelacion) {
 
     private static final int DURACION_POR_DEFECTO = 30;
 
@@ -90,6 +93,7 @@ public record CitaResponse(
                 cita.getCreatedAt(),
                 pagado,
                 duracionMinutos,
-                false);
+                false,
+                cita.getEstado() == EstadoCita.CANCELADA ? cita.getMotivoCancelacion() : null);
     }
 }

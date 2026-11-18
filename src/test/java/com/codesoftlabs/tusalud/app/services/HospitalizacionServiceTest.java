@@ -312,11 +312,54 @@ class HospitalizacionServiceTest {
     }
 
     @Test
+    void evolucionesPendientesListaLosIngresosSinRegistroDeEnfermeriaReciente() {
+        IngresoHospResponse ingreso = ingresar(paciente, cama(AreaCama.HOSPITALIZACION, "100.00"));
+        assertThat(hospitalizacionService.evolucionesPendientes(8))
+                .extracting(com.codesoftlabs.tusalud.app.dto.response.EvolucionPendienteResponse::ingresoId)
+                .doesNotContain(ingreso.id());
+
+        retrocederIngreso(ingreso.id(), 0, 10);
+
+        var pendientes = hospitalizacionService.evolucionesPendientes(8);
+        assertThat(pendientes)
+                .extracting(com.codesoftlabs.tusalud.app.dto.response.EvolucionPendienteResponse::ingresoId)
+                .contains(ingreso.id());
+        assertThat(pendientes.stream()
+                        .filter(item -> item.ingresoId().equals(ingreso.id()))
+                        .findFirst()
+                        .orElseThrow()
+                        .horasSinRegistro())
+                .isGreaterThanOrEqualTo(10);
+
+        hospitalizacionService.registrarEvolucion(
+                enfermeria, ingreso.id(), evolucion(TipoEvolucion.ENFERMERIA, "Control de turno"));
+
+        assertThat(hospitalizacionService.evolucionesPendientes(8))
+                .extracting(com.codesoftlabs.tusalud.app.dto.response.EvolucionPendienteResponse::ingresoId)
+                .doesNotContain(ingreso.id());
+        assertThatThrownBy(() -> hospitalizacionService.evolucionesPendientes(0))
+                .isInstanceOf(com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException.class);
+    }
+
+    @Test
+    void cancelarIngresoExigeYGuardaElMotivo() {
+        IngresoHospResponse ingreso = ingresar(paciente, cama(AreaCama.HOSPITALIZACION, "100.00"));
+
+        assertThatThrownBy(() -> hospitalizacionService.cancelarIngreso(ingreso.id(), "no"))
+                .isInstanceOf(com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException.class);
+        IngresoHospResponse cancelado =
+                hospitalizacionService.cancelarIngreso(ingreso.id(), "  Ingreso   registrado por error ");
+
+        assertThat(cancelado.motivoCancelacion()).isEqualTo("Ingreso registrado por error");
+    }
+
+    @Test
     void cancelarLiberaLaCamaSoloSiNoHayEvoluciones() {
         CamaResponse cama = cama(AreaCama.HOSPITALIZACION, "100.00");
         IngresoHospResponse sinNotas = ingresar(paciente, cama);
 
-        IngresoHospResponse cancelado = hospitalizacionService.cancelarIngreso(sinNotas.id());
+        IngresoHospResponse cancelado =
+                hospitalizacionService.cancelarIngreso(sinNotas.id(), "Ingreso registrado por error");
 
         assertThat(cancelado.estado()).isEqualTo(EstadoIngresoHosp.CANCELADO);
         assertThat(hospitalizacionService.listarCamas(null, EstadoCama.LIBRE))
@@ -326,7 +369,7 @@ class HospitalizacionServiceTest {
         IngresoHospResponse conNotas = ingresar(otroPaciente, cama);
         hospitalizacionService.registrarEvolucion(
                 medicoPrincipal, conNotas.id(), evolucion(TipoEvolucion.MEDICA, "Ya hay evolución"));
-        assertThatThrownBy(() -> hospitalizacionService.cancelarIngreso(conNotas.id()))
+        assertThatThrownBy(() -> hospitalizacionService.cancelarIngreso(conNotas.id(), "Ingreso registrado por error"))
                 .isInstanceOf(ConflictException.class);
     }
 

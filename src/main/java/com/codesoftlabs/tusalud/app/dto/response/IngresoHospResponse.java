@@ -36,7 +36,10 @@ public record IngresoHospResponse(
         TriajeResponse triaje,
 
         @Schema(example = "25", description = "Solo en emergencias que aún esperan una cama")
-        Long esperaMinutos) {
+        Long esperaMinutos,
+
+        @Schema(description = "Motivo de la cancelación, solo en ingresos cancelados y para personal clínico")
+        String motivoCancelacion) {
 
     public IngresoHospResponse sinDatosClinicos() {
         return new IngresoHospResponse(
@@ -60,7 +63,8 @@ public record IngresoHospResponse(
                 diasEstancia,
                 cargoCama,
                 triaje == null ? null : triaje.soloPrioridad(),
-                esperaMinutos);
+                esperaMinutos,
+                null);
     }
 
     public static IngresoHospResponse from(IngresoHospitalario ingreso, LocalDateTime ahora) {
@@ -97,7 +101,8 @@ public record IngresoHospResponse(
                 (int) dias(ingreso.getFechaIngreso(), hasta),
                 cargo,
                 TriajeResponse.from(ingreso),
-                espera);
+                espera,
+                ingreso.getEstado() == EstadoIngresoHosp.CANCELADO ? ingreso.getMotivoCancelacion() : null);
     }
 
     public static long dias(LocalDateTime desde, LocalDateTime hasta) {

@@ -6,6 +6,7 @@ import com.codesoftlabs.tusalud.app.dto.response.MfaEstadoResponse;
 import com.codesoftlabs.tusalud.app.entities.MfaCodigoRecuperacion;
 import com.codesoftlabs.tusalud.app.entities.MfaUsuario;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
+import com.codesoftlabs.tusalud.app.entities.enums.TipoEventoSeguridad;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
 import com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException;
@@ -17,6 +18,7 @@ import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.security.CifradorSecretos;
 import com.codesoftlabs.tusalud.app.security.TotpService;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
+import com.codesoftlabs.tusalud.app.services.interfaces.EventoSeguridadService;
 import com.codesoftlabs.tusalud.app.services.interfaces.MfaService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import java.nio.charset.StandardCharsets;
@@ -56,6 +58,7 @@ public class MfaServiceImpl implements MfaService {
     private final TotpService totpService;
     private final CifradorSecretos cifrador;
     private final NotificacionService notificacionService;
+    private final EventoSeguridadService eventoSeguridadService;
 
     private final SecureRandom aleatorio = new SecureRandom();
 
@@ -117,6 +120,8 @@ public class MfaServiceImpl implements MfaService {
                 "Verificación en dos pasos activada",
                 "Tu cuenta ahora solicita un código de la aplicación autenticadora al iniciar sesión.",
                 "/perfil?tab=seguridad");
+        eventoSeguridadService.registrar(
+                TipoEventoSeguridad.MFA_ACTIVADO, actor.getId(), actor.getId(), "Verificación en dos pasos activada");
         log.info("Auditoría: MFA activado para el usuario {}", actor.getId());
         return new MfaCodigosRecuperacionResponse(codigos);
     }
@@ -142,6 +147,11 @@ public class MfaServiceImpl implements MfaService {
                 "Verificación en dos pasos desactivada",
                 "Se desactivó la verificación en dos pasos de tu cuenta. Si no fuiste tú, cambia tu contraseña.",
                 "/perfil?tab=seguridad");
+        eventoSeguridadService.registrar(
+                TipoEventoSeguridad.MFA_DESACTIVADO,
+                actor.getId(),
+                actor.getId(),
+                "Verificación en dos pasos desactivada");
         log.info("Auditoría: MFA desactivado para el usuario {}", actor.getId());
     }
 
@@ -236,6 +246,11 @@ public class MfaServiceImpl implements MfaService {
 
     private void verificarBloqueo(MfaUsuario mfa) {
         if (mfa.getBloqueadoHasta() != null && mfa.getBloqueadoHasta().isAfter(LocalDateTime.now())) {
+            eventoSeguridadService.registrar(
+                    TipoEventoSeguridad.BLOQUEO_INTENTOS,
+                    mfa.getUsuario().getId(),
+                    null,
+                    "Verificación bloqueada por intentos fallidos");
             throw new DemasiadosIntentosException(
                     "Demasiados intentos fallidos. Intente nuevamente en " + MINUTOS_BLOQUEO + " minutos");
         }

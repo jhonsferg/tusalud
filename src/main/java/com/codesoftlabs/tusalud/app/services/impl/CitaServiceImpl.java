@@ -26,6 +26,8 @@ import com.codesoftlabs.tusalud.app.repositories.EventoCalendarioRepository;
 import com.codesoftlabs.tusalud.app.repositories.HorarioAtencionRepository;
 import com.codesoftlabs.tusalud.app.repositories.MedicoRepository;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
+import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
+import com.codesoftlabs.tusalud.app.security.TextoSeguro;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.CitaService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
@@ -69,6 +71,7 @@ public class CitaServiceImpl implements CitaService {
     private static final long VENTANA_MAXIMA_MINUTOS = 240;
 
     private final CitaRepository citaRepository;
+    private final UsuarioRepository usuarioRepository;
     private final MedicoRepository medicoRepository;
     private final PacienteRepository pacienteRepository;
     private final HorarioAtencionRepository horarioRepository;
@@ -167,11 +170,16 @@ public class CitaServiceImpl implements CitaService {
 
     @Override
     @Transactional
-    public CitaResponse cancelarCita(UUID citaId, UsuarioPrincipal actor) {
+    public CitaResponse cancelarCita(UUID citaId, String motivo, UsuarioPrincipal actor) {
         Cita cita = buscarCita(citaId);
         boolean admin = esAdmin(actor);
-        if (!admin && !esPacienteDe(cita, actor)) {
-            throw new ForbiddenOperationException("Solo el paciente de la cita o un administrador pueden cancelarla");
+        if (!admin && !esPacienteDe(cita, actor) && !esMedicoDe(cita, actor)) {
+            throw new ForbiddenOperationException(
+                    "Solo el paciente, el médico de la cita o un administrador pueden cancelarla");
+        }
+        String motivoLimpio = TextoSeguro.limpiar(motivo);
+        if (motivoLimpio == null || motivoLimpio.length() < 5 || motivoLimpio.length() > 300) {
+            throw new DatosInvalidosException("El motivo de la cancelación debe tener entre 5 y 300 caracteres");
         }
         if (!ESTADOS_CANCELABLES.contains(cita.getEstado())) {
             throw new BusinessLogicException("No se puede cancelar una cita en estado " + cita.getEstado());
@@ -190,13 +198,16 @@ public class CitaServiceImpl implements CitaService {
                             + cita.getFechaHora().format(FORMATO_FECHA) + ".",
                     enlace(cita));
         }
+        cita.setMotivoCancelacion(motivoLimpio);
+        cita.setCanceladaPor(usuarioRepository.getReferenceById(actor.getId()));
         CitaResponse cancelada = cambiarEstado(cita, EstadoCita.CANCELADA, actor);
+        log.info("Auditoría: cita {} cancelada por {} con motivo registrado", cita.getId(), actor.getId());
         notificarOtraParte(
                 cita,
                 actor,
                 TipoNotificacion.CITA_CANCELADA,
                 "Cita cancelada",
-                "La cita del " + cita.getFechaHora().format(FORMATO_FECHA) + " fue cancelada.");
+                "La cita del " + cita.getFechaHora().format(FORMATO_FECHA) + " fue cancelada. Motivo: " + motivoLimpio);
         return cancelada;
     }
 

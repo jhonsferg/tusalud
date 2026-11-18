@@ -15,6 +15,7 @@ import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.ArchivoService;
 import com.codesoftlabs.tusalud.app.services.interfaces.AuditoriaClinicaService;
+import com.codesoftlabs.tusalud.app.services.interfaces.EventoSeguridadService;
 import com.codesoftlabs.tusalud.app.services.interfaces.ImagenesService;
 import com.codesoftlabs.tusalud.app.services.interfaces.RelacionAsistencialService;
 import com.codesoftlabs.tusalud.app.storage.AlmacenamientoException;
@@ -64,6 +65,7 @@ public class ArchivoServiceImpl implements ArchivoService {
     private final RelacionAsistencialService relacionAsistencial;
     private final AuditoriaClinicaService auditoriaClinica;
     private final ImagenesService imagenes;
+    private final EventoSeguridadService eventoSeguridad;
 
     public ArchivoServiceImpl(
             ArchivoRepository archivoRepository,
@@ -74,7 +76,8 @@ public class ArchivoServiceImpl implements ArchivoService {
             DetectorContenido detector,
             RelacionAsistencialService relacionAsistencial,
             AuditoriaClinicaService auditoriaClinica,
-            @Lazy ImagenesService imagenes) {
+            @Lazy ImagenesService imagenes,
+            EventoSeguridadService eventoSeguridad) {
         this.archivoRepository = archivoRepository;
         this.usuarioRepository = usuarioRepository;
         this.pacienteRepository = pacienteRepository;
@@ -84,6 +87,7 @@ public class ArchivoServiceImpl implements ArchivoService {
         this.relacionAsistencial = relacionAsistencial;
         this.auditoriaClinica = auditoriaClinica;
         this.imagenes = imagenes;
+        this.eventoSeguridad = eventoSeguridad;
     }
 
     @Override
@@ -207,6 +211,7 @@ public class ArchivoServiceImpl implements ArchivoService {
     public Descarga descargar(UsuarioPrincipal actor, UUID id, String rango) {
         Archivo archivo = buscar(id);
         autorizarLectura(actor, archivo, true);
+        eventoSeguridad.registrarDescarga(actor.getId());
         return abrirSinAutorizar(archivo, rango);
     }
 

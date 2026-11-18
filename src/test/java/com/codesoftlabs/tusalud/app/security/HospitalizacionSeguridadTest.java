@@ -310,7 +310,10 @@ class HospitalizacionSeguridadTest {
                         .content("{\"camaId\":\"" + destino + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.camaId", is(destino.toString())));
-        mockMvc.perform(put(BASE + "/ingresos/" + ingreso + "/cancelar").header(HttpHeaders.AUTHORIZATION, tokenMedico))
+        mockMvc.perform(put(BASE + "/ingresos/" + ingreso + "/cancelar")
+                        .header(HttpHeaders.AUTHORIZATION, tokenMedico)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"motivo\":\"Cancelado por una prueba\"}"))
                 .andExpect(status().isConflict());
 
         String alta = "{\"diagnosticoAlta\":\"Recuperado\",\"indicacionesAlta\":\"Control en una semana\"}";

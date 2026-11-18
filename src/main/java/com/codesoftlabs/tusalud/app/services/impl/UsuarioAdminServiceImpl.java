@@ -7,6 +7,7 @@ import com.codesoftlabs.tusalud.app.entities.Rol;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoUsuario;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
+import com.codesoftlabs.tusalud.app.entities.enums.TipoEventoSeguridad;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
 import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
@@ -19,6 +20,7 @@ import com.codesoftlabs.tusalud.app.repositories.RolRepository;
 import com.codesoftlabs.tusalud.app.repositories.SesionUsuarioRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
+import com.codesoftlabs.tusalud.app.services.interfaces.EventoSeguridadService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.UsuarioAdminService;
 import java.time.LocalDateTime;
@@ -50,6 +52,7 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
     private final MedicoRepository medicoRepository;
     private final PacienteRepository pacienteRepository;
     private final NotificacionService notificacionService;
+    private final EventoSeguridadService eventoSeguridadService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -116,6 +119,11 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
                 "Tus roles fueron actualizados",
                 "Un administrador modificó tus permisos. Vuelve a iniciar sesión para aplicarlos.",
                 "/perfil");
+        eventoSeguridadService.registrar(
+                TipoEventoSeguridad.ROLES_CAMBIADOS,
+                usuario.getId(),
+                actor.getId(),
+                "Roles asignados: " + nuevos.stream().map(Enum::name).sorted().collect(Collectors.joining(", ")));
         log.info("Roles de {} actualizados a {} por {}", usuario.getId(), nuevos, actor.getId());
         return UsuarioAdminResponse.from(usuario, ultimosAccesos().get(usuarioId));
     }
@@ -183,6 +191,13 @@ public class UsuarioAdminServiceImpl implements UsuarioAdminService {
         }
         usuario.setEstado(estado);
         usuarioRepository.saveAndFlush(usuario);
+        eventoSeguridadService.registrar(
+                estado == EstadoUsuario.INACTIVO
+                        ? TipoEventoSeguridad.CUENTA_DESACTIVADA
+                        : TipoEventoSeguridad.CUENTA_ACTIVADA,
+                usuario.getId(),
+                actor.getId(),
+                null);
         if (estado == EstadoUsuario.INACTIVO) {
             sesionRepository.revocarTodasDelUsuario(usuarioId);
             refreshTokenRepository.revocarDeUsuario(usuarioId);

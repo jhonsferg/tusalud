@@ -3405,7 +3405,12 @@
           ],
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/citas/{{citaId}}/cancelar",
               "host": ["{{baseUrl}}"],
@@ -3421,6 +3426,15 @@
                   "type": "string"
                 }
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"No puedo asistir por un imprevisto\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": []
@@ -3597,13 +3611,27 @@
           ],
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/citas/{{cita2Id}}/cancelar",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "citas", "{{cita2Id}}", "cancelar"]
             },
-            "description": "El paciente dueño cancela su cita: CANCELADA."
+            "description": "El paciente dueño cancela su cita: CANCELADA.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"No puedo asistir por un imprevisto\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
           },
           "response": [
             {
@@ -3651,13 +3679,27 @@
           ],
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/citas/{{cita2Id}}/cancelar",
               "host": ["{{baseUrl}}"],
               "path": ["api", "v1", "citas", "{{cita2Id}}", "cancelar"]
             },
-            "description": "Una cita CANCELADA no puede volver a cancelarse: 409."
+            "description": "Una cita CANCELADA no puede volver a cancelarse: 409.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"No puedo asistir por un imprevisto\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
           },
           "response": []
         },
@@ -6738,7 +6780,12 @@
           ],
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/farmacia/dispensaciones/{{dispensacionId}}/anular",
               "host": ["{{baseUrl}}"],
@@ -6761,6 +6808,15 @@
                   "type": "string"
                 }
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Producto entregado por error\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": []
@@ -6780,7 +6836,12 @@
           ],
           "request": {
             "method": "PUT",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/api/v1/farmacia/dispensaciones/{{dispensacionId}}/anular",
               "host": ["{{baseUrl}}"],
@@ -6803,6 +6864,15 @@
                   "type": "string"
                 }
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Producto entregado por error\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": []
@@ -7514,7 +7584,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"motivo\": \"Intento tardío\"\n}",
+              "raw": "{\n  \"motivo\": \"Solicitada por error\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -17603,7 +17673,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"motivo\": \"Solicitada por error\"\n}",
+              "raw": "{\n  \"motivo\": \"Solicitado por error\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -17659,7 +17729,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{}",
+              "raw": "{\n  \"motivo\": \"Solicitado por error\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -17715,7 +17785,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{}",
+              "raw": "{\n  \"motivo\": \"Solicitado por error\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -22292,6 +22362,868 @@
                   "type": "string"
                 }
               ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "25 - Seguridad operativa y motivos",
+      "item": [
+        {
+          "name": "Login fallido para generar un evento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@correo.com\",\n  \"password\": \"ClaveIncorrecta123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login con cuenta inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nadie.existe@tusalud.test\",\n  \"password\": \"ClaveIncorrecta123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eventos de seguridad paginados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Trae la página y el total\", () => {",
+                  "    pm.expect(j.contenido).to.be.an(\"array\").that.is.not.empty;",
+                  "    pm.expect(j.total).to.be.at.least(1);",
+                  "    pm.expect(j.tamano).to.eql(50);",
+                  "});",
+                  "pm.test(\"No guarda correos ni claves intentadas\", () => {",
+                  "    const texto = pm.response.text();",
+                  "    pm.expect(texto).to.not.include(\"ClaveIncorrecta123!\");",
+                  "    pm.expect(texto).to.not.include(\"nadie.existe@tusalud.test\");",
+                  "});",
+                  "pm.test(\"La IP está enmascarada\", () => {",
+                  "    j.contenido.filter(e => e.ip).forEach(e => pm.expect(e.ip).to.match(/(\\.x|:xxxx)$/));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/seguridad/eventos?tamano=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "seguridad", "eventos"],
+              "query": [
+                {
+                  "key": "tamano",
+                  "value": "50"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eventos filtrados por tipo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Solo inicios fallidos\", () => pm.response.json().contenido.forEach(e => pm.expect(e.tipo).to.eql(\"LOGIN_FALLIDO\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/seguridad/eventos?tipo=LOGIN_FALLIDO&severidad=AVISO",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "seguridad", "eventos"],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "LOGIN_FALLIDO"
+                },
+                {
+                  "key": "severidad",
+                  "value": "AVISO"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Página inválida (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/seguridad/eventos?pagina=-1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "seguridad", "eventos"],
+              "query": [
+                {
+                  "key": "pagina",
+                  "value": "-1"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rango de fechas inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/seguridad/eventos?desde=2026-05-10&hasta=2026-05-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "seguridad", "eventos"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "2026-05-10"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-05-01"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resumen de seguridad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Trae las dos ventanas\", () => {",
+                  "    pm.expect(j.ultimas24Horas.total).to.be.at.least(1);",
+                  "    pm.expect(j.ultimos7Dias.porTipo).to.be.an(\"array\").that.is.not.empty;",
+                  "    pm.expect(j.iniciosInusuales).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/seguridad/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "seguridad", "resumen"]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente no ve eventos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/seguridad/eventos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "seguridad", "eventos"]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médico no ve el resumen (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/seguridad/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "seguridad", "resumen"]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eventos sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/seguridad/eventos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "seguridad", "eventos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Estado del sistema",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Servicios sanos y migraciones aplicadas\", () => {",
+                  "    pm.expect(j.estadoGeneral).to.eql(\"OK\");",
+                  "    pm.expect(j.componentes).to.have.lengthOf(2);",
+                  "    pm.expect(j.migraciones.disponible).to.be.true;",
+                  "    pm.expect(j.migraciones.aplicadas).to.be.at.least(19);",
+                  "});",
+                  "pm.test(\"No expone secretos ni rutas internas\", () => {",
+                  "    const texto = pm.response.text();",
+                  "    pm.expect(texto).to.not.include(\"jdbc:\");",
+                  "    pm.expect(texto).to.not.match(/password|secret/i);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/sistema/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "sistema", "estado"]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Uso del almacenamiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Trae totales y buckets\", () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.totalObjetos).to.be.a(\"number\");",
+                  "    pm.expect(j.buckets).to.be.an(\"array\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/almacenamiento/uso",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "almacenamiento", "uso"]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente no ve el estado del sistema (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/sistema/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "sistema", "estado"]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Evoluciones pendientes de enfermería",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es una lista ordenada por horas sin registro\", () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j).to.be.an(\"array\");",
+                  "    for (let i = 1; i < j.length; i++) pm.expect(j[i - 1].horasSinRegistro).to.be.at.least(j[i].horasSinRegistro);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hospitalizacion/evoluciones-pendientes?horas=1",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hospitalizacion",
+                "evoluciones-pendientes"
+              ],
+              "query": [
+                {
+                  "key": "horas",
+                  "value": "1"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{enfermeriaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Horas inválidas (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hospitalizacion/evoluciones-pendientes?horas=0",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hospitalizacion",
+                "evoluciones-pendientes"
+              ],
+              "query": [
+                {
+                  "key": "horas",
+                  "value": "0"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{enfermeriaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente no ve evoluciones pendientes (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hospitalizacion/evoluciones-pendientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hospitalizacion", "evoluciones-pendientes"]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar cita sin motivo (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/00000000-0000-4000-8000-000000000001/cancelar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "citas",
+                "00000000-0000-4000-8000-000000000001",
+                "cancelar"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar cita con motivo corto (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/00000000-0000-4000-8000-000000000001/cancelar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "citas",
+                "00000000-0000-4000-8000-000000000001",
+                "cancelar"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"abc\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Anular dispensación sin motivo (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/farmacia/dispensaciones/00000000-0000-4000-8000-000000000001/anular",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "farmacia",
+                "dispensaciones",
+                "00000000-0000-4000-8000-000000000001",
+                "anular"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{farmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar ingreso sin motivo (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hospitalizacion/ingresos/00000000-0000-4000-8000-000000000001/cancelar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hospitalizacion",
+                "ingresos",
+                "00000000-0000-4000-8000-000000000001",
+                "cancelar"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
           },
           "response": []

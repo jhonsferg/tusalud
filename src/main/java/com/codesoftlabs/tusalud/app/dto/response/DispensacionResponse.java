@@ -19,7 +19,8 @@ public record DispensacionResponse(
         MetodoPagoFarmacia metodoPago,
         BigDecimal total,
         String observaciones,
-        List<DispensacionItemResponse> items) {
+        List<DispensacionItemResponse> items,
+        String motivoAnulacion) {
 
     public static final String CLIENTE_GENERAL = "Cliente general";
 
@@ -41,6 +42,7 @@ public record DispensacionResponse(
                 dispensacion.getObservaciones(),
                 dispensacion.getItems().stream()
                         .map(DispensacionItemResponse::from)
-                        .toList());
+                        .toList(),
+                dispensacion.getEstado() == EstadoDispensacion.ANULADA ? dispensacion.getMotivoAnulacion() : null);
     }
 }

@@ -109,7 +109,7 @@ class NotificacionServiceImplTest {
                         medico.getEspecialidades().iterator().next().getId()),
                 fixture.principal(paciente.getUsuario()));
 
-        citaService.cancelarCita(cita.id(), fixture.principal(paciente.getUsuario()));
+        citaService.cancelarCita(cita.id(), "Cancelación por prueba", fixture.principal(paciente.getUsuario()));
 
         assertThat(notificacionesDe(medico.getUsuario()))
                 .extracting(NotificacionResponse::tipo)

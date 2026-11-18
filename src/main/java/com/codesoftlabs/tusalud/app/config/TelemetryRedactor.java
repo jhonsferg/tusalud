@@ -53,7 +53,7 @@ public final class TelemetryRedactor {
     private static final Pattern RUTAS_SIN_CUERPO = Pattern.compile("^/api/v1/(" + "auth(/.*)?" + "|perfil(/.*)?"
             + "|metodos-pago(/.*)?"
             + "|pagos(/.*)?"
-            + "|admin/(usuarios|personal|roles|pagos)(/.*)?"
+            + "|admin/(usuarios|personal|roles|pagos|seguridad|sistema|almacenamiento)(/.*)?"
             + "|recepcion/pacientes(/.*)?"
             + "|historia-clinica(/.*)?"
             + "|pacientes/[^/]+/(historia-clinica|datos-medicos)(/.*)?"

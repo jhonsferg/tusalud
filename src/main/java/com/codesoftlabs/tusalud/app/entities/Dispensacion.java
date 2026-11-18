@@ -57,6 +57,9 @@ public class Dispensacion {
     @Column(nullable = false, length = 10)
     private EstadoDispensacion estado;
 
+    @Column(name = "motivo_anulacion", length = 300)
+    private String motivoAnulacion;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paciente_id")
     private Paciente paciente;

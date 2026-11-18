@@ -1,5 +1,6 @@
 package com.codesoftlabs.tusalud.app.controllers;
 
+import com.codesoftlabs.tusalud.app.dto.request.CancelarCitaRequest;
 import com.codesoftlabs.tusalud.app.dto.request.CitaCreateRequest;
 import com.codesoftlabs.tusalud.app.dto.request.ReprogramarRequest;
 import com.codesoftlabs.tusalud.app.dto.response.CitaResponse;
@@ -146,11 +147,11 @@ public class CitaController {
     }
 
     @PutMapping("/{id}/cancelar")
-    @PreAuthorize("hasAnyRole('PACIENTE', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('PACIENTE', 'MEDICO', 'ADMIN')")
     @Operation(
             summary = "Cancelar cita",
             description =
-                    "Cambia el estado de una cita PENDIENTE o CONFIRMADA a CANCELADA. Permitido al paciente dueño o a un ADMIN.")
+                    "Cambia el estado de una cita PENDIENTE o CONFIRMADA a CANCELADA y exige un motivo. Permitido al paciente dueño, al médico de la cita o a un ADMIN.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Cita cancelada"),
         @ApiResponse(
@@ -173,8 +174,9 @@ public class CitaController {
     public ResponseEntity<CitaResponse> cancelar(
             @Parameter(description = "ID de la cita", example = "3fa85f64-5717-4562-b3fc-2c963f66afa6") @PathVariable
                     UUID id,
+            @Valid @RequestBody CancelarCitaRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
-        return ResponseEntity.ok(citaService.cancelarCita(id, principal));
+        return ResponseEntity.ok(citaService.cancelarCita(id, request.motivo(), principal));
     }
 
     @PutMapping("/{id}/reprogramar")

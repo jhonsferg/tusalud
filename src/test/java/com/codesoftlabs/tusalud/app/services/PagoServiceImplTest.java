@@ -196,7 +196,7 @@ class PagoServiceImplTest {
         Cita cita = citaPendiente();
         PagoResponse pago = pagoService.pagarCita(cita.getId(), new PagoRequest(metodo.id(), null), principal);
 
-        citaService.cancelarCita(cita.getId(), principal);
+        citaService.cancelarCita(cita.getId(), "Cancelación por prueba", principal);
 
         assertThat(pagoService.obtenerMiPago(principal, pago.id()).estado()).isEqualTo(EstadoPago.REEMBOLSADO);
         assertThat(citaService.obtenerCita(cita.getId(), principal).pagado()).isFalse();

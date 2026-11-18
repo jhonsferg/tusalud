@@ -9,6 +9,7 @@ import com.codesoftlabs.tusalud.app.dto.request.EvolucionHospRequest;
 import com.codesoftlabs.tusalud.app.dto.request.IngresoHospCreateRequest;
 import com.codesoftlabs.tusalud.app.dto.response.CamaResponse;
 import com.codesoftlabs.tusalud.app.dto.response.EvolucionHospResponse;
+import com.codesoftlabs.tusalud.app.dto.response.EvolucionPendienteResponse;
 import com.codesoftlabs.tusalud.app.dto.response.HospResumenResponse;
 import com.codesoftlabs.tusalud.app.dto.response.IngresoHospResponse;
 import com.codesoftlabs.tusalud.app.dto.response.MapaCamasResponse;
@@ -41,7 +42,9 @@ public interface HospitalizacionService {
 
     IngresoHospResponse darAlta(UsuarioPrincipal actor, UUID id, AltaHospRequest request);
 
-    IngresoHospResponse cancelarIngreso(UUID id);
+    IngresoHospResponse cancelarIngreso(UUID id, String motivo);
+
+    List<EvolucionPendienteResponse> evolucionesPendientes(Integer horas);
 
     EvolucionHospResponse registrarEvolucion(UsuarioPrincipal actor, UUID ingresoId, EvolucionHospRequest request);
 

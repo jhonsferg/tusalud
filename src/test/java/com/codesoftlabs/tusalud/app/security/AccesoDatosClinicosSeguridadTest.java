@@ -217,7 +217,9 @@ class AccesoDatosClinicosSeguridadTest {
                     .andExpect(status().isForbidden());
         }
         mockMvc.perform(put("/api/v1/citas/" + cita.getId() + "/cancelar")
-                        .header(HttpHeaders.AUTHORIZATION, tokenOtroPaciente))
+                        .header(HttpHeaders.AUTHORIZATION, tokenOtroPaciente)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"motivo\":\"Cancelado por una prueba\"}"))
                 .andExpect(status().isForbidden());
         mockMvc.perform(put("/api/v1/citas/" + cita.getId() + "/confirmar")
                         .header(HttpHeaders.AUTHORIZATION, tokenAjeno))

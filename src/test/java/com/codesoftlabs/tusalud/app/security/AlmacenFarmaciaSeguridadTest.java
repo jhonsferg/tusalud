@@ -188,10 +188,14 @@ class AlmacenFarmaciaSeguridadTest {
                                         "{\"items\":[{\"productoId\":\"00000000-0000-0000-0000-000000000001\",\"cantidad\":1}],\"metodoPago\":\"EFECTIVO\"}"))
                 .andExpect(status().isForbidden());
         mockMvc.perform(put("/api/v1/farmacia/dispensaciones/00000000-0000-0000-0000-000000000001/anular")
-                        .header(HttpHeaders.AUTHORIZATION, almacen))
+                        .header(HttpHeaders.AUTHORIZATION, almacen)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"motivo\":\"Anulada por una prueba\"}"))
                 .andExpect(status().isForbidden());
         mockMvc.perform(put("/api/v1/farmacia/dispensaciones/00000000-0000-0000-0000-000000999999/anular")
-                        .header(HttpHeaders.AUTHORIZATION, farmacia))
+                        .header(HttpHeaders.AUTHORIZATION, farmacia)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"motivo\":\"Anulada por una prueba\"}"))
                 .andExpect(status().isNotFound());
     }
 

@@ -1,12 +1,14 @@
 package com.codesoftlabs.tusalud.app.exceptions;
 
 import com.codesoftlabs.tusalud.app.dto.response.ErrorResponse;
+import com.codesoftlabs.tusalud.app.services.interfaces.EventoSeguridadService;
 import com.codesoftlabs.tusalud.app.storage.AlmacenamientoException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -33,6 +35,9 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @Autowired(required = false)
+    private EventoSeguridadService eventoSeguridadService;
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(
@@ -144,11 +149,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
+        registrarDenegado(request);
         return build(HttpStatus.FORBIDDEN, "No tiene permisos para realizar esta operación", request);
+    }
+
+    private void registrarDenegado(HttpServletRequest request) {
+        if (eventoSeguridadService == null) {
+            return;
+        }
+        try {
+            eventoSeguridadService.registrarAccesoDenegado(request.getMethod(), request.getRequestURI());
+        } catch (RuntimeException ex) {
+            log.warn(
+                    "No se pudo registrar el acceso denegado: {}", ex.getClass().getSimpleName());
+        }
     }
 
     @ExceptionHandler(ForbiddenOperationException.class)
     public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenOperationException ex, HttpServletRequest request) {
+        registrarDenegado(request);
         return build(HttpStatus.FORBIDDEN, ex.getMessage(), request);
     }
 

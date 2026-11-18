@@ -1,5 +1,6 @@
 package com.codesoftlabs.tusalud.app.controllers;
 
+import com.codesoftlabs.tusalud.app.dto.request.AnularDispensacionRequest;
 import com.codesoftlabs.tusalud.app.dto.request.DispensacionRequest;
 import com.codesoftlabs.tusalud.app.dto.response.CatalogoFarmaciaResponse;
 import com.codesoftlabs.tusalud.app.dto.response.DispensacionResponse;
@@ -99,8 +100,10 @@ public class FarmaciaController {
             description =
                     "Devuelve el stock a sus lotes y reabre los ítems de receta. Responde 409 si ya está anulada.")
     public ResponseEntity<DispensacionResponse> anular(
-            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable UUID id) {
-        return ResponseEntity.ok(farmaciaService.anular(principal, id));
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
+            @PathVariable UUID id,
+            @Valid @RequestBody AnularDispensacionRequest request) {
+        return ResponseEntity.ok(farmaciaService.anular(principal, id, request.motivo()));
     }
 
     @GetMapping("/mis-dispensaciones")

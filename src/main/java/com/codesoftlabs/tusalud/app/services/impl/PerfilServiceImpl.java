@@ -11,6 +11,7 @@ import com.codesoftlabs.tusalud.app.entities.MfaUsuario;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
 import com.codesoftlabs.tusalud.app.entities.PreferenciaUsuario;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
+import com.codesoftlabs.tusalud.app.entities.enums.TipoEventoSeguridad;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
@@ -21,6 +22,7 @@ import com.codesoftlabs.tusalud.app.repositories.PreferenciaUsuarioRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.ArchivoService;
+import com.codesoftlabs.tusalud.app.services.interfaces.EventoSeguridadService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.PerfilService;
 import com.codesoftlabs.tusalud.app.services.interfaces.RefreshTokenService;
@@ -42,6 +44,7 @@ public class PerfilServiceImpl implements PerfilService {
     private final PacienteRepository pacienteRepository;
     private final MedicoRepository medicoRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EventoSeguridadService eventoSeguridadService;
     private final PreferenciaUsuarioRepository preferenciaRepository;
     private final NotificacionService notificacionService;
     private final MfaUsuarioRepository mfaUsuarioRepository;
@@ -99,6 +102,8 @@ public class PerfilServiceImpl implements PerfilService {
                 "Contraseña actualizada",
                 "Su contraseña fue cambiada. Si no fue usted, comuníquese con soporte.",
                 "/perfil");
+        eventoSeguridadService.registrar(
+                TipoEventoSeguridad.CONTRASENA_CAMBIADA, usuario.getId(), usuario.getId(), null);
         log.info("Contraseña actualizada para {}", usuario.getId());
     }
 

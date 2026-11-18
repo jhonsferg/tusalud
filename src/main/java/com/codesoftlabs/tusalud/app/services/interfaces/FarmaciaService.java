@@ -23,7 +23,7 @@ public interface FarmaciaService {
 
     DispensacionResponse obtener(UUID id);
 
-    DispensacionResponse anular(UsuarioPrincipal actor, UUID id);
+    DispensacionResponse anular(UsuarioPrincipal actor, UUID id, String motivo);
 
     List<DispensacionResponse> misDispensaciones(UsuarioPrincipal actor);
 

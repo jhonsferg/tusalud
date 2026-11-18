@@ -4,12 +4,14 @@ import com.codesoftlabs.tusalud.app.dto.request.AltaHospRequest;
 import com.codesoftlabs.tusalud.app.dto.request.CamaAsignacionRequest;
 import com.codesoftlabs.tusalud.app.dto.request.CamaEstadoRequest;
 import com.codesoftlabs.tusalud.app.dto.request.CamaRequest;
+import com.codesoftlabs.tusalud.app.dto.request.CancelarIngresoRequest;
 import com.codesoftlabs.tusalud.app.dto.request.EmergenciaRequest;
 import com.codesoftlabs.tusalud.app.dto.request.EvolucionHospRequest;
 import com.codesoftlabs.tusalud.app.dto.request.IngresoHospCreateRequest;
 import com.codesoftlabs.tusalud.app.dto.response.CamaResponse;
 import com.codesoftlabs.tusalud.app.dto.response.ErrorResponse;
 import com.codesoftlabs.tusalud.app.dto.response.EvolucionHospResponse;
+import com.codesoftlabs.tusalud.app.dto.response.EvolucionPendienteResponse;
 import com.codesoftlabs.tusalud.app.dto.response.HospResumenResponse;
 import com.codesoftlabs.tusalud.app.dto.response.IngresoHospResponse;
 import com.codesoftlabs.tusalud.app.dto.response.MapaCamasResponse;
@@ -201,10 +203,23 @@ public class HospitalizacionController {
 
     @PutMapping("/ingresos/{id}/cancelar")
     @PreAuthorize("hasAnyRole('MEDICO', 'ADMIN')")
-    @Operation(summary = "Cancelar un ingreso", description = "Solo mientras no tenga evoluciones.")
+    @Operation(summary = "Cancelar un ingreso", description = "Solo mientras no tenga evoluciones y con un motivo.")
     @ApiResponse(responseCode = "200", description = "Ingreso cancelado")
-    public ResponseEntity<IngresoHospResponse> cancelarIngreso(@PathVariable UUID id) {
-        return ResponseEntity.ok(hospitalizacionService.cancelarIngreso(id));
+    public ResponseEntity<IngresoHospResponse> cancelarIngreso(
+            @PathVariable UUID id, @Valid @RequestBody CancelarIngresoRequest request) {
+        return ResponseEntity.ok(hospitalizacionService.cancelarIngreso(id, request.motivo()));
+    }
+
+    @GetMapping("/evoluciones-pendientes")
+    @PreAuthorize("hasAnyRole('ENFERMERIA', 'ADMIN')")
+    @Operation(
+            summary = "Ingresos sin evolución de enfermería reciente",
+            description =
+                    "Ingresos activos con cama cuya última evolución de enfermería supera las horas indicadas, 8 por defecto.")
+    @ApiResponse(responseCode = "200", description = "Pendientes ordenados por horas sin registro")
+    public ResponseEntity<List<EvolucionPendienteResponse>> evolucionesPendientes(
+            @RequestParam(required = false) Integer horas) {
+        return ResponseEntity.ok(hospitalizacionService.evolucionesPendientes(horas));
     }
 
     @PostMapping("/ingresos/{id}/evoluciones")

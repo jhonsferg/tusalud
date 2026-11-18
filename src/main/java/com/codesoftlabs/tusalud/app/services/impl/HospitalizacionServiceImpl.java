@@ -10,6 +10,7 @@ import com.codesoftlabs.tusalud.app.dto.request.IngresoHospCreateRequest;
 import com.codesoftlabs.tusalud.app.dto.request.TriajeRequest;
 import com.codesoftlabs.tusalud.app.dto.response.CamaResponse;
 import com.codesoftlabs.tusalud.app.dto.response.EvolucionHospResponse;
+import com.codesoftlabs.tusalud.app.dto.response.EvolucionPendienteResponse;
 import com.codesoftlabs.tusalud.app.dto.response.HospResumenResponse;
 import com.codesoftlabs.tusalud.app.dto.response.IngresoHospResponse;
 import com.codesoftlabs.tusalud.app.dto.response.MapaCamasResponse;
@@ -27,6 +28,7 @@ import com.codesoftlabs.tusalud.app.entities.enums.TipoEvolucion;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoIngresoHosp;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
+import com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException;
 import com.codesoftlabs.tusalud.app.exceptions.ForbiddenOperationException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.CamaRepository;
@@ -35,13 +37,16 @@ import com.codesoftlabs.tusalud.app.repositories.IngresoHospitalarioRepository;
 import com.codesoftlabs.tusalud.app.repositories.MedicoRepository;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
+import com.codesoftlabs.tusalud.app.security.TextoSeguro;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.HospitalizacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.RelacionAsistencialService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -54,11 +59,14 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class HospitalizacionServiceImpl implements HospitalizacionService {
@@ -72,6 +80,10 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     private final CamaRepository camaRepository;
     private final IngresoHospitalarioRepository ingresoRepository;
     private final EvolucionHospitalariaRepository evolucionRepository;
+
+    @Value("${app.hospitalizacion.horas-evolucion-pendiente:8}")
+    private int horasEvolucionPendiente;
+
     private final PacienteRepository pacienteRepository;
     private final MedicoRepository medicoRepository;
     private final UsuarioRepository usuarioRepository;
@@ -258,8 +270,12 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     }
 
     @Override
-    public IngresoHospResponse cancelarIngreso(UUID id) {
+    public IngresoHospResponse cancelarIngreso(UUID id, String motivo) {
         IngresoHospitalario ingreso = buscarIngresoActivo(id);
+        String motivoLimpio = TextoSeguro.limpiar(motivo);
+        if (motivoLimpio == null || motivoLimpio.length() < 5 || motivoLimpio.length() > 300) {
+            throw new DatosInvalidosException("El motivo de la cancelación debe tener entre 5 y 300 caracteres");
+        }
         if (evolucionRepository.countByIngresoId(id) > 0) {
             throw new ConflictException("El ingreso ya tiene evoluciones registradas y no se puede cancelar");
         }
@@ -269,8 +285,51 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
             camaRepository.save(cama);
         }
         ingreso.setEstado(EstadoIngresoHosp.CANCELADO);
+        ingreso.setMotivoCancelacion(motivoLimpio);
         ingreso.setDesdeEnCama(null);
+        log.info("Auditoría: ingreso {} cancelado con motivo registrado", ingreso.getId());
         return IngresoHospResponse.from(ingresoRepository.save(ingreso), LocalDateTime.now());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<EvolucionPendienteResponse> evolucionesPendientes(Integer horas) {
+        int umbral = horas == null ? horasEvolucionPendiente : horas;
+        if (umbral < 1 || umbral > 72) {
+            throw new DatosInvalidosException("Las horas deben estar entre 1 y 72");
+        }
+        List<IngresoHospitalario> activos = ingresoRepository.findPorEstado(EstadoIngresoHosp.ACTIVO).stream()
+                .filter(ingreso -> ingreso.getCama() != null)
+                .toList();
+        if (activos.isEmpty()) {
+            return List.of();
+        }
+        Map<UUID, LocalDateTime> ultimas = new HashMap<>();
+        for (Object[] fila : evolucionRepository.ultimaPorIngreso(
+                activos.stream().map(IngresoHospitalario::getId).toList(), TipoEvolucion.ENFERMERIA)) {
+            ultimas.put((UUID) fila[0], (LocalDateTime) fila[1]);
+        }
+        LocalDateTime ahora = LocalDateTime.now();
+        List<EvolucionPendienteResponse> pendientes = new ArrayList<>();
+        for (IngresoHospitalario ingreso : activos) {
+            LocalDateTime ultima = ultimas.get(ingreso.getId());
+            LocalDateTime referencia = ultima == null ? ingreso.getFechaIngreso() : ultima;
+            long sinRegistro = Duration.between(referencia, ahora).toHours();
+            if (sinRegistro >= umbral) {
+                pendientes.add(new EvolucionPendienteResponse(
+                        ingreso.getId(),
+                        ingreso.getCodigo(),
+                        ingreso.getCama().getCodigo(),
+                        ingreso.getCama().getArea().name(),
+                        ingreso.getPaciente().getUsuario().getNombreCompleto(),
+                        ingreso.getFechaIngreso(),
+                        ultima,
+                        sinRegistro));
+            }
+        }
+        pendientes.sort(Comparator.comparingLong(EvolucionPendienteResponse::horasSinRegistro)
+                .reversed());
+        return pendientes;
     }
 
     @Override

@@ -18,7 +18,7 @@ public interface CitaService {
 
     CitaResponse obtenerCita(UUID citaId, UsuarioPrincipal actor);
 
-    CitaResponse cancelarCita(UUID citaId, UsuarioPrincipal actor);
+    CitaResponse cancelarCita(UUID citaId, String motivo, UsuarioPrincipal actor);
 
     CitaResponse confirmarCita(UUID citaId, UsuarioPrincipal actor);
 

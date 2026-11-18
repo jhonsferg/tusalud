@@ -12,6 +12,7 @@ import com.codesoftlabs.tusalud.app.entities.SesionUsuario;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoUsuario;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
+import com.codesoftlabs.tusalud.app.entities.enums.TipoEventoSeguridad;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.ConflictException;
 import com.codesoftlabs.tusalud.app.exceptions.DemasiadosIntentosException;
@@ -22,6 +23,7 @@ import com.codesoftlabs.tusalud.app.security.ContextoConexion;
 import com.codesoftlabs.tusalud.app.security.JwtUtils;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.AuthService;
+import com.codesoftlabs.tusalud.app.services.interfaces.EventoSeguridadService;
 import com.codesoftlabs.tusalud.app.services.interfaces.MfaService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.RefreshTokenService;
@@ -37,8 +39,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,12 +66,19 @@ public class AuthServiceImpl implements AuthService {
     private final MfaService mfaService;
     private final RefreshTokenService refreshTokenService;
     private final NotificacionService notificacionService;
+    private final EventoSeguridadService eventoSeguridadService;
 
     @Override
-    @Transactional
+    @Transactional(noRollbackFor = AuthenticationException.class)
     public AuthResponse login(LoginRequest request, ContextoConexion contexto) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(normalizarEmail(request.email()), request.password()));
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(normalizarEmail(request.email()), request.password()));
+        } catch (AuthenticationException ex) {
+            registrarLoginFallido(request.email(), contexto, ex instanceof DisabledException);
+            throw ex;
+        }
         UsuarioPrincipal principal = (UsuarioPrincipal) authentication.getPrincipal();
         Usuario usuario = usuarioRepository
                 .findById(principal.getId())
@@ -87,6 +98,26 @@ public class AuthServiceImpl implements AuthService {
         UUID tokenId = sesionService.iniciarSesion(usuario, contexto);
         log.info("Inicio de sesión exitoso para {}", principal.getId());
         return construirRespuesta(principal, tokenId);
+    }
+
+    private void registrarLoginFallido(String email, ContextoConexion contexto, boolean inactiva) {
+        UUID usuarioId = usuarioRepository
+                .findByEmailWithRoles(normalizarEmail(email))
+                .map(Usuario::getId)
+                .orElse(null);
+        if (inactiva) {
+            eventoSeguridadService.registrar(
+                    TipoEventoSeguridad.LOGIN_CUENTA_INACTIVA,
+                    usuarioId,
+                    null,
+                    "Intento de acceso con una cuenta inactiva",
+                    contexto);
+            return;
+        }
+        eventoSeguridadService.registrarLoginFallido(
+                usuarioId,
+                usuarioId == null ? "Credenciales inválidas para una cuenta inexistente" : "Credenciales inválidas",
+                contexto);
     }
 
     @Override

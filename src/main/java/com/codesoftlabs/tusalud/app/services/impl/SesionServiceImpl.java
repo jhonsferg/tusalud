@@ -3,6 +3,7 @@ package com.codesoftlabs.tusalud.app.services.impl;
 import com.codesoftlabs.tusalud.app.dto.response.SesionResponse;
 import com.codesoftlabs.tusalud.app.entities.SesionUsuario;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
+import com.codesoftlabs.tusalud.app.entities.enums.TipoEventoSeguridad;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.PreferenciaUsuarioRepository;
@@ -11,6 +12,7 @@ import com.codesoftlabs.tusalud.app.security.ContextoConexion;
 import com.codesoftlabs.tusalud.app.security.DispositivoParser;
 import com.codesoftlabs.tusalud.app.security.JwtUtils;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
+import com.codesoftlabs.tusalud.app.services.interfaces.EventoSeguridadService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.RefreshTokenService;
 import com.codesoftlabs.tusalud.app.services.interfaces.SesionService;
@@ -34,6 +36,7 @@ public class SesionServiceImpl implements SesionService {
     private final SesionUsuarioRepository sesionRepository;
     private final PreferenciaUsuarioRepository preferenciaRepository;
     private final NotificacionService notificacionService;
+    private final EventoSeguridadService eventoSeguridadService;
     private final JwtUtils jwtUtils;
     private final RefreshTokenService refreshTokenService;
 
@@ -44,6 +47,8 @@ public class SesionServiceImpl implements SesionService {
         LocalDateTime ahora = LocalDateTime.now();
         String dispositivo = DispositivoParser.describir(contexto.userAgent());
         UUID tokenId = UUID.randomUUID();
+        boolean conocido =
+                sesionRepository.existsByUsuarioIdAndDispositivoAndIp(usuario.getId(), dispositivo, contexto.ip());
 
         sesionRepository.save(SesionUsuario.builder()
                 .usuario(usuario)
@@ -57,6 +62,14 @@ public class SesionServiceImpl implements SesionService {
                 .revocada(false)
                 .build());
 
+        if (tieneSesionesPrevias && !conocido) {
+            eventoSeguridadService.registrar(
+                    TipoEventoSeguridad.DISPOSITIVO_NUEVO,
+                    usuario.getId(),
+                    null,
+                    "Inicio de sesión desde un dispositivo o una dirección no usados antes",
+                    contexto);
+        }
         if (tieneSesionesPrevias && alertasActivas(usuario.getId())) {
             notificacionService.crear(
                     usuario,

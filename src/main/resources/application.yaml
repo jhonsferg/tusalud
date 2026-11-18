@@ -45,6 +45,14 @@ app:
     allowed-headers: Authorization,Content-Type,Accept,Origin,X-Requested-With
     exposed-headers: Authorization
     max-age: 3600
+  version: "@project.version@"
+  seguridad:
+    retencion-dias: ${SEGURIDAD_RETENCION_DIAS:90}
+    accesos-denegados-umbral: 5
+    login-fallidos-umbral: 5
+    descargas-umbral: 30
+  hospitalizacion:
+    horas-evolucion-pendiente: ${HOSPITALIZACION_HORAS_EVOLUCION:8}
   mfa:
     clave-cifrado: ${MFA_CLAVE_CIFRADO:clave-de-desarrollo-para-cifrar-secretos-mfa}
   pagos:

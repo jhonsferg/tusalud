@@ -28,6 +28,7 @@ import com.codesoftlabs.tusalud.app.repositories.DispensacionRepository;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
 import com.codesoftlabs.tusalud.app.repositories.ProductoRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
+import com.codesoftlabs.tusalud.app.security.TextoSeguro;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.FarmaciaService;
 import com.codesoftlabs.tusalud.app.services.interfaces.InventarioService;
@@ -45,11 +46,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class FarmaciaServiceImpl implements FarmaciaService {
@@ -199,9 +202,13 @@ public class FarmaciaServiceImpl implements FarmaciaService {
 
     @Override
     @Transactional
-    public DispensacionResponse anular(UsuarioPrincipal actor, UUID id) {
+    public DispensacionResponse anular(UsuarioPrincipal actor, UUID id, String motivo) {
         Usuario usuario = usuario(actor);
         Dispensacion dispensacion = buscar(id);
+        String motivoLimpio = TextoSeguro.limpiar(motivo);
+        if (motivoLimpio == null || motivoLimpio.length() < 5 || motivoLimpio.length() > 300) {
+            throw new DatosInvalidosException("El motivo de la anulación debe tener entre 5 y 300 caracteres");
+        }
         if (dispensacion.getEstado() == EstadoDispensacion.ANULADA) {
             throw new ConflictException("La dispensación " + dispensacion.getComprobante() + " ya fue anulada");
         }
@@ -212,6 +219,11 @@ public class FarmaciaServiceImpl implements FarmaciaService {
             }
         }
         dispensacion.setEstado(EstadoDispensacion.ANULADA);
+        dispensacion.setMotivoAnulacion(motivoLimpio);
+        log.info(
+                "Auditoría: dispensación {} anulada por {} con motivo registrado",
+                dispensacion.getId(),
+                usuario.getId());
         return DispensacionResponse.from(dispensacion);
     }
 

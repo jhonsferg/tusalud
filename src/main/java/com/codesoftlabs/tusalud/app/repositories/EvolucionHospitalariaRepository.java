@@ -20,4 +20,13 @@ public interface EvolucionHospitalariaRepository extends JpaRepository<Evolucion
     List<EvolucionHospitalaria> findDelIngreso(@Param("ingresoId") UUID ingresoId);
 
     long countByIngresoId(UUID ingresoId);
+
+    @Query("""
+            SELECT e.ingreso.id, MAX(e.fecha) FROM EvolucionHospitalaria e
+            WHERE e.ingreso.id IN :ingresoIds AND e.tipo = :tipo
+            GROUP BY e.ingreso.id
+            """)
+    List<Object[]> ultimaPorIngreso(
+            @Param("ingresoIds") java.util.Collection<UUID> ingresoIds,
+            @Param("tipo") com.codesoftlabs.tusalud.app.entities.enums.TipoEvolucion tipo);
 }

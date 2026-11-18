@@ -262,12 +262,26 @@ class FarmaciaServiceTest {
     }
 
     @Test
+    void anularExigeYGuardaElMotivo() {
+        DispensacionResponse dispensada = farmaciaService.dispensar(
+                farmacia, dispensar(atencion.getId(), null, new DispensacionItemRequest(0, conReceta.id(), 5)));
+
+        assertThatThrownBy(() -> farmaciaService.anular(farmacia, dispensada.id(), "no"))
+                .isInstanceOf(com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException.class);
+        DispensacionResponse anulada =
+                farmaciaService.anular(farmacia, dispensada.id(), "  Producto   entregado por error ");
+
+        assertThat(anulada.motivoAnulacion()).isEqualTo("Producto entregado por error");
+    }
+
+    @Test
     void anularDevuelveElStockYReabreLaReceta() {
         DispensacionResponse dispensada = farmaciaService.dispensar(
                 farmacia, dispensar(atencion.getId(), null, new DispensacionItemRequest(0, conReceta.id(), 25)));
         assertThat(stock(conReceta)).isEqualTo(75);
 
-        DispensacionResponse anulada = farmaciaService.anular(farmacia, dispensada.id());
+        DispensacionResponse anulada =
+                farmaciaService.anular(farmacia, dispensada.id(), "Producto entregado por error");
 
         assertThat(anulada.estado()).isEqualTo(EstadoDispensacion.ANULADA);
         assertThat(stock(conReceta)).isEqualTo(100);
@@ -276,7 +290,7 @@ class FarmaciaServiceTest {
         assertThat(almacenService.movimientos(conReceta.id(), TipoMovimiento.ENTRADA, null, null))
                 .extracting(m -> m.motivo().name())
                 .contains("ANULACION_DISPENSACION");
-        assertThatThrownBy(() -> farmaciaService.anular(farmacia, dispensada.id()))
+        assertThatThrownBy(() -> farmaciaService.anular(farmacia, dispensada.id(), "Producto entregado por error"))
                 .isInstanceOf(ConflictException.class);
     }
 

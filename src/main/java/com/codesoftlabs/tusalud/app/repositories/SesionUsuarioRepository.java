@@ -20,6 +20,8 @@ public interface SesionUsuarioRepository extends JpaRepository<SesionUsuario, UU
 
     boolean existsByUsuarioId(UUID usuarioId);
 
+    boolean existsByUsuarioIdAndDispositivoAndIp(UUID usuarioId, String dispositivo, String ip);
+
     List<SesionUsuario> findByUsuarioIdAndRevocadaFalseAndExpiraEnAfterOrderByUltimoAccesoDesc(
             UUID usuarioId, LocalDateTime ahora);
 
