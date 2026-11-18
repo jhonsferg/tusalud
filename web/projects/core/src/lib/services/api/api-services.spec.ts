@@ -24,6 +24,7 @@ import { RecepcionApiService } from './recepcion-api.service';
 import { ReportesApiService } from './reportes-api.service';
 import { SeguridadOperativaApiService } from './seguridad-operativa-api.service';
 import { RrhhApiService } from './rrhh-api.service';
+import { SegurosApiService } from './seguros-api.service';
 
 function u(n: number): string {
   return `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
@@ -954,5 +955,97 @@ describe('servicios de la API', () => {
     expectRequest({ method: 'GET', url: '/api/v1/admin/sistema/estado' });
     api.usoAlmacenamiento().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/admin/almacenamiento/uso' });
+  });
+
+  it('CajaApiService calcula el desglose con la cobertura del seguro', () => {
+    const api = TestBed.inject(CajaApiService);
+    api.desglose('CITA', u(5)).subscribe();
+    expectRequest({
+      method: 'POST',
+      url: '/api/v1/caja/cobros/desglose',
+      body: { origen: 'CITA', referenciaId: u(5) },
+    });
+  });
+
+  it('SegurosApiService cubre catálogo, pólizas, preautorizaciones y liquidaciones', () => {
+    const api = TestBed.inject(SegurosApiService);
+    api.aseguradoras().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/seguros/aseguradoras' });
+    const aseguradora = { codigo: 'RIMAC', nombre: 'Rímac', tipo: 'PRIVADO' as const };
+    api.crearAseguradora(aseguradora).subscribe();
+    expectRequest({ method: 'POST', url: '/api/v1/seguros/aseguradoras', body: aseguradora });
+    api.actualizarAseguradora(u(1), aseguradora).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: `/api/v1/seguros/aseguradoras/${u(1)}`,
+      body: aseguradora,
+    });
+    api.convenios().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/seguros/convenios' });
+
+    api.buscarPolizas('pac').subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/seguros/polizas', params: { q: 'pac' } });
+    api.polizasDelPaciente(u(2)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/seguros/pacientes/${u(2)}/polizas` });
+    api.verificarPoliza(u(3)).subscribe();
+    expectRequest({
+      method: 'POST',
+      url: `/api/v1/seguros/polizas/${u(3)}/verificaciones`,
+      body: {},
+    });
+    api.cambiarEstadoPoliza(u(3), { estado: 'SUSPENDIDA', motivo: 'Revisión' }).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: `/api/v1/seguros/polizas/${u(3)}/estado`,
+      body: { estado: 'SUSPENDIDA', motivo: 'Revisión' },
+    });
+    api.misPolizas().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/seguros/mis-polizas' });
+    api.coberturaDelPaciente(u(2)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/seguros/cobertura/pacientes/${u(2)}` });
+
+    api.preautorizaciones('SOLICITADA').subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/seguros/preautorizaciones',
+      params: { estado: 'SOLICITADA' },
+    });
+    api.misPreautorizaciones().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/seguros/preautorizaciones/mias' });
+    api.aprobarPreautorizacion(u(4), { montoAprobado: 600, vigenciaDias: 15 }).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: `/api/v1/seguros/preautorizaciones/${u(4)}/aprobar`,
+      body: { montoAprobado: 600, vigenciaDias: 15 },
+    });
+    api.rechazarPreautorizacion(u(4), 'No cubierto').subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: `/api/v1/seguros/preautorizaciones/${u(4)}/rechazar`,
+      body: { motivo: 'No cubierto' },
+    });
+
+    api.cartera().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/seguros/cartera' });
+    api.cuentasDeAseguradora(u(1)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/seguros/aseguradoras/${u(1)}/cuentas` });
+    api
+      .crearLiquidacion({ aseguradoraId: u(1), desde: '2026-11-01', hasta: '2026-11-30' })
+      .subscribe();
+    expectRequest({
+      method: 'POST',
+      url: '/api/v1/seguros/liquidaciones',
+      body: { aseguradoraId: u(1), desde: '2026-11-01', hasta: '2026-11-30' },
+    });
+    api.enviarLiquidacion(u(6)).subscribe();
+    expectRequest({ method: 'PUT', url: `/api/v1/seguros/liquidaciones/${u(6)}/enviar`, body: {} });
+    api.registrarPagoLiquidacion(u(6), { montoPagado: 100, motivoGlosa: 'Glosa' }).subscribe();
+    expectRequest({
+      method: 'PUT',
+      url: `/api/v1/seguros/liquidaciones/${u(6)}/pago`,
+      body: { montoPagado: 100, motivoGlosa: 'Glosa' },
+    });
+    api.resumen().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/seguros/resumen' });
   });
 });

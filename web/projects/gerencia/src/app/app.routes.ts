@@ -45,6 +45,12 @@ export const routes: Routes = [
         redirectTo: 'mi-espacio/ausencias',
       },
       {
+        path: 'seguros',
+        canMatch: [roleGuard('ROLE_GERENCIA')],
+        loadChildren: () =>
+          import('@tusalud/features/seguros').then((m) => m.SEGUROS_GERENCIA_ROUTES),
+      },
+      {
         path: 'calendario',
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },

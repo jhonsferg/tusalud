@@ -28,6 +28,8 @@ export type TipoNotificacion =
   | 'ESTUDIO_INFORMADO'
   | 'HALLAZGO_CRITICO'
   | 'EXPORTACION_LISTA'
+  | 'PREAUTORIZACION_SOLICITADA'
+  | 'PREAUTORIZACION_RESUELTA'
   | 'SISTEMA';
 
 export interface NotificacionResponse {

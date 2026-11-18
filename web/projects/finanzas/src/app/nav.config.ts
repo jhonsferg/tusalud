@@ -31,6 +31,35 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Seguros y convenios',
+    items: [
+      {
+        label: 'Aseguradoras y convenios',
+        icon: 'pi-shield',
+        link: '/seguros/aseguradoras',
+        roles: ['ROLE_FINANZAS'],
+      },
+      {
+        label: 'Cartera',
+        icon: 'pi-briefcase',
+        link: '/seguros/cartera',
+        roles: ['ROLE_FINANZAS'],
+      },
+      {
+        label: 'Liquidaciones',
+        icon: 'pi-file-edit',
+        link: '/seguros/liquidaciones',
+        roles: ['ROLE_FINANZAS'],
+      },
+      {
+        label: 'Preautorizaciones',
+        icon: 'pi-verified',
+        link: '/seguros/preautorizaciones',
+        roles: ['ROLE_FINANZAS'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

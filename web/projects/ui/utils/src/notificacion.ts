@@ -30,6 +30,8 @@ export const ICONO_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   ESTUDIO_INFORMADO: 'pi-file-check',
   HALLAZGO_CRITICO: 'pi-exclamation-triangle',
   EXPORTACION_LISTA: 'pi-file-export',
+  PREAUTORIZACION_SOLICITADA: 'pi-verified',
+  PREAUTORIZACION_RESUELTA: 'pi-verified',
   SISTEMA: 'pi-info-circle',
 };
 
@@ -63,5 +65,7 @@ export const COLOR_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   ESTUDIO_INFORMADO: '#10b981',
   HALLAZGO_CRITICO: '#dc2626',
   EXPORTACION_LISTA: '#0891b2',
+  PREAUTORIZACION_SOLICITADA: '#0d9488',
+  PREAUTORIZACION_RESUELTA: '#0d9488',
   SISTEMA: '#64748b',
 };

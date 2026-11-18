@@ -110,6 +110,17 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Seguros',
+    items: [
+      {
+        label: 'Preautorizaciones',
+        icon: 'pi-verified',
+        link: '/preautorizaciones',
+        roles: ['ROLE_MEDICO'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

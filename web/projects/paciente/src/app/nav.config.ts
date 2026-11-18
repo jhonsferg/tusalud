@@ -105,6 +105,17 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Mi seguro',
+    items: [
+      {
+        label: 'Mis seguros',
+        icon: 'pi-shield',
+        link: '/mis-seguros',
+        roles: ['ROLE_PACIENTE'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

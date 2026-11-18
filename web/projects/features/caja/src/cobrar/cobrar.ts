@@ -20,8 +20,10 @@ import { TableModule } from 'primeng/table';
 import { Subject, debounceTime } from 'rxjs';
 
 import {
+  CajaApiService,
   CajaStore,
   ComprobanteResponse,
+  DesgloseCobroResponse,
   ETIQUETA_METODO_CAJA,
   ETIQUETA_ORIGEN,
   MetodoPagoCaja,
@@ -60,6 +62,7 @@ import { PageHeader } from '@tusalud/ui/page-header';
 })
 export class Cobrar implements OnInit {
   protected readonly store = inject(CajaStore);
+  private readonly cajaApi = inject(CajaApiService);
   private readonly notifications = inject(NotificationService);
   private readonly fb = inject(FormBuilder).nonNullable;
 
@@ -98,7 +101,20 @@ export class Cobrar implements OnInit {
     precioUnitario: [0],
   });
 
-  protected readonly total = computed(() => this.pendiente()?.monto ?? 0);
+  protected readonly desglose = signal<DesgloseCobroResponse | null>(null);
+  protected readonly particular = signal(false);
+  protected readonly motivoParticular = signal('');
+  protected readonly cobraCopago = computed(
+    () => this.desglose()?.tieneCobertura === true && !this.particular(),
+  );
+
+  protected readonly total = computed(() => {
+    const desglose = this.desglose();
+    if (desglose?.tieneCobertura && !this.particular()) {
+      return desglose.copago;
+    }
+    return this.pendiente()?.monto ?? 0;
+  });
 
   constructor() {
     this.cambio.pipe(debounceTime(300), takeUntilDestroyed()).subscribe(() => this.cargar());
@@ -131,6 +147,15 @@ export class Cobrar implements OnInit {
       cantidad: 1,
       precioUnitario: 0,
     });
+    this.desglose.set(null);
+    this.particular.set(false);
+    this.motivoParticular.set('');
+    if (pendiente && ['CITA', 'LABORATORIO', 'IMAGEN'].includes(pendiente.origen)) {
+      this.cajaApi.desglose(pendiente.origen, pendiente.referenciaId).subscribe({
+        next: (desglose) => this.desglose.set(desglose),
+        error: () => this.desglose.set(null),
+      });
+    }
     this.visible.set(true);
   }
 
@@ -151,6 +176,10 @@ export class Cobrar implements OnInit {
       this.error.set('Indica el nombre del cliente y su documento.');
       return;
     }
+    if (this.particular() && this.motivoParticular().trim().length < 5) {
+      this.error.set('Indica el motivo para cobrar como particular.');
+      return;
+    }
     const pendiente = this.pendiente();
     if (!pendiente && (!valor.descripcion.trim() || valor.precioUnitario <= 0)) {
       this.error.set('Describe el servicio e indica un precio mayor a cero.');
@@ -166,6 +195,8 @@ export class Cobrar implements OnInit {
         clienteDoc: valor.clienteDoc.trim() || null,
         clienteNombre: valor.clienteNombre.trim(),
         metodoPago: valor.metodoPago,
+        forzarParticular: this.particular() ? true : null,
+        motivoParticular: this.particular() ? this.motivoParticular().trim() : null,
         items: pendiente
           ? null
           : [

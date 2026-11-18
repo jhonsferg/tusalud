@@ -8,6 +8,8 @@ import {
   CierreCajaRequest,
   CobroRequest,
   ComprobanteResponse,
+  DesgloseCobroResponse,
+  OrigenCobro,
   PendienteCobroResponse,
   ReporteIngresosResponse,
   ResumenCajaResponse,
@@ -32,6 +34,13 @@ export class CajaApiService {
 
   cerrar(request: CierreCajaRequest): Observable<SesionCajaResponse> {
     return this.http.post<SesionCajaResponse>(`${this.baseUrl}/cierre`, request);
+  }
+
+  desglose(origen: OrigenCobro, referenciaId: string): Observable<DesgloseCobroResponse> {
+    return this.http.post<DesgloseCobroResponse>(`${this.baseUrl}/cobros/desglose`, {
+      origen,
+      referenciaId,
+    });
   }
 
   resumen(): Observable<ResumenCajaResponse> {

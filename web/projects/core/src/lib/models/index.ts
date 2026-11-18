@@ -22,3 +22,4 @@ export * from './reportes.model';
 export * from './rrhh.model';
 export * from './documentos.model';
 export * from './seguridad-operativa.model';
+export * from './seguros.model';

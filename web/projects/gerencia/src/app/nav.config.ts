@@ -67,6 +67,23 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Seguros',
+    items: [
+      {
+        label: 'Cartera',
+        icon: 'pi-briefcase',
+        link: '/seguros/cartera',
+        roles: ['ROLE_GERENCIA'],
+      },
+      {
+        label: 'Liquidaciones',
+        icon: 'pi-file-edit',
+        link: '/seguros/liquidaciones',
+        roles: ['ROLE_GERENCIA'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

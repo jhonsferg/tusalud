@@ -19,6 +19,12 @@ import { PERFIL_ROUTES } from '@tusalud/features/perfil';
 import { COLA_ROUTES, RECEPCION_ROUTES } from '@tusalud/features/recepcion';
 import { REPORTES_ROUTES } from '@tusalud/features/reportes';
 import { MI_ESPACIO_ROUTES, RRHH_ROUTES } from '@tusalud/features/rrhh';
+import {
+  SEGUROS_FINANZAS_ROUTES,
+  SEGUROS_MEDICO_ROUTES,
+  SEGUROS_PACIENTE_ROUTES,
+  SEGUROS_RECEPCION_ROUTES,
+} from '@tusalud/features/seguros';
 
 const DOMINIOS: Record<string, Routes> = {
   ADMIN_ROUTES,
@@ -47,6 +53,10 @@ const DOMINIOS: Record<string, Routes> = {
   REPORTES_ROUTES,
   RRHH_ROUTES,
   MI_ESPACIO_ROUTES,
+  SEGUROS_FINANZAS_ROUTES,
+  SEGUROS_RECEPCION_ROUTES,
+  SEGUROS_MEDICO_ROUTES,
+  SEGUROS_PACIENTE_ROUTES,
 };
 
 function aplanar(rutas: Routes): Route[] {

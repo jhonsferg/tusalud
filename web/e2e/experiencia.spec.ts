@@ -27,7 +27,7 @@ test.describe('inicio por rol', () => {
     }) => {
       await iniciarSesion(page, cuenta);
       await expect(
-        page.getByRole('heading', { level: 1, name: /^Buenas (días|tardes|noches)/ }),
+        page.getByRole('heading', { level: 1, name: /^Buen(os|as) (días|tardes|noches)/ }),
       ).toBeVisible();
       await expect(page.getByRole('heading', { level: 2, name: seccion })).toBeVisible();
       await expect(page.getByRole('status', { name: /^Módulo actual: / })).toBeVisible();
@@ -69,7 +69,7 @@ test.describe('seguridad en la experiencia', () => {
     await bloqueo.getByLabel('Contraseña').fill(CUENTAS.paciente.password);
     await bloqueo.getByRole('button', { name: 'Desbloquear' }).click();
     await expect(bloqueo).toHaveCount(0);
-    await expect(page.getByRole('heading', { level: 1, name: /^Buenas / })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /^Buen(os|as) / })).toBeVisible();
   });
 
   test('el bloqueo también se puede cerrar saliendo de la sesión', async ({ page }) => {

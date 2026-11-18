@@ -4,7 +4,8 @@ export type TipoDocumentoPdf =
   | 'resultados-laboratorio'
   | 'informe-imagen'
   | 'constancia'
-  | 'resumen-historia';
+  | 'resumen-historia'
+  | 'liquidacion';
 
 export type TipoExportacion =
   | 'reporte-ejecutivo'

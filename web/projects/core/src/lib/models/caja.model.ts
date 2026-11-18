@@ -62,6 +62,8 @@ export interface ComprobanteItem {
 
 export interface ComprobanteResponse {
   id: string;
+  montoCubierto?: number | null;
+  aseguradoraNombre?: string | null;
   tipo: TipoComprobante;
   serie: string;
   numero: number;
@@ -85,6 +87,8 @@ export interface ComprobanteResponse {
 }
 
 export interface CobroRequest {
+  forzarParticular?: boolean | null;
+  motivoParticular?: string | null;
   origen: OrigenCobro;
   referenciaId?: string | null;
   pacienteId?: string | null;

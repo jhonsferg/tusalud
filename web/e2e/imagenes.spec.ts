@@ -199,6 +199,7 @@ test.describe('imágenes diagnósticas', () => {
       await expect(
         pagina.getByRole('heading', { level: 1, name: 'Agenda de salas' }),
       ).toBeVisible();
+      await pagina.getByRole('button', { name: 'Día siguiente' }).click();
       await expect(pagina.locator('app-agenda-salas .sala').first()).toBeVisible();
       await expect(pagina.getByText('Abrir orden')).toHaveCount(0);
     }

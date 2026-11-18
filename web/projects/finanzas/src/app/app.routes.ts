@@ -40,6 +40,16 @@ export const routes: Routes = [
         redirectTo: 'mi-espacio/ausencias',
       },
       {
+        path: 'seguros',
+        canMatch: [roleGuard('ROLE_FINANZAS')],
+        loadChildren: () =>
+          import('@tusalud/features/seguros').then((m) => m.SEGUROS_FINANZAS_ROUTES),
+      },
+      {
+        path: 'preautorizaciones',
+        redirectTo: 'seguros/preautorizaciones',
+      },
+      {
         path: 'calendario',
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },

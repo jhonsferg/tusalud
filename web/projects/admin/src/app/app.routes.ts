@@ -77,6 +77,11 @@ export const routes: Routes = [
         loadChildren: () => import('@tusalud/features/almacen').then((m) => m.ALMACEN_ROUTES),
       },
       {
+        path: 'seguros',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () => import('@tusalud/features/seguros').then((m) => m.SEGUROS_ADMIN_ROUTES),
+      },
+      {
         path: 'calendario',
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },

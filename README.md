@@ -1553,7 +1553,7 @@ Los reportes aceptan los mismos `desde`, `hasta` y `agrupacion` que la consulta 
 
 #### Plantillas
 
-Las diez plantillas viven en `src/main/resources/reportes` y se usan por defecto. El administrador puede reemplazar cualquiera desde la web o con la API. La versión nueva se guarda en el bucket `plantillas` y manda sobre la del sistema hasta que se restaure.
+Las once plantillas viven en `src/main/resources/reportes` y se usan por defecto. El administrador puede reemplazar cualquiera desde la web o con la API. La versión nueva se guarda en el bucket `plantillas` y manda sobre la del sistema hasta que se restaure.
 
 - `GET /api/v1/plantillas` lista las plantillas, su versión vigente y si están personalizadas.
 - `GET /api/v1/plantillas/{codigo}/descargar` baja el JRXML vigente.
@@ -1587,6 +1587,37 @@ La administración ve en un solo lugar lo que ocurre con la seguridad de la plat
 - El motivo de la cancelación de una cita lo ven el paciente, el médico y la administración y viaja en la notificación a la otra parte. Ahora el médico de la cita también puede cancelarla. El motivo de un ingreso cancelado solo lo ve el personal clínico, y recepción y administración reciben los ingresos sin él.
 
 En la web, el administrador tiene el inicio con eventos, estado de servicios y almacenamiento, y la página `/admin/seguridad` con el listado completo y sus filtros. El inicio de enfermería muestra las evoluciones pendientes con acceso directo a cada ingreso. El componente `@tusalud/ui/dialogo-motivo` pide el motivo con un diálogo accesible, con contador, validación y sin autocompletado, y lo usan todas las acciones anteriores a través de `MotivoService`.
+
+### Seguros y convenios
+
+La clínica atiende a pacientes con seguro público, EPS, seguros privados y convenios con empresas. El módulo calcula en caja cuánto cubre la aseguradora y cuánto paga el paciente, y lleva la cuenta por cobrar hasta que la aseguradora paga.
+
+- Una aseguradora es de tipo `SIS`, `ESSALUD`, `EPS`, `PRIVADO` o `EMPRESA`. Un convenio vincula la aseguradora con la clínica por un rango de vigencia, con un tope anual por asegurado, y reúne reglas de cobertura por categoría de servicio: `CONSULTA`, `LABORATORIO`, `IMAGEN`, `HOSPITALIZACION`, `FARMACIA` y `PROCEDIMIENTO`. Cada regla es un porcentaje o un copago fijo, puede tener un tope por servicio y puede exigir preautorización. Las exclusiones son códigos de servicio que el convenio nunca cubre.
+- La póliza une a un paciente con un convenio. Su estado efectivo sale de la suspensión manual y de las fechas: `SUSPENDIDA` gana sobre `VENCIDA`, y esta sobre `ACTIVA`. Verificar una póliza devuelve un código `VC-` con diez caracteres hexadecimales derivados con SHA-256 del número y la fecha, porque la consulta a la aseguradora está simulada de forma determinista detrás de la interfaz `VerificadorCobertura`.
+- El cálculo de `CoberturaCalculadora` trabaja por línea, redondea a dos decimales con `HALF_UP`, respeta el tope por servicio y el saldo del tope anual, que se consume por paciente y convenio dentro del año calendario, y nunca deja el copago en cero: el mínimo es 0.01.
+- En caja, `POST /api/v1/caja/cobros/desglose` muestra la cobertura antes de cobrar. Al cobrar solo se cobra el copago, el comprobante guarda el monto cubierto y el nombre de la aseguradora, y se abre una cuenta por cobrar. El cajero puede cobrar como particular con un motivo de 5 a 300 caracteres. Al anular el comprobante la cuenta pasa a `REVERTIDA`, salvo que ya esté liquidada.
+- Las preautorizaciones las solicita el médico y las resuelven finanzas o recepción. Aprobarlas genera un código `AUT-` y una vigencia, y las vencidas se marcan solas. Programar un estudio de imagen o crear un ingreso hospitalario exige una preautorización aprobada cuando el convenio lo pide, con excepción de las emergencias.
+- Finanzas arma liquidaciones por aseguradora y periodo con código `LQ-yyyyMM-NNN`. Una liquidación pasa de `BORRADOR` a `ENVIADA` y termina `PAGADA` u `OBSERVADA`, y una glosa exige su motivo. La cartera se agrupa por antigüedad en los tramos de 0 a 30, 31 a 60, 61 a 90 y más de 90 días, y la liquidación tiene su PDF con la plantilla `liquidacion`.
+- El reporte financiero incluye el bloque de seguros, con lo cubierto, el copago, la cartera pendiente, el detalle por aseguradora y la antigüedad, tanto en pantalla como en el PDF y en el Excel.
+
+| Método y ruta                                                       | Quién                                                                                                   |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `GET`, `POST` y `PUT /api/v1/seguros/aseguradoras`                  | Lectura de finanzas, administración, gerencia, caja y recepción. Escritura de finanzas y administración |
+| `GET`, `POST` y `PUT /api/v1/seguros/convenios`                     | Igual que las aseguradoras                                                                              |
+| `GET /api/v1/seguros/polizas` y `POST` para registrar               | Recepción y administración                                                                              |
+| `GET /api/v1/seguros/pacientes/{id}/polizas`                        | Personal con acceso al paciente                                                                         |
+| `PUT /api/v1/seguros/polizas/{id}/estado`                           | Recepción y administración, con motivo                                                                  |
+| `POST /api/v1/seguros/polizas/{id}/verificaciones`                  | Recepción, caja y administración                                                                        |
+| `GET /api/v1/seguros/mis-polizas`                                   | El paciente, solo lectura                                                                               |
+| `GET /api/v1/seguros/cobertura/pacientes/{id}`                      | El médico, que ve solo aseguradora y estado                                                             |
+| `POST /api/v1/seguros/preautorizaciones`                            | El médico                                                                                               |
+| `GET /api/v1/seguros/preautorizaciones` y `/mias`                   | Finanzas, recepción y administración. El médico y el paciente ven las suyas                             |
+| `PUT /api/v1/seguros/preautorizaciones/{id}/aprobar` y `/rechazar`  | Finanzas y recepción                                                                                    |
+| `GET /api/v1/seguros/cartera` y `/aseguradoras/{id}/cuentas`        | Finanzas, administración y gerencia                                                                     |
+| `POST /api/v1/seguros/liquidaciones`, `PUT .../enviar` y `.../pago` | Solo finanzas                                                                                           |
+| `GET /api/v1/seguros/resumen`                                       | Cada rol recibe su propio resumen                                                                       |
+
+En la web no hay aplicaciones nuevas. Finanzas y administración usan `/seguros/aseguradoras`, `/seguros/cartera` y `/seguros/liquidaciones`, y finanzas y recepción `/seguros/preautorizaciones`. Recepción usa `/seguros/polizas`, el médico `/preautorizaciones`, el paciente `/mis-seguros` y gerencia ve la cartera y las liquidaciones. Todo vive en el entry point `@tusalud/features/seguros`, y la pantalla de cobro de caja muestra el desglose con la opción de cobrar como particular.
 
 ## Manejo de errores
 
@@ -2090,7 +2121,7 @@ La interfaz está pensada para una clínica seria: sobria, legible y rápida de 
 
 ### Pruebas del frontend
 
-Las 364 pruebas unitarias corren con Vitest, repartidas entre los proyectos, y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, el enrutamiento entre aplicaciones, las rutas de cada aplicación con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API. Cada aplicación tiene una prueba de humo que resuelve todos sus componentes perezosos.
+Las 370 pruebas unitarias corren con Vitest, repartidas entre los proyectos, y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, el enrutamiento entre aplicaciones, las rutas de cada aplicación con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API. Cada aplicación tiene una prueba de humo que resuelve todos sus componentes perezosos.
 
 ```bash
 npm test
@@ -2229,7 +2260,7 @@ En los perfiles `local`, `dev` y `qa` los datos se cargan con las migraciones de
 
 ### Datos de demostración
 
-`V100__datos_demostracion.sql` amplía esos datos en los perfiles `local`, `dev` y `qa`, y los scripts V101 a V108 hacen lo mismo con cada módulo.
+`V100__datos_demostracion.sql` amplía esos datos en los perfiles `local`, `dev` y `qa`, y los scripts V101 a V113 hacen lo mismo con cada módulo. V113 agrega cuatro aseguradoras con su convenio, seis pólizas de pacientes demo, una suspendida, una vencida y una por vencer, preautorizaciones, cuentas por cobrar y liquidaciones en varios estados.
 
 - Cinco médicos más, de Medicina General, Dermatología, Traumatología, Ginecología y Oftalmología, cada uno con sus horarios.
 - Ocho pacientes más con nombres, DNI y fechas de nacimiento ficticios.
@@ -2248,17 +2279,19 @@ docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml up -d --b
 ./mvnw test
 ```
 
-Las 614 pruebas usan el perfil `test` con H2 en memoria y no necesitan PostgreSQL ni Docker.
+Las 654 pruebas usan el perfil `test` con H2 en memoria y no necesitan PostgreSQL ni Docker.
 
 | Clase                                                                   | Qué verifica                                                                                                                                                                  |
 | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `VirtualThreadsTest`                                                    | Que Tomcat atiende las peticiones con virtual threads                                                                                                                         |
 | `TusaludApplicationTests`                                               | Que el contexto de Spring arranca                                                                                                                                             |
 | `ValidadorPlantillaTest`                                                | La lista blanca de plantillas: scripts, importaciones, entidades externas, tamaño y recursos externos                                                                         |
-| `MotorPlantillasTest`                                                   | La compilación y el llenado de las diez plantillas, las tildes en el PDF y el límite de filas                                                                                 |
+| `MotorPlantillasTest`                                                   | La compilación y el llenado de las once plantillas, las tildes en el PDF y el límite de filas                                                                                 |
 | `LibroExcelTest`                                                        | La escritura en flujo, la neutralización de fórmulas y el reempaquetado del libro                                                                                             |
 | `DocumentoServiceTest`                                                  | La autorización de cada documento, las exportaciones, la purga, los límites y las plantillas                                                                                  |
 | `SeguridadOperativaSeguridadTest`, `EventoSeguridadServiceTest`         | Eventos de seguridad sin correos ni claves, enmascarado de IP, umbrales, purga, permisos de administración, estado del sistema, evoluciones pendientes y motivos obligatorios |
+| `CoberturaCalculadoraTest`, `SegurosServiceTest`                        | El cálculo de cobertura con porcentaje, copago fijo, topes, exclusiones y redondeo, las pólizas, las preautorizaciones, el cobro del copago, la reversión y las liquidaciones |
+| `SegurosSeguridadTest`                                                  | Los permisos por rol, el acceso a pólizas ajenas y lo que ve el médico                                                                                                        |
 | `DocumentosSeguridadTest`                                               | El acceso por rol, los intentos de acceso a datos ajenos y el aislamiento entre usuarios                                                                                      |
 | `CitaRepositoryTest`                                                    | Las consultas JPQL de citas, médicos, horarios y auditoría contra datos reales                                                                                                |
 | `SecurityIntegrationTest`                                               | Respuestas 401 y 403, rutas públicas, CORS, contenido del token y login con BCrypt                                                                                            |
@@ -2347,6 +2380,7 @@ Para usarla en Postman, importa el archivo y ejecuta la colección completa con 
 | `23 - Archivos y almacenamiento`                        | Foto de perfil, descarga con ETag y Range, rechazo de archivos disfrazados, documentos de paciente con acceso por relación y eliminación                                                                                |
 | `24 - Documentos y exportaciones`                       | Documentos de un registro con su regla de acceso, exportaciones asíncronas con consulta hasta terminar, aislamiento entre usuarios, formatos y filtros inválidos, y gestión de plantillas con validación y restauración |
 | `25 - Seguridad operativa y motivos`                    | Eventos de seguridad sin datos sensibles, resumen, estado del sistema, uso del almacenamiento, evoluciones pendientes y validación del motivo en las acciones sensibles                                                 |
+| `26 - Seguros y convenios`                              | Catálogo con convenios y reglas, pólizas, verificación, preautorizaciones, cobro del copago con cuenta por cobrar, cobrar como particular, reversión al anular, cartera, liquidaciones con glosa y permisos por rol     |
 
 Desde la línea de comandos:
 

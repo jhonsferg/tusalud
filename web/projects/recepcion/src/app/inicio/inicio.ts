@@ -16,6 +16,7 @@ import {
   CitaHoyResponse,
   RecepcionApiService,
   ResumenRecepcionResponse,
+  SegurosStore,
   TurnoResponse,
 } from '@tusalud/core';
 import { PageHeader } from '@tusalud/ui/page-header';
@@ -103,6 +104,23 @@ import {
         icono="pi-stopwatch"
         [tono]="(resumen.value()?.esperaPromedioMinutos ?? 0) > 30 ? 'aviso' : 'neutro'"
       />
+      @if (seguros.resumen.value(); as s) {
+        <app-stat-card
+          etiqueta="Pólizas por vencer"
+          [valor]="s.polizasPorVencer ?? 0"
+          icono="pi-id-card"
+          [tono]="(s.polizasPorVencer ?? 0) > 0 ? 'aviso' : 'neutro'"
+          detalle="En los próximos 30 días"
+          enlace="/seguros/polizas"
+        />
+        <app-stat-card
+          etiqueta="Preautorizaciones por resolver"
+          [valor]="s.preautorizacionesPendientes ?? 0"
+          icono="pi-verified"
+          [tono]="(s.preautorizacionesPendientes ?? 0) > 0 ? 'aviso' : 'neutro'"
+          enlace="/seguros/preautorizaciones"
+        />
+      }
     </div>
 
     <div class="tablero">
@@ -182,6 +200,7 @@ export class InicioRecepcion implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly api = inject(RecepcionApiService);
   private readonly router = inject(Router);
+  protected readonly seguros = inject(SegurosStore);
 
   protected readonly resumen = new AsyncState<ResumenRecepcionResponse>();
   protected readonly citas = new AsyncState<CitaHoyResponse[]>();
@@ -273,6 +292,7 @@ export class InicioRecepcion implements OnInit {
   );
 
   ngOnInit(): void {
+    this.seguros.cargarResumen();
     this.resumen.load(this.api.resumen());
     this.citas.load(this.api.citasHoy());
     this.cola.load(this.api.cola());

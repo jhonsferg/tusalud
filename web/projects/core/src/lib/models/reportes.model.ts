@@ -1,3 +1,4 @@
+import type { SegurosReporteResponse } from './seguros.model';
 export type Agrupacion = 'DIA' | 'SEMANA' | 'MES';
 
 export const AGRUPACIONES: readonly { label: string; value: Agrupacion }[] = [
@@ -85,6 +86,7 @@ export interface PorCobrarDetalle {
 }
 
 export interface ReporteFinancieroResponse {
+  seguros?: SegurosReporteResponse;
   periodo: PeriodoReporte;
   totalCobrado: number;
   transacciones: number;

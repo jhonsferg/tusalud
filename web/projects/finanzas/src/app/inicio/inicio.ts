@@ -15,6 +15,7 @@ import {
   ETIQUETA_ORIGEN_INGRESO,
   ReporteFinancieroResponse,
   ReportesApiService,
+  SegurosStore,
 } from '@tusalud/core';
 import { PageHeader } from '@tusalud/ui/page-header';
 import {
@@ -106,6 +107,37 @@ const soles = (valor: number): string =>
       </div>
     }
 
+    @if (seguros.resumen.value(); as s) {
+      <div class="fila-stats stats">
+        <app-stat-card
+          etiqueta="Cartera de aseguradoras"
+          [valor]="(s.carteraPendiente ?? 0 | currency: 'PEN' : 'symbol-narrow') ?? ''"
+          icono="pi-briefcase"
+          [tono]="(s.carteraPendiente ?? 0) > 0 ? 'aviso' : 'neutro'"
+          [detalle]="(s.cuentasPendientes ?? 0) + ' cuentas pendientes'"
+          enlace="/seguros/cartera"
+        />
+        <app-stat-card
+          etiqueta="Liquidaciones abiertas"
+          [valor]="s.liquidacionesAbiertas ?? 0"
+          icono="pi-file-edit"
+          enlace="/seguros/liquidaciones"
+        />
+        <app-stat-card
+          etiqueta="Preautorizaciones por resolver"
+          [valor]="s.preautorizacionesPendientes ?? 0"
+          icono="pi-verified"
+          [tono]="(s.preautorizacionesPendientes ?? 0) > 0 ? 'aviso' : 'neutro'"
+          enlace="/seguros/preautorizaciones"
+        />
+        <app-stat-card
+          etiqueta="Pólizas por vencer"
+          [valor]="s.polizasPorVencer ?? 0"
+          icono="pi-clock"
+          detalle="En los próximos 30 días"
+        />
+      </div>
+    }
     <div class="tablero">
       <div class="c8">
         <app-section-card
@@ -176,6 +208,7 @@ const soles = (valor: number): string =>
 export class InicioFinanzas implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly api = inject(ReportesApiService);
+  protected readonly seguros = inject(SegurosStore);
 
   protected readonly dec = dec;
   protected readonly reporte = new AsyncState<ReporteFinancieroResponse>();
@@ -235,6 +268,7 @@ export class InicioFinanzas implements OnInit {
   );
 
   ngOnInit(): void {
+    this.seguros.cargarResumen();
     this.cargar();
   }
 

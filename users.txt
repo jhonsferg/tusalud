@@ -135,3 +135,8 @@ ROLE_IMAGENES      Renato Villanueva   imagenes@tusalud.com      Personal123!   
 
 Hace de tecnólogo y de radiólogo: programa los estudios, carga las imágenes, registra la toma y emite los informes firmados.
 Datos de ejemplo: 15 estudios de radiografía, ecografía, tomografía y resonancia, y 6 órdenes para Juan Pérez, Carlos Mendoza y Sofía Ramírez en todos los estados, con imágenes de ejemplo, informes y un hallazgo crítico corregido en una segunda versión.
+
+SEGUROS Y CONVENIOS
+-------------------
+Sin usuarios nuevos: finanzas y administración gestionan aseguradoras, convenios, cartera y liquidaciones, recepción registra las pólizas, el médico solicita preautorizaciones y el paciente ve su seguro en Mis seguros.
+Datos de ejemplo: aseguradoras SIS, EsSalud, Pacífico EPS y Rímac con un convenio cada una. Pólizas de Camila Torres (PAC-100234), Luis Vargas (SIS-778821), Ana Paredes (RIM-554120, por vencer), María Rodríguez (ESS-330871), Valeria Castillo (RIM-221907, vencida) y Diego Herrera (SIS-990124, suspendida), más preautorizaciones, cuentas por cobrar y liquidaciones en varios estados.

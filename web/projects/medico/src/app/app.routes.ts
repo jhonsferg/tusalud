@@ -60,6 +60,12 @@ export const routes: Routes = [
           import('@tusalud/features/hospitalizacion').then((m) => m.HOSPITALIZACION_ROUTES),
       },
       {
+        path: 'preautorizaciones',
+        canMatch: [roleGuard('ROLE_MEDICO')],
+        loadChildren: () =>
+          import('@tusalud/features/seguros').then((m) => m.SEGUROS_MEDICO_ROUTES),
+      },
+      {
         path: 'calendario',
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },

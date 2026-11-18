@@ -230,6 +230,68 @@
         </div>
       </dl>
     </section>
+
+    @if (r.seguros; as s) {
+      <section class="panel" id="rep-seguros">
+        <h3>Seguros y convenios</h3>
+        <dl class="resumen">
+          <div>
+            <dt>Cubierto por aseguradoras</dt>
+            <dd>{{ s.totalCubierto | currency: 'PEN' : 'symbol-narrow' }}</dd>
+          </div>
+          <div>
+            <dt>Copago de pacientes</dt>
+            <dd>{{ s.totalCopago | currency: 'PEN' : 'symbol-narrow' }}</dd>
+          </div>
+          <div>
+            <dt>Cartera pendiente</dt>
+            <dd>{{ s.carteraPendiente | currency: 'PEN' : 'symbol-narrow' }}</dd>
+          </div>
+        </dl>
+        @if (s.porAseguradora.length > 0) {
+          <table class="tabla-seguros" aria-label="Cobertura por aseguradora">
+            <thead>
+              <tr>
+                <th>Aseguradora</th>
+                <th>Cuentas</th>
+                <th>Cubierto</th>
+                <th>Copago</th>
+                <th>Pendiente</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (a of s.porAseguradora; track a.nombre) {
+                <tr>
+                  <td>{{ a.nombre }}</td>
+                  <td>{{ a.cuentas }}</td>
+                  <td>{{ a.cubierto | currency: 'PEN' : 'symbol-narrow' }}</td>
+                  <td>{{ a.copago | currency: 'PEN' : 'symbol-narrow' }}</td>
+                  <td>{{ a.pendiente | currency: 'PEN' : 'symbol-narrow' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+        <table class="tabla-seguros" aria-label="Antigüedad de la cartera">
+          <thead>
+            <tr>
+              <th>Antigüedad</th>
+              <th>Cuentas</th>
+              <th>Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of s.antiguedad; track t.tramo) {
+              <tr>
+                <td>{{ t.tramo }}</td>
+                <td>{{ t.cuentas }}</td>
+                <td>{{ t.monto | currency: 'PEN' : 'symbol-narrow' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+    }
   </div>
 } @else if (store.financiero.loading()) {
   <div class="panel"><p>Preparando el reporte…</p></div>

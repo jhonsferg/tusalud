@@ -109,8 +109,96 @@
         </label>
       </div>
     } @else {
+      @if (desglose(); as d) {
+        @if (d.tieneCobertura) {
+          <section
+            class="cobertura"
+            [class.omitida]="particular()"
+            aria-label="Cobertura del seguro"
+          >
+            <header>
+              <strong>{{ d.aseguradora }}</strong> · {{ d.convenio }}
+              <small class="text-muted"
+                >Póliza <span class="sensible">{{ d.polizaNumero }}</span></small
+              >
+            </header>
+            <table>
+              <thead>
+                <tr>
+                  <th>Servicio</th>
+                  <th class="text-right">Monto</th>
+                  <th class="text-right">Cubierto</th>
+                  <th class="text-right">Copago</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (l of d.lineas; track $index) {
+                  <tr>
+                    <td>
+                      {{ l.descripcion }}
+                      @if (l.motivo) {
+                        <small class="text-muted block">{{ l.motivo }}</small>
+                      }
+                    </td>
+                    <td class="text-right">{{ l.monto | currency: 'PEN' : 'symbol-narrow' }}</td>
+                    <td class="text-right">{{ l.cubierto | currency: 'PEN' : 'symbol-narrow' }}</td>
+                    <td class="text-right">{{ l.copago | currency: 'PEN' : 'symbol-narrow' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+            <dl>
+              <div>
+                <dt>Total del servicio</dt>
+                <dd>{{ d.total | currency: 'PEN' : 'symbol-narrow' }}</dd>
+              </div>
+              <div>
+                <dt>Cubierto por la aseguradora</dt>
+                <dd id="cob-cubierto">{{ d.montoCubierto | currency: 'PEN' : 'symbol-narrow' }}</dd>
+              </div>
+              <div>
+                <dt>Copago del paciente</dt>
+                <dd id="cob-copago">{{ d.copago | currency: 'PEN' : 'symbol-narrow' }}</dd>
+              </div>
+            </dl>
+            @if (d.saldoTopeAnual != null) {
+              <small class="text-muted"
+                >Saldo del tope anual:
+                {{ d.saldoTopeAnual | currency: 'PEN' : 'symbol-narrow' }}</small
+              >
+            }
+            <label class="check">
+              <input
+                type="checkbox"
+                id="cob-particular"
+                [checked]="particular()"
+                (change)="particular.set($any($event.target).checked)"
+              />
+              Cobrar como particular, sin usar el seguro
+            </label>
+            @if (particular()) {
+              <label>
+                Motivo
+                <input
+                  pInputText
+                  id="cob-motivo-particular"
+                  class="w-full"
+                  autocomplete="off"
+                  maxlength="300"
+                  [ngModel]="motivoParticular()"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="motivoParticular.set($event)"
+                />
+              </label>
+            }
+          </section>
+        } @else {
+          <p class="text-muted" id="cob-sin-cobertura">{{ d.mensaje }}</p>
+        }
+      }
       <p class="monto">
-        Total a cobrar <strong>{{ total() | currency: 'PEN' : 'symbol-narrow' }}</strong>
+        {{ cobraCopago() ? 'Copago a cobrar' : 'Total a cobrar' }}
+        <strong id="cob-total">{{ total() | currency: 'PEN' : 'symbol-narrow' }}</strong>
       </p>
     }
 

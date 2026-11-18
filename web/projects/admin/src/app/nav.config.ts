@@ -313,6 +313,29 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Seguros y convenios',
+    items: [
+      {
+        label: 'Aseguradoras y convenios',
+        icon: 'pi-shield',
+        link: '/seguros/aseguradoras',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Cartera',
+        icon: 'pi-briefcase',
+        link: '/seguros/cartera',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Liquidaciones',
+        icon: 'pi-file-edit',
+        link: '/seguros/liquidaciones',
+        roles: ['ROLE_ADMIN'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {
