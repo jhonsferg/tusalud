@@ -69,9 +69,7 @@ describe('aplicación finanzas', () => {
   });
 
   it('aplica los permisos de su rol dentro de la aplicación', async () => {
-    expect((await navegar(['ROLE_FINANZAS'], '/')).url).toBe('/reportes/financiero');
-    expect((await navegar(['ROLE_FINANZAS'], '/reportes/operativo')).url).toBe(
-      '/reportes/financiero',
-    );
+    expect((await navegar(['ROLE_FINANZAS'], '/')).url).toBe('/inicio');
+    expect((await navegar(['ROLE_FINANZAS'], '/reportes/operativo')).url).toBe('/inicio');
   });
 });

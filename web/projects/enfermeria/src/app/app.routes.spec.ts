@@ -69,6 +69,6 @@ describe('aplicación enfermeria', () => {
   });
 
   it('aplica los permisos de su rol dentro de la aplicación', async () => {
-    expect((await navegar(['ROLE_ENFERMERIA'], '/')).url).toBe('/hospitalizacion');
+    expect((await navegar(['ROLE_ENFERMERIA'], '/')).url).toBe('/inicio');
   });
 });

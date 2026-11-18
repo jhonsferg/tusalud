@@ -1753,7 +1753,7 @@ pgAdmin queda en `http://localhost:5050` con el usuario `admin@tusalud.com` y la
 ## Aplicación web
 
 La carpeta `web` es un workspace de Angular 21 con varios proyectos, al estilo de un monorepo. Cada actor de la clínica tiene su propia aplicación, con sus rutas, su menú, su guía de bienvenida y sus flujos, y todas comparten librerías propias. El login es común: vive en un portal y, al autenticarse, el usuario es enviado a la aplicación de su rol. Todo usa componentes standalone, detección de cambios sin zone.js, SCSS, TypeScript en modo estricto y Vitest para las pruebas unitarias.
-nLa guía de bienvenida se ofrece una sola vez por usuario y navegador. Se recuerda en el almacenamiento local con la clave `tusalud.tour.visto` seguida del id del usuario, además de la preferencia guardada en el servidor, así que no reaparece al recargar ni al volver a iniciar sesión. Cada paso lleva a la pantalla que explica y, al terminar o al omitirla, el usuario vuelve a la pantalla de inicio de su rol. Desde el menú de usuario se puede abrir de nuevo cuando se quiera.
+La guía de bienvenida se ofrece una sola vez por usuario y navegador. Se recuerda en el almacenamiento local con la clave `tusalud.tour.visto` seguida del id del usuario, además de la preferencia guardada en el servidor, así que no reaparece al recargar ni al volver a iniciar sesión. Cada paso lleva a la pantalla que explica y, al terminar o al omitirla, el usuario vuelve a la pantalla de inicio de su rol. Desde el menú de usuario se puede abrir de nuevo cuando se quiera.
 
 ### Requisitos
 
@@ -1932,6 +1932,57 @@ Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrec
 | `CitaActions`   | Confirmación y ejecución de cancelar, confirmar y atender una cita |
 
 `NotificationOutlet` muestra las notificaciones de `NotificationService` como toasts de PrimeNG y `LoadingBar` muestra una barra de progreso global mientras hay peticiones en curso.
+
+### Sistema de diseño y experiencia por rol
+
+La interfaz está pensada para una clínica seria: sobria, legible y rápida de leer. Los colores de estado, como éxito, aviso, peligro e información, se reservan para comunicar estado y triaje, y nunca se usan solo como decoración. No hay degradados llamativos ni animaciones decorativas, y se respeta la preferencia del sistema de reducir el movimiento.
+
+**Tokens.** Los valores de diseño viven en `ui/styles/tusalud.scss` como variables CSS: escala de espaciado de 4 y 8 píxeles, radios, sombras sobrias, colores de estado con fondo propio y colores de triaje, todo con variante para el modo oscuro. El preset de PrimeNG está en `core/config/theme.ts` con una escala primaria de azul verdoso, superficies frías y color de foco visible. Los contrastes cumplen AA y las cifras usan números tabulares. La tipografía es la del sistema, sin fuentes externas.
+
+**Componentes del tablero.** El entry point `@tusalud/ui/tablero` reúne los bloques con los que se arma cada Inicio:
+
+| Componente        | Función                                                                  |
+| ----------------- | ------------------------------------------------------------------------ |
+| `SectionCard`     | Tarjeta de sección con estados de carga, error y vacío consistentes      |
+| `StatCard`        | Indicador con tendencia, mini serie y enlace a su detalle                |
+| `Timeline`        | Línea de tiempo de la agenda del día                                     |
+| `TaskList`        | Lista de pendientes con cantidad y tono                                  |
+| `QuickActions`    | Accesos rápidos a las acciones más frecuentes del rol                    |
+| `BarList`         | Barras horizontales con etiqueta y valor, así no dependen solo del color |
+| `BarChart`        | Gráfico de barras con una tabla alternativa para lectores de pantalla    |
+| `SelectorPeriodo` | Periodo de 7, 30 o 90 días que se recuerda entre visitas                 |
+| `StatusBadge`     | Etiqueta de estado con tono e icono                                      |
+| `SecurityNotice`  | Aviso de que un acceso queda registrado en la auditoría                  |
+
+**Inicio por aplicación.** Todas las aplicaciones abren en `/inicio`, un tablero propio construido solo con los endpoints que ya existen. Si un dato no existe, se muestra un estado vacío honesto y no una cifra inventada.
+
+| Aplicación  | Qué ve primero                                                                                      |
+| ----------- | --------------------------------------------------------------------------------------------------- |
+| Paciente    | Próxima cita con sus acciones, resumen de salud en solo lectura, pendientes y accesos rápidos       |
+| Médico      | Agenda del día como línea de tiempo, cola de pacientes, resultados e imágenes publicados y críticos |
+| Recepción   | Buscador de paciente, citas por registrar llegada, cola de espera y tiempos                         |
+| Enfermería  | Emergencias ordenadas por triaje, ocupación por área, camas por limpiar y pacientes hospitalizados  |
+| Caja        | Estado de la caja, cuentas por cobrar, cobrado por método y última diferencia                       |
+| Laboratorio | Cola de trabajo con urgentes primero y tiempos de espera                                            |
+| Imágenes    | Cola de trabajo, estudios del día y órdenes por informar                                            |
+| Farmacia    | Recetas por dispensar, ventas del día y alertas de inventario                                       |
+| Almacén     | Alertas de reposición y vencimientos, valor del inventario y movimientos del día                    |
+| RR. HH.     | Ausencias por resolver, contratos por vencer y plantilla por área                                   |
+| Gerencia    | Indicadores ejecutivos con comparación contra el periodo anterior y series por día                  |
+| Finanzas    | Cobros por día, por método y por origen, anulaciones y diferencias de caja                          |
+| Operaciones | Ocupación, esperas, emergencias por nivel e inventario crítico                                      |
+| Calidad     | Satisfacción por especialidad, cancelación e inasistencia, entrega de resultados                    |
+| Admin       | Usuarios activos, accesos recientes, usuarios por rol, citas por estado y estado de la seguridad    |
+
+**Seguridad en la experiencia.** La interfaz no decide los permisos, los decide el backend, pero evita ofrecer lo que un rol no puede hacer y reduce la exposición de datos en pantalla:
+
+- El bloqueo por inactividad avisa con una cuenta regresiva y luego cubre toda la pantalla con un formulario que pide la contraseña, o el código de verificación si la cuenta lo usa. El tiempo se configura por aplicación con `provideInactividad`: 20 minutos en paciente, 8 en caja, RR. HH., finanzas y administración y 10 en el resto. También hay un máximo de horas de sesión. El estado se comparte entre pestañas del mismo navegador y desde la barra se puede bloquear a voluntad.
+- El modo privacidad se activa en la barra y difumina nombres y documentos de pacientes con la clase `sensible` hasta pasar el cursor o enfocar el elemento. Se recuerda por navegador y está pensado para estaciones compartidas. Las funciones `enmascararDni`, `enmascararTelefono` y `enmascararCorreo` dejan solo los extremos de un dato donde no hace falta verlo completo.
+- Las pantallas de historia clínica de un paciente, de órdenes de laboratorio, de estudios de imagen y de ingresos hospitalarios muestran el aviso de que el acceso queda registrado.
+- La barra superior muestra siempre el módulo y el rol actuales, y el menú de usuario permite cambiar de módulo cuando hay varios roles.
+- La pantalla de acceso recuerda cerrar la sesión en equipos compartidos, ningún título de pestaña incluye datos personales y los campos sensibles no usan el autocompletado del navegador.
+
+**Accesibilidad y adaptación.** El foco es visible en todo elemento interactivo, los objetivos táctiles miden al menos 44 píxeles en dispositivos táctiles y todo se maneja con teclado. El paciente tiene una barra de navegación inferior en el móvil con sus cuatro accesos principales, y las tablas anchas se desplazan sin romper la página. Los comprobantes y constancias tienen estilos de impresión sobrios que ocultan la navegación.
 
 ### Pruebas del frontend
 

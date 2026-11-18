@@ -111,6 +111,7 @@ test.describe('ciclo de vida de una cita', () => {
 
   test('el paciente ve el historial y filtra por vista', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
+    await ir(page, '/citas');
     await page.getByText('Historial', { exact: true }).click();
     await expect(page.getByRole('table')).toBeVisible();
     await page.getByText('Todas', { exact: true }).click();

@@ -64,8 +64,10 @@
           }
         </td>
         <td>
-          {{ i.pacienteNombre }}
-          <small class="text-muted block">DNI {{ i.dni }}</small>
+          <span class="sensible">{{ i.pacienteNombre }}</span>
+          <small class="text-muted block"
+            >DNI <span class="sensible">{{ i.dni }}</span></small
+          >
         </td>
         <td>{{ i.camaCodigo || '—' }}</td>
         <td>{{ i.medicoNombre || '—' }}</td>

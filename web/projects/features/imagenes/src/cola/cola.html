@@ -121,9 +121,11 @@
           }
         </td>
         <td>
-          {{ orden.pacienteNombre }}
+          <span class="sensible">{{ orden.pacienteNombre }}</span>
           @if (orden.dni) {
-            <small class="text-muted block">DNI {{ orden.dni }}</small>
+            <small class="text-muted block"
+              >DNI <span class="sensible">{{ orden.dni }}</span></small
+            >
           }
         </td>
         <td class="estudios">{{ resumirEstudios(orden) }}</td>

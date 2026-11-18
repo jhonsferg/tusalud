@@ -55,7 +55,9 @@
             <div class="font-semibold">{{ pago.comprobante }}</div>
             <small class="text-muted">{{ pago.fechaPago | date: 'd MMM y, HH:mm' }}</small>
           </td>
-          <td>{{ pago.pacienteNombre }}</td>
+          <td>
+            <span class="sensible">{{ pago.pacienteNombre }}</span>
+          </td>
           <td>
             <div class="font-semibold">{{ pago.medicoNombre }}</div>
             <small class="text-muted">{{ pago.especialidad }}</small>

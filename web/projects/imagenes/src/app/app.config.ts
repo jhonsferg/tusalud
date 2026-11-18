@@ -5,6 +5,7 @@ import {
   provideTourSteps,
   rolesDeApp,
   provideTusalud,
+  provideInactividad,
 } from '@tusalud/core';
 import { environment } from '@tusalud/environment';
 import { provideAppShell } from '@tusalud/ui/shell-config';
@@ -22,6 +23,7 @@ export const appConfig: ApplicationConfig = {
       rutas: routes,
       prefijoOculto: 'imagenes',
     }),
+    provideInactividad({ bloqueoMinutos: 10, sesionMaximaHoras: 12 }),
     provideAppShell({ brand: 'TuSalud', grupos: NAV_GROUPS }),
     provideTourSteps(
       PASOS_TOUR_PREDETERMINADOS.filter(

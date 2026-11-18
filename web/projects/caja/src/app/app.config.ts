@@ -5,6 +5,7 @@ import {
   provideTourSteps,
   rolesDeApp,
   provideTusalud,
+  provideInactividad,
 } from '@tusalud/core';
 import { environment } from '@tusalud/environment';
 import { provideAppShell } from '@tusalud/ui/shell-config';
@@ -17,6 +18,7 @@ const ROLES = rolesDeApp(APP);
 export const appConfig: ApplicationConfig = {
   providers: [
     provideTusalud({ app: APP, apiUrl: environment.apiUrl, rutas: routes, prefijoOculto: 'caja' }),
+    provideInactividad({ bloqueoMinutos: 8, sesionMaximaHoras: 12 }),
     provideAppShell({ brand: 'TuSalud', grupos: NAV_GROUPS }),
     provideTourSteps(
       PASOS_TOUR_PREDETERMINADOS.filter(

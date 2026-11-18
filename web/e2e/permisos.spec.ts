@@ -10,7 +10,7 @@ test.describe('permisos por rol', () => {
   }) => {
     const alergia = `Polen ${Date.now().toString().slice(-6)}`;
     await iniciarSesion(page, 'medico');
-    await page.getByRole('link', { name: 'Mis pacientes' }).click();
+    await page.getByRole('link', { name: 'Mis pacientes', exact: true }).click();
     await page
       .getByRole('row', { name: /Carlos Mendoza/ })
       .getByRole('button', { name: 'Historia' })
@@ -31,11 +31,11 @@ test.describe('permisos por rol', () => {
     await expect(page.getByRole('link', { name: 'Mis pacientes' })).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Dispensar' })).toHaveCount(0);
     await page.goto(`/medico/pacientes/${ID_AJENO}/historia-clinica`);
-    await expect(page).toHaveURL(/\/admin\/panel$/);
+    await expect(page).toHaveURL(/\/admin\/$/);
     await page.goto('/farmacia/dispensar');
-    await expect(page).toHaveURL(/\/admin\/panel$/);
+    await expect(page).toHaveURL(/\/admin\/$/);
     await page.goto(`/laboratorio/ordenes/${ID_AJENO}`);
-    await expect(page).toHaveURL(/\/admin\/panel$/);
+    await expect(page).toHaveURL(/\/admin\/$/);
   });
 
   test('recepción ve la hospitalización sin poder ingresar ni registrar triaje', async ({

@@ -40,7 +40,9 @@
       <tr>
         <td>
           {{ p.paciente }}
-          <small class="text-muted block">DNI {{ p.dni }}</small>
+          <small class="text-muted block"
+            >DNI <span class="sensible">{{ p.dni }}</span></small
+          >
         </td>
         <td>{{ p.descripcion }}</td>
         <td>{{ etiquetaOrigen[p.origen] }}</td>

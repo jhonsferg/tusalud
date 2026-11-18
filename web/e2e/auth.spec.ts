@@ -43,6 +43,6 @@ test.describe('autenticación', () => {
     await page.locator('#reg-email').fill(`ana.${sufijo}@correo.com`);
     await page.locator('#reg-password').fill('Paciente123!');
     await page.getByRole('button', { name: 'Crear cuenta' }).click();
-    await expect(page).toHaveURL(/\/citas$/);
+    await expect(page).toHaveURL(/\/paciente\/inicio$/);
   });
 });

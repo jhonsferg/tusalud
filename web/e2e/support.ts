@@ -6,17 +6,17 @@ export const CUENTAS = {
   paciente: {
     email: 'juan.perez@correo.com',
     password: 'Paciente123!',
-    home: /\/paciente\/citas$/,
+    home: /\/paciente\/inicio$/,
   },
-  medico: { email: 'dr.garcia@tusalud.com', password: 'Medico123!', home: /\/medico\/agenda$/ },
-  medico2: { email: 'dra.lopez@tusalud.com', password: 'Medico123!', home: /\/medico\/agenda$/ },
+  medico: { email: 'dr.garcia@tusalud.com', password: 'Medico123!', home: /\/medico\/inicio$/ },
+  medico2: { email: 'dra.lopez@tusalud.com', password: 'Medico123!', home: /\/medico\/inicio$/ },
   paciente2: {
     email: 'maria.rodriguez@correo.com',
     password: 'Paciente123!',
-    home: /\/paciente\/citas$/,
+    home: /\/paciente\/inicio$/,
   },
   imagenes: { email: 'imagenes@tusalud.com', password: 'Personal123!', home: /\/imagenes\/$/ },
-  admin: { email: 'admin@tusalud.com', password: 'Admin123!', home: /\/admin\/panel$/ },
+  admin: { email: 'admin@tusalud.com', password: 'Admin123!', home: /\/admin\/$/ },
   laboratorio: { email: 'lab@tusalud.com', password: 'Personal123!', home: /\/laboratorio\/$/ },
   farmacia: { email: 'farmacia@tusalud.com', password: 'Personal123!', home: /\/farmacia\/$/ },
   almacen: { email: 'almacen@tusalud.com', password: 'Personal123!', home: /\/almacen\/$/ },
@@ -25,22 +25,22 @@ export const CUENTAS = {
   gerencia: {
     email: 'gerencia@tusalud.com',
     password: 'Personal123!',
-    home: /\/gerencia\/reportes\/ejecutivo$/,
+    home: /\/gerencia\/inicio$/,
   },
   finanzas: {
     email: 'finanzas@tusalud.com',
     password: 'Personal123!',
-    home: /\/finanzas\/reportes\/financiero$/,
+    home: /\/finanzas\/inicio$/,
   },
   operaciones: {
     email: 'operaciones@tusalud.com',
     password: 'Personal123!',
-    home: /\/operaciones\/reportes\/operativo$/,
+    home: /\/operaciones\/inicio$/,
   },
   calidad: {
     email: 'calidad@tusalud.com',
     password: 'Personal123!',
-    home: /\/calidad\/reportes\/calidad$/,
+    home: /\/calidad\/inicio$/,
   },
   rrhh: { email: 'rrhh@tusalud.com', password: 'Personal123!', home: /\/rrhh\/$/ },
   enfermeria: {
@@ -94,7 +94,7 @@ export function urlDeModulo(app: string, interna: string): string {
   const ruta = corte < 0 ? interna : interna.slice(0, corte);
   const resto = corte < 0 ? '' : interna.slice(corte);
   let visible = ruta;
-  if (oculto && (ruta === `/${oculto}` || ruta.startsWith(`/${oculto}/`))) {
+  if (oculto && ruta.startsWith(`/${oculto}/`)) {
     visible = ruta.slice(oculto.length + 1);
   }
   return `/${app}${visible === '' ? '/' : visible}${resto}`;
@@ -200,7 +200,7 @@ export async function registrarPaciente(page: Page, etiqueta: string) {
   await page.locator('#reg-email').fill(cuenta.email);
   await page.locator('#reg-password').fill(cuenta.password);
   await page.getByRole('button', { name: 'Crear cuenta' }).click();
-  await expect(page).toHaveURL(/\/citas$/);
+  await expect(page).toHaveURL(/\/paciente\/inicio$/);
   return cuenta;
 }
 

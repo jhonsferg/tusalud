@@ -1,3 +1,18 @@
+@if (migas(); as lista) {
+  <nav class="migas" aria-label="Ruta de navegación">
+    <ol>
+      @for (miga of lista; track miga.label; let ultima = $last) {
+        <li>
+          @if (miga.link && !ultima) {
+            <a [routerLink]="miga.link">{{ miga.label }}</a>
+          } @else {
+            <span [attr.aria-current]="ultima ? 'page' : null">{{ miga.label }}</span>
+          }
+        </li>
+      }
+    </ol>
+  </nav>
+}
 @if (backLink(); as link) {
   <a class="back" [routerLink]="link"><i class="pi pi-arrow-left"></i> {{ backLabel() }}</a>
 }

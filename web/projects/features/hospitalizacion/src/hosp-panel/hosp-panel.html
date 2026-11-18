@@ -63,7 +63,13 @@
           (click)="abrirCama(cama)"
         >
           <strong>{{ cama.codigo }}</strong>
-          <small>{{ cama.pacienteNombre || etiquetaEstado[cama.estado] }}</small>
+          <small>
+            @if (cama.pacienteNombre) {
+              <span class="sensible">{{ cama.pacienteNombre }}</span>
+            } @else {
+              {{ etiquetaEstado[cama.estado] }}
+            }
+          </small>
         </button>
       }
     </div>

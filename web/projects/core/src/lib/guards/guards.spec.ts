@@ -76,12 +76,12 @@ describe('guards', () => {
   });
 
   it('guestGuard envía a quien ya inició sesión a la página inicial de su rol', async () => {
-    expect((await navegar(['ROLE_MEDICO'], '/auth/login')).url).toBe('/agenda');
+    expect((await navegar(['ROLE_MEDICO'], '/auth/login')).url).toBe('/inicio');
     expect((await navegar(null, '/auth/login')).url).toBe('/auth/login');
   });
 
   it('roleGuard deniega el acceso a roles no autorizados', async () => {
-    expect((await navegar(['ROLE_PACIENTE'], '/admin')).url).toBe('/citas');
+    expect((await navegar(['ROLE_PACIENTE'], '/admin')).url).toBe('/inicio');
     expect((await navegar(['ROLE_ADMIN'], '/admin')).url).toBe('/admin');
   });
 
@@ -120,7 +120,7 @@ describe('guards', () => {
         { provide: APP_ACTUAL, useValue: 'medico' },
       ],
     });
-    expect(TestBed.inject(AuthService).homeUrl()).toBe('/agenda');
+    expect(TestBed.inject(AuthService).homeUrl()).toBe('/inicio');
   });
 });
 
@@ -166,6 +166,22 @@ describe('ruta oculta', () => {
     expect(serializador.parse('/cobrar').toString()).toBe('/caja/cobrar');
     expect(serializador.parse('/').toString()).toBe('/caja');
     expect(serializador.parse('/?x=1').toString()).toBe('/caja?x=1');
+  });
+
+  it('cuando la aplicación tiene inicio, la raíz abre el inicio y la página del módulo conserva su prefijo', () => {
+    const conInicio = new RutaOcultaSerializer(
+      'caja',
+      primerosSegmentos([
+        { path: 'caja', children: [] },
+        { path: '', children: [{ path: 'inicio' }, { path: 'calendario' }] },
+      ]),
+    );
+    expect(conInicio.parse('/').toString()).toBe('/inicio');
+    expect(conInicio.serialize(conInicio.parse('/'))).toBe('/');
+    expect(conInicio.serialize(conInicio.parse('/inicio'))).toBe('/');
+    expect(conInicio.serialize(conInicio.parse('/caja'))).toBe('/caja');
+    expect(conInicio.serialize(conInicio.parse('/caja/cobrar'))).toBe('/cobrar');
+    expect(conInicio.parse('/cobrar').toString()).toBe('/caja/cobrar');
   });
 
   it('no toca las rutas de otros dominios de la aplicación', () => {

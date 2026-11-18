@@ -69,7 +69,7 @@ describe('aplicación caja', () => {
   });
 
   it('aplica los permisos de su rol dentro de la aplicación', async () => {
-    expect((await navegar(['ROLE_CAJA'], '/')).url).toBe('/caja');
+    expect((await navegar(['ROLE_CAJA'], '/')).url).toBe('/inicio');
     expect((await navegar(['ROLE_CAJA'], '/caja/cobrar')).url).toBe('/caja/cobrar');
   });
 });

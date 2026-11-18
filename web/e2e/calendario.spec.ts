@@ -5,6 +5,7 @@ import { iniciarSesion, reservarPrimeraHoraLibre, idDeGarcia, ir } from './suppo
 test.describe('calendario', () => {
   test('el paciente ve sus citas en las vistas de mes, semana y día', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
+    await ir(page, '/citas');
     await page.getByRole('button', { name: 'Calendario' }).click();
 
     const vistas = page.getByRole('group', { name: 'Vista del calendario' });
@@ -129,6 +130,7 @@ test.describe('calendario', () => {
 
   test('el médico alterna entre el día y el calendario de su agenda', async ({ page }) => {
     await iniciarSesion(page, 'medico');
+    await ir(page, '/agenda');
     await page.getByRole('button', { name: 'Calendario' }).click();
     await page
       .getByRole('group', { name: 'Vista del calendario' })

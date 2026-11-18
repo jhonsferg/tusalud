@@ -21,9 +21,12 @@
         <small>{{ ingreso.triaje?.clasificacion }}</small>
       </div>
       <div class="datos">
-        <strong>{{ ingreso.pacienteNombre }}</strong>
+        <strong
+          ><span class="sensible">{{ ingreso.pacienteNombre }}</span></strong
+        >
         <small class="text-muted"
-          >DNI {{ ingreso.dni }} · espera {{ ingreso.esperaMinutos }} min</small
+          >DNI <span class="sensible">{{ ingreso.dni }}</span> · espera
+          {{ ingreso.esperaMinutos }} min</small
         >
         @if (ingreso.triaje?.motivoConsulta) {
           <span>{{ ingreso.triaje?.motivoConsulta }}</span>

@@ -167,7 +167,8 @@
                 <p>{{ item.comentario }}</p>
               }
               <small class="text-muted"
-                >{{ item.pacienteNombre }} · {{ item.createdAt | date: 'd MMM y' }}</small
+                ><span class="sensible">{{ item.pacienteNombre }}</span> ·
+                {{ item.createdAt | date: 'd MMM y' }}</small
               >
             </li>
           }

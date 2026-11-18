@@ -35,8 +35,12 @@
     </ng-template>
     <ng-template #body let-p>
       <tr>
-        <td class="font-semibold">{{ p.nombreCompleto }}</td>
-        <td>{{ p.dni }}</td>
+        <td class="font-semibold">
+          <span class="sensible">{{ p.nombreCompleto }}</span>
+        </td>
+        <td>
+          <span class="sensible">{{ p.dni }}</span>
+        </td>
         <td>
           {{ p.telefono || '—' }}
           @if (p.email) {
@@ -81,15 +85,34 @@
     }
     <div class="dos">
       <label
-        >Nombre <input pInputText id="pac-nombre" formControlName="nombre" class="w-full"
+        >Nombre
+        <input
+          pInputText
+          id="pac-nombre"
+          autocomplete="off"
+          formControlName="nombre"
+          class="w-full"
       /></label>
       <label
-        >Apellido <input pInputText id="pac-apellido" formControlName="apellido" class="w-full"
+        >Apellido
+        <input
+          pInputText
+          id="pac-apellido"
+          autocomplete="off"
+          formControlName="apellido"
+          class="w-full"
       /></label>
     </div>
     <div class="dos">
       <label
-        >DNI <input pInputText id="pac-dni" formControlName="dni" maxlength="8" class="w-full"
+        >DNI
+        <input
+          pInputText
+          id="pac-dni"
+          autocomplete="off"
+          formControlName="dni"
+          maxlength="8"
+          class="w-full"
       /></label>
       <label>
         Fecha de nacimiento
@@ -106,11 +129,23 @@
     </div>
     <div class="dos">
       <label
-        >Teléfono <input pInputText id="pac-telefono" formControlName="telefono" class="w-full"
+        >Teléfono
+        <input
+          pInputText
+          id="pac-telefono"
+          autocomplete="off"
+          formControlName="telefono"
+          class="w-full"
       /></label>
       <label
         >Correo
-        <input pInputText id="pac-email" type="email" formControlName="email" class="w-full"
+        <input
+          pInputText
+          id="pac-email"
+          type="email"
+          autocomplete="off"
+          formControlName="email"
+          class="w-full"
       /></label>
     </div>
   </form>
@@ -135,8 +170,10 @@
 >
   @if (registrado(); as r) {
     <p>
-      <strong>{{ r.paciente.nombreCompleto }}</strong> ya tiene su cuenta. Entrega esta contraseña
-      temporal al paciente: solo se muestra ahora.
+      <strong
+        ><span class="sensible">{{ r.paciente.nombreCompleto }}</span></strong
+      >
+      ya tiene su cuenta. Entrega esta contraseña temporal al paciente: solo se muestra ahora.
     </p>
     <div class="clave">
       <small>Usuario</small>

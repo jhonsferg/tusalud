@@ -207,11 +207,15 @@
         <dl>
           <div>
             <dt>Nombre</dt>
-            <dd>{{ cita.pacienteNombre }}</dd>
+            <dd>
+              <span class="sensible">{{ cita.pacienteNombre }}</span>
+            </dd>
           </div>
           <div>
             <dt>DNI</dt>
-            <dd>{{ cita.pacienteDni }}</dd>
+            <dd>
+              <span class="sensible">{{ cita.pacienteDni }}</span>
+            </dd>
           </div>
         </dl>
         @if (auth.isMedico()) {

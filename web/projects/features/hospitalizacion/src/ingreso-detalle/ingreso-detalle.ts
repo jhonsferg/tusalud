@@ -28,10 +28,12 @@ import {
 import { COLOR_TRIAJE } from '@tusalud/ui/utils';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { PageHeader } from '@tusalud/ui/page-header';
+import { SecurityNotice } from '@tusalud/ui/tablero';
 
 @Component({
   selector: 'app-ingreso-detalle',
   imports: [
+    SecurityNotice,
     CurrencyPipe,
     DatePipe,
     FormsModule,

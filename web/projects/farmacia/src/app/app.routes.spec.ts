@@ -69,8 +69,8 @@ describe('aplicación farmacia', () => {
   });
 
   it('aplica los permisos de su rol dentro de la aplicación', async () => {
-    expect((await navegar(['ROLE_FARMACIA'], '/')).url).toBe('/farmacia');
-    expect((await navegar(['ROLE_FARMACIA'], '/almacen/ingresos')).url).toBe('/farmacia');
+    expect((await navegar(['ROLE_FARMACIA'], '/')).url).toBe('/inicio');
+    expect((await navegar(['ROLE_FARMACIA'], '/almacen/ingresos')).url).toBe('/inicio');
     expect((await navegar(['ROLE_FARMACIA'], '/almacen/productos')).url).toBe('/almacen/productos');
   });
 });

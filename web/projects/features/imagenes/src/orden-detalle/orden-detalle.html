@@ -6,6 +6,8 @@
   backLabel="Volver a las órdenes"
 />
 
+<app-security-notice class="aviso-acceso" />
+
 @if (store.orden.error(); as problema) {
   <div class="panel">
     <app-empty-state
@@ -20,10 +22,12 @@
 } @else if (orden(); as o) {
   <section class="panel cabecera">
     <div>
-      <h2>{{ o.pacienteNombre }}</h2>
+      <h2>
+        <span class="sensible">{{ o.pacienteNombre }}</span>
+      </h2>
       <p class="text-muted">
         @if (o.dni) {
-          DNI {{ o.dni }} ·
+          DNI <span class="sensible">{{ o.dni }}</span> ·
         }
         Solicitada {{ o.fecha | date: 'd MMM y, HH:mm' }} por {{ o.medicoNombre }}
       </p>

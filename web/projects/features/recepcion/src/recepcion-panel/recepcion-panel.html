@@ -86,9 +86,10 @@
             }
           </td>
           <td>
-            {{ turno.pacienteNombre }}
+            <span class="sensible">{{ turno.pacienteNombre }}</span>
             <small class="text-muted block"
-              >DNI {{ turno.dni }} · {{ turno.esperaMinutos }} min</small
+              >DNI <span class="sensible">{{ turno.dni }}</span> ·
+              {{ turno.esperaMinutos }} min</small
             >
           </td>
           <td>{{ turno.medicoNombre || 'Sin asignar' }}</td>
@@ -165,8 +166,10 @@
         <tr>
           <td>{{ cita.fechaHora | date: 'HH:mm' }}</td>
           <td>
-            {{ cita.pacienteNombre }}
-            <small class="text-muted block">DNI {{ cita.pacienteDni }}</small>
+            <span class="sensible">{{ cita.pacienteNombre }}</span>
+            <small class="text-muted block"
+              >DNI <span class="sensible">{{ cita.pacienteDni }}</span></small
+            >
           </td>
           <td>{{ cita.medicoNombre }}</td>
           <td class="text-right">

@@ -39,6 +39,8 @@ export * from './lib/services/loading.service';
 export * from './lib/services/notification.service';
 export * from './lib/services/realtime.service';
 export * from './lib/services/storage.service';
+export * from './lib/services/inactividad.service';
+export * from './lib/services/privacidad.service';
 export * from './lib/services/theme.service';
 export * from './lib/services/tour.service';
 export * from './lib/state/admin.store';

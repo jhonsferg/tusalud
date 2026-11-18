@@ -21,12 +21,14 @@ import { AuthService, ClinicaStore, NotificationService, optionalIdAttribute } f
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { FormField } from '@tusalud/ui/form-field';
 import { PageHeader } from '@tusalud/ui/page-header';
+import { SecurityNotice } from '@tusalud/ui/tablero';
 
 const GRUPOS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
 @Component({
   selector: 'app-historia-clinica',
   imports: [
+    SecurityNotice,
     DatePipe,
     ReactiveFormsModule,
     RouterLink,

@@ -6,12 +6,17 @@
   backLabel="Volver a ingresos"
 />
 
+<app-security-notice class="aviso-acceso" />
+
 @if (ingreso(); as i) {
   <div class="cabecera panel">
     <div>
-      <h2>{{ i.pacienteNombre }}</h2>
+      <h2>
+        <span class="sensible">{{ i.pacienteNombre }}</span>
+      </h2>
       <p class="text-muted">
-        DNI {{ i.dni }} · Ingresó {{ i.fechaIngreso | date: 'd MMM y, HH:mm' }}
+        DNI <span class="sensible">{{ i.dni }}</span> · Ingresó
+        {{ i.fechaIngreso | date: 'd MMM y, HH:mm' }}
       </p>
       @if (i.motivo) {
         <p><strong>Motivo:</strong> {{ i.motivo }}</p>

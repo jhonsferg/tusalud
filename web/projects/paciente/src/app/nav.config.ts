@@ -5,10 +5,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     title: 'Principal',
     items: [
       {
-        label: 'Calendario',
-        icon: 'pi-calendar-plus',
-        link: '/calendario',
+        label: 'Inicio',
+        icon: 'pi-home',
+        link: '/inicio',
         roles: ['ROLE_PACIENTE'],
+        exact: true,
+        inferior: true,
       },
       {
         label: 'Mis citas',
@@ -16,11 +18,21 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         link: '/citas',
         roles: ['ROLE_PACIENTE'],
         exact: true,
+        inferior: true,
+        corta: 'Citas',
       },
       {
         label: 'Reservar cita',
         icon: 'pi-calendar-plus',
         link: '/citas/nueva',
+        roles: ['ROLE_PACIENTE'],
+        inferior: true,
+        corta: 'Reservar',
+      },
+      {
+        label: 'Calendario',
+        icon: 'pi-calendar',
+        link: '/calendario',
         roles: ['ROLE_PACIENTE'],
       },
     ],
@@ -39,6 +51,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         icon: 'pi-filter',
         link: '/mis-resultados',
         roles: ['ROLE_PACIENTE'],
+        inferior: true,
+        corta: 'Resultados',
       },
       {
         label: 'Mis estudios',

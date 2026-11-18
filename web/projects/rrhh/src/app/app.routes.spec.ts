@@ -69,7 +69,7 @@ describe('aplicación rrhh', () => {
   });
 
   it('aplica los permisos de su rol dentro de la aplicación', async () => {
-    expect((await navegar(['ROLE_RRHH'], '/')).url).toBe('/rrhh');
+    expect((await navegar(['ROLE_RRHH'], '/')).url).toBe('/inicio');
     expect((await navegar(['ROLE_RRHH'], '/rrhh/empleados')).url).toBe('/rrhh/empleados');
   });
 });

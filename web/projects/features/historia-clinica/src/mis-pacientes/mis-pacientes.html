@@ -52,8 +52,12 @@
             <div class="flex align-items-center gap-2">
               <app-user-avatar [nombre]="paciente.nombreCompleto" />
               <div>
-                <div class="font-semibold">{{ paciente.nombreCompleto }}</div>
-                <small class="text-muted">DNI {{ paciente.dni }}</small>
+                <div class="font-semibold">
+                  <span class="sensible">{{ paciente.nombreCompleto }}</span>
+                </div>
+                <small class="text-muted"
+                  >DNI <span class="sensible">{{ paciente.dni }}</span></small
+                >
                 @if (paciente.compartidoPor) {
                   <p-tag
                     [value]="'Compartido por ' + paciente.compartidoPor"

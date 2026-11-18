@@ -5,6 +5,13 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     title: 'Principal',
     items: [
       {
+        label: 'Inicio',
+        icon: 'pi-home',
+        link: '/inicio',
+        roles: ['ROLE_ADMIN'],
+        exact: true,
+      },
+      {
         label: 'Panel',
         icon: 'pi-th-large',
         link: '/admin/panel',

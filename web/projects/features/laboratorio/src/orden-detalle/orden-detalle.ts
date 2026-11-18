@@ -30,10 +30,12 @@ import {
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { ICONO_ORDEN, rangoReferencia, SEVERIDAD_ORDEN } from '@tusalud/ui/utils';
 import { PageHeader } from '@tusalud/ui/page-header';
+import { SecurityNotice } from '@tusalud/ui/tablero';
 
 @Component({
   selector: 'app-orden-detalle',
   imports: [
+    SecurityNotice,
     CurrencyPipe,
     DatePipe,
     ReactiveFormsModule,

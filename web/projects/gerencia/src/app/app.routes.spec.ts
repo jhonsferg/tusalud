@@ -69,7 +69,7 @@ describe('aplicación gerencia', () => {
   });
 
   it('aplica los permisos de su rol dentro de la aplicación', async () => {
-    expect((await navegar(['ROLE_GERENCIA'], '/')).url).toBe('/reportes/ejecutivo');
+    expect((await navegar(['ROLE_GERENCIA'], '/')).url).toBe('/inicio');
     expect((await navegar(['ROLE_GERENCIA'], '/reportes/financiero')).url).toBe(
       '/reportes/financiero',
     );

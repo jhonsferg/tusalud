@@ -38,6 +38,7 @@ import {
 import { CargaArchivos } from '@tusalud/ui/carga-archivos';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { PageHeader } from '@tusalud/ui/page-header';
+import { SecurityNotice } from '@tusalud/ui/tablero';
 import {
   ICONO_ESTADO_IMAGEN,
   SEVERIDAD_IMAGEN,
@@ -49,6 +50,7 @@ import { VisorImagen } from '../visor/visor-imagen';
 @Component({
   selector: 'app-orden-imagen-detalle',
   imports: [
+    SecurityNotice,
     CargaArchivos,
     CurrencyPipe,
     DatePipe,

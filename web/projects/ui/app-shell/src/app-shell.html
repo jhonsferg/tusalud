@@ -79,7 +79,49 @@
       />
       <span class="topbar-logo only-mobile"><i class="pi pi-heart-fill"></i> {{ marca }}</span>
 
+      @if (modulo(); as m) {
+        <span
+          class="modulo-chip only-desktop"
+          role="status"
+          [attr.aria-label]="'Módulo actual: ' + m.etiqueta + ', rol ' + rol()"
+        >
+          <i [class]="'pi ' + m.icono" aria-hidden="true"></i>
+          <strong>{{ m.etiqueta }}</strong>
+          <span class="sep" aria-hidden="true">·</span>
+          <span>{{ rol() }}</span>
+        </span>
+      }
+
       <div class="spacer"></div>
+
+      <p-button
+        class="only-desktop"
+        [icon]="privacidad.activa() ? 'pi pi-eye-slash' : 'pi pi-eye'"
+        [text]="true"
+        [rounded]="true"
+        [severity]="privacidad.activa() ? 'warn' : 'secondary'"
+        [ariaLabel]="
+          privacidad.activa()
+            ? 'Desactivar modo privacidad'
+            : 'Activar modo privacidad, oculta datos personales'
+        "
+        [attr.aria-pressed]="privacidad.activa()"
+        pTooltip="Modo privacidad"
+        tooltipPosition="bottom"
+        (onClick)="privacidad.alternar()"
+      />
+
+      <p-button
+        class="only-desktop"
+        icon="pi pi-lock"
+        [text]="true"
+        [rounded]="true"
+        severity="secondary"
+        ariaLabel="Bloquear pantalla"
+        pTooltip="Bloquear pantalla"
+        tooltipPosition="bottom"
+        (onClick)="inactividad.bloquearAhora()"
+      />
 
       <p-button
         data-tour="tema"
@@ -124,11 +166,33 @@
       </button>
     </header>
 
-    <div class="content">
+    <div class="content" [class.con-inferior]="inferior().length > 1">
       <div class="page"><router-outlet /></div>
     </div>
   </div>
 </div>
+
+@if (inferior().length > 1) {
+  <nav class="navegacion-inferior" aria-label="Navegación rápida">
+    @for (item of inferior(); track item.link) {
+      <a
+        [routerLink]="item.link"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+        [attr.aria-label]="item.label"
+      >
+        <i [class]="'pi ' + item.icon" aria-hidden="true"></i>
+        <span>{{ item.corta ?? item.label }}</span>
+      </a>
+    }
+    <button type="button" aria-label="Más opciones del menú" (click)="menuOpen.set(true)">
+      <i class="pi pi-bars" aria-hidden="true"></i>
+      <span>Más</span>
+    </button>
+  </nav>
+}
+
+<app-pantalla-bloqueo />
 
 <p-popover #panelUsuario styleClass="popover-cuenta" appendTo="body">
   <div class="cuenta">
@@ -136,8 +200,11 @@
       <app-user-avatar [nombre]="user()?.nombreCompleto ?? ''" [imagen]="avatar()" size="xlarge" />
       <div class="cuenta-id">
         <strong>{{ user()?.nombreCompleto }}</strong>
-        <span>{{ correo() }}</span>
+        <span class="correo">{{ correo() }}</span>
         <span class="rol-chip">{{ rol() }}</span>
+        @if (modulo(); as m) {
+          <small class="modulo-actual">Módulo {{ m.etiqueta }}</small>
+        }
       </div>
     </div>
 
@@ -162,6 +229,20 @@
           </a>
         </li>
       }
+      <li>
+        <button type="button" (click)="alternarPrivacidad(panelUsuario)">
+          <i [class]="'pi ' + (privacidad.activa() ? 'pi-eye-slash' : 'pi-eye')"></i>
+          <span>{{
+            privacidad.activa() ? 'Desactivar modo privacidad' : 'Activar modo privacidad'
+          }}</span>
+        </button>
+      </li>
+      <li>
+        <button type="button" (click)="bloquear(panelUsuario)">
+          <i class="pi pi-lock"></i>
+          <span>Bloquear pantalla</span>
+        </button>
+      </li>
       <li>
         <button type="button" (click)="iniciarTour(panelUsuario)">
           <i class="pi pi-compass"></i>

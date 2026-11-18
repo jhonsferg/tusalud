@@ -95,7 +95,7 @@ test.describe('historia clínica', () => {
     page,
   }) => {
     await iniciarSesion(page, 'paciente');
-    await page.getByRole('link', { name: 'Historia clínica' }).click();
+    await page.getByRole('link', { name: 'Historia clínica', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Juan Pérez' })).toBeVisible();
     await expect(page.getByText('Penicilina')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Editar datos médicos' })).toHaveCount(0);
@@ -104,7 +104,7 @@ test.describe('historia clínica', () => {
 
   test('el médico ve sus pacientes y abre una historia', async ({ page }) => {
     await iniciarSesion(page, 'medico');
-    await page.getByRole('link', { name: 'Mis pacientes' }).click();
+    await page.getByRole('link', { name: 'Mis pacientes', exact: true }).click();
     await expect(page.getByRole('cell', { name: /Carlos Mendoza/ }).first()).toBeVisible();
     await page
       .getByRole('row', { name: /Carlos Mendoza/ })
@@ -277,7 +277,7 @@ test.describe('pacientes compartidos', () => {
     await salazar.getByLabel('Email').fill('dr.salazar@tusalud.com');
     await salazar.locator('#login-password').fill('Medico123!');
     await salazar.getByRole('button', { name: 'Iniciar sesión' }).click();
-    await expect(salazar).toHaveURL(/\/agenda$/);
+    await expect(salazar).toHaveURL(/\/medico\/inicio$/);
     await ir(salazar, '/pacientes');
     await expect(
       salazar.getByRole('row', { name: /Diego Herrera/ }).getByText(/Compartido por/),
@@ -291,6 +291,7 @@ test.describe('pacientes compartidos', () => {
 test.describe('administración', () => {
   test('muestra el panel de control con indicadores', async ({ page }) => {
     await iniciarSesion(page, 'admin');
+    await ir(page, '/admin/panel');
     await expect(page.getByRole('heading', { name: 'Panel de control' })).toBeVisible();
     await expect(page.getByText('Ingresos del mes')).toBeVisible();
     await expect(page.getByText('Médicos con más citas atendidas')).toBeVisible();

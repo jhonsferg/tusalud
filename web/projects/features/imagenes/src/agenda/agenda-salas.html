@@ -57,7 +57,9 @@
               >
               <p-tag [value]="etiquetaEstado[cita.estado]" [severity]="severidad[cita.estado]" />
             </header>
-            <span>{{ cita.pacienteNombre }}</span>
+            <span
+              ><span class="sensible">{{ cita.pacienteNombre }}</span></span
+            >
             <small class="text-muted">
               {{ cita.codigo }} ·
               @for (modalidad of cita.modalidades; track modalidad; let ultimo = $last) {

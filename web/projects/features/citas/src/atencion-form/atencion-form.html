@@ -21,10 +21,12 @@
   <div class="paciente panel">
     <i class="pi pi-user"></i>
     <div>
-      <strong>{{ cita.pacienteNombre }}</strong>
+      <strong
+        ><span class="sensible">{{ cita.pacienteNombre }}</span></strong
+      >
       <span class="text-muted"
-        >DNI {{ cita.pacienteDni }} · {{ cita.fechaHora | date: 'd MMM y, h:mm a' }} ·
-        {{ cita.motivo }}</span
+        >DNI <span class="sensible">{{ cita.pacienteDni }}</span> ·
+        {{ cita.fechaHora | date: 'd MMM y, h:mm a' }} · {{ cita.motivo }}</span
       >
     </div>
   </div>

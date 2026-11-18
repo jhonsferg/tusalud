@@ -1,6 +1,11 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+export interface MigaDePan {
+  readonly label: string;
+  readonly link?: string | readonly string[] | null;
+}
+
 @Component({
   selector: 'app-page-header',
   imports: [RouterLink],
@@ -14,4 +19,5 @@ export class PageHeader {
   readonly icon = input<string>();
   readonly backLink = input<string>();
   readonly backLabel = input('Volver');
+  readonly migas = input<readonly MigaDePan[] | null>(null);
 }
