@@ -69,9 +69,7 @@ describe('aplicación operaciones', () => {
   });
 
   it('aplica los permisos de su rol dentro de la aplicación', async () => {
-    expect((await navegar(['ROLE_OPERACIONES'], '/')).url).toBe('/reportes/operativo');
-    expect((await navegar(['ROLE_OPERACIONES'], '/reportes/calidad')).url).toBe(
-      '/reportes/operativo',
-    );
+    expect((await navegar(['ROLE_OPERACIONES'], '/')).url).toBe('/inicio');
+    expect((await navegar(['ROLE_OPERACIONES'], '/reportes/calidad')).url).toBe('/inicio');
   });
 });

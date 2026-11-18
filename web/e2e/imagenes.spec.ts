@@ -62,6 +62,7 @@ test.describe('imágenes diagnósticas', () => {
 
     const personal = await (await browser.newContext()).newPage();
     await iniciarSesion(personal, 'imagenes');
+    await ir(personal, '/imagenes');
     await personal.getByPlaceholder('Buscar por código, DNI o paciente').fill(orden.codigo);
     await expect(personal.getByText(orden.codigo).first()).toBeVisible();
 
@@ -209,13 +210,17 @@ test.describe('imágenes diagnósticas', () => {
     const paciente = await (await browser.newContext()).newPage();
     await iniciarSesion(paciente, 'paciente');
     await paciente.goto('/imagenes/');
-    await expect(paciente).toHaveURL(/\/paciente\/citas$/);
-    await expect(paciente.getByRole('link', { name: 'Mis estudios' })).toBeVisible();
+    await expect(paciente).toHaveURL(/\/paciente\/inicio$/);
+    await expect(paciente.getByRole('link', { name: 'Mis estudios', exact: true })).toBeVisible();
 
     const personal = await (await browser.newContext()).newPage();
     await iniciarSesion(personal, 'imagenes');
-    await expect(personal.getByRole('link', { name: 'Agenda de salas' })).toBeVisible();
-    await expect(personal.getByRole('link', { name: 'Catálogo de estudios' })).toBeVisible();
+    await expect(
+      personal.getByRole('link', { name: 'Agenda de salas', exact: true }),
+    ).toBeVisible();
+    await expect(
+      personal.getByRole('link', { name: 'Catálogo de estudios', exact: true }),
+    ).toBeVisible();
     await ir(personal, '/imagenes/catalogo');
     await personal.getByPlaceholder('Buscar estudio').fill('tórax');
     await expect(

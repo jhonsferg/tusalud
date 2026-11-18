@@ -22,6 +22,11 @@ export const routes: Routes = [
         redirectTo: () => inject(AuthService).homeUrl(),
       },
       {
+        path: 'inicio',
+        title: 'Inicio',
+        loadComponent: () => import('./inicio/inicio').then((m) => m.InicioFinanzas),
+      },
+      {
         path: 'reportes',
         canMatch: [roleGuard('ROLE_FINANZAS')],
         loadChildren: () => import('@tusalud/features/reportes').then((m) => m.REPORTES_ROUTES),

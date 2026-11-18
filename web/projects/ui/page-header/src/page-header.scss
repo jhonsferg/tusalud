@@ -3,6 +3,37 @@
   margin-bottom: 1.5rem;
 }
 
+.migas {
+  margin-bottom: 0.5rem;
+  font-size: 0.8125rem;
+
+  ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--p-text-muted-color);
+  }
+
+  li:not(:last-child)::after {
+    content: '/';
+    opacity: 0.6;
+  }
+
+  li:last-child {
+    color: var(--p-text-color);
+    font-weight: 600;
+  }
+}
+
 .back {
   display: inline-flex;
   align-items: center;

@@ -69,7 +69,7 @@ describe('aplicación paciente', () => {
   });
 
   it('aplica los permisos de su rol dentro de la aplicación', async () => {
-    expect((await navegar(['ROLE_PACIENTE'], '/')).url).toBe('/citas');
+    expect((await navegar(['ROLE_PACIENTE'], '/')).url).toBe('/inicio');
     expect((await navegar(['ROLE_PACIENTE'], '/medicos/1/disponibilidad')).url).toBe(
       '/medicos/1/disponibilidad',
     );

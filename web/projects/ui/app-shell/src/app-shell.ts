@@ -2,6 +2,7 @@ import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  OnDestroy,
   OnInit,
   effect,
   computed,
@@ -19,16 +20,20 @@ import {
   APP_ACTUAL,
   AuthService,
   ETIQUETA_ROL,
+  InactividadService,
+  MODULOS,
   modulosDe,
   NotificacionesStore,
   NotificacionResponse,
   PerfilStore,
+  PrivacidadService,
   StorageService,
   ThemeMode,
   ThemeService,
   TourService,
 } from '@tusalud/core';
-import { APP_SHELL_CONFIG, NavGroup, ShellAccess } from '@tusalud/ui/shell-config';
+import { PantallaBloqueo } from '@tusalud/ui/inactividad';
+import { APP_SHELL_CONFIG, NavGroup, NavItem, ShellAccess } from '@tusalud/ui/shell-config';
 import { COLOR_NOTIFICACION, ICONO_NOTIFICACION } from '@tusalud/ui/utils';
 import { Tour } from '@tusalud/ui/tour';
 import { UserAvatar } from '@tusalud/ui/user-avatar';
@@ -50,14 +55,17 @@ const COLLAPSE_KEY = 'tusalud.sidebar.collapsed';
     Tooltip,
     UserAvatar,
     Tour,
+    PantallaBloqueo,
   ],
   templateUrl: './app-shell.html',
   styleUrl: './app-shell.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppShell implements OnInit {
+export class AppShell implements OnInit, OnDestroy {
   protected readonly auth = inject(AuthService);
   protected readonly theme = inject(ThemeService);
+  protected readonly privacidad = inject(PrivacidadService);
+  protected readonly inactividad = inject(InactividadService);
   protected readonly notificaciones = inject(NotificacionesStore);
   private readonly perfil = inject(PerfilStore);
   private readonly router = inject(Router);
@@ -98,6 +106,14 @@ export class AppShell implements OnInit {
     modulosDe(this.auth.roles()).filter((modulo) => modulo.app !== this.app),
   );
 
+  protected readonly modulo = computed(() => MODULOS.find((m) => m.app === this.app) ?? null);
+
+  protected readonly inferior = computed<NavItem[]>(() =>
+    this.grupos()
+      .flatMap((grupo) => grupo.items)
+      .filter((item) => item.inferior),
+  );
+
   protected readonly modos: readonly { valor: ThemeMode; label: string; icon: string }[] = [
     { valor: 'light', label: 'Claro', icon: 'pi-sun' },
     { valor: 'dark', label: 'Oscuro', icon: 'pi-moon' },
@@ -125,6 +141,21 @@ export class AppShell implements OnInit {
   ngOnInit(): void {
     this.perfil.load();
     this.perfil.cargarPreferencias();
+    this.inactividad.iniciar();
+  }
+
+  ngOnDestroy(): void {
+    this.inactividad.detener();
+  }
+
+  protected alternarPrivacidad(panel: Popover): void {
+    panel.hide();
+    this.privacidad.alternar();
+  }
+
+  protected bloquear(panel: Popover): void {
+    panel.hide();
+    this.inactividad.bloquearAhora();
   }
 
   protected iniciarTour(panel?: Popover): void {

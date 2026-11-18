@@ -26,22 +26,24 @@ export type LogoutReason = 'manual' | 'expired' | 'unauthorized';
 const MAX_TIMER_MS = 2_147_483_647;
 const ANTICIPO_RENOVACION_MS = 60_000;
 
+const INICIO = '/inicio';
+
 const HOME_BY_ROLE: readonly (readonly [Rol, string])[] = [
-  ['ROLE_ADMIN', '/admin/panel'],
-  ['ROLE_GERENCIA', '/reportes/ejecutivo'],
-  ['ROLE_MEDICO', '/agenda'],
-  ['ROLE_PACIENTE', '/citas'],
-  ['ROLE_LABORATORIO', '/laboratorio'],
-  ['ROLE_IMAGENES', '/imagenes'],
-  ['ROLE_FARMACIA', '/farmacia'],
-  ['ROLE_ALMACEN', '/almacen'],
-  ['ROLE_RECEPCION', '/recepcion'],
-  ['ROLE_CAJA', '/caja'],
-  ['ROLE_ENFERMERIA', '/hospitalizacion'],
-  ['ROLE_FINANZAS', '/reportes/financiero'],
-  ['ROLE_OPERACIONES', '/reportes/operativo'],
-  ['ROLE_CALIDAD', '/reportes/calidad'],
-  ['ROLE_RRHH', '/rrhh'],
+  ['ROLE_ADMIN', INICIO],
+  ['ROLE_GERENCIA', INICIO],
+  ['ROLE_MEDICO', INICIO],
+  ['ROLE_PACIENTE', INICIO],
+  ['ROLE_LABORATORIO', INICIO],
+  ['ROLE_IMAGENES', INICIO],
+  ['ROLE_FARMACIA', INICIO],
+  ['ROLE_ALMACEN', INICIO],
+  ['ROLE_RECEPCION', INICIO],
+  ['ROLE_CAJA', INICIO],
+  ['ROLE_ENFERMERIA', INICIO],
+  ['ROLE_FINANZAS', INICIO],
+  ['ROLE_OPERACIONES', INICIO],
+  ['ROLE_CALIDAD', INICIO],
+  ['ROLE_RRHH', INICIO],
 ];
 
 const DEFAULT_HOME = '/perfil';

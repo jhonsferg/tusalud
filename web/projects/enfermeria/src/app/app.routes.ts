@@ -22,6 +22,11 @@ export const routes: Routes = [
         redirectTo: () => inject(AuthService).homeUrl(),
       },
       {
+        path: 'inicio',
+        title: 'Inicio',
+        loadComponent: () => import('./inicio/inicio').then((m) => m.InicioEnfermeria),
+      },
+      {
         path: 'hospitalizacion',
         loadChildren: () =>
           import('@tusalud/features/hospitalizacion').then((m) => m.HOSPITALIZACION_ROUTES),

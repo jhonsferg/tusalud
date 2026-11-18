@@ -16,6 +16,8 @@
   }
 </app-page-header>
 
+<app-security-notice class="aviso-acceso" />
+
 @if (store.orden.error(); as error) {
   <div class="panel">
     <app-empty-state
@@ -28,9 +30,12 @@
 } @else if (orden(); as o) {
   <div class="cabecera panel">
     <div>
-      <h2>{{ o.pacienteNombre }}</h2>
+      <h2>
+        <span class="sensible">{{ o.pacienteNombre }}</span>
+      </h2>
       <p class="text-muted">
-        DNI {{ o.dni }} · Solicitó {{ o.medicoNombre }} · {{ o.fecha | date: 'd MMM y, HH:mm' }}
+        DNI <span class="sensible">{{ o.dni }}</span> · Solicitó {{ o.medicoNombre }} ·
+        {{ o.fecha | date: 'd MMM y, HH:mm' }}
       </p>
       @if (o.indicaciones) {
         <p class="indicaciones"><i class="pi pi-info-circle"></i> {{ o.indicaciones }}</p>

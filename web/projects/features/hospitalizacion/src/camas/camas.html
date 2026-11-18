@@ -39,7 +39,9 @@
           }
         </td>
         <td>{{ etiquetaArea[c.area] }}</td>
-        <td>{{ c.pacienteNombre || '—' }}</td>
+        <td>
+          <span class="sensible">{{ c.pacienteNombre || '—' }}</span>
+        </td>
         <td class="text-right">{{ c.precioDia | currency: 'PEN' : 'symbol-narrow' }}</td>
         <td>
           @if (c.estado === 'OCUPADA') {

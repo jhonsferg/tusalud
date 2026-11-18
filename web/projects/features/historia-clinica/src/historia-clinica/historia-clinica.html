@@ -12,6 +12,10 @@
       [outlined]="true"
       [routerLink]="['/imagenes/paciente', pacienteId]"
     />
+
+    @if (!esPropia()) {
+      <app-security-notice class="aviso-acceso" />
+    }
   }
   @if (store.historia.value(); as resumen) {
     <app-boton-documento
@@ -37,9 +41,11 @@
   <section class="panel ficha">
     <div class="ficha-head">
       <div>
-        <h2>{{ historia.paciente.nombreCompleto }}</h2>
+        <h2>
+          <span class="sensible">{{ historia.paciente.nombreCompleto }}</span>
+        </h2>
         <span class="text-muted"
-          >DNI {{ historia.paciente.dni }} · Historia
+          >DNI <span class="sensible">{{ historia.paciente.dni }}</span> · Historia
           {{ historia.paciente.historialClinicoNumero }}</span
         >
       </div>

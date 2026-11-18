@@ -69,8 +69,8 @@ describe('aplicación recepcion', () => {
   });
 
   it('aplica los permisos de su rol dentro de la aplicación', async () => {
-    expect((await navegar(['ROLE_RECEPCION'], '/')).url).toBe('/recepcion');
-    expect((await navegar(['ROLE_RECEPCION'], '/hospitalizacion/camas')).url).toBe('/recepcion');
+    expect((await navegar(['ROLE_RECEPCION'], '/')).url).toBe('/inicio');
+    expect((await navegar(['ROLE_RECEPCION'], '/hospitalizacion/camas')).url).toBe('/inicio');
     expect(
       (
         await navegar(

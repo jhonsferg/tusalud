@@ -12,9 +12,12 @@
     @if (receta(); as r) {
       <div class="receta-activa">
         <div>
-          <strong>{{ r.pacienteNombre }}</strong>
+          <strong
+            ><span class="sensible">{{ r.pacienteNombre }}</span></strong
+          >
           <small class="text-muted block"
-            >DNI {{ r.dni }} · {{ r.medicoNombre }} · {{ r.fecha | date: 'd MMM y' }}</small
+            >DNI <span class="sensible">{{ r.dni }}</span> · {{ r.medicoNombre }} ·
+            {{ r.fecha | date: 'd MMM y' }}</small
           >
         </div>
         <div class="acciones-receta">
@@ -43,9 +46,12 @@
           <li>
             <button type="button" (click)="elegirReceta(item)">
               <span>
-                <strong>{{ item.pacienteNombre }}</strong>
+                <strong
+                  ><span class="sensible">{{ item.pacienteNombre }}</span></strong
+                >
                 <small class="text-muted"
-                  >DNI {{ item.dni }} · {{ item.items.length }} medicamentos</small
+                  >DNI <span class="sensible">{{ item.dni }}</span> ·
+                  {{ item.items.length }} medicamentos</small
                 >
               </span>
               <small>{{ item.fecha | date: 'd MMM' }}</small>
@@ -162,7 +168,10 @@
   @if (comprobante(); as c) {
     <div class="comprobante">
       <h4>{{ c.comprobante }}</h4>
-      <p class="text-muted">{{ c.fecha | date: 'd MMM y, HH:mm' }} · {{ c.pacienteNombre }}</p>
+      <p class="text-muted">
+        {{ c.fecha | date: 'd MMM y, HH:mm' }} ·
+        <span class="sensible">{{ c.pacienteNombre }}</span>
+      </p>
       <table>
         @for (item of c.items; track $index) {
           <tr>

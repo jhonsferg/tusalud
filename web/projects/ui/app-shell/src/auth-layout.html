@@ -5,20 +5,30 @@
       TuSalud
     </div>
     <div class="mensaje">
-      <h2>Atención médica cercana, segura y sin esperas</h2>
+      <h2>Sistema clínico integral</h2>
       <p>
-        Reserva con especialistas, revisa tu historia clínica y paga tus consultas desde un solo
-        lugar.
+        Un solo acceso para pacientes, personal de salud y administración. Al ingresar, llegas
+        directo a tu módulo de trabajo.
       </p>
       <ul>
-        <li><i class="pi pi-calendar-plus"></i> Citas en segundos, con horarios en tiempo real</li>
-        <li><i class="pi pi-wallet"></i> Paga con tarjeta, Yape o Plin</li>
-        <li><i class="pi pi-shield"></i> Tu información protegida con verificación en dos pasos</li>
+        <li><i class="pi pi-id-card"></i> Cada persona ve solo lo que necesita para su labor</li>
+        <li>
+          <i class="pi pi-shield"></i> Los accesos a historias clínicas quedan registrados en la
+          auditoría
+        </li>
+        <li><i class="pi pi-lock"></i> La sesión se bloquea sola tras un periodo sin actividad</li>
+        <li>
+          <i class="pi pi-mobile"></i> Verificación en dos pasos con tu aplicación de autenticación
+        </li>
       </ul>
     </div>
     <small class="pie">© 2026 TuSalud. Todos los derechos reservados.</small>
   </aside>
   <main class="content">
     <div class="card"><router-outlet /></div>
+    <p class="aviso-equipo">
+      <i class="pi pi-desktop" aria-hidden="true"></i>
+      ¿Equipo compartido? Cierra tu sesión al terminar.
+    </p>
   </main>
 </div>

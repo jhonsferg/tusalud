@@ -6,6 +6,7 @@ test.describe('recepción', () => {
   test('registra un paciente en mostrador y abre un turno sin cita', async ({ page }) => {
     const dni = String(Math.floor(10_000_000 + Math.random() * 89_999_999));
     await iniciarSesion(page, 'recepcion');
+    await ir(page, '/recepcion');
     await expect(page.getByRole('heading', { level: 1, name: 'Recepción' })).toBeVisible();
 
     await ir(page, '/recepcion/pacientes');
@@ -37,6 +38,7 @@ test.describe('recepción', () => {
 test.describe('caja', () => {
   test('abre la caja, cobra, anula el comprobante y cierra con diferencia', async ({ page }) => {
     await iniciarSesion(page, 'caja');
+    await ir(page, '/caja');
     await expect(page.getByRole('heading', { level: 1, name: 'Caja' })).toBeVisible();
     const abrir = page.getByRole('button', { name: 'Abrir caja' });
     const cerrar = page.getByRole('button', { name: 'Cerrar caja' });
@@ -88,7 +90,7 @@ test.describe('caja', () => {
     const paciente = await (await browser.newContext()).newPage();
     await iniciarSesion(paciente, 'paciente');
     await paciente.goto('/caja/');
-    await expect(paciente).toHaveURL(/\/paciente\/citas$/);
+    await expect(paciente).toHaveURL(/\/paciente\/inicio$/);
   });
 });
 
@@ -96,6 +98,7 @@ test.describe('hospitalización', () => {
   test('enfermería ve el mapa de camas y registra un triaje de emergencia', async ({ page }) => {
     const dni = await crearPaciente(page);
     await iniciarSesion(page, 'enfermeria');
+    await ir(page, '/hospitalizacion');
     await expect(page.getByRole('heading', { level: 1, name: 'Hospitalización' })).toBeVisible();
     await expect(page.getByRole('button', { name: /^Cama / }).first()).toBeVisible();
 
@@ -117,7 +120,7 @@ test.describe('hospitalización', () => {
       page.getByRole('heading', { level: 1, name: 'Mis hospitalizaciones' }),
     ).toBeVisible();
     await page.goto('/enfermeria/');
-    await expect(page).toHaveURL(/\/paciente\/citas$/);
+    await expect(page).toHaveURL(/\/paciente\/inicio$/);
     await cerrarSesion(page);
   });
 });

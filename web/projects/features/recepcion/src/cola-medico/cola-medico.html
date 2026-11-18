@@ -13,8 +13,13 @@
     >
       <div class="numero">{{ turno.numero }}</div>
       <div class="datos">
-        <strong>{{ turno.pacienteNombre }}</strong>
-        <small class="text-muted">DNI {{ turno.dni }} · espera {{ turno.esperaMinutos }} min</small>
+        <strong
+          ><span class="sensible">{{ turno.pacienteNombre }}</span></strong
+        >
+        <small class="text-muted"
+          >DNI <span class="sensible">{{ turno.dni }}</span> · espera
+          {{ turno.esperaMinutos }} min</small
+        >
         @if (turno.motivo) {
           <span>{{ turno.motivo }}</span>
         }

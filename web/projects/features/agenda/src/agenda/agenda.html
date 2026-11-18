@@ -85,8 +85,12 @@
       >
         <time>{{ cita.fechaHora | date: 'HH:mm' }}</time>
         <div class="info">
-          <strong>{{ cita.pacienteNombre }}</strong>
-          <span class="text-muted">DNI {{ cita.pacienteDni }}</span>
+          <strong
+            ><span class="sensible">{{ cita.pacienteNombre }}</span></strong
+          >
+          <span class="text-muted"
+            >DNI <span class="sensible">{{ cita.pacienteDni }}</span></span
+          >
           <p>{{ cita.motivo }}</p>
         </div>
         <div class="side">

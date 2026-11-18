@@ -39,6 +39,7 @@ import { CargaArchivos } from '@tusalud/ui/carga-archivos';
 import { BotonDocumento } from '@tusalud/ui/boton-documento';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { PageHeader } from '@tusalud/ui/page-header';
+import { SecurityNotice } from '@tusalud/ui/tablero';
 import { ICONO_ESTADO_IMAGEN, SEVERIDAD_IMAGEN, tamanoLegible } from '../imagenes.utils';
 import { VisorImagen } from '../visor/visor-imagen';
 
@@ -46,6 +47,7 @@ import { VisorImagen } from '../visor/visor-imagen';
   selector: 'app-orden-imagen-detalle',
   imports: [
     BotonDocumento,
+    SecurityNotice,
     CargaArchivos,
     CurrencyPipe,
     DatePipe,

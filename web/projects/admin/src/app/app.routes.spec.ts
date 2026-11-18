@@ -75,24 +75,24 @@ describe('aplicación admin', () => {
   });
 
   it('aplica los permisos de su rol dentro de la aplicación', async () => {
-    expect((await navegar(['ROLE_ADMIN'], '/')).url).toBe('/admin/panel');
+    expect((await navegar(['ROLE_ADMIN'], '/')).url).toBe('/inicio');
     expect((await navegar(['ROLE_ADMIN'], '/especialidades/3/editar')).url).toBe(
       '/especialidades/3/editar',
     );
     expect((await navegar(['ROLE_ADMIN'], '/citas/5')).url).toBe('/citas/5');
-    expect((await navegar(['ROLE_ADMIN'], '/farmacia')).url).toBe('/admin/panel');
+    expect((await navegar(['ROLE_ADMIN'], '/farmacia')).url).toBe('/inicio');
     expect((await navegar(['ROLE_ADMIN'], '/farmacia/historial')).url).toBe('/farmacia/historial');
     expect(
       (await navegar(['ROLE_ADMIN'], '/laboratorio/ordenes/11111111-1111-4111-8111-111111111111'))
         .url,
-    ).toBe('/admin/panel');
+    ).toBe('/inicio');
     expect((await navegar(['ROLE_ADMIN'], '/hospitalizacion/camas')).url).toBe(
       '/hospitalizacion/camas',
     );
     expect((await navegar(['ROLE_ADMIN'], '/pacientes')).url).toBe('/pacientes');
   });
 
-  it('abre el panel al entrar a la raíz con el prefijo oculto', async () => {
+  it('abre el inicio al entrar a la raíz con el prefijo oculto', async () => {
     TestBed.resetTestingModule();
     localStorage.clear();
     localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(createSession(['ROLE_ADMIN'])));
@@ -111,6 +111,6 @@ describe('aplicación admin', () => {
     });
     const harness = await RouterTestingHarness.create();
     await harness.navigateByUrl('/');
-    expect(TestBed.inject(Router).url).toBe('/panel');
+    expect(TestBed.inject(Router).url).toBe('/');
   });
 });

@@ -103,8 +103,12 @@
         <tr>
           <td>{{ cita.fechaHora | date: 'dd/MM/y HH:mm' }}</td>
           <td>
-            <div class="font-semibold">{{ cita.pacienteNombre }}</div>
-            <small class="text-muted">DNI {{ cita.pacienteDni }}</small>
+            <div class="font-semibold">
+              <span class="sensible">{{ cita.pacienteNombre }}</span>
+            </div>
+            <small class="text-muted"
+              >DNI <span class="sensible">{{ cita.pacienteDni }}</span></small
+            >
           </td>
           <td>
             <div class="font-semibold">{{ cita.medicoNombre }}</div>

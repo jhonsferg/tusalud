@@ -30,6 +30,12 @@ export const PASOS_TOUR_PREDETERMINADOS: readonly TourStep[] = [
     text: 'Te mostramos en un minuto dónde está cada herramienta. Puedes salir cuando quieras y volver a abrir esta guía desde el menú de tu cuenta.',
   },
   {
+    target: 'nav:/inicio',
+    icon: 'pi-home',
+    title: 'Tu inicio',
+    text: 'Tu tablero con lo más importante de tu día y accesos rápidos a lo que más usas.',
+  },
+  {
     target: 'nav:/admin/panel',
     icon: 'pi-th-large',
     title: 'Panel de control',

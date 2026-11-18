@@ -42,19 +42,22 @@ test.describe('personal de la institución', () => {
 
     await cerrarSesion(page);
     await entrarCon(page, correo, 'Personal123!', /\/almacen\/$/);
-    await expect(page.getByRole('heading', { name: 'Almacén' })).toBeVisible();
+    await ir(page, '/almacen');
+    await expect(page.getByRole('heading', { level: 1, name: 'Almacén' })).toBeVisible();
   });
 
   test('cada rol ve en el menú solo lo que le corresponde', async ({ browser }) => {
     const paciente = await (await browser.newContext()).newPage();
     await iniciarSesion(paciente, 'paciente');
-    await expect(paciente.getByRole('link', { name: 'Mis resultados' })).toBeVisible();
-    await expect(paciente.getByRole('link', { name: 'Mis medicamentos' })).toBeVisible();
+    await expect(paciente.getByRole('link', { name: 'Mis resultados', exact: true })).toBeVisible();
+    await expect(
+      paciente.getByRole('link', { name: 'Mis medicamentos', exact: true }),
+    ).toBeVisible();
     await expect(paciente.getByRole('link', { name: 'Proveedores' })).toHaveCount(0);
 
     const farmacia = await (await browser.newContext()).newPage();
     await iniciarSesion(farmacia, 'farmacia');
-    await expect(farmacia.getByRole('link', { name: 'Dispensar' })).toBeVisible();
+    await expect(farmacia.getByRole('link', { name: 'Dispensar', exact: true })).toBeVisible();
     await expect(farmacia.getByRole('link', { name: 'Proveedores' })).toHaveCount(0);
     await farmacia.goto('/almacen/ingresos');
     await expect(farmacia).toHaveURL(/\/farmacia\/$/);
@@ -67,6 +70,7 @@ test.describe('almacén', () => {
     const codigo = `E2E${Date.now().toString().slice(-7)}`;
     const nombre = `Producto ${codigo}`;
     await iniciarSesion(page, 'almacen');
+    await ir(page, '/almacen');
     await expect(page.getByText('Productos activos')).toBeVisible();
     await expect(page.getByText('Valor del inventario')).toBeVisible();
 
@@ -122,6 +126,7 @@ test.describe('farmacia', () => {
   test('dispensa una receta pendiente y anula la dispensación', async ({ page }) => {
     test.setTimeout(90_000);
     await iniciarSesion(page, 'farmacia');
+    await ir(page, '/farmacia');
     await expect(page.getByText('Recetas pendientes', { exact: true }).first()).toBeVisible();
     await page.getByRole('button', { name: 'Dispensar' }).first().click();
     await expect(page).toHaveURL(/\/farmacia\/dispensar\?atencionId=[0-9a-f-]{36}/);
@@ -205,7 +210,7 @@ test.describe('laboratorio', () => {
     await expect(lab.getByText('Los resultados fueron validados y publicados.')).toBeVisible();
 
     const paciente = await (await browser.newContext()).newPage();
-    await entrarCon(paciente, 'carlos.mendoza@correo.com', 'Paciente123!', /\/paciente\/citas$/);
+    await entrarCon(paciente, 'carlos.mendoza@correo.com', 'Paciente123!', /\/paciente\/inicio$/);
     await ir(paciente, '/mis-resultados');
     const tarjeta = paciente.locator('article', { hasText: codigo });
     await expect(tarjeta).toBeVisible();
@@ -218,6 +223,7 @@ test.describe('laboratorio', () => {
     page,
   }) => {
     await iniciarSesion(page, 'laboratorio');
+    await ir(page, '/laboratorio');
     await expect(page.getByRole('row').nth(1)).toBeVisible();
     await ir(page, '/laboratorio/examenes');
     await page.getByPlaceholder('Buscar examen').fill('Hemograma');
@@ -246,7 +252,7 @@ test.describe('laboratorio', () => {
   });
 
   test('el paciente ve sus órdenes con el avance de cada una', async ({ page }) => {
-    await entrarCon(page, 'carlos.mendoza@correo.com', 'Paciente123!', /\/paciente\/citas$/);
+    await entrarCon(page, 'carlos.mendoza@correo.com', 'Paciente123!', /\/paciente\/inicio$/);
     await ir(page, '/mis-resultados');
     await expect(page.locator('article').first()).toBeVisible();
     await expect(page.getByText('Completada').first()).toBeVisible();

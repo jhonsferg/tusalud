@@ -1,6 +1,6 @@
 import { Page, expect, test } from '@playwright/test';
 
-import { CUENTAS, cerrarSesion, iniciarSesion, tokenDe } from './support';
+import { CUENTAS, cerrarSesion, iniciarSesion, tokenDe, ir } from './support';
 
 function diaAleatorioFuturo(): string {
   const fecha = new Date(Date.now() + (20 + Math.floor(Math.random() * 100)) * 86_400_000);
@@ -39,6 +39,7 @@ test.describe('reportes gerenciales', () => {
     page,
   }) => {
     await iniciarSesion(page, 'gerencia');
+    await ir(page, '/reportes/ejecutivo');
     await expect(page.getByRole('heading', { level: 1, name: 'Reporte ejecutivo' })).toBeVisible();
     await expect(page.getByText('Tasa de ausencia')).toBeVisible();
     await expect(page.getByText('Ocupación hospitalaria')).toBeVisible();
@@ -62,6 +63,7 @@ test.describe('reportes gerenciales', () => {
 
   test('el rango de un solo día y la agrupación recargan el reporte', async ({ page }) => {
     await iniciarSesion(page, 'gerencia');
+    await ir(page, '/reportes/ejecutivo');
     await expect(page.getByText('Tasa de ausencia')).toBeVisible();
     const peticion = page.waitForRequest(
       (r) => r.url().includes('/reportes/ejecutivo') && r.url().includes('agrupacion=SEMANA'),
@@ -72,19 +74,21 @@ test.describe('reportes gerenciales', () => {
 
   test('finanzas solo ve el reporte financiero y no entra al operativo', async ({ page }) => {
     await iniciarSesion(page, 'finanzas');
+    await ir(page, '/reportes/financiero');
     await expect(page.getByRole('heading', { level: 1, name: 'Reporte financiero' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Reporte operativo' })).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Reporte de calidad' })).toHaveCount(0);
     await page.goto('/finanzas/reportes/operativo');
-    await expect(page).toHaveURL(/\/finanzas\/reportes\/financiero$/);
+    await expect(page).toHaveURL(/\/finanzas\/inicio$/);
     await page.goto('/finanzas/reportes/ejecutivo');
-    await expect(page).toHaveURL(/\/finanzas\/reportes\/financiero$/);
+    await expect(page).toHaveURL(/\/finanzas\/inicio$/);
     await page.goto('/finanzas/rrhh/empleados');
     await expect(page.getByRole('heading', { name: /no encontrada/i })).toBeVisible();
   });
 
   test('operaciones ve el mapa de demanda y el inventario crítico', async ({ page }) => {
     await iniciarSesion(page, 'operaciones');
+    await ir(page, '/reportes/operativo');
     await expect(page.getByRole('heading', { level: 1, name: 'Reporte operativo' })).toBeVisible();
     await expect(page.getByText('Demanda de citas por día y hora')).toBeVisible();
     await expect(
@@ -96,18 +100,20 @@ test.describe('reportes gerenciales', () => {
 
   test('calidad ve las valoraciones y las tasas de cancelación', async ({ page }) => {
     await iniciarSesion(page, 'calidad');
+    await ir(page, '/reportes/calidad');
     await expect(page.getByRole('heading', { level: 1, name: 'Reporte de calidad' })).toBeVisible();
     await expect(page.getByText('Valoración promedio').first()).toBeVisible();
     await expect(page.getByText('Valoraciones por médico')).toBeVisible();
     await expect(page.getByText('Cancelaciones y ausencias por especialidad')).toBeVisible();
     await page.goto('/calidad/reportes/financiero');
-    await expect(page).toHaveURL(/\/calidad\/reportes\/calidad$/);
+    await expect(page).toHaveURL(/\/calidad\/inicio$/);
   });
 });
 
 test.describe('recursos humanos', () => {
   test('RR. HH. ve la plantilla, asigna un turno y lo retira', async ({ page }) => {
     await iniciarSesion(page, 'rrhh');
+    await ir(page, '/rrhh');
     await expect(page.getByRole('heading', { level: 1, name: 'Recursos humanos' })).toBeVisible();
     await expect(page.getByText('Masa salarial mensual')).toBeVisible();
     await expect(page.getByText('Contratos por vencer')).toBeVisible();
@@ -134,7 +140,7 @@ test.describe('recursos humanos', () => {
 
   test('RR. HH. busca empleados y ve la ficha con el sueldo', async ({ page }) => {
     await iniciarSesion(page, 'rrhh');
-    await page.getByRole('link', { name: 'Empleados' }).click();
+    await page.getByRole('link', { name: 'Empleados', exact: true }).click();
     await expect(page).toHaveURL(/\/rrhh\/empleados$/);
     await page.getByLabel('Buscar empleado').fill('Carla');
     await expect(page.getByRole('cell', { name: /Carla Núñez/ }).first()).toBeVisible();
@@ -148,7 +154,7 @@ test.describe('recursos humanos', () => {
     const rechazada = await solicitarAusenciaComo(page, `E2E rechazar ${Date.now()}`);
     try {
       await iniciarSesion(page, 'rrhh');
-      await page.getByRole('link', { name: 'Ausencias' }).click();
+      await page.getByRole('link', { name: 'Ausencias', exact: true }).click();
       await expect(page).toHaveURL(/\/rrhh\/ausencias$/);
 
       const fila1 = page.getByRole('row').filter({ hasText: `E2E aprobar` }).first();
@@ -173,7 +179,7 @@ test.describe('recursos humanos', () => {
 
   test('RR. HH. alterna al calendario de ausencias', async ({ page }) => {
     await iniciarSesion(page, 'rrhh');
-    await page.getByRole('link', { name: 'Ausencias' }).click();
+    await page.getByRole('link', { name: 'Ausencias', exact: true }).click();
     await page.getByRole('button', { name: 'Calendario' }).click();
     await expect(page.getByRole('table', { name: 'Calendario de ausencias' })).toBeVisible();
   });
@@ -183,7 +189,7 @@ test.describe('recursos humanos', () => {
     await page.getByRole('link', { name: 'Resumen de plantilla' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Recursos humanos' })).toBeVisible();
     await expect(page.getByText('Masa salarial mensual')).toHaveCount(0);
-    await page.getByRole('link', { name: 'Empleados' }).click();
+    await page.getByRole('link', { name: 'Empleados', exact: true }).click();
     await expect(page.getByRole('columnheader', { name: /Sueldo/ })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Nuevo empleado' })).toHaveCount(0);
   });
@@ -246,11 +252,11 @@ test.describe('acceso a los módulos gerenciales', () => {
   test('un paciente no entra a gerencia ni a recursos humanos', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
     await page.goto('/gerencia/');
-    await expect(page).toHaveURL(/\/paciente\/citas$/);
+    await expect(page).toHaveURL(/\/paciente\/inicio$/);
     await page.goto('/rrhh/');
-    await expect(page).toHaveURL(/\/paciente\/citas$/);
+    await expect(page).toHaveURL(/\/paciente\/inicio$/);
     await page.goto('/finanzas/reportes/financiero');
-    await expect(page).toHaveURL(/\/paciente\/citas$/);
+    await expect(page).toHaveURL(/\/paciente\/inicio$/);
   });
 
   test('un empleado de otra área vuelve a su módulo desde gerencia y recursos humanos', async ({

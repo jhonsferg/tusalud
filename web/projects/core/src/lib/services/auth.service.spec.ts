@@ -79,7 +79,7 @@ describe('AuthService', () => {
     expect(auth.isAuthenticated()).toBe(true);
     expect(auth.isPaciente()).toBe(true);
     expect(auth.isAdmin()).toBe(false);
-    expect(auth.homeUrl()).toBe('/citas');
+    expect(auth.homeUrl()).toBe('/inicio');
     expect(auth.token()).toContain('.');
     expect(JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) ?? 'null')?.user.email).toBe(
       'juan.perez@correo.com',
@@ -106,7 +106,7 @@ describe('AuthService', () => {
 
   it('restaura una sesión vigente y descarta una expirada', () => {
     localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(createSession(['ROLE_MEDICO'])));
-    expect(setup().homeUrl()).toBe('/agenda');
+    expect(setup().homeUrl()).toBe('/inicio');
 
     TestBed.resetTestingModule();
     localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(createSession(['ROLE_ADMIN'], -1000)));

@@ -16,12 +16,17 @@ export function primerosSegmentos(rutas: readonly Route[]): ReadonlySet<string> 
   return segmentos;
 }
 
+const INICIO = 'inicio';
+
 export class RutaOcultaSerializer extends DefaultUrlSerializer {
+  private readonly conInicio: boolean;
+
   constructor(
     private readonly prefijo: string,
     private readonly otras: ReadonlySet<string>,
   ) {
     super();
+    this.conInicio = otras.has(INICIO);
   }
 
   override parse(url: string): UrlTree {
@@ -33,7 +38,7 @@ export class RutaOcultaSerializer extends DefaultUrlSerializer {
     const resto = corte < 0 ? '' : url.slice(corte);
     const primero = ruta.split('/').filter(Boolean)[0];
     if (primero === undefined) {
-      return super.parse(`/${this.prefijo}${resto}`);
+      return super.parse(this.conInicio ? `/${INICIO}${resto}` : `/${this.prefijo}${resto}`);
     }
     if (primero === this.prefijo || this.otras.has(primero)) {
       return super.parse(url);
@@ -44,14 +49,19 @@ export class RutaOcultaSerializer extends DefaultUrlSerializer {
   override serialize(arbol: UrlTree): string {
     const completa = super.serialize(arbol);
     const raiz = `/${this.prefijo}`;
+    if (this.conInicio && (completa === `/${INICIO}` || completa.startsWith(`/${INICIO}?`))) {
+      return completa.slice(INICIO.length + 1) === ''
+        ? '/'
+        : `/${completa.slice(INICIO.length + 1)}`;
+    }
     if (completa === raiz) {
-      return '/';
+      return this.conInicio ? raiz : '/';
     }
     if (completa.startsWith(`${raiz}/`)) {
       return completa.slice(raiz.length);
     }
     if (completa.startsWith(`${raiz}?`) || completa.startsWith(`${raiz}#`)) {
-      return `/${completa.slice(raiz.length)}`;
+      return this.conInicio ? completa : `/${completa.slice(raiz.length)}`;
     }
     return completa;
   }

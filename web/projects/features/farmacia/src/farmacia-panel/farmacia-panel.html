@@ -56,8 +56,12 @@
     <ng-template #body let-receta>
       <tr>
         <td>
-          <div class="font-semibold">{{ receta.pacienteNombre }}</div>
-          <small class="text-muted">DNI {{ receta.dni }}</small>
+          <div class="font-semibold">
+            <span class="sensible">{{ receta.pacienteNombre }}</span>
+          </div>
+          <small class="text-muted"
+            >DNI <span class="sensible">{{ receta.dni }}</span></small
+          >
         </td>
         <td>{{ receta.medicoNombre }}</td>
         <td>{{ receta.fecha | date: 'd MMM y' }}</td>

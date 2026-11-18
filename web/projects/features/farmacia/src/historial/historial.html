@@ -56,7 +56,9 @@
       <tr>
         <td class="font-semibold">{{ d.comprobante }}</td>
         <td>{{ d.fecha | date: 'd MMM y, HH:mm' }}</td>
-        <td>{{ d.pacienteNombre }}</td>
+        <td>
+          <span class="sensible">{{ d.pacienteNombre }}</span>
+        </td>
         <td>{{ etiquetaMetodo[d.metodoPago] }}</td>
         <td class="text-right">{{ d.total | currency: 'PEN' : 'symbol-narrow' }}</td>
         <td>
@@ -112,7 +114,10 @@
   @if (detalle(); as c) {
     <div class="comprobante">
       <h4>{{ c.comprobante }}</h4>
-      <p class="text-muted">{{ c.fecha | date: 'd MMM y, HH:mm' }} · {{ c.pacienteNombre }}</p>
+      <p class="text-muted">
+        {{ c.fecha | date: 'd MMM y, HH:mm' }} ·
+        <span class="sensible">{{ c.pacienteNombre }}</span>
+      </p>
       <table>
         @for (item of c.items; track $index) {
           <tr>

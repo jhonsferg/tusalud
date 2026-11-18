@@ -14,6 +14,8 @@ export interface NavItem {
   readonly roles?: readonly Rol[];
   readonly exact?: boolean;
   readonly badge?: 'notificaciones';
+  readonly inferior?: boolean;
+  readonly corta?: string;
 }
 
 export interface NavGroup {

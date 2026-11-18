@@ -69,7 +69,7 @@ describe('aplicación calidad', () => {
   });
 
   it('aplica los permisos de su rol dentro de la aplicación', async () => {
-    expect((await navegar(['ROLE_CALIDAD'], '/')).url).toBe('/reportes/calidad');
-    expect((await navegar(['ROLE_CALIDAD'], '/reportes/ejecutivo')).url).toBe('/reportes/calidad');
+    expect((await navegar(['ROLE_CALIDAD'], '/')).url).toBe('/inicio');
+    expect((await navegar(['ROLE_CALIDAD'], '/reportes/ejecutivo')).url).toBe('/inicio');
   });
 });

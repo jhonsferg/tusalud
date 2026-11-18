@@ -54,15 +54,16 @@ test.describe('paciente', () => {
   test('no puede entrar a las secciones de administración', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
     await page.goto('/admin/auditoria');
-    await expect(page).toHaveURL(/\/paciente\/citas$/);
+    await expect(page).toHaveURL(/\/paciente\/inicio$/);
     await page.goto('/admin/medicos/nuevo');
-    await expect(page).toHaveURL(/\/paciente\/citas$/);
+    await expect(page).toHaveURL(/\/paciente\/inicio$/);
   });
 });
 
 test.describe('médico', () => {
   test('ve su agenda y confirma una cita pendiente', async ({ page }) => {
     await iniciarSesion(page, 'medico');
+    await ir(page, '/agenda');
     await expect(page.getByRole('heading', { name: 'Mi agenda' })).toBeVisible();
     await page.getByRole('button', { name: 'Día siguiente' }).click();
     const confirmar = page.getByRole('button', { name: 'Confirmar', exact: true });
@@ -121,6 +122,6 @@ test.describe('diseño adaptable @responsive', () => {
   test('el menú lateral se abre desde el botón en móvil', async ({ page }) => {
     await iniciarSesion(page, 'paciente');
     await page.getByRole('button', { name: 'Abrir menú' }).click();
-    await expect(page.getByRole('link', { name: 'Reservar cita' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Reservar cita', exact: true })).toBeVisible();
   });
 });

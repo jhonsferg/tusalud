@@ -22,6 +22,7 @@ import { EmptyState } from '@tusalud/ui/empty-state';
 import { FormField } from '@tusalud/ui/form-field';
 import { BotonDocumento } from '@tusalud/ui/boton-documento';
 import { PageHeader } from '@tusalud/ui/page-header';
+import { SecurityNotice } from '@tusalud/ui/tablero';
 
 const GRUPOS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
@@ -29,6 +30,7 @@ const GRUPOS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
   selector: 'app-historia-clinica',
   imports: [
     BotonDocumento,
+    SecurityNotice,
     DatePipe,
     ReactiveFormsModule,
     RouterLink,

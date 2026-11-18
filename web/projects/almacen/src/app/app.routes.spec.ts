@@ -69,6 +69,6 @@ describe('aplicación almacen', () => {
   });
 
   it('aplica los permisos de su rol dentro de la aplicación', async () => {
-    expect((await navegar(['ROLE_ALMACEN'], '/')).url).toBe('/almacen');
+    expect((await navegar(['ROLE_ALMACEN'], '/')).url).toBe('/inicio');
   });
 });

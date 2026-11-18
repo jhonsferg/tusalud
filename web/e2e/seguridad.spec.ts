@@ -25,7 +25,7 @@ test.describe('acceso por rol', () => {
       '/admin/panel',
     ]) {
       await page.goto(ruta);
-      await expect(page).toHaveURL(/\/medico\/agenda$/);
+      await expect(page).toHaveURL(/\/medico\/inicio$/);
     }
   });
 
@@ -34,7 +34,7 @@ test.describe('acceso por rol', () => {
     await iniciarSesion(paciente, 'paciente');
     for (const ruta of ['/admin/usuarios', '/medico/agenda', '/medico/pacientes']) {
       await paciente.goto(ruta);
-      await expect(paciente).toHaveURL(/\/paciente\/citas$/);
+      await expect(paciente).toHaveURL(/\/paciente\/inicio$/);
     }
 
     const admin = await (await browser.newContext()).newPage();
@@ -46,7 +46,7 @@ test.describe('acceso por rol', () => {
       '/medico/agenda',
     ]) {
       await admin.goto(ruta);
-      await expect(admin).toHaveURL(/\/admin\/panel$/);
+      await expect(admin).toHaveURL(/\/admin\/$/);
     }
   });
 });
@@ -57,6 +57,9 @@ test.describe('guía de bienvenida', () => {
     const guia = page.getByRole('dialog', { name: 'Te damos la bienvenida a TuSalud' });
     await expect(guia).toBeVisible({ timeout: 10_000 });
     await guia.getByRole('button', { name: 'Comenzar' }).click();
+    await expect(page.getByRole('dialog', { name: 'Tu inicio' })).toBeVisible();
+    await expect(page).toHaveURL(/\/paciente\/inicio$/);
+    await page.getByRole('button', { name: 'Siguiente' }).click();
     await expect(page.getByRole('dialog', { name: 'Reserva tu cita' })).toBeVisible();
     await expect(page).toHaveURL(/\/paciente\/citas\/nueva/);
     await page.getByRole('button', { name: 'Siguiente' }).click();
@@ -71,7 +74,7 @@ test.describe('guía de bienvenida', () => {
     await page.keyboard.press('Escape');
     await guardado;
     await expect(page.getByRole('dialog', { name: 'Tu historia clínica' })).toHaveCount(0);
-    await expect(page).toHaveURL(/\/paciente\/citas$/);
+    await expect(page).toHaveURL(/\/paciente\/inicio$/);
 
     await page.reload();
     await expect(page.getByRole('button', { name: 'Menú de usuario' })).toBeVisible();
@@ -85,7 +88,7 @@ test.describe('guía de bienvenida', () => {
     await page.getByLabel('Email').fill(cuenta.email);
     await page.locator('#login-password').fill(cuenta.password);
     await page.getByRole('button', { name: 'Iniciar sesión' }).click();
-    await expect(page).toHaveURL(/\/paciente\/citas$/);
+    await expect(page).toHaveURL(/\/paciente\/inicio$/);
     await page.waitForTimeout(1500);
     await expect(
       page.getByRole('dialog', { name: 'Te damos la bienvenida a TuSalud' }),
@@ -144,7 +147,7 @@ test.describe('verificación en dos pasos', () => {
 
     await page.locator('#login-codigo').fill(codigoTotp(secreto));
     await page.getByRole('button', { name: 'Verificar y entrar' }).click();
-    await expect(page).toHaveURL(/\/citas$/);
+    await expect(page).toHaveURL(/\/paciente\/inicio$/);
 
     await cerrarSesion(page);
     await page.getByLabel('Email').fill(cuenta.email);
@@ -153,7 +156,7 @@ test.describe('verificación en dos pasos', () => {
     await page.getByRole('button', { name: 'Usar un código de recuperación' }).click();
     await page.locator('#login-codigo').fill(recuperacion);
     await page.getByRole('button', { name: 'Verificar y entrar' }).click();
-    await expect(page).toHaveURL(/\/citas$/);
+    await expect(page).toHaveURL(/\/paciente\/inicio$/);
 
     await ir(page, '/perfil?tab=seguridad');
     await page.getByRole('button', { name: 'Desactivar', exact: true }).click();
@@ -177,7 +180,7 @@ test.describe('renovación de sesión', () => {
     });
     await page.reload();
     await expect(page.getByRole('button', { name: 'Menú de usuario' })).toBeVisible();
-    await expect(page).toHaveURL(/\/citas$/);
+    await expect(page).toHaveURL(/\/paciente\/inicio$/);
 
     await expect
       .poll(async () =>

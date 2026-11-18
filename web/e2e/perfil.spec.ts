@@ -97,7 +97,7 @@ test.describe('perfil', () => {
 
     await page.locator('#login-password').fill('NuevaClave456!');
     await page.getByRole('button', { name: 'Iniciar sesión' }).click();
-    await expect(page).toHaveURL(/\/citas$/);
+    await expect(page).toHaveURL(/\/paciente\/inicio$/);
 
     await ir(page, '/perfil');
     await page.getByRole('tab', { name: 'Seguridad' }).click();

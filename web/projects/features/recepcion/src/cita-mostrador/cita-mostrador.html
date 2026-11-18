@@ -80,7 +80,9 @@
     <dl>
       <div>
         <dt>Paciente</dt>
-        <dd>{{ paciente()?.nombreCompleto ?? 'Por elegir' }}</dd>
+        <dd>
+          <span class="sensible">{{ paciente()?.nombreCompleto ?? 'Por elegir' }}</span>
+        </dd>
       </div>
       <div>
         <dt>Fecha y hora</dt>

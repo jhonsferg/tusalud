@@ -82,7 +82,7 @@
   width: 2.25rem;
   height: 2.25rem;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--p-primary-500), var(--p-primary-700));
+  background: var(--p-primary-600);
   color: #ffffff;
 }
 
@@ -152,10 +152,10 @@ nav {
   }
 
   &.active {
-    background: var(--p-primary-color);
+    background: color-mix(in srgb, var(--p-primary-400) 24%, transparent);
     color: #ffffff;
     font-weight: 600;
-    box-shadow: 0 6px 16px color-mix(in srgb, var(--p-primary-color) 40%, transparent);
+    box-shadow: inset 3px 0 0 var(--p-primary-300);
   }
 }
 
@@ -600,5 +600,95 @@ nav {
 
   &:hover {
     background: rgb(255 255 255 / 12%);
+  }
+}
+
+.modulo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: 22rem;
+  margin-left: 0.5rem;
+  padding: 0.3rem 0.8rem;
+  overflow: hidden;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 999px;
+  background: var(--app-primary-soft);
+  color: var(--app-primary-text);
+  font-size: 0.8125rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  .sep {
+    opacity: 0.6;
+  }
+
+  @media (max-width: 992px) {
+    display: none;
+  }
+}
+
+.navegacion-inferior {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 120;
+  display: none;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  padding: 0.35rem 0.25rem calc(0.35rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--p-content-border-color);
+  background: var(--p-content-background);
+  box-shadow: 0 -4px 16px rgb(15 40 56 / 8%);
+
+  a,
+  button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    min-height: 3.25rem;
+    padding: 0.25rem;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--p-text-muted-color);
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+
+    i {
+      font-size: 1.25rem;
+    }
+
+    &.active {
+      background: var(--app-primary-soft);
+      color: var(--app-primary-text);
+    }
+  }
+
+  @media (max-width: 992px) {
+    display: grid;
+  }
+}
+
+.content.con-inferior {
+  @media (max-width: 992px) {
+    padding-bottom: 5.5rem;
+  }
+}
+
+.cuenta-id {
+  .correo {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .modulo-actual {
+    color: var(--p-text-muted-color);
   }
 }
