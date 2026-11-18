@@ -21,6 +21,7 @@ import {
 } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 import { Button } from 'primeng/button';
+import { Dialog } from 'primeng/dialog';
 import { DatePicker } from 'primeng/datepicker';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
@@ -43,6 +44,8 @@ import {
   parseIsoDate,
   PASSWORD_MAX,
   PerfilStore,
+  REGLAS_ARCHIVO,
+  ReglasArchivo,
   SesionResponse,
   ThemeMode,
   ThemeService,
@@ -51,11 +54,11 @@ import {
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { FormField } from '@tusalud/ui/form-field';
 import { PageHeader } from '@tusalud/ui/page-header';
+import { CargaArchivos } from '@tusalud/ui/carga-archivos';
 import { UserAvatar } from '@tusalud/ui/user-avatar';
 import { MfaPanel } from '../mfa-panel/mfa-panel';
 
 const AVATAR_LADO = 256;
-const AVATAR_MAX_ENTRADA = 8 * 1024 * 1024;
 
 function passwordsIguales(group: AbstractControl): ValidationErrors | null {
   const nueva = group.get('passwordNueva');
@@ -73,39 +76,45 @@ function passwordsIguales(group: AbstractControl): ValidationErrors | null {
   return null;
 }
 
-function reducirImagen(archivo: File): Promise<string> {
+function reducirImagen(archivo: File): Promise<File> {
   return new Promise((resolve, reject) => {
-    const lector = new FileReader();
-    lector.onerror = () => reject(new Error('No se pudo leer la imagen.'));
-    lector.onload = () => {
-      const imagen = new Image();
-      imagen.onerror = () => reject(new Error('El archivo no es una imagen válida.'));
-      imagen.onload = () => {
-        const lienzo = document.createElement('canvas');
-        lienzo.width = AVATAR_LADO;
-        lienzo.height = AVATAR_LADO;
-        const contexto = lienzo.getContext('2d');
-        if (!contexto) {
-          reject(new Error('No se pudo procesar la imagen.'));
-          return;
-        }
-        const lado = Math.min(imagen.width, imagen.height);
-        contexto.drawImage(
-          imagen,
-          (imagen.width - lado) / 2,
-          (imagen.height - lado) / 2,
-          lado,
-          lado,
-          0,
-          0,
-          AVATAR_LADO,
-          AVATAR_LADO,
-        );
-        resolve(lienzo.toDataURL('image/jpeg', 0.85));
-      };
-      imagen.src = String(lector.result);
+    const direccion = URL.createObjectURL(archivo);
+    const imagen = new Image();
+    imagen.onerror = () => {
+      URL.revokeObjectURL(direccion);
+      reject(new Error('El archivo no es una imagen válida.'));
     };
-    lector.readAsDataURL(archivo);
+    imagen.onload = () => {
+      URL.revokeObjectURL(direccion);
+      const lienzo = document.createElement('canvas');
+      lienzo.width = AVATAR_LADO;
+      lienzo.height = AVATAR_LADO;
+      const contexto = lienzo.getContext('2d');
+      if (!contexto) {
+        reject(new Error('No se pudo procesar la imagen.'));
+        return;
+      }
+      const lado = Math.min(imagen.width, imagen.height);
+      contexto.drawImage(
+        imagen,
+        (imagen.width - lado) / 2,
+        (imagen.height - lado) / 2,
+        lado,
+        lado,
+        0,
+        0,
+        AVATAR_LADO,
+        AVATAR_LADO,
+      );
+      lienzo.toBlob(
+        (blob) =>
+          blob
+            ? resolve(new File([blob], 'avatar.png', { type: 'image/png' }))
+            : reject(new Error('No se pudo procesar la imagen.')),
+        'image/png',
+      );
+    };
+    imagen.src = direccion;
   });
 }
 
@@ -135,6 +144,8 @@ function reducirImagen(archivo: File): Promise<string> {
     FormField,
     PageHeader,
     UserAvatar,
+    CargaArchivos,
+    Dialog,
   ],
   templateUrl: './perfil.html',
   styleUrl: './perfil.scss',
@@ -152,6 +163,12 @@ export class Perfil implements OnInit {
   protected readonly guardando = signal(false);
   protected readonly cambiando = signal(false);
   protected readonly subiendoAvatar = signal(false);
+  protected readonly avatarDialogo = signal(false);
+  protected readonly avatarElegido = signal<File[]>([]);
+  protected readonly reglasAvatar: ReglasArchivo = {
+    ...REGLAS_ARCHIVO.AVATAR,
+    maxBytes: 8 * 1024 * 1024,
+  };
   protected readonly guardandoPreferencias = signal(false);
   protected readonly errorPassword = signal<string | null>(null);
   protected readonly paletas = PALETAS;
@@ -284,29 +301,32 @@ export class Perfil implements OnInit {
       });
   }
 
-  protected async elegirAvatar(evento: Event): Promise<void> {
-    const entrada = evento.target as HTMLInputElement;
-    const archivo = entrada.files?.[0];
-    entrada.value = '';
+  protected abrirAvatar(): void {
+    this.avatarElegido.set([]);
+    this.avatarDialogo.set(true);
+  }
+
+  protected async subirAvatar(archivos: File[]): Promise<void> {
+    this.avatarElegido.set(archivos);
+    const archivo = archivos[0];
     if (!archivo) {
-      return;
-    }
-    if (!archivo.type.startsWith('image/') || archivo.size > AVATAR_MAX_ENTRADA) {
-      this.notifications.warning('Elige una imagen de hasta 8 MB.');
       return;
     }
     this.subiendoAvatar.set(true);
     try {
-      const imagen = await reducirImagen(archivo);
-      this.store.actualizarAvatar(imagen).subscribe({
+      const reducida = await reducirImagen(archivo);
+      this.store.actualizarAvatar(reducida).subscribe({
         next: () => {
           this.subiendoAvatar.set(false);
+          this.avatarDialogo.set(false);
+          this.avatarElegido.set([]);
           this.notifications.success('Tu foto de perfil fue actualizada.');
         },
         error: () => this.subiendoAvatar.set(false),
       });
     } catch (error) {
       this.subiendoAvatar.set(false);
+      this.avatarElegido.set([]);
       this.notifications.error(
         error instanceof Error ? error.message : 'No se pudo cargar la imagen.',
       );

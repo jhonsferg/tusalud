@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, effect, inject, signal, untracked } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 
 import {
@@ -9,6 +9,7 @@ import {
   SesionResponse,
 } from '../models';
 import { PerfilApiService } from '../services/api/perfil-api.service';
+import { ArchivoBlob, ArchivoBlobService } from '../services/archivo-blob.service';
 import { AuthService } from '../services/auth.service';
 import { AsyncState } from './async-state';
 import { resetOnLogout } from './session-scoped';
@@ -17,13 +18,22 @@ import { resetOnLogout } from './session-scoped';
 export class PerfilStore {
   private readonly api = inject(PerfilApiService);
   private readonly auth = inject(AuthService);
+  private readonly blobs = inject(ArchivoBlobService);
+  private avatarActual: ArchivoBlob | null = null;
+  private avatarCargado: string | null = null;
 
   readonly perfil = new AsyncState<PerfilResponse>();
   readonly preferencias = new AsyncState<PreferenciasResponse>();
   readonly sesiones = new AsyncState<SesionResponse[]>();
 
+  readonly avatarUrl = signal<string | null>(null);
+
   constructor() {
     resetOnLogout(() => this.reset());
+    effect(() => {
+      const id = this.perfil.value()?.avatarId ?? null;
+      untracked(() => this.sincronizarAvatar(id));
+    });
   }
 
   load(): void {
@@ -34,15 +44,17 @@ export class PerfilStore {
     return this.api.actualizar(request).pipe(tap((perfil) => this.aplicar(perfil)));
   }
 
-  actualizarAvatar(imagen: string): Observable<PerfilResponse> {
-    return this.api.actualizarAvatar(imagen).pipe(tap((perfil) => this.aplicar(perfil)));
+  actualizarAvatar(archivo: File): Observable<PerfilResponse> {
+    return this.api.actualizarAvatar(archivo).pipe(tap((perfil) => this.aplicar(perfil)));
   }
 
   eliminarAvatar(): Observable<void> {
     return this.api
       .eliminarAvatar()
       .pipe(
-        tap(() => this.perfil.update((perfil) => (perfil ? { ...perfil, avatar: null } : perfil))),
+        tap(() =>
+          this.perfil.update((perfil) => (perfil ? { ...perfil, avatarId: null } : perfil)),
+        ),
       );
   }
 
@@ -92,9 +104,43 @@ export class PerfilStore {
   }
 
   reset(): void {
+    this.liberarAvatar();
     this.perfil.reset();
     this.preferencias.reset();
     this.sesiones.reset();
+  }
+
+  private sincronizarAvatar(id: string | null): void {
+    if (id === this.avatarCargado) {
+      return;
+    }
+    this.liberarAvatar();
+    this.avatarCargado = id;
+    if (id === null) {
+      return;
+    }
+    this.blobs.cargar(id).subscribe({
+      next: (blob) => {
+        if (this.avatarCargado !== id) {
+          blob.liberar();
+          return;
+        }
+        this.avatarActual = blob;
+        this.avatarUrl.set(blob.url);
+      },
+      error: () => {
+        if (this.avatarCargado === id) {
+          this.avatarUrl.set(null);
+        }
+      },
+    });
+  }
+
+  private liberarAvatar(): void {
+    this.avatarActual?.liberar();
+    this.avatarActual = null;
+    this.avatarCargado = null;
+    this.avatarUrl.set(null);
   }
 
   private aplicar(perfil: PerfilResponse): void {

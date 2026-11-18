@@ -38,8 +38,8 @@ public record PerfilResponse(
         @Schema(example = "Cardiología") String especialidad,
         @Schema(example = "[\"Cardiología\"]") List<String> especialidades,
 
-        @Schema(description = "Imagen de perfil como data URL o null", example = "data:image/png;base64,iVBORw0KGgo=")
-        String avatar,
+        @Schema(description = "Id del archivo de la foto de perfil o null; se descarga con GET /api/v1/archivos/{id}")
+        UUID avatarId,
 
         @Schema(example = "false") boolean mfaActivo) {
 
@@ -70,7 +70,9 @@ public record PerfilResponse(
                         : medico.getEspecialidades().stream()
                                 .map(Especialidad::getNombre)
                                 .toList(),
-                usuario.getAvatar(),
+                usuario.getAvatarArchivo() == null
+                        ? null
+                        : usuario.getAvatarArchivo().getId(),
                 mfaActivo);
     }
 }

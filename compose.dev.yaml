@@ -8,10 +8,37 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       MFA_CLAVE_CIFRADO: ${MFA_CLAVE_CIFRADO:-clave-de-desarrollo-para-cifrar-secretos-mfa}
       PAGOS_SIMULACION_HABILITADA: ${PAGOS_SIMULACION_HABILITADA:-true}
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-tusalud-dev-access}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-tusalud-dev-secret-0123456789}
       OTEL_RESOURCE_ATTRIBUTES: service.namespace=tusalud,deployment.environment.name=dev
+    ports:
+      - "${APP_PORT:-8080}:8080"
+
+  storage:
+    environment:
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-tusalud-dev-access}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-tusalud-dev-secret-0123456789}
+    ports:
+      - "127.0.0.1:${STORAGE_ADMIN_PORT:-9333}:9333"
 
   web:
     build:
       args:
         BUILD_CONFIGURATION: dev
     image: tusalud-web:dev
+
+  gateway:
+    image: tusalud-gateway:dev
+    environment:
+      GATEWAY_EXPONER_DOCS: "on"
+      RATE_KEY: $$binary_remote_addr$$http_x_rate_probe
+      RATE_LOGIN: 240r/m
+      RATE_REFRESH: 240r/m
+      RATE_MFA: 240r/m
+      RATE_REGISTRO: 240r/m
+      RATE_GENERAL: 12000r/m
+      RATE_BURST_AUTH: "60"
+      RATE_BURST_GENERAL: "1000"
+    ports: !override
+      - "${WEB_PORT:-4200}:8080"
+      - "${GATEWAY_TLS_PORT:-4443}:8443"

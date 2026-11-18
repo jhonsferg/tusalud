@@ -1,7 +1,8 @@
-import { provideHttpClient } from '@angular/common/http';
+import { HttpEventType, provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
+import { ArchivosApiService } from './archivos-api.service';
 import { AuditoriaApiService } from './auditoria-api.service';
 import { AuthApiService } from './auth-api.service';
 import { CitasApiService } from './citas-api.service';
@@ -197,12 +198,15 @@ describe('servicios de la API', () => {
       alertasInicioSesion: true,
       tourCompletado: false,
     };
-    api.actualizarAvatar('data:image/png;base64,AAAA').subscribe();
-    expectRequest({
-      method: 'PUT',
-      url: '/api/v1/perfil/avatar',
-      body: { imagen: 'data:image/png;base64,AAAA' },
-    });
+    const foto = new File([new Uint8Array([1, 2, 3])], 'yo.png', { type: 'image/png' });
+    api.actualizarAvatar(foto).subscribe();
+    const avatar = controller.expectOne(
+      (req) => req.method === 'PUT' && req.url === '/api/v1/perfil/avatar',
+    );
+    expect(avatar.request.body).toBeInstanceOf(FormData);
+    expect((avatar.request.body as FormData).get('archivo')).toBeInstanceOf(File);
+    expect(((avatar.request.body as FormData).get('archivo') as File).name).toBe('yo.png');
+    avatar.flush({});
     api.eliminarAvatar().subscribe();
     expectRequest({ method: 'DELETE', url: '/api/v1/perfil/avatar' });
     api.obtenerPreferencias().subscribe();
@@ -840,5 +844,56 @@ describe('servicios de la API', () => {
     expectRequest({ method: 'POST', url: '/api/v1/rrhh/mis-ausencias', body: solicitud });
     api.cancelarMiAusencia(u(9)).subscribe();
     expectRequest({ method: 'PUT', url: `/api/v1/rrhh/mis-ausencias/${u(9)}/cancelar`, body: {} });
+  });
+
+  it('ArchivosApiService sube con progreso, descarga y gestiona archivos', () => {
+    const api = TestBed.inject(ArchivosApiService);
+    const archivo = new File([new Uint8Array([1, 2, 3, 4])], 'informe.pdf', {
+      type: 'application/pdf',
+    });
+    const progreso: number[] = [];
+    let subido: unknown = null;
+    api.subir(archivo, 'DOCUMENTO_PACIENTE', u(5), 'PACIENTE').subscribe((estado) => {
+      progreso.push(estado.progreso);
+      subido = estado.archivo ?? subido;
+    });
+    const subida = controller.expectOne(
+      (req) => req.method === 'POST' && req.url === '/api/v1/archivos',
+    );
+    const formulario = subida.request.body as FormData;
+    expect(formulario.get('proposito')).toBe('DOCUMENTO_PACIENTE');
+    expect(formulario.get('referenciaId')).toBe(u(5));
+    expect(formulario.get('referenciaTipo')).toBe('PACIENTE');
+    expect((formulario.get('archivo') as File).name).toBe('informe.pdf');
+    subida.event({ type: HttpEventType.UploadProgress, loaded: 2, total: 4 });
+    subida.flush({ id: u(9), nombre: 'informe.pdf' });
+    expect(progreso).toEqual([50, 100]);
+    expect(subido).toEqual({ id: u(9), nombre: 'informe.pdf' });
+
+    api.descargar(u(9)).subscribe();
+    const descarga = controller.expectOne(`/api/v1/archivos/${u(9)}`);
+    expect(descarga.request.responseType).toBe('blob');
+    descarga.flush(new Blob(['x']));
+
+    api.metadatos(u(9)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/archivos/${u(9)}/metadatos` });
+    api.listar('PACIENTE', u(5)).subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/archivos',
+      params: { referenciaTipo: 'PACIENTE', referenciaId: u(5) },
+    });
+    api.eliminar(u(9)).subscribe();
+    expectRequest({ method: 'DELETE', url: `/api/v1/archivos/${u(9)}` });
+  });
+
+  it('ArchivosApiService omite la referencia cuando no se indica', () => {
+    const api = TestBed.inject(ArchivosApiService);
+    api.subir(new File([new Uint8Array([1])], 'a.png'), 'AVATAR').subscribe();
+    const subida = controller.expectOne((req) => req.url === '/api/v1/archivos');
+    const formulario = subida.request.body as FormData;
+    expect(formulario.has('referenciaId')).toBe(false);
+    expect(formulario.has('referenciaTipo')).toBe(false);
+    subida.flush({});
   });
 });

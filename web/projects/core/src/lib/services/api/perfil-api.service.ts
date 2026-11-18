@@ -31,8 +31,10 @@ export class PerfilApiService {
     });
   }
 
-  actualizarAvatar(imagen: string): Observable<PerfilResponse> {
-    return this.http.put<PerfilResponse>(`${this.baseUrl}/avatar`, { imagen });
+  actualizarAvatar(archivo: File): Observable<PerfilResponse> {
+    const formulario = new FormData();
+    formulario.append('archivo', archivo, archivo.name);
+    return this.http.put<PerfilResponse>(`${this.baseUrl}/avatar`, formulario);
   }
 
   eliminarAvatar(): Observable<void> {

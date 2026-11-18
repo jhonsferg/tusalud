@@ -27,8 +27,6 @@ LABEL org.opencontainers.image.title="tusalud-web" \
       org.opencontainers.image.description="Aplicaciones web de TuSalud" \
       org.opencontainers.image.source="https://github.com/jhonsferg/tusalud" \
       org.opencontainers.image.vendor="CodeSoftLabs"
-ENV API_UPSTREAM=http://tusalud-api:8080 \
-    NGINX_RESOLVER=127.0.0.11
 COPY nginx/security-headers.conf /etc/nginx/snippets/security-headers.conf
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /site /usr/share/nginx/html

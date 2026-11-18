@@ -5,18 +5,21 @@ services:
       dockerfile: Dockerfile.dev
     image: tusalud-web:hot
     environment: !override
-      API_UPSTREAM: http://app:8080
       PORT: "4200"
       WATCH: ${WEB_WATCH:-}
     healthcheck:
       disable: true
-    ports: !override
-      - "${WEB_PORT:-4200}:4200"
+    expose: !override
+      - "4200"
     volumes:
       - ./web:/app
       - web-node-modules:/app/node_modules
       - web-dist:/app/dist
       - web-angular-cache:/app/.angular
+
+  gateway:
+    environment:
+      FRONT_UPSTREAM: http://web:4200
 
 volumes:
   web-node-modules:

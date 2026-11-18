@@ -1,0 +1,65 @@
+<div
+  class="zona"
+  role="group"
+  [class.activa]="arrastrando()"
+  [class.bloqueada]="deshabilitado() || subiendo()"
+  (dragover)="sobre($event)"
+  (dragleave)="arrastrando.set(false)"
+  (drop)="soltar($event)"
+>
+  <i class="pi pi-cloud-upload" aria-hidden="true"></i>
+  <span class="titulo">{{ subiendo() ? 'Cargando…' : titulo() }}</span>
+  <small class="ayuda">{{ ayuda() }}</small>
+  <button type="button" class="elegir" [disabled]="deshabilitado() || subiendo()" (click)="abrir()">
+    Elegir {{ multiple() ? 'archivos' : 'archivo' }}
+  </button>
+  <input
+    #entrada
+    class="oculto"
+    type="file"
+    [id]="inputId()"
+    [multiple]="multiple()"
+    [accept]="accept()"
+    [disabled]="deshabilitado() || subiendo()"
+    (change)="elegir($event)"
+  />
+</div>
+
+@if (subiendo() && progreso() !== null) {
+  <p-progressbar [value]="progreso()!" [showValue]="false" styleClass="progreso" />
+}
+
+@if (errores().length > 0) {
+  <ul class="errores" role="alert">
+    @for (mensaje of errores(); track mensaje) {
+      <li>{{ mensaje }}</li>
+    }
+  </ul>
+}
+
+@if (elegidos().length > 0) {
+  <ul class="elegidos">
+    @for (item of elegidos(); track item.archivo; let i = $index) {
+      <li>
+        @if (item.vista) {
+          <img [src]="item.vista" alt="" />
+        } @else {
+          <i class="pi pi-file" aria-hidden="true"></i>
+        }
+        <span class="nombre">
+          <strong>{{ item.archivo.name }}</strong>
+          <small>{{ formato(item.archivo.size) }}</small>
+        </span>
+        <button
+          type="button"
+          class="quitar"
+          [disabled]="subiendo()"
+          [attr.aria-label]="'Quitar ' + item.archivo.name"
+          (click)="quitar(i)"
+        >
+          <i class="pi pi-times" aria-hidden="true"></i>
+        </button>
+      </li>
+    }
+  </ul>
+}

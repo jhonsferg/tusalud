@@ -1,11 +1,11 @@
 package com.codesoftlabs.tusalud.app.services.impl;
 
-import com.codesoftlabs.tusalud.app.dto.request.AvatarRequest;
 import com.codesoftlabs.tusalud.app.dto.request.PasswordChangeRequest;
 import com.codesoftlabs.tusalud.app.dto.request.PerfilUpdateRequest;
 import com.codesoftlabs.tusalud.app.dto.request.PreferenciasRequest;
 import com.codesoftlabs.tusalud.app.dto.response.PerfilResponse;
 import com.codesoftlabs.tusalud.app.dto.response.PreferenciasResponse;
+import com.codesoftlabs.tusalud.app.entities.Archivo;
 import com.codesoftlabs.tusalud.app.entities.Medico;
 import com.codesoftlabs.tusalud.app.entities.MfaUsuario;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
@@ -13,7 +13,6 @@ import com.codesoftlabs.tusalud.app.entities.PreferenciaUsuario;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
-import com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException;
 import com.codesoftlabs.tusalud.app.exceptions.ResourceNotFoundException;
 import com.codesoftlabs.tusalud.app.repositories.MedicoRepository;
 import com.codesoftlabs.tusalud.app.repositories.MfaUsuarioRepository;
@@ -21,13 +20,12 @@ import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
 import com.codesoftlabs.tusalud.app.repositories.PreferenciaUsuarioRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
+import com.codesoftlabs.tusalud.app.services.interfaces.ArchivoService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.PerfilService;
 import com.codesoftlabs.tusalud.app.services.interfaces.RefreshTokenService;
-import java.util.Base64;
+import com.codesoftlabs.tusalud.app.storage.PropositoArchivo;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,10 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class PerfilServiceImpl implements PerfilService {
 
-    private static final long TAMANO_MAXIMO_AVATAR_BYTES = 300L * 1024;
-    private static final Pattern PATRON_AVATAR =
-            Pattern.compile("^data:(image/(?:png|jpeg|webp));base64,([A-Za-z0-9+/]+={0,2})$");
-
     private final UsuarioRepository usuarioRepository;
     private final PacienteRepository pacienteRepository;
     private final MedicoRepository medicoRepository;
@@ -52,6 +46,7 @@ public class PerfilServiceImpl implements PerfilService {
     private final NotificacionService notificacionService;
     private final MfaUsuarioRepository mfaUsuarioRepository;
     private final RefreshTokenService refreshTokenService;
+    private final ArchivoService archivoService;
 
     @Override
     public PerfilResponse obtener(UsuarioPrincipal principal) {
@@ -134,24 +129,16 @@ public class PerfilServiceImpl implements PerfilService {
 
     @Override
     @Transactional
-    public PerfilResponse actualizarAvatar(UsuarioPrincipal principal, AvatarRequest request) {
+    public PerfilResponse actualizarAvatar(UsuarioPrincipal principal, String nombre, byte[] contenido) {
         Usuario usuario = cargarUsuario(principal);
-        String imagen = request.imagen().trim();
-        Matcher coincidencia = PATRON_AVATAR.matcher(imagen);
-        if (!coincidencia.matches()) {
-            throw new DatosInvalidosException(
-                    "La imagen debe ser una data URL en formato PNG, JPEG o WEBP codificada en base64");
+        Archivo anterior = usuario.getAvatarArchivo();
+        Archivo nuevo =
+                archivoService.almacenar(usuario, usuario, PropositoArchivo.AVATAR, nombre, contenido, null, null);
+        usuario.setAvatarArchivo(nuevo);
+        usuarioRepository.saveAndFlush(usuario);
+        if (anterior != null) {
+            archivoService.eliminarSinAutorizar(anterior);
         }
-        byte[] contenido;
-        try {
-            contenido = Base64.getDecoder().decode(coincidencia.group(2));
-        } catch (IllegalArgumentException ex) {
-            throw new DatosInvalidosException("El contenido base64 de la imagen no es válido");
-        }
-        if (contenido.length > TAMANO_MAXIMO_AVATAR_BYTES) {
-            throw new DatosInvalidosException("La imagen no debe superar 300 KB");
-        }
-        usuario.setAvatar(imagen);
         log.info("Avatar actualizado para {} ({} bytes)", usuario.getId(), contenido.length);
         return construir(usuario, principal);
     }
@@ -159,7 +146,13 @@ public class PerfilServiceImpl implements PerfilService {
     @Override
     @Transactional
     public void eliminarAvatar(UsuarioPrincipal principal) {
-        cargarUsuario(principal).setAvatar(null);
+        Usuario usuario = cargarUsuario(principal);
+        Archivo anterior = usuario.getAvatarArchivo();
+        usuario.setAvatarArchivo(null);
+        usuarioRepository.saveAndFlush(usuario);
+        if (anterior != null) {
+            archivoService.eliminarSinAutorizar(anterior);
+        }
     }
 
     private Usuario cargarUsuario(UsuarioPrincipal principal) {

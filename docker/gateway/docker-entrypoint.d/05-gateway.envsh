@@ -1,0 +1,46 @@
+#!/bin/sh
+
+defecto() {
+    eval "valor=\${$1:-}"
+    if [ -z "$valor" ]; then
+        export "$1=$2"
+    else
+        export "$1=$valor"
+    fi
+}
+
+defecto API_UPSTREAM "http://app:8080"
+defecto FRONT_UPSTREAM "http://web:8080"
+defecto NGINX_RESOLVER "127.0.0.11"
+defecto GATEWAY_SERVER_NAME "_"
+defecto GATEWAY_MAX_BODY_DEFAULT "1m"
+defecto GATEWAY_MAX_BODY_UPLOAD "25m"
+defecto GATEWAY_EXPONER_DOCS "off"
+defecto RATE_KEY '$binary_remote_addr'
+defecto RATE_LOGIN "10r/m"
+defecto RATE_REFRESH "30r/m"
+defecto RATE_MFA "10r/m"
+defecto RATE_REGISTRO "5r/m"
+defecto RATE_GENERAL "600r/m"
+defecto RATE_BURST_AUTH "5"
+defecto RATE_BURST_GENERAL "100"
+export GATEWAY_HTTPS_REDIRECT_PORT="${GATEWAY_HTTPS_REDIRECT_PORT:-}"
+
+origen=/etc/nginx/gateway-templates
+destino=/tmp/gateway-templates
+rm -rf "$destino"
+mkdir -p "$destino"
+cp "$origen"/*.inc.template "$destino"/
+cp "$origen"/00-limites.conf.template "$destino"/
+
+if [ "${GATEWAY_TLS:-off}" = "on" ]; then
+    if [ ! -r /etc/nginx/certs/tls.crt ] || [ ! -r /etc/nginx/certs/tls.key ]; then
+        echo "05-gateway: GATEWAY_TLS=on exige /etc/nginx/certs/tls.crt y /etc/nginx/certs/tls.key" >&2
+        exit 1
+    fi
+    cp "$origen/server-tls.conf.template" "$destino/10-server.conf.template"
+    export GATEWAY_HSTS_VALOR="max-age=31536000; includeSubDomains"
+else
+    cp "$origen/server-http.conf.template" "$destino/10-server.conf.template"
+    export GATEWAY_HSTS_VALOR=""
+fi

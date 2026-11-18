@@ -74,7 +74,7 @@ export class AppShell implements OnInit {
   );
 
   protected readonly user = this.auth.user;
-  protected readonly avatar = computed(() => this.perfil.perfil.value()?.avatar ?? null);
+  protected readonly avatar = this.perfil.avatarUrl;
   protected readonly rol = computed(() => ETIQUETA_ROL[this.auth.roles()[0]] ?? '');
   protected readonly correo = computed(() => this.auth.user()?.email ?? '');
   protected readonly marca = this.config.brand;

@@ -19,20 +19,22 @@
   <div class="layout">
     <aside class="panel resumen">
       <div class="avatar-box">
-        <app-user-avatar [nombre]="perfil.nombreCompleto" [imagen]="perfil.avatar" size="xlarge" />
-        <label class="avatar-edit" for="per-avatar" title="Cambiar foto">
-          <i [class]="subiendoAvatar() ? 'pi pi-spin pi-spinner' : 'pi pi-camera'"></i>
-        </label>
-        <input
-          id="per-avatar"
-          class="sr-only"
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          aria-label="Subir foto de perfil"
-          (change)="elegirAvatar($event)"
+        <app-user-avatar
+          [nombre]="perfil.nombreCompleto"
+          [imagen]="store.avatarUrl()"
+          size="xlarge"
         />
+        <button
+          type="button"
+          class="avatar-edit"
+          title="Cambiar foto"
+          aria-label="Cambiar foto de perfil"
+          (click)="abrirAvatar()"
+        >
+          <i class="pi pi-camera"></i>
+        </button>
       </div>
-      @if (perfil.avatar) {
+      @if (perfil.avatarId) {
         <button type="button" class="link-button" (click)="quitarAvatar()">Quitar foto</button>
       }
       <h2>{{ perfil.nombreCompleto }}</h2>
@@ -432,3 +434,21 @@
     <div class="panel"><p-skeleton height="18rem" /></div>
   </div>
 }
+
+<p-dialog
+  header="Foto de perfil"
+  [visible]="avatarDialogo()"
+  (visibleChange)="avatarDialogo.set($event)"
+  [modal]="true"
+  [draggable]="false"
+  [style]="{ width: '28rem', maxWidth: '96vw' }"
+>
+  <app-carga-archivos
+    inputId="per-avatar"
+    titulo="Arrastra una foto aquí o haz clic para elegirla"
+    [reglas]="reglasAvatar"
+    [subiendo]="subiendoAvatar()"
+    [archivos]="avatarElegido()"
+    (archivosChange)="subirAvatar($event)"
+  />
+</p-dialog>

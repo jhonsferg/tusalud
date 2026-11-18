@@ -170,27 +170,17 @@
         <p-message severity="error" styleClass="w-full mb-3">{{ mensaje }}</p-message>
       }
       @if (puedeCargar()) {
-        <label
-          class="carga"
-          [class.activa]="arrastrando()"
-          (dragover)="sobre($event)"
-          (dragleave)="arrastrando.set(false)"
-          (drop)="soltar($event, o)"
-        >
-          <i class="pi pi-cloud-upload"></i>
-          <span>{{
-            subiendo() ? 'Cargando…' : 'Arrastra las imágenes aquí o haz clic para elegirlas'
-          }}</span>
-          <small class="text-muted">JPEG, PNG o PDF de hasta 5 MB, máximo 12 por orden</small>
-          <input
-            id="img-archivos"
-            type="file"
-            multiple
-            accept="image/jpeg,image/png,application/pdf"
-            [disabled]="subiendo()"
-            (change)="seleccionados($event, o)"
-          />
-        </label>
+        <app-carga-archivos
+          inputId="img-archivos"
+          titulo="Arrastra las imágenes aquí o haz clic para elegirlas"
+          [reglas]="reglasImagen"
+          [multiple]="true"
+          [subiendo]="subiendo()"
+          [progreso]="progreso()"
+          [vistaPrevia]="false"
+          [archivos]="pendientes()"
+          (archivosChange)="elegidos($event, o)"
+        />
       }
       @if (o.archivos.length > 0) {
         <ul class="archivos">

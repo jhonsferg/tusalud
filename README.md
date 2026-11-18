@@ -46,6 +46,7 @@ TuSalud es el sistema de gestión de citas y consultas médicas. El repositorio 
   - [Hospitalización y emergencias](#hospitalización-y-emergencias)
   - [Reportes y BI](#reportes-y-bi)
   - [Recursos humanos](#recursos-humanos)
+  - [Almacenamiento de archivos](#almacenamiento-de-archivos)
 - [Manejo de errores](#manejo-de-errores)
 - [Perfiles y configuración](#perfiles-y-configuración)
 - [Migraciones con Flyway](#migraciones-con-flyway)
@@ -189,7 +190,9 @@ La API es completamente sin estado. Spring Security 7 trabaja con `SessionCreati
 - Un usuario inactivo no puede iniciar sesión y su token deja de ser válido aunque no haya expirado.
 - Las contraseñas se almacenan con BCrypt.
 - Todas las entidades y tablas usan UUID versión 4 como identificador, generado en la aplicación y con `gen_random_uuid()` como valor por defecto en la base. Así los ids no se pueden adivinar ni recorrer en orden. Un id con formato inválido en la ruta responde 400 y uno inexistente responde 404. Los códigos legibles de negocio, como los comprobantes, los turnos y los ingresos, siguen siendo correlativos.
-- CORS permite peticiones desde `http://localhost:4200` con los métodos GET, POST, PUT, DELETE y OPTIONS. El origen se configura con `CORS_ALLOWED_ORIGINS`.
+- CORS permite peticiones desde `http://localhost:4200` con los métodos GET, POST, PUT, DELETE y OPTIONS. El origen se configura con `CORS_ALLOWED_ORIGINS`. Como el gateway sirve el frontend y la API desde el mismo origen, el navegador no necesita CORS en el uso normal.
+- Los archivos nunca se exponen por una dirección pública. El almacén de objetos solo es accesible desde la red interna de Docker y toda descarga pasa por la API, que valida la sesión y la relación con el dato antes de entregar el contenido. Los tipos se detectan por el contenido y no por la extensión, se rechazan SVG, HTML, scripts y ejecutables, y los nombres se sanitizan.
+- El gateway nginx es el único servicio que publica puertos. Limita la tasa de los intentos de inicio de sesión, renovación, registro y verificación en dos pasos, acota el tamaño de las peticiones por ruta, bloquea los métodos poco comunes, oculta la versión de nginx y entrega una política de seguridad de contenido estricta junto con las demás cabeceras de seguridad.
 - La autorización combina reglas por URL en `SecurityConfig` con `@PreAuthorize` en cada método de los controladores.
 - Tener el rol correcto no basta para ver los datos de una persona: hace falta una relación con ella. `RelacionAsistencialService` es la única regla y la cumple un médico que atendió al paciente en una cita no cancelada, que tiene un ingreso activo a su cargo o a quien otro médico le compartió el paciente. Ese acceso se aplica a la historia clínica, el laboratorio, la hospitalización y la lista de pacientes del médico.
 - Los datos clínicos los modifica solo el personal de salud. El paciente consulta su historia y, si algún dato no es correcto, se comunica con el centro de salud. El médico con relación actualiza los datos médicos y queda registrado quién y cuándo, y cada consulta de una historia ajena se guarda en `auditoria_clinica`.
@@ -420,6 +423,10 @@ La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y
 | `PUT`                            | `/api/v1/admin/usuarios/{id}/estado`                                                          | Admin                                                  | 200       |
 | `GET`                            | `/api/v1/perfil/preferencias`                                                                 | Autenticado                                            | 200       |
 | `PUT`                            | `/api/v1/perfil/preferencias`                                                                 | Autenticado                                            | 200       |
+| `POST`                           | `/api/v1/archivos`                                                                            | Autenticado, según el propósito                        | 201       |
+| `GET`                            | `/api/v1/archivos/{id}`, `/archivos/{id}/metadatos`                                           | Autenticado, según el propósito                        | 200       |
+| `GET`                            | `/api/v1/archivos?referenciaTipo=&referenciaId=`                                              | Autenticado, solo lo que puede ver                     | 200       |
+| `DELETE`                         | `/api/v1/archivos/{id}`                                                                       | Según el propósito                                     | 204       |
 | `PUT`                            | `/api/v1/perfil/avatar`                                                                       | Autenticado                                            | 200       |
 | `DELETE`                         | `/api/v1/perfil/avatar`                                                                       | Autenticado                                            | 204       |
 | `GET`                            | `/api/v1/perfil/sesiones`                                                                     | Autenticado                                            | 200       |
@@ -458,7 +465,9 @@ Los diagramas de esta sección usan Mermaid y GitHub los muestra directamente. P
 
 ```mermaid
 flowchart LR
-    Cliente[Cliente Angular, Postman o curl] -->|HTTP| Tomcat
+    Cliente[Cliente Angular, Postman o curl] -->|HTTP o HTTPS| Gateway[Gateway nginx]
+    Gateway -->|/| Web[Frontend estático]
+    Gateway -->|/api| Tomcat
     subgraph API[tusalud-api]
         Tomcat --> Telemetria[HttpTelemetryFilter]
         Telemetria --> JWT[JwtAuthenticationFilter]
@@ -469,6 +478,7 @@ flowchart LR
         Controladores -.->|Excepciones| Errores[GlobalExceptionHandler]
     end
     Repositorios -->|JDBC| PostgreSQL[(PostgreSQL 18)]
+    Servicios -->|API S3 en red interna| Almacen[(SeaweedFS)]
     API -.->|OTLP HTTP 4318| Collector[OpenTelemetry Collector]
     Collector -.->|OTLP gRPC 4317| Jaeger
 ```
@@ -1382,7 +1392,7 @@ El módulo de imágenes atiende radiografías, ecografías, tomografías y reson
 - El informe lleva hallazgos, conclusión, la marca de hallazgo crítico y la firma con el nombre y la colegiatura del radiólogo. Un informe emitido solo se corrige con un motivo y cada corrección crea una versión nueva, de modo que el historial se conserva. Un hallazgo crítico avisa de inmediato al médico solicitante. El informe se puede imprimir.
 - El paciente ve la preparación mientras el estudio está solicitado o programado y, solo cuando está informado, el informe y las imágenes, sin la indicación clínica ni la marca de hallazgo crítico. Administración y recepción ven únicamente la agenda de salas, sin datos clínicos. Un médico con relación asistencial ve todo de sus pacientes y esa consulta queda en la auditoría clínica.
 - Caja cobra el estudio realizado como una cuenta por cobrar de origen imagen, con su comprobante, y solo ve el concepto y el monto. Anular el comprobante devuelve el estudio a por cobrar.
-- La carga de archivos usa multipart: el backend limita cada archivo a 5 MB y cada petición a 40 MB, y nginx acepta cuerpos de hasta 40 MB en `/api/`.
+- La carga de archivos usa multipart: el backend limita cada imagen a 5 MB y cada petición a 40 MB, y el gateway acepta cuerpos de hasta 25 MB en las rutas de carga. Las imágenes se guardan en el bucket `imagenes` del almacén de objetos, la orden solo conserva el vínculo con cada archivo y los datos de demostración traen los informes pero no las imágenes, porque Flyway no puede subir objetos al almacén.
 
 ### Reprogramación de citas
 
@@ -1441,6 +1451,43 @@ Recursos humanos administra la ficha laboral, los turnos y las ausencias del per
 - Un empleado solicita ausencias sobre sí mismo, es decir vacaciones, permiso, descanso médico, licencia u otro. Recursos humanos las aprueba o las rechaza con un motivo, no puede resolver la suya propia y las vacaciones no pueden superar el saldo anual. El saldo se calcula por año calendario.
 - Cualquier integrante del personal consulta sus turnos y sus ausencias y solicita nuevas desde Mi espacio, con las rutas `/mis-turnos`, `/mis-ausencias` y `/mi-ficha`. Quien no tiene ficha recibe 404 y la web muestra un estado vacío.
 - Recursos humanos recibe una notificación `SOLICITUD_AUSENCIA` por cada solicitud y el empleado recibe `AUSENCIA_RESUELTA`, ambas con el enlace `/ausencias`, que cada aplicación lleva a la bandeja o a Mis ausencias según el rol.
+
+### Almacenamiento de archivos
+
+Los archivos viven en un almacén de objetos compatible con S3, que en Docker es SeaweedFS con licencia Apache 2.0. La API habla con él mediante la interfaz `StorageService` y el cliente S3 del AWS SDK v2, así que cambiar a otro almacén compatible, como un fork de MinIO, Garage, Ceph o S3 real, es solo configuración. Cada archivo tiene un registro en la tabla `archivos` con su bucket, su clave aleatoria, el nombre original ya sanitizado, el tipo detectado, el tamaño, la huella SHA-256, el propósito, el propietario y la referencia al objeto del dominio. La clave del objeto es un UUID y nunca incluye el nombre que envió el usuario.
+
+Cada propósito tiene su bucket, sus tipos permitidos y su tamaño máximo:
+
+| Propósito            | Bucket       | Tipos permitidos                 | Máximo |
+| -------------------- | ------------ | -------------------------------- | ------ |
+| `AVATAR`             | `avatares`   | JPEG, PNG y WEBP                 | 2 MB   |
+| `IMAGEN_DIAGNOSTICA` | `imagenes`   | JPEG, PNG y PDF                  | 5 MB   |
+| `DOCUMENTO_PACIENTE` | `documentos` | PDF, JPEG, PNG, DOCX, XLSX y CSV | 10 MB  |
+| `REPORTE`            | `reportes`   | PDF, XLSX, DOCX y CSV            | 25 MB  |
+| `PLANTILLA`          | `plantillas` | JRXML, XLSX y DOCX               | 2 MB   |
+
+La validación ocurre en el servidor y no confía en lo que declara el cliente:
+
+- El tipo se detecta por la firma binaria del contenido. Los documentos de Office se reconocen por su estructura interna, el CSV por ser texto válido, y las plantillas JRXML se analizan con un lector XML que rechaza las declaraciones DOCTYPE y las entidades externas. Un ejecutable, un script, un SVG o una página HTML se rechazan aunque lleven una extensión de imagen.
+- La extensión debe corresponder al tipo detectado y el archivo debe tener una. Un PNG llamado `foto.pdf` se rechaza.
+- Los nombres pierden las rutas, los saltos de línea, los puntos repetidos y los caracteres especiales, y se acotan a 120 caracteres conservando la extensión.
+- Un archivo vacío, uno que supera el máximo del propósito o uno comprimido con demasiadas entradas se rechaza con 400.
+
+El acceso lo decide el propósito y se aplica en la API, nunca en el almacén:
+
+- Los avatares los ven todos los usuarios autenticados y solo los gestiona su dueño desde el perfil.
+- Las imágenes diagnósticas siguen las reglas de la orden de imagen: el personal de imágenes, el médico solicitante o con relación asistencial, y el paciente solo cuando la orden está informada. No se cargan ni se quitan por el endpoint genérico.
+- Los documentos del paciente los adjunta solo un médico con relación asistencial. Los ven el paciente dueño y los médicos con relación, y cada subida y cada lectura de un médico queda en la auditoría clínica. El administrador, recepción y el resto del personal reciben 403.
+- Los reportes los genera el sistema. Los ven su dueño, el administrador y los roles del área, como finanzas para el reporte financiero, con gerencia en todos.
+- Las plantillas las cargan el administrador y recursos humanos, y las leen además gerencia, finanzas, operaciones y calidad, que son quienes generan reportes.
+
+La descarga entrega el tipo detectado, `X-Content-Type-Options: nosniff`, una política de contenido que impide ejecutar el archivo, `Content-Disposition` en línea para imágenes y PDF y como adjunto para los demás, `ETag` con la huella y `Cache-Control: private, no-cache`. Acepta el encabezado `Range` para servir un PDF por partes y responde 416 con `Content-Range` cuando el rango no es válido. Si el almacén no responde, la API contesta 503 y si el objeto falta responde 404.
+
+La foto de perfil dejó de guardarse como data URL en la base. `PUT /api/v1/perfil/avatar` recibe el archivo como multipart, lo guarda en el bucket `avatares`, reemplaza y elimina la foto anterior, y el perfil devuelve `avatarId`. El frontend descarga la imagen con la sesión y la muestra con una URL de blob que libera al cambiarla, sin poner el token en ninguna dirección. La migración V17 quita la columna `avatar` y elimina las imágenes diagnósticas que se guardaban como bytes en la base, porque no se pueden mover al almacén desde SQL.
+
+El frontend ofrece dos piezas reutilizables en la librería `ui`: `app-carga-archivos`, con zona de arrastrar y soltar, validación de tipo y tamaño en el cliente, vista previa y progreso, y `app-archivo-img`, que muestra un archivo autenticado. Las usan la foto de perfil y las imágenes diagnósticas, y quedan listas para los documentos y los reportes. El servicio `ArchivosApiService` sube con progreso y `ArchivoBlobService` administra las URL de blob.
+
+Los parámetros se definen en `app.storage.*`. Con `STORAGE_TIPO=local`, el valor por defecto fuera de producción, la API guarda los objetos en un directorio local y no necesita el servicio de almacenamiento, lo que permite correr las pruebas con H2 sin red. En producción el valor es `s3` y la API no arranca si faltan `STORAGE_ENDPOINT`, `STORAGE_ACCESS_KEY` o `STORAGE_SECRET_KEY`.
 
 ## Manejo de errores
 
@@ -1514,7 +1561,7 @@ Al cambiar de perfil de Maven conviene ejecutar `./mvnw clean` antes, para que n
 
 ## Migraciones con Flyway
 
-Todos los perfiles que usan PostgreSQL crean y evolucionan la base con Flyway. Los scripts viven en `src/main/resources/db` y se ejecutan al arrancar la API, antes de que Hibernate valide el modelo.
+Todos los perfiles que usan PostgreSQL crean y evolucionan la base con Flyway. Los scripts viven en `src/main/resources/db` y se ejecutan al arrancar la API, antes de que Hibernate valide el modelo. La migración V17 crea la tabla `archivos`, mueve la foto de perfil y las imágenes diagnósticas a ella y elimina la columna `avatar` y los bytes que se guardaban en la base.
 
 | Carpeta        | Perfiles                      | Contenido                                                                                                                                                                 |
 | -------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1564,14 +1611,17 @@ Para enviar trazas a Jaeger desde el IDE, levanta también `otel-collector` y `j
 
 ### Servicios
 
-| Servicio         | Imagen                                         | Puerto en el host                   |
-| ---------------- | ---------------------------------------------- | ----------------------------------- |
-| `app`            | `tusalud-api`, construida con el `Dockerfile`  | 8080                                |
-| `web`            | `tusalud-web`, construida con `web/Dockerfile` | 4200                                |
-| `postgres`       | `postgres:18-alpine`                           | 5432                                |
-| `otel-collector` | `otel/opentelemetry-collector-contrib:0.162.0` | 4317 gRPC, 4318 HTTP y 13133 health |
-| `jaeger`         | `jaegertracing/jaeger:2.22.0`                  | 16686                               |
-| `pgadmin`        | `dpage/pgadmin4`, solo con el perfil `tools`   | 5050                                |
+| Servicio         | Imagen                                                        | Puerto en el host                                                             |
+| ---------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `gateway`        | `tusalud-gateway`, construida con `docker/gateway/Dockerfile` | 80 y 443 en producción, 4200 y 4443 en desarrollo                             |
+| `app`            | `tusalud-api`, construida con el `Dockerfile`                 | Ninguno en producción, 8080 en desarrollo                                     |
+| `web`            | `tusalud-web`, construida con `web/Dockerfile`                | Ninguno, solo red interna                                                     |
+| `storage`        | `chrislusf/seaweedfs:4.54`                                    | Ninguno, la interfaz de administración en `127.0.0.1:9333` solo en desarrollo |
+| `storage-init`   | `chrislusf/seaweedfs:4.54`, termina al crear los buckets      | Ninguno                                                                       |
+| `postgres`       | `postgres:18-alpine`                                          | 5432                                                                          |
+| `otel-collector` | `otel/opentelemetry-collector-contrib:0.162.0`                | 4317 gRPC, 4318 HTTP y 13133 health                                           |
+| `jaeger`         | `jaegertracing/jaeger:2.22.0`                                 | 16686                                                                         |
+| `pgadmin`        | `dpage/pgadmin4`, solo con el perfil `tools`                  | 5050                                                                          |
 
 El `Dockerfile` de la API está optimizado en tamaño, arranque y seguridad. La imagen final pesa unos 330 MB:
 
@@ -1586,11 +1636,12 @@ El argumento de build `MAVEN_PROFILE` elige el perfil de Maven, `prod` por defec
 
 ### Archivos de Compose
 
-| Archivo            | Rol                                                                                                              |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| `compose.yaml`     | Stack completo en modo producción con PostgreSQL 18, OpenTelemetry Collector, Jaeger, la API y la aplicación web |
-| `compose.dev.yaml` | Compila la API con el perfil `dev` y la aplicación web con la configuración `dev`                                |
-| `compose.qa.yaml`  | Compila la API con el perfil `qa` y la aplicación web con la configuración `qa`                                  |
+| Archivo            | Rol                                                                                                                                                         |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `compose.yaml`     | Stack completo en modo producción con PostgreSQL 18, OpenTelemetry Collector, Jaeger, el almacén de objetos, la API, la aplicación web y el gateway         |
+| `compose.dev.yaml` | Compila la API con el perfil `dev` y la aplicación web con la configuración `dev`, publica la API en 8080 y el gateway en 4200 con límites de tasa holgados |
+| `compose.qa.yaml`  | Compila la API con el perfil `qa` y la aplicación web con la configuración `qa`, con límites de tasa moderados                                              |
+| `compose.hot.yaml` | Reemplaza la imagen de la aplicación web por el contenedor de desarrollo con recarga                                                                        |
 
 ### Producción
 
@@ -1617,6 +1668,51 @@ docker compose -f compose.yaml -f compose.qa.yaml up -d --build
 
 Para no repetir `-f` en cada comando, define `COMPOSE_FILE` en `.env` o en la terminal, por ejemplo `COMPOSE_FILE=compose.yaml:compose.dev.yaml`. En Windows el separador es `;`.
 
+### Almacenamiento de objetos
+
+El servicio `storage` ejecuta SeaweedFS en modo de servidor único con el filer y la puerta de enlace S3 en el puerto interno 8333, y guarda los datos en el volumen `storage-data`. Las credenciales S3 se toman de `STORAGE_ACCESS_KEY` y `STORAGE_SECRET_KEY`, que en `compose.dev.yaml` y `compose.qa.yaml` traen valores de desarrollo y en `compose.yaml` no tienen valor por defecto: sin ellas el servicio se niega a arrancar. El contenedor `storage-init` espera a que el almacén esté sano y crea los buckets `avatares`, `imagenes`, `documentos`, `reportes` y `plantillas` de forma idempotente con `weed shell`. Como la creación de buckets es infraestructura, no hay código de arranque en Java que cargue datos. La API depende de que `storage-init` termine bien.
+
+Nada del almacén se publica al host salvo, en desarrollo, la interfaz de administración de SeaweedFS en `http://127.0.0.1:9333`, que se puede cambiar con `STORAGE_ADMIN_PORT`. Para inspeccionar un objeto basta con consultar el filer desde el contenedor:
+
+```bash
+docker exec tusalud-storage wget -qO- "http://localhost:8888/buckets/avatares/?pretty=y" --header "Accept: application/json"
+```
+
+Las direcciones prefirmadas de S3 no se usan, porque su firma incluye el host y la ruta y se rompen detrás de un proxy, y porque obligarían a exponer el almacén. Si algún día se necesitan, define `STORAGE_ENDPOINT_PUBLICO` con el host público desde el que el navegador alcanzaría el almacén y `StorageService.urlPrefirmada` firmará contra ese host. Sin esa variable devuelve vacío.
+
+### Gateway
+
+El servicio `gateway` es un nginx sin privilegios y es el único que publica puertos. Cada petición entra por él y se reparte así:
+
+| Ruta                                       | Destino                                                                       |
+| ------------------------------------------ | ----------------------------------------------------------------------------- |
+| `/`                                        | El contenedor `web`, que sirve el portal y las aplicaciones por rutas base    |
+| `/api/`                                    | La API, con límites de tasa y de tamaño                                       |
+| `/api/v1/notificaciones/stream`            | La API sin buffering y con una espera de una hora para el flujo en vivo       |
+| `/storage/`                                | Responde 404, el almacén no se expone                                         |
+| `/swagger-ui.html` y `/v3/api-docs`        | La API solo con `GATEWAY_EXPONER_DOCS=on`, que está activo en desarrollo y qa |
+| `/healthz`, `/healthz/web`, `/healthz/api` | El estado del gateway y de sus destinos                                       |
+
+Con un solo origen desaparece el CORS cruzado, y la cabecera `Origin` que el navegador envía en las peticiones de escritura coincide con `CORS_ALLOWED_ORIGINS`, que debe apuntar al origen público del gateway, por ejemplo `https://clinica.ejemplo.pe`. El gateway sobrescribe `X-Forwarded-For` con la dirección real del cliente, de modo que no se puede falsificar, y propaga un `X-Request-Id` que también devuelve al navegador.
+
+Seguridad del gateway:
+
+- Cabeceras `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` y `Cross-Origin-Opener-Policy` en todas las respuestas, sin duplicar las que envían los destinos, y `Strict-Transport-Security` cuando el TLS está activo. Las páginas del frontend llevan además una política de contenido que solo permite scripts propios, imágenes propias, de datos y de blob, y conexiones al mismo origen. Para que eso funcione, los builds de `production` y `qa` no inyectan el CSS crítico en línea.
+- Límites de tasa por dirección: `RATE_LOGIN`, `RATE_REFRESH`, `RATE_MFA` y `RATE_REGISTRO` para los intentos de autenticación, y `RATE_GENERAL` para el resto de la API, con ráfagas de `RATE_BURST_AUTH` y `RATE_BURST_GENERAL`. Por defecto son estrictos, 10 inicios de sesión por minuto, y `compose.dev.yaml` los relaja para que las pruebas de extremo a extremo no se bloqueen. Al superarlos el gateway responde 429. En desarrollo la clave de la limitación incluye la cabecera `X-Rate-Probe`, que usa la prueba de tasa para no afectar al resto, y esa clave nunca se usa en producción.
+- Tamaños: 1 MB por defecto, que se cambia con `GATEWAY_MAX_BODY_DEFAULT`, y 25 MB en las rutas de carga de archivos, con `GATEWAY_MAX_BODY_UPLOAD`. Al excederlos responde 413.
+- Solo se aceptan los métodos GET, HEAD, POST, PUT, PATCH, DELETE y OPTIONS, se oculta la versión de nginx y se bloquean los archivos ocultos y los sourcemaps.
+- Los registros de acceso incluyen el id de la petición, el método, la ruta sin parámetros y el estado, y no incluyen cabeceras ni cuerpos.
+
+TLS es opcional. Con `GATEWAY_TLS=on` el gateway sirve HTTPS en el puerto 8443 con los certificados `tls.crt` y `tls.key` montados desde `GATEWAY_CERTS_DIR`, que por defecto es `docker/gateway/certs`, redirige el HTTP al HTTPS con `GATEWAY_HTTPS_REDIRECT_PORT` cuando el puerto público no es el 443 y activa HSTS. Para generar un certificado autofirmado de desarrollo:
+
+```bash
+./scripts/generar-certificado-dev.sh
+```
+
+En PowerShell existe `scripts/generar-certificado-dev.ps1`, que usa Docker. Luego se levanta con `GATEWAY_TLS=on GATEWAY_SERVER_NAME=localhost`.
+
+El gateway apunta a `web` con `FRONT_UPSTREAM` y a la API con `API_UPSTREAM`. En el desarrollo con recarga `compose.hot.yaml` cambia el primero a `http://web:4200`.
+
 ### PostgreSQL 18
 
 Desde la versión 18, la imagen oficial guarda los datos en un subdirectorio por versión, `/var/lib/postgresql/18/docker`. Por eso el volumen `postgres-data` se monta en `/var/lib/postgresql` y no en `/var/lib/postgresql/data`. Un volumen creado con PostgreSQL 17 no es compatible: hay que eliminarlo con `docker compose down -v`, lo que borra los datos, o migrarlos con `pg_dump` y `pg_restore`.
@@ -1631,15 +1727,17 @@ pgAdmin queda en `http://localhost:5050` con el usuario `admin@tusalud.com` y la
 
 ### URLs
 
-| Servicio              | URL                                     |
-| --------------------- | --------------------------------------- |
-| Aplicación web        | `http://localhost:4200`                 |
-| API                   | `http://localhost:8080`                 |
-| Swagger UI            | `http://localhost:8080/swagger-ui.html` |
-| OpenAPI               | `http://localhost:8080/v3/api-docs`     |
-| Jaeger                | `http://localhost:16686`                |
-| OTel Collector health | `http://localhost:13133`                |
-| pgAdmin               | `http://localhost:5050`                 |
+| Servicio                                       | URL                                     |
+| ---------------------------------------------- | --------------------------------------- |
+| Aplicación web, por el gateway                 | `http://localhost:4200` en desarrollo   |
+| API, por el gateway                            | `http://localhost:4200/api/v1`          |
+| API directa, solo en desarrollo                | `http://localhost:8080`                 |
+| Swagger UI                                     | `http://localhost:4200/swagger-ui.html` |
+| OpenAPI                                        | `http://localhost:4200/v3/api-docs`     |
+| Administración del almacén, solo en desarrollo | `http://127.0.0.1:9333`                 |
+| Jaeger                                         | `http://localhost:16686`                |
+| OTel Collector health                          | `http://localhost:13133`                |
+| pgAdmin                                        | `http://localhost:5050`                 |
 
 ### Comandos útiles
 
@@ -1670,7 +1768,7 @@ web/
 ├── environments/             Configuración de cada entorno, compartida por todas las aplicaciones
 ├── nginx/                    nginx y cabeceras de seguridad para la imagen Docker
 ├── scripts/
-│   ├── serve-dist.mjs        Servidor que sirve todas las aplicaciones compiladas y reenvía /api
+│   ├── serve-dist.mjs        Servidor que sirve todas las aplicaciones compiladas, con proxy de /api solo si se define API_UPSTREAM
 │   └── dev.mjs               Arranque del contenedor de desarrollo
 ├── e2e/                      Pruebas de extremo a extremo con Playwright
 ├── public/                   Archivos estáticos copiados a cada build
@@ -1837,13 +1935,13 @@ Solo se programaron como componentes compartidos las piezas que PrimeNG no ofrec
 
 ### Pruebas del frontend
 
-Las 253 pruebas unitarias corren con Vitest, repartidas entre los proyectos, y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, el enrutamiento entre aplicaciones, las rutas de cada aplicación con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API. Cada aplicación tiene una prueba de humo que resuelve todos sus componentes perezosos.
+Las 277 pruebas unitarias corren con Vitest, repartidas entre los proyectos, y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, el enrutamiento entre aplicaciones, las rutas de cada aplicación con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API. Cada aplicación tiene una prueba de humo que resuelve todos sus componentes perezosos.
 
 ```bash
 npm test
 ```
 
-Las 113 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal los flujos de almacén, farmacia y laboratorio, los de recepción, caja y hospitalización, el recorrido completo de un estudio de imagen con carga de imágenes e informe, y los reportes gerenciales, los turnos, las ausencias y Mi espacio. Requieren el stack levantado con datos de prueba y atraviesan el portal y las aplicaciones por sus rutas base. El helper `ir` de `e2e/support.ts` construye la dirección real de cada pantalla a partir de la aplicación en la que está el usuario y de su prefijo oculto.
+Las 123 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal los flujos de almacén, farmacia y laboratorio, los de recepción, caja y hospitalización, el recorrido completo de un estudio de imagen con carga de imágenes e informe, los reportes gerenciales, los turnos, las ausencias y Mi espacio, y la subida y descarga de archivos, el aislamiento del almacén, las cabeceras de seguridad, el límite de tasa y los tamaños del gateway. Requieren el stack levantado con datos de prueba y atraviesan el portal y las aplicaciones por sus rutas base. El helper `ir` de `e2e/support.ts` construye la dirección real de cada pantalla a partir de la aplicación en la que está el usuario y de su prefijo oculto.
 
 ```bash
 npm run e2e
@@ -1879,7 +1977,7 @@ Todos los comandos se ejecutan dentro de la carpeta `web`. Cada compilación gen
 
 ### Desarrollo con recarga en caliente
 
-`compose.hot.yaml` reemplaza la imagen de nginx por un contenedor de desarrollo que monta la carpeta `web` como volumen. Al arrancar compila una vez el portal y las quince aplicaciones con el entorno `local` y las sirve todas en `http://localhost:4200` con `scripts/serve-dist.mjs`, que reenvía `/api` al servicio `app`. Compilar todas una vez cuesta menos de dos minutos y casi no ocupa memoria.
+`compose.hot.yaml` reemplaza la imagen de nginx por un contenedor de desarrollo que monta la carpeta `web` como volumen. Al arrancar compila una vez el portal y las quince aplicaciones con el entorno `local` y las sirve todas con `scripts/serve-dist.mjs` en el puerto 4200 interno de ese contenedor, detrás del gateway, que es quien publica el puerto 4200 del host y reenvía `/api` al servicio `app`. Compilar todas una vez cuesta menos de dos minutos y casi no ocupa memoria.
 
 La recarga se activa solo en las aplicaciones en las que se trabaja con la variable `WEB_WATCH`, que acepta una lista separada por comas o `all`. Cada una de ellas ejecuta `ng build --watch` con sondeo y vuelve a compilar al guardar un archivo, y el navegador se actualiza al recargar la página. Vigilar todas las aplicaciones a la vez consume más de 13 GB de memoria con solo diez, y crece con cada una, por eso no es el comportamiento por defecto.
 
@@ -1912,14 +2010,14 @@ docker compose up -d --build --no-deps web
 nginx cumple estas funciones:
 
 - Sirve el portal en la raíz y cada aplicación en su ruta base, como `/paciente/` o `/caja/`, y devuelve el `index.html` de la aplicación correspondiente para cualquier ruta que no sea un archivo, de modo que las rutas de Angular funcionan al recargar la página. Una ruta base sin barra final se redirige con 301.
-- Reenvía `/api/` al backend definido en `API_UPSTREAM`, que en Compose es `http://app:8080`. Conserva el header `Host` original con su puerto y agrega `X-Forwarded-Host`, `X-Forwarded-For`, `X-Forwarded-Proto` y `X-Real-IP`, de modo que el header `Location` de las respuestas 201 apunta a `http://localhost:4200`. El nombre del backend se resuelve con el DNS indicado en `NGINX_RESOLVER`, que por defecto es el DNS interno de Docker, `127.0.0.11`, por lo que nginx arranca aunque la API todavía no esté disponible.
+- No reenvía la API: de eso se encarga el gateway, que es el único punto de entrada. Este nginx solo sirve los archivos estáticos y no publica puertos.
 - Marca los archivos JavaScript y CSS con hash en el nombre como inmutables durante un año y obliga a revalidar el `index.html` de cada aplicación en cada visita.
 - Sirve los archivos de texto ya comprimidos. El build genera una versión gzip de cada archivo JavaScript, CSS, HTML y SVG, y nginx la entrega directamente con `gzip_static`, sin comprimir en cada petición. Las respuestas de la API se comprimen al vuelo.
-- Agrega las cabeceras de seguridad `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` y `Cross-Origin-Opener-Policy`, y oculta la versión de nginx.
+- Agrega las cabeceras de seguridad `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` y `Cross-Origin-Opener-Policy`. El gateway oculta las suyas duplicadas y añade la política de seguridad de contenido.
 - Responde `ok` en `/healthz` sin registrar la petición, y el healthcheck de la imagen usa esa ruta.
 - Bloquea la descarga de los archivos `.map`, de modo que los sourcemaps ocultos del build de `qa` no queden expuestos.
 
-Como el navegador solo habla con nginx, la API se consume desde el mismo origen que la aplicación y no depende de CORS. La colección de Postman también puede ejecutarse a través del frontend:
+Como el navegador solo habla con el gateway, la API se consume desde el mismo origen que la aplicación y no depende de CORS. La colección de Postman puede ejecutarse contra la API directa en desarrollo o a través del gateway:
 
 ```bash
 npx newman run postman/Tusalud.postman_collection.json --env-var baseUrl=http://localhost:4200
@@ -1951,7 +2049,7 @@ La configuración está repartida en tres lugares:
 
 - `docker/otel-agent/agent.properties` desactiva la instrumentación de Hibernate, que duplicaba cada consulta, activa los spans de controladores y crea spans para el filtro JWT, el `UserDetailsService` y los métodos de las interfaces de servicio.
 - `docker/otel-collector/config.yaml` aplica un muestreo de cola que conserva solo las trazas con una petición HTTP a `/api/`. Así se descartan el arranque, la carga de datos iniciales, el healthcheck y Swagger UI. Cada traza aparece en Jaeger unos cinco segundos después de la petición, que es el tiempo que el Collector espera para recibirla completa.
-- `HttpTelemetryFilter` agrega al span de cada petición a `/api/**` todos los headers de request y response, en `http.request.header.<nombre>` y `http.response.header.<nombre>`, y los cuerpos completos en `http.request.body` y `http.response.body` junto con sus tamaños. No se enmascara nada: el header `Authorization`, las contraseñas y los tokens quedan visibles tal como viajan. Esta configuración está pensada para depuración y no debe usarse en un entorno compartido con datos reales.
+- `HttpTelemetryFilter` agrega al span de cada petición a `/api/**` los headers de request y response, en `http.request.header.<nombre>` y `http.response.header.<nombre>`, y los cuerpos JSON en `http.request.body` y `http.response.body` junto con sus tamaños. `TelemetryRedactor` enmascara siempre los headers `Authorization`, `Cookie`, `Set-Cookie` y similares, redacta de forma recursiva los campos sensibles de los cuerpos, como contraseñas, tokens y códigos de verificación, trunca los cuerpos a 4 KB y descarta los que no son JSON. Las rutas de autenticación, perfil, pagos, historia clínica, laboratorio, hospitalización, farmacia, imágenes y archivos registran solo el método, la ruta, el estado y el tamaño, sin cuerpo. Los DTO con credenciales ocultan sus valores en `toString` y el collector elimina las cabeceras sensibles antes de exportar.
 
 Tomcat agrega los headers `Connection`, `Keep-Alive` y `Transfer-Encoding` al enviar la respuesta, fuera del alcance de la API de servlets, por lo que no aparecen en las trazas.
 
@@ -2004,11 +2102,14 @@ Las pruebas usan el perfil `test` con H2 en memoria y no necesitan PostgreSQL ni
 | `CitaServiceImplTest`                                                   | Reserva de citas, conflictos de horario con rollback, permisos, transiciones de estado y disponibilidad                                            |
 | `AuthServiceImplTest`                                                   | Registro de pacientes, duplicados y login                                                                                                          |
 | `MedicoEspecialidadServiceImplTest`                                     | Especialidades, alta de médicos y validación de horarios                                                                                           |
-| `HttpTelemetryFilterTest`                                               | Que headers y cuerpos llegan completos al span                                                                                                     |
+| `HttpTelemetryFilterTest`, `DtoCredencialesToStringTest`                | Que los spans enmascaran credenciales y no registran cuerpos clínicos ni de autenticación, y que los DTO ocultan sus secretos                      |
 | `RecepcionServiceTest`, `AdmisionServiceTest`, `RecepcionSeguridadTest` | Llegadas, numeración y cola de turnos, registro de pacientes y citas de mostrador, y permisos por rol                                              |
 | `CajaServiceTest`, `CajaSeguridadTest`                                  | Apertura y cierre, cobros con IGV, anulación, cuentas por cobrar, reporte y permisos                                                               |
 | `HospitalizacionServiceTest`, `HospitalizacionSeguridadTest`            | Camas, ingresos, traslados con cargo por tramos, triaje, evoluciones por rol, alta y permisos                                                      |
 | `ImagenesServiceTest`, `ImagenesSeguridadTest`                          | Catálogo, programación con choque de sala, carga validada por contenido, informes con versiones, acceso por relación, minimización por rol y cobro |
+| `DetectorContenidoTest`, `NombresArchivoTest`                           | Detección por firma de imágenes, PDF, Office, CSV y JRXML, rechazo de ejecutables, SVG, HTML y XML con DOCTYPE, y sanitización de nombres          |
+| `LocalStorageServiceTest`, `S3StorageServiceTest`                       | Guardado, lectura por rangos, borrado, claves con recorrido de directorio y errores del almacén con un cliente S3 simulado                         |
+| `ArchivoServiceTest`, `ArchivosSeguridadTest`                           | Validación por propósito, acceso por relación y propietario, rangos, ETag, avatar del perfil y accesos indebidos por HTTP                          |
 
 ## Flujo de trabajo con Git
 
@@ -2055,31 +2156,32 @@ El archivo `postman/Tusalud.postman_collection.json` es la única colección del
 
 Para usarla en Postman, importa el archivo y ejecuta la colección completa con Run collection. Las carpetas están numeradas y se ejecutan en orden, porque cada una reutiliza los tokens e identificadores que capturan las anteriores:
 
-| Carpeta                                                 | Contenido                                                                                                                 |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `00 - Autenticación`                                    | Login de los cinco usuarios de prueba, registro de un paciente y errores 400 y 401                                        |
-| `01 - Especialidades`                                   | Alta, consulta, actualización, duplicado, acceso sin permiso y eliminación                                                |
-| `02 - Médicos y Horarios`                               | Listados, alta de médico, bloques de horario, solapamiento y disponibilidad                                               |
-| `03 - Citas (Paciente)`                                 | Reserva en el primer turno libre, conflictos y acceso a citas ajenas                                                      |
-| `04 - Citas (Médico)`                                   | Agenda, confirmación, atención y transiciones inválidas                                                                   |
-| `05 - Cancelación`                                      | Cancelación de una segunda cita y cancelación repetida                                                                    |
-| `06 - Auditoría (Admin)`                                | Reportes por estado y por rango, y accesos no permitidos                                                                  |
-| `07 - Seguridad`                                        | Peticiones sin token y con token inválido                                                                                 |
-| `08 - Perfil`                                           | Datos personales, contraseña y preferencias                                                                               |
-| `09 - Tarifas, roles y pacientes compartidos`           | Tarifa por especialidad, especialidades del médico, roles y pacientes compartidos                                         |
-| `10 - Pagos con Yape y Plin`                            | Reserva, generación del QR, consulta y confirmación simulada                                                              |
-| `11 - Verificación en dos pasos y renovación del token` | Configuración del autenticador y errores del refresh token                                                                |
-| `12 - Calendario y eventos`                             | Eventos personales, arrastre, privacidad y límites del rango                                                              |
-| `13 - Personal y almacén`                               | Alta de personal, productos, proveedores, ingresos, salidas y alertas                                                     |
-| `14 - Farmacia`                                         | Catálogo, venta libre, anulación y entregas del paciente                                                                  |
-| `15 - Laboratorio`                                      | Orden del médico, muestra, resultados fuera de rango, validación y acceso                                                 |
-| `16 - Recepción y turnos`                               | Registro de pacientes, turnos, cola, llamado, pantalla y permisos                                                         |
-| `17 - Caja y facturación`                               | Apertura, cobros con IGV, factura, anulación, reporte, cierre y permisos                                                  |
-| `18 - Hospitalización y emergencia`                     | Ingreso, evoluciones por rol, traslado, triaje, alta y permisos                                                           |
-| `19 - Seguridad y permisos`                             | Accesos indebidos por relación, por rol y a datos clínicos, y campos que no se exponen                                    |
-| `20 - Reportes y BI`                                    | Los cuatro reportes por rol, validaciones del rango, comparación con el periodo anterior y ausencia de datos de pacientes |
-| `21 - Recursos humanos`                                 | Fichas, turnos con choques y exceso de horas, ausencias con aprobación, Mi espacio y permisos                             |
-| `22 - Imágenes diagnósticas`                            | Catálogo, orden, programación, carga de imágenes, informe con correcciones, accesos indebidos, cobro y cancelación        |
+| Carpeta                                                 | Contenido                                                                                                                                |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `00 - Autenticación`                                    | Login de los cinco usuarios de prueba, registro de un paciente y errores 400 y 401                                                       |
+| `01 - Especialidades`                                   | Alta, consulta, actualización, duplicado, acceso sin permiso y eliminación                                                               |
+| `02 - Médicos y Horarios`                               | Listados, alta de médico, bloques de horario, solapamiento y disponibilidad                                                              |
+| `03 - Citas (Paciente)`                                 | Reserva en el primer turno libre, conflictos y acceso a citas ajenas                                                                     |
+| `04 - Citas (Médico)`                                   | Agenda, confirmación, atención y transiciones inválidas                                                                                  |
+| `05 - Cancelación`                                      | Cancelación de una segunda cita y cancelación repetida                                                                                   |
+| `06 - Auditoría (Admin)`                                | Reportes por estado y por rango, y accesos no permitidos                                                                                 |
+| `07 - Seguridad`                                        | Peticiones sin token y con token inválido                                                                                                |
+| `08 - Perfil`                                           | Datos personales, contraseña y preferencias                                                                                              |
+| `09 - Tarifas, roles y pacientes compartidos`           | Tarifa por especialidad, especialidades del médico, roles y pacientes compartidos                                                        |
+| `10 - Pagos con Yape y Plin`                            | Reserva, generación del QR, consulta y confirmación simulada                                                                             |
+| `11 - Verificación en dos pasos y renovación del token` | Configuración del autenticador y errores del refresh token                                                                               |
+| `12 - Calendario y eventos`                             | Eventos personales, arrastre, privacidad y límites del rango                                                                             |
+| `13 - Personal y almacén`                               | Alta de personal, productos, proveedores, ingresos, salidas y alertas                                                                    |
+| `14 - Farmacia`                                         | Catálogo, venta libre, anulación y entregas del paciente                                                                                 |
+| `15 - Laboratorio`                                      | Orden del médico, muestra, resultados fuera de rango, validación y acceso                                                                |
+| `16 - Recepción y turnos`                               | Registro de pacientes, turnos, cola, llamado, pantalla y permisos                                                                        |
+| `17 - Caja y facturación`                               | Apertura, cobros con IGV, factura, anulación, reporte, cierre y permisos                                                                 |
+| `18 - Hospitalización y emergencia`                     | Ingreso, evoluciones por rol, traslado, triaje, alta y permisos                                                                          |
+| `19 - Seguridad y permisos`                             | Accesos indebidos por relación, por rol y a datos clínicos, y campos que no se exponen                                                   |
+| `20 - Reportes y BI`                                    | Los cuatro reportes por rol, validaciones del rango, comparación con el periodo anterior y ausencia de datos de pacientes                |
+| `21 - Recursos humanos`                                 | Fichas, turnos con choques y exceso de horas, ausencias con aprobación, Mi espacio y permisos                                            |
+| `22 - Imágenes diagnósticas`                            | Catálogo, orden, programación, carga de imágenes, informe con correcciones, accesos indebidos, cobro y cancelación                       |
+| `23 - Archivos y almacenamiento`                        | Foto de perfil, descarga con ETag y Range, rechazo de archivos disfrazados, documentos de paciente con acceso por relación y eliminación |
 
 Desde la línea de comandos:
 
@@ -2120,8 +2222,32 @@ cp .env.example .env
 | `SERVER_PORT`                 | Puerto HTTP de la API dentro del contenedor                                           | `8080`                                                |
 | `JDK_JAVA_OPTIONS`            | Opciones adicionales de la JVM de la API                                              | `-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError` |
 | `OTEL_SERVICE_NAME`           | Nombre del servicio en las trazas                                                     | `tusalud-api`                                         |
-| `APP_PORT`                    | Puerto de la API en el host                                                           | `8080`                                                |
-| `WEB_PORT`                    | Puerto de la aplicación web en el host                                                | `4200`                                                |
+| `APP_PORT`                    | Puerto de la API en el host, solo en desarrollo                                       | `8080`                                                |
+| `WEB_PORT`                    | Puerto del gateway en el host en desarrollo                                           | `4200`                                                |
+| `GATEWAY_PORT`                | Puerto HTTP del gateway en el host en producción                                      | `80`                                                  |
+| `GATEWAY_TLS_PORT`            | Puerto HTTPS del gateway en el host                                                   | `443`, y `4443` en desarrollo                         |
+| `GATEWAY_TLS`                 | Activa HTTPS con los certificados de `GATEWAY_CERTS_DIR`                              | `off`                                                 |
+| `GATEWAY_CERTS_DIR`           | Carpeta con `tls.crt` y `tls.key`                                                     | `docker/gateway/certs`                                |
+| `GATEWAY_SERVER_NAME`         | Nombre de servidor del gateway                                                        | `_`                                                   |
+| `GATEWAY_HTTPS_REDIRECT_PORT` | Puerto, con los dos puntos, al que redirige el HTTP cuando no es el 443               | Vacío                                                 |
+| `GATEWAY_EXPONER_DOCS`        | Expone Swagger UI y OpenAPI por el gateway                                            | `off`, y `on` en desarrollo y qa                      |
+| `GATEWAY_MAX_BODY_DEFAULT`    | Tamaño máximo de una petición en la API                                               | `1m`                                                  |
+| `GATEWAY_MAX_BODY_UPLOAD`     | Tamaño máximo en las rutas de carga de archivos                                       | `25m`                                                 |
+| `RATE_LOGIN`                  | Límite de intentos de inicio de sesión y cambio de contraseña por dirección           | `10r/m`, y `240r/m` en desarrollo                     |
+| `RATE_REFRESH`                | Límite de renovaciones del token                                                      | `30r/m`                                               |
+| `RATE_MFA`                    | Límite de verificaciones de la verificación en dos pasos                              | `10r/m`                                               |
+| `RATE_REGISTRO`               | Límite de registros de pacientes                                                      | `5r/m`                                                |
+| `RATE_GENERAL`                | Límite del resto de la API                                                            | `600r/m`, y `12000r/m` en desarrollo                  |
+| `RATE_BURST_AUTH`             | Ráfaga permitida en las rutas de autenticación                                        | `5`, y `60` en desarrollo                             |
+| `RATE_BURST_GENERAL`          | Ráfaga permitida en el resto de la API                                                | `100`, y `1000` en desarrollo                         |
+| `STORAGE_TIPO`                | Almacén de archivos, `s3` o `local`                                                   | `local`, y `s3` en `prod` y en Compose                |
+| `STORAGE_ENDPOINT`            | URL interna de la puerta de enlace S3, obligatoria con `s3`                           | `http://storage:8333` en Compose                      |
+| `STORAGE_ENDPOINT_PUBLICO`    | Host público para firmar direcciones prefirmadas, opcional                            | Vacío                                                 |
+| `STORAGE_ACCESS_KEY`          | Clave de acceso S3, sin valor por defecto en producción                               | Solo en `compose.dev.yaml` y `compose.qa.yaml`        |
+| `STORAGE_SECRET_KEY`          | Clave secreta S3, sin valor por defecto en producción                                 | Solo en `compose.dev.yaml` y `compose.qa.yaml`        |
+| `STORAGE_REGION`              | Región que firman las peticiones S3                                                   | `us-east-1`                                           |
+| `STORAGE_DIRECTORIO_LOCAL`    | Directorio del almacén con `STORAGE_TIPO=local`                                       | Una carpeta temporal                                  |
+| `STORAGE_ADMIN_PORT`          | Puerto de la interfaz de SeaweedFS en `127.0.0.1`, solo en desarrollo                 | `9333`                                                |
 | `POSTGRES_PORT`               | Puerto de PostgreSQL en el host                                                       | `5432`                                                |
 | `JAEGER_UI_PORT`              | Puerto de la interfaz de Jaeger en el host                                            | `16686`                                               |
 | `OTEL_GRPC_PORT`              | Puerto OTLP gRPC del Collector en el host                                             | `4317`                                                |

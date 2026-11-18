@@ -85,38 +85,6 @@ section.panel {
   color: var(--p-orange-700);
 }
 
-.carga {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3rem;
-  margin-bottom: 1rem;
-  padding: 1.4rem;
-  border: 2px dashed var(--p-content-border-color);
-  border-radius: 12px;
-  cursor: pointer;
-  text-align: center;
-
-  > i {
-    color: var(--p-primary-color);
-    font-size: 1.8rem;
-  }
-
-  &.activa,
-  &:hover {
-    border-color: var(--p-primary-color);
-    background: color-mix(in srgb, var(--p-primary-color) 6%, transparent);
-  }
-
-  input {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-  }
-}
-
 .informe {
   header {
     display: flex;

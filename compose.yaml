@@ -12,7 +12,7 @@ services:
       TZ: America/Lima
       PGTZ: America/Lima
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql
     healthcheck:
@@ -57,6 +57,10 @@ services:
         condition: service_healthy
       otel-collector:
         condition: service_started
+      storage:
+        condition: service_healthy
+      storage-init:
+        condition: service_completed_successfully
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SERVER_PORT: 8080
@@ -68,6 +72,11 @@ services:
       JWT_REFRESH_EXPIRATION_MS: ${JWT_REFRESH_EXPIRATION_MS:-604800000}
       MFA_CLAVE_CIFRADO: ${MFA_CLAVE_CIFRADO:-}
       PAGOS_SIMULACION_HABILITADA: ${PAGOS_SIMULACION_HABILITADA:-false}
+      STORAGE_TIPO: s3
+      STORAGE_ENDPOINT: http://storage:8333
+      STORAGE_REGION: ${STORAGE_REGION:-us-east-1}
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:4200}
       JDK_JAVA_OPTIONS: ${JDK_JAVA_OPTIONS:--XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError}
       OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME:-tusalud-api}
@@ -77,8 +86,42 @@ services:
       OTEL_TRACES_EXPORTER: otlp
       OTEL_METRICS_EXPORTER: otlp
       OTEL_LOGS_EXPORTER: otlp
-    ports:
-      - "${APP_PORT:-8080}:8080"
+
+  storage:
+    image: chrislusf/seaweedfs:4.54
+    container_name: tusalud-storage
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/etc/seaweedfs/arrancar.sh"]
+    environment:
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-}
+      STORAGE_VOLUME_MB: ${STORAGE_VOLUME_MB:-1024}
+      STORAGE_MAX_VOLUMES: ${STORAGE_MAX_VOLUMES:-30}
+    volumes:
+      - ./docker/storage/arrancar.sh:/etc/seaweedfs/arrancar.sh:ro
+      - storage-data:/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -q -O /dev/null http://127.0.0.1:9333/cluster/status && (wget -S -O /dev/null http://127.0.0.1:8333/ 2>&1 | grep -q "HTTP/1.1 403")
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+
+  storage-init:
+    image: chrislusf/seaweedfs:4.54
+    container_name: tusalud-storage-init
+    restart: "no"
+    depends_on:
+      storage:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "/etc/seaweedfs/crear-buckets.sh"]
+    environment:
+      STORAGE_MASTER: storage:9333
+      STORAGE_BUCKETS: avatares imagenes documentos reportes plantillas
+    volumes:
+      - ./docker/storage/crear-buckets.sh:/etc/seaweedfs/crear-buckets.sh:ro
 
   web:
     build:
@@ -89,14 +132,44 @@ services:
     image: tusalud-web:prod
     container_name: tusalud-web
     restart: unless-stopped
+    expose:
+      - "8080"
+
+  gateway:
+    build:
+      context: ./docker/gateway
+      dockerfile: Dockerfile
+    image: tusalud-gateway:prod
+    container_name: tusalud-gateway
+    restart: unless-stopped
     depends_on:
       app:
+        condition: service_healthy
+      web:
         condition: service_started
     environment:
       API_UPSTREAM: http://app:8080
+      FRONT_UPSTREAM: http://web:8080
       NGINX_RESOLVER: 127.0.0.11
+      GATEWAY_TLS: ${GATEWAY_TLS:-off}
+      GATEWAY_SERVER_NAME: ${GATEWAY_SERVER_NAME:-_}
+      GATEWAY_HTTPS_REDIRECT_PORT: ${GATEWAY_HTTPS_REDIRECT_PORT:-}
+      GATEWAY_EXPONER_DOCS: ${GATEWAY_EXPONER_DOCS:-off}
+      GATEWAY_MAX_BODY_DEFAULT: ${GATEWAY_MAX_BODY_DEFAULT:-1m}
+      GATEWAY_MAX_BODY_UPLOAD: ${GATEWAY_MAX_BODY_UPLOAD:-25m}
+      RATE_KEY: ${RATE_KEY:-$$binary_remote_addr}
+      RATE_LOGIN: ${RATE_LOGIN:-10r/m}
+      RATE_REFRESH: ${RATE_REFRESH:-30r/m}
+      RATE_MFA: ${RATE_MFA:-10r/m}
+      RATE_REGISTRO: ${RATE_REGISTRO:-5r/m}
+      RATE_GENERAL: ${RATE_GENERAL:-600r/m}
+      RATE_BURST_AUTH: ${RATE_BURST_AUTH:-5}
+      RATE_BURST_GENERAL: ${RATE_BURST_GENERAL:-100}
+    volumes:
+      - ${GATEWAY_CERTS_DIR:-./docker/gateway/certs}:/etc/nginx/certs:ro
     ports:
-      - "${WEB_PORT:-4200}:8080"
+      - "${GATEWAY_PORT:-80}:8080"
+      - "${GATEWAY_TLS_PORT:-443}:8443"
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -120,3 +193,4 @@ services:
 volumes:
   postgres-data:
   pgadmin-data:
+  storage-data:

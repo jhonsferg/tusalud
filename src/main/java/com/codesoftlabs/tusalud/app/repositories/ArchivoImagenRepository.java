@@ -13,11 +13,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ArchivoImagenRepository extends JpaRepository<ArchivoImagen, UUID> {
 
-    record Metadatos(UUID id, String nombre, String tipoContenido, int tamano, LocalDateTime subidoEn) {}
+    record Metadatos(UUID id, String nombre, String tipoContenido, long tamano, LocalDateTime subidoEn) {}
 
     @Query("""
             SELECT new com.codesoftlabs.tusalud.app.repositories.ArchivoImagenRepository$Metadatos(
-                a.id, a.nombre, a.tipoContenido, a.tamano, a.subidoEn)
+                a.id, a.archivo.nombreOriginal, a.archivo.tipoContenido, a.archivo.tamano, a.archivo.createdAt)
             FROM ArchivoImagen a
             WHERE a.orden.id = :ordenId
             ORDER BY a.posicion ASC
@@ -30,6 +30,12 @@ public interface ArchivoImagenRepository extends JpaRepository<ArchivoImagen, UU
     @Query("SELECT COALESCE(MAX(a.posicion), -1) FROM ArchivoImagen a WHERE a.orden.id = :ordenId")
     int ultimaPosicion(@Param("ordenId") UUID ordenId);
 
-    @Query("SELECT a FROM ArchivoImagen a WHERE a.id = :id AND a.orden.id = :ordenId")
+    @Query("""
+            SELECT a FROM ArchivoImagen a JOIN FETCH a.archivo
+            WHERE a.id = :id AND a.orden.id = :ordenId
+            """)
     Optional<ArchivoImagen> findDeOrden(@Param("id") UUID id, @Param("ordenId") UUID ordenId);
+
+    @Query("SELECT a FROM ArchivoImagen a JOIN FETCH a.orden WHERE a.archivo.id = :archivoId")
+    Optional<ArchivoImagen> findPorArchivo(@Param("archivoId") UUID archivoId);
 }

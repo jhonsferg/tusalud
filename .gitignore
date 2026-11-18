@@ -23,3 +23,6 @@ Thumbs.db
 
 .env
 *.log
+
+docker/gateway/certs/*
+!docker/gateway/certs/.gitkeep

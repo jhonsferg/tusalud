@@ -4,7 +4,7 @@ import com.codesoftlabs.tusalud.app.repositories.ArchivoImagenRepository.Metadat
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record ArchivoImagenResponse(UUID id, String nombre, String tipoContenido, int tamano, LocalDateTime subidoEn) {
+public record ArchivoImagenResponse(UUID id, String nombre, String tipoContenido, long tamano, LocalDateTime subidoEn) {
 
     public static ArchivoImagenResponse from(Metadatos metadatos) {
         return new ArchivoImagenResponse(

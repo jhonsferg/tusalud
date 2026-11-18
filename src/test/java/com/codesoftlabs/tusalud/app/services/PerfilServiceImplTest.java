@@ -3,7 +3,6 @@ package com.codesoftlabs.tusalud.app.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.codesoftlabs.tusalud.app.dto.request.AvatarRequest;
 import com.codesoftlabs.tusalud.app.dto.request.PasswordChangeRequest;
 import com.codesoftlabs.tusalud.app.dto.request.PerfilUpdateRequest;
 import com.codesoftlabs.tusalud.app.dto.request.PreferenciasRequest;
@@ -16,12 +15,14 @@ import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
 import com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException;
+import com.codesoftlabs.tusalud.app.repositories.ArchivoRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.PerfilService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Base64;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,6 +51,12 @@ class PerfilServiceImplTest {
 
     @Autowired
     private NotificacionService notificacionService;
+
+    @Autowired
+    private ArchivoRepository archivoRepository;
+
+    private static final byte[] PNG = Base64.getDecoder()
+            .decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==");
 
     @Test
     void obtenerDevuelveLosDatosDelPaciente() {
@@ -148,14 +155,29 @@ class PerfilServiceImplTest {
     }
 
     @Test
-    void actualizarAvatarGuardaLaImagenEnElPerfil() {
+    void actualizarAvatarGuardaLaImagenEnElAlmacen() {
         Usuario usuario = fixture.usuario("avatar", RolNombre.ROLE_PACIENTE);
-        String imagen = "data:image/png;base64,iVBORw0KGgo=";
 
-        PerfilResponse perfil = perfilService.actualizarAvatar(fixture.principal(usuario), new AvatarRequest(imagen));
+        PerfilResponse perfil = perfilService.actualizarAvatar(fixture.principal(usuario), "foto.png", PNG);
 
-        assertThat(perfil.avatar()).isEqualTo(imagen);
-        assertThat(perfilService.obtener(fixture.principal(usuario)).avatar()).isEqualTo(imagen);
+        assertThat(perfil.avatarId()).isNotNull();
+        assertThat(perfilService.obtener(fixture.principal(usuario)).avatarId()).isEqualTo(perfil.avatarId());
+    }
+
+    @Test
+    void actualizarAvatarReemplazaYQuitaLaFotoAnterior() {
+        Usuario usuario = fixture.usuario("avatar5", RolNombre.ROLE_PACIENTE);
+        UUID primero = perfilService
+                .actualizarAvatar(fixture.principal(usuario), "uno.png", PNG)
+                .avatarId();
+
+        UUID segundo = perfilService
+                .actualizarAvatar(fixture.principal(usuario), "dos.png", PNG)
+                .avatarId();
+
+        assertThat(segundo).isNotEqualTo(primero);
+        assertThat(archivoRepository.findActivo(primero)).isEmpty();
+        assertThat(archivoRepository.findActivo(segundo)).isPresent();
     }
 
     @Test
@@ -163,33 +185,39 @@ class PerfilServiceImplTest {
         Usuario usuario = fixture.usuario("avatar2", RolNombre.ROLE_PACIENTE);
 
         assertThatThrownBy(() -> perfilService.actualizarAvatar(
-                        fixture.principal(usuario), new AvatarRequest("data:image/gif;base64,R0lGOD")))
+                        fixture.principal(usuario), "foto.gif", "GIF89a......".getBytes()))
                 .isInstanceOf(DatosInvalidosException.class)
-                .hasMessageContaining("PNG, JPEG o WEBP");
+                .hasMessageContaining("no está permitido");
+        assertThatThrownBy(() -> perfilService.actualizarAvatar(fixture.principal(usuario), "foto.jpg", PNG))
+                .isInstanceOf(DatosInvalidosException.class)
+                .hasMessageContaining("no coincide con su extensión");
         assertThatThrownBy(() -> perfilService.actualizarAvatar(
-                        fixture.principal(usuario), new AvatarRequest("https://correo.com/foto.png")))
+                        fixture.principal(usuario), "foto.png", "<svg xmlns='x'/>".getBytes()))
                 .isInstanceOf(DatosInvalidosException.class);
     }
 
     @Test
-    void actualizarAvatarRechazaImagenMayorA300Kb() {
+    void actualizarAvatarRechazaImagenMayorA2Mb() {
         Usuario usuario = fixture.usuario("avatar3", RolNombre.ROLE_PACIENTE);
-        String grande = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(new byte[300 * 1024 + 1]);
+        byte[] grande = new byte[2 * 1024 * 1024 + 1];
+        System.arraycopy(PNG, 0, grande, 0, 8);
 
-        assertThatThrownBy(() -> perfilService.actualizarAvatar(fixture.principal(usuario), new AvatarRequest(grande)))
+        assertThatThrownBy(() -> perfilService.actualizarAvatar(fixture.principal(usuario), "grande.png", grande))
                 .isInstanceOf(DatosInvalidosException.class)
-                .hasMessageContaining("300 KB");
+                .hasMessageContaining("2 MB");
     }
 
     @Test
     void eliminarAvatarQuitaLaImagen() {
         Usuario usuario = fixture.usuario("avatar4", RolNombre.ROLE_PACIENTE);
-        perfilService.actualizarAvatar(
-                fixture.principal(usuario), new AvatarRequest("data:image/webp;base64,UklGRg=="));
+        UUID id = perfilService
+                .actualizarAvatar(fixture.principal(usuario), "foto.png", PNG)
+                .avatarId();
 
         perfilService.eliminarAvatar(fixture.principal(usuario));
 
-        assertThat(perfilService.obtener(fixture.principal(usuario)).avatar()).isNull();
+        assertThat(perfilService.obtener(fixture.principal(usuario)).avatarId()).isNull();
+        assertThat(archivoRepository.findActivo(id)).isEmpty();
     }
 
     @Test

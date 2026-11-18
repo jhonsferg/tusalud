@@ -3,8 +3,7 @@ ARG NODE_IMAGE=node:24-alpine
 FROM ${NODE_IMAGE}
 ENV NG_CLI_ANALYTICS=false \
     CI=true \
-    PORT=4200 \
-    API_UPSTREAM=http://app:8080
+    PORT=4200
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund --prefer-offline

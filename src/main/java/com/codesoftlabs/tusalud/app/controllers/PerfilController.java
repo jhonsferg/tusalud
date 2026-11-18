@@ -1,12 +1,12 @@
 package com.codesoftlabs.tusalud.app.controllers;
 
-import com.codesoftlabs.tusalud.app.dto.request.AvatarRequest;
 import com.codesoftlabs.tusalud.app.dto.request.PasswordChangeRequest;
 import com.codesoftlabs.tusalud.app.dto.request.PerfilUpdateRequest;
 import com.codesoftlabs.tusalud.app.dto.request.PreferenciasRequest;
 import com.codesoftlabs.tusalud.app.dto.response.ErrorResponse;
 import com.codesoftlabs.tusalud.app.dto.response.PerfilResponse;
 import com.codesoftlabs.tusalud.app.dto.response.PreferenciasResponse;
+import com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException;
 import com.codesoftlabs.tusalud.app.security.JwtAuthenticationFilter;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.PerfilService;
@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,7 +31,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/perfil")
@@ -150,11 +153,11 @@ public class PerfilController {
         return ResponseEntity.ok(perfilService.actualizarPreferencias(principal, request));
     }
 
-    @PutMapping("/avatar")
+    @PutMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
             summary = "Actualizar mi avatar",
             description =
-                    "Guarda la imagen de perfil como data URL. Formatos permitidos: image/png, image/jpeg e image/webp; máximo 300 KB decodificados.")
+                    "Sube la imagen de perfil como archivo multipart y la guarda en el almacén de objetos. Formatos permitidos: PNG, JPEG y WEBP validados por su contenido, hasta 2 MB.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Avatar actualizado; devuelve el perfil"),
         @ApiResponse(
@@ -167,9 +170,15 @@ public class PerfilController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<PerfilResponse> actualizarAvatar(
-            @Valid @RequestBody AvatarRequest request,
+            @RequestParam("archivo") MultipartFile archivo,
             @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal) {
-        return ResponseEntity.ok(perfilService.actualizarAvatar(principal, request));
+        byte[] contenido;
+        try {
+            contenido = archivo.getBytes();
+        } catch (java.io.IOException ex) {
+            throw new DatosInvalidosException("No se pudo leer el archivo cargado");
+        }
+        return ResponseEntity.ok(perfilService.actualizarAvatar(principal, archivo.getOriginalFilename(), contenido));
     }
 
     @DeleteMapping("/avatar")

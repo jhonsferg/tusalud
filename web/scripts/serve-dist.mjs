@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const raiz = resolve(fileURLToPath(new URL('..', import.meta.url)), 'dist');
 const puerto = Number(process.env.PORT ?? 4300);
-const destinoApi = new URL(process.env.API_UPSTREAM ?? 'http://localhost:8080');
+const destinoApi = process.env.API_UPSTREAM ? new URL(process.env.API_UPSTREAM) : null;
 
 const tipos = {
   '.html': 'text/html; charset=utf-8',
@@ -74,6 +74,11 @@ function sinOrigen(cabeceras) {
 }
 
 function proxy(req, res) {
+  if (!destinoApi) {
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Sin proxy de API: use el gateway o defina API_UPSTREAM');
+    return;
+  }
   const entrante = http.request(
     {
       hostname: destinoApi.hostname,

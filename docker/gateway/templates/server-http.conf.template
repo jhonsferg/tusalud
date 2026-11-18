@@ -1,0 +1,5 @@
+server {
+    listen 8080 default_server;
+    server_name ${GATEWAY_SERVER_NAME};
+    include /etc/nginx/conf.d/gateway-comun.inc;
+}

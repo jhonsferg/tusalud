@@ -62,6 +62,8 @@ public interface ImagenesService {
 
     void eliminarArchivo(UsuarioPrincipal actor, UUID ordenId, UUID archivoId);
 
+    void exigirLecturaDeArchivo(UsuarioPrincipal actor, UUID archivoId, boolean auditar);
+
     List<AgendaImagenResponse> agenda(LocalDate desde, LocalDate hasta);
 
     ImagenesResumenResponse resumen();

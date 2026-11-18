@@ -1,12 +1,14 @@
 package com.codesoftlabs.tusalud.app.exceptions;
 
 import com.codesoftlabs.tusalud.app.dto.response.ErrorResponse;
+import com.codesoftlabs.tusalud.app.storage.AlmacenamientoException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -79,6 +81,21 @@ public class GlobalExceptionHandler {
             MissingServletRequestPartException ex, HttpServletRequest request) {
         return build(
                 HttpStatus.BAD_REQUEST, "Falta la parte '" + ex.getRequestPartName() + "' de la petición", request);
+    }
+
+    @ExceptionHandler(RangoNoSatisfacibleException.class)
+    public ResponseEntity<ErrorResponse> handleRango(RangoNoSatisfacibleException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE)
+                .header(HttpHeaders.CONTENT_RANGE, "bytes */" + ex.getTamano())
+                .body(ErrorResponse.of(
+                        HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE, ex.getMessage(), request.getRequestURI()));
+    }
+
+    @ExceptionHandler(AlmacenamientoException.class)
+    public ResponseEntity<ErrorResponse> handleAlmacenamiento(AlmacenamientoException ex, HttpServletRequest request) {
+        log.error("Falla del almacén de archivos en {} {}", request.getMethod(), request.getRequestURI(), ex);
+        return build(
+                HttpStatus.SERVICE_UNAVAILABLE, "El almacén de archivos no está disponible en este momento", request);
     }
 
     @ExceptionHandler(MultipartException.class)

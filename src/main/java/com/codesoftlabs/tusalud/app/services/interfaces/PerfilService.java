@@ -1,6 +1,5 @@
 package com.codesoftlabs.tusalud.app.services.interfaces;
 
-import com.codesoftlabs.tusalud.app.dto.request.AvatarRequest;
 import com.codesoftlabs.tusalud.app.dto.request.PasswordChangeRequest;
 import com.codesoftlabs.tusalud.app.dto.request.PerfilUpdateRequest;
 import com.codesoftlabs.tusalud.app.dto.request.PreferenciasRequest;
@@ -23,7 +22,7 @@ public interface PerfilService {
 
     PreferenciasResponse actualizarPreferencias(UsuarioPrincipal principal, PreferenciasRequest request);
 
-    PerfilResponse actualizarAvatar(UsuarioPrincipal principal, AvatarRequest request);
+    PerfilResponse actualizarAvatar(UsuarioPrincipal principal, String nombre, byte[] contenido);
 
     void eliminarAvatar(UsuarioPrincipal principal);
 }

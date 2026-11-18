@@ -8,10 +8,27 @@ services:
       SPRING_PROFILES_ACTIVE: qa
       MFA_CLAVE_CIFRADO: ${MFA_CLAVE_CIFRADO:-clave-de-desarrollo-para-cifrar-secretos-mfa}
       PAGOS_SIMULACION_HABILITADA: ${PAGOS_SIMULACION_HABILITADA:-true}
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-tusalud-qa-access}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-tusalud-qa-secret-0123456789}
       OTEL_RESOURCE_ATTRIBUTES: service.namespace=tusalud,deployment.environment.name=qa
+
+  storage:
+    environment:
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-tusalud-qa-access}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-tusalud-qa-secret-0123456789}
 
   web:
     build:
       args:
         BUILD_CONFIGURATION: qa
     image: tusalud-web:qa
+
+  gateway:
+    image: tusalud-gateway:qa
+    environment:
+      GATEWAY_EXPONER_DOCS: "on"
+      RATE_LOGIN: ${RATE_LOGIN:-60r/m}
+      RATE_REFRESH: ${RATE_REFRESH:-120r/m}
+      RATE_MFA: ${RATE_MFA:-60r/m}
+      RATE_REGISTRO: ${RATE_REGISTRO:-30r/m}
+      RATE_GENERAL: ${RATE_GENERAL:-3000r/m}

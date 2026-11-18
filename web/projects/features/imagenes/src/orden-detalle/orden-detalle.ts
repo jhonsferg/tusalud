@@ -29,10 +29,13 @@ import {
   ImagenesStore,
   NotificationService,
   OrdenImagenResponse,
+  REGLAS_ARCHIVO,
+  ReglasArchivo,
   SALAS_IMAGEN,
   optionalIdAttribute,
   toIsoDateTime,
 } from '@tusalud/core';
+import { CargaArchivos } from '@tusalud/ui/carga-archivos';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { PageHeader } from '@tusalud/ui/page-header';
 import {
@@ -46,6 +49,7 @@ import { VisorImagen } from '../visor/visor-imagen';
 @Component({
   selector: 'app-orden-imagen-detalle',
   imports: [
+    CargaArchivos,
     CurrencyPipe,
     DatePipe,
     FormsModule,
@@ -126,7 +130,12 @@ export class OrdenImagenDetalle {
 
   protected readonly subiendo = signal(false);
   protected readonly errorCarga = signal<string | null>(null);
-  protected readonly arrastrando = signal(false);
+  protected readonly pendientes = signal<File[]>([]);
+  protected readonly progreso = signal<number | null>(null);
+  protected readonly reglasImagen: ReglasArchivo = {
+    ...REGLAS_ARCHIVO.IMAGEN_DIAGNOSTICA,
+    maxArchivos: 12,
+  };
 
   protected readonly visorVisible = signal(false);
   protected readonly visorIndice = signal(0);
@@ -200,22 +209,9 @@ export class OrdenImagenDetalle {
       });
   }
 
-  protected seleccionados(evento: Event, orden: OrdenImagenResponse): void {
-    const entrada = evento.target as HTMLInputElement;
-    const archivos = Array.from(entrada.files ?? []);
-    entrada.value = '';
+  protected elegidos(archivos: File[], orden: OrdenImagenResponse): void {
+    this.pendientes.set(archivos);
     this.subir(orden, archivos);
-  }
-
-  protected soltar(evento: DragEvent, orden: OrdenImagenResponse): void {
-    evento.preventDefault();
-    this.arrastrando.set(false);
-    this.subir(orden, Array.from(evento.dataTransfer?.files ?? []));
-  }
-
-  protected sobre(evento: DragEvent): void {
-    evento.preventDefault();
-    this.arrastrando.set(true);
   }
 
   private subir(orden: OrdenImagenResponse, archivos: File[]): void {
@@ -224,15 +220,18 @@ export class OrdenImagenDetalle {
     }
     this.errorCarga.set(null);
     this.subiendo.set(true);
+    this.progreso.set(null);
     this.store.subirArchivos(orden.id, archivos).subscribe({
       next: () => {
         this.subiendo.set(false);
+        this.pendientes.set([]);
         this.notifications.success(
           archivos.length === 1 ? 'La imagen fue cargada.' : 'Las imágenes fueron cargadas.',
         );
       },
       error: (error: { message: string }) => {
         this.subiendo.set(false);
+        this.pendientes.set([]);
         this.errorCarga.set(error.message);
       },
     });

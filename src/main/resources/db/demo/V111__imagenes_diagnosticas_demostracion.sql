@@ -70,18 +70,6 @@ FROM (SELECT x.*, ROW_NUMBER() OVER () AS n FROM (VALUES
 JOIN ordenes_imagen o ON o.codigo = v.orden
 JOIN estudios_imagen e ON e.codigo = v.estudio;
 
-INSERT INTO archivos_imagen (orden_id, nombre, tipo_contenido, tamano, contenido, posicion, subido_por, subido_en)
-SELECT o.id, v.nombre, 'image/png', octet_length(img.b), img.b, v.posicion, u.id, o.realizada_en - INTERVAL '10 minutes'
-FROM (SELECT decode('iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAAAAAB3tzPbAAAEiklEQVR4nO2dS3IbMQxEvcwVdKHIlv8XyZonyXlTkuWSYhFEo9Ej6oNeTdmKgUeyCXBGU3n4deV6mJ1AVgUwWwUwW3uA1UF/LltHmRbAFBXAbBXAbBXAbBXAbBXAbBXAbBXAbBXAbBXAbBXAbBXAbJ0L4O+pNH+4AEAVgKUCAFUAlgoAVAFYKgBQEwFG+v36+L75fFm/PX08G9f7T3YA9r8Z/NvvazCbOAAQe/3mADj8X9cLAUCx9+NnAQBzuL1eBACM/TV+BgA0h9vrBQDg2Lvx6wOAc3jkJR1AIPZ2/LoA8BwevKQDiMR+MgDwOXzffIoBQrFf1l2AyBy+Pr5LAYKxN58dgNAcbq+VANHYjx2A2BwCPg4AhGM/dwCCc+j7GAeIrp+X9VsHIDiHfk+BA0TXj8gDno9hgPD6EXnA8zEMEF4/Kg84Pr7V84AmTgFYinuA2EN1Hhj21SAAsYfK6sCuL0wCMHuorA7s+sIkADXvsjowPB9DANy8Cz0wOB9DAOS86zzw8ZwDIOdd6AG7J0UAuDGTesDuSREAbsy0HjB7UgSAHDOpB8xaBgCwYyb1gNmTAgDsmGk9YNUyAIAeM6kHrFrmA/BjJvWAVct8AH7MtB4watmtngc0cQrAUsQDtOfkHujXMheAjyeuA8a5zAXg44nrgNHPuQB8PHUd6PdzHkAintwD3XuMHkAmntoD3X7OA8jEU3ug2895AJl4ag90+7nyQHlgWQ+k4sk90Hvu7QDk4qk90DvTOAC5eGoP9M40DkAuntoDvftzt3oe0MQpAEt34IFvVR2oOnCvdaA8UB4oD5QHygPlgfLATA9o2vYOgOYPFwCoiQBX74FvVR2oOnCvdeBmPHD1zwdSz8haB6Bl1iQDQMdrrXUBWuMZGAB2/bQBQGPXJAPAzXVrQ4DWLtwDzQVol+yB1gCA1s7kgfj3hRoI0MJz283PBYiO01GGDkCLzm0EgO7UjxP0ANqC5wFJ/i4ATXAHAEeKeOD/9HyAluyl1d+d/pEdANByvbT6u9MEQK6XhgCC/U8QINAXsQBwP3eSGwTQMn0EBoCuURIg00do36EhATK9tPQ9stPUMADQx1ZyCAC3h8IAmAcyANweCgNgHsgAQLWskxkIAPXVZm4QALJGEwB8H6F8nzgBwPcR8BvdgXMwAcDvocp36hMA5P2IIUD2JBACWOI8UACzAU401QOjxFCAqXVAAeD2pAkAfg+NAEysAxoArydNAJB9aBRgmgdUAI6PEwBkHxoGcHxMA1BneQpg7GMagDrLUwBjH9MAw3FxcwoBjOsxCUDXYAbg7PeF1ABDH5MAdA2mAIb3iCgA5l5QBmB4PiYAcutH/YSGAOACLQXwk8AHIOMsBnCRz8g6Qn3sAqT2nwTAYC8KAeT2nwzAoC8KAND9jwLA6otWKxjAvF8WyoMG6N5v3P0cBNh9luifdQA/GQ4/BgAOH+a8KwKw5ALoQi0DsEewAJSBlgJYDQCkcRYD2DL0ANRBlgQY/D80Oi0KcA4VwGzdKgDbqJ9JBTBbBsD1qgBmqwBm6x+Eu5efyZPL7gAAAABJRU5ErkJggg==', 'base64') AS b) AS img
-CROSS JOIN (VALUES
-    ('IMG-000003', 'ecocardiograma-corte-4-camaras.png', 0),
-    ('IMG-000004', 'torax-pa.png', 0),
-    ('IMG-000004', 'torax-lateral.png', 1),
-    ('IMG-000005', 'tc-craneo-corte-axial.png', 0)
-) AS v (orden, nombre, posicion)
-JOIN ordenes_imagen o ON o.codigo = v.orden
-CROSS JOIN (SELECT id FROM usuarios WHERE email = 'imagenes@tusalud.com') AS u;
-
 INSERT INTO informes_imagen (orden_id, version, hallazgos, conclusion, hallazgo_critico, firma_nombre, firma_colegiatura, autor_id, motivo_correccion, created_at)
 SELECT o.id, v.version, v.hallazgos, v.conclusion, v.critico, u.nombre || ' ' || u.apellido, 'CMP-45210', u.id, v.motivo,
        o.informada_en + (v.version - 1) * INTERVAL '3 hours'

@@ -6,7 +6,7 @@ spring:
     name: tusalud-api
   servlet:
     multipart:
-      max-file-size: 5MB
+      max-file-size: 25MB
       max-request-size: 40MB
   profiles:
     active: "@spring.profiles.active@"
@@ -50,6 +50,22 @@ app:
   pagos:
     simulacion-habilitada: ${PAGOS_SIMULACION_HABILITADA:true}
     expiracion-qr-minutos: 5
+  storage:
+    tipo: ${STORAGE_TIPO:local}
+    endpoint: ${STORAGE_ENDPOINT:}
+    endpoint-publico: ${STORAGE_ENDPOINT_PUBLICO:}
+    region: ${STORAGE_REGION:us-east-1}
+    access-key: ${STORAGE_ACCESS_KEY:}
+    secret-key: ${STORAGE_SECRET_KEY:}
+    path-style: true
+    directorio-local: ${STORAGE_DIRECTORIO_LOCAL:}
+    vigencia-prefirmada: 5m
+    buckets:
+      avatares: ${STORAGE_BUCKET_AVATARES:avatares}
+      imagenes: ${STORAGE_BUCKET_IMAGENES:imagenes}
+      documentos: ${STORAGE_BUCKET_DOCUMENTOS:documentos}
+      reportes: ${STORAGE_BUCKET_REPORTES:reportes}
+      plantillas: ${STORAGE_BUCKET_PLANTILLAS:plantillas}
 
 springdoc:
   api-docs:

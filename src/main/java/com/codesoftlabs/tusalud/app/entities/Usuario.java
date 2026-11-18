@@ -13,6 +13,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
@@ -57,8 +58,9 @@ public class Usuario {
     @Column(length = 20)
     private String telefono;
 
-    @Column(length = 450000)
-    private String avatar;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "avatar_archivo_id")
+    private Archivo avatarArchivo;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 15)

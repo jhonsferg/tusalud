@@ -1,0 +1,31 @@
+server {
+    listen 8080 default_server;
+    server_name _;
+    access_log /dev/stdout tusalud;
+
+    location = /healthz {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok";
+    }
+
+    location / {
+        return 301 https://$host${GATEWAY_HTTPS_REDIRECT_PORT}$request_uri;
+    }
+}
+
+server {
+    listen 8443 ssl default_server;
+    http2 on;
+    server_name ${GATEWAY_SERVER_NAME};
+
+    ssl_certificate /etc/nginx/certs/tls.crt;
+    ssl_certificate_key /etc/nginx/certs/tls.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    include /etc/nginx/conf.d/gateway-comun.inc;
+}

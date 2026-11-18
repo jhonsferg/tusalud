@@ -15,7 +15,7 @@ export interface PerfilResponse {
   consultorio?: string | null;
   especialidad?: string | null;
   especialidades?: string[];
-  avatar?: string | null;
+  avatarId?: string | null;
   mfaActivo?: boolean;
 }
 

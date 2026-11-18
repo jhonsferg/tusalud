@@ -13,6 +13,7 @@ import com.codesoftlabs.tusalud.app.dto.response.ImagenesResumenResponse;
 import com.codesoftlabs.tusalud.app.dto.response.InformeImagenResponse;
 import com.codesoftlabs.tusalud.app.dto.response.MiFirmaImagenResponse;
 import com.codesoftlabs.tusalud.app.dto.response.OrdenImagenResponse;
+import com.codesoftlabs.tusalud.app.entities.Archivo;
 import com.codesoftlabs.tusalud.app.entities.ArchivoImagen;
 import com.codesoftlabs.tusalud.app.entities.Atencion;
 import com.codesoftlabs.tusalud.app.entities.EstudioImagen;
@@ -40,10 +41,14 @@ import com.codesoftlabs.tusalud.app.repositories.OrdenImagenRepository;
 import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
+import com.codesoftlabs.tusalud.app.services.interfaces.ArchivoService;
 import com.codesoftlabs.tusalud.app.services.interfaces.AuditoriaClinicaService;
 import com.codesoftlabs.tusalud.app.services.interfaces.ImagenesService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.RelacionAsistencialService;
+import com.codesoftlabs.tusalud.app.storage.PropositoArchivo;
+import com.codesoftlabs.tusalud.app.storage.StorageService.ObjetoAlmacenado;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.Normalizer;
 import java.time.Duration;
@@ -98,6 +103,7 @@ public class ImagenesServiceImpl implements ImagenesService {
     private final RelacionAsistencialService relacionAsistencial;
     private final AuditoriaClinicaService auditoriaClinica;
     private final NotificacionService notificacionService;
+    private final ArchivoService archivoService;
 
     @Override
     @Transactional(readOnly = true)
@@ -404,15 +410,18 @@ public class ImagenesServiceImpl implements ImagenesService {
                 throw new DatosInvalidosException(
                         "El archivo " + nombreSeguro(entrante.nombreOriginal()) + " no es JPEG, PNG ni PDF");
             }
+            Archivo almacenado = archivoService.almacenar(
+                    subidoPor,
+                    orden.getPaciente().getUsuario(),
+                    PropositoArchivo.IMAGEN_DIAGNOSTICA,
+                    nombreSeguro(entrante.nombreOriginal()),
+                    contenido,
+                    ArchivoService.REFERENCIA_ORDEN_IMAGEN,
+                    orden.getId());
             nuevos.add(ArchivoImagen.builder()
                     .orden(orden)
-                    .nombre(nombreSeguro(entrante.nombreOriginal()))
-                    .tipoContenido(tipo)
-                    .tamano(contenido.length)
-                    .contenido(contenido)
+                    .archivo(almacenado)
                     .posicion(++posicion)
-                    .subidoPor(subidoPor)
-                    .subidoEn(LocalDateTime.now())
                     .build());
         }
         archivoRepository.saveAll(nuevos);
@@ -434,7 +443,16 @@ public class ImagenesServiceImpl implements ImagenesService {
         ArchivoImagen archivo = archivoRepository
                 .findDeOrden(archivoId, ordenId)
                 .orElseThrow(() -> new ResourceNotFoundException("Archivo de imagen", "id", archivoId));
-        return new ArchivoDescarga(archivo.getNombre(), archivo.getTipoContenido(), archivo.getContenido());
+        Archivo almacenado = archivo.getArchivo();
+        try (ObjetoAlmacenado objeto =
+                archivoService.abrirSinAutorizar(almacenado, null).objeto()) {
+            return new ArchivoDescarga(
+                    almacenado.getNombreOriginal(),
+                    almacenado.getTipoContenido(),
+                    objeto.flujo().readAllBytes());
+        } catch (IOException ex) {
+            throw new DatosInvalidosException("No se pudo leer el archivo almacenado");
+        }
     }
 
     @Override
@@ -446,7 +464,24 @@ public class ImagenesServiceImpl implements ImagenesService {
         ArchivoImagen archivo = archivoRepository
                 .findDeOrden(archivoId, ordenId)
                 .orElseThrow(() -> new ResourceNotFoundException("Archivo de imagen", "id", archivoId));
+        Archivo almacenado = archivo.getArchivo();
         archivoRepository.delete(archivo);
+        archivoRepository.flush();
+        archivoService.eliminarSinAutorizar(almacenado);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void exigirLecturaDeArchivo(UsuarioPrincipal actor, UUID archivoId, boolean auditar) {
+        ArchivoImagen vinculo = archivoRepository
+                .findPorArchivo(archivoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Archivo de imagen", "id", archivoId));
+        OrdenImagen orden = vinculo.getOrden();
+        Acceso acceso = acceso(actor, orden, auditar);
+        if (acceso == Acceso.ADMINISTRACION
+                || (acceso == Acceso.PACIENTE && orden.getEstado() != EstadoOrdenImagen.INFORMADA)) {
+            throw new ForbiddenOperationException("No tiene acceso a las imágenes de esta orden");
+        }
     }
 
     @Override

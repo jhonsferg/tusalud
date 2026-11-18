@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "6b0d7c1e-3f5a-4e1b-9a7c-2d4e8f9a1c01",
     "name": "TuSalud API",
-    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 22, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
+    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 23, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -17827,6 +17827,1298 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "23 - Archivos y almacenamiento",
+      "item": [
+        {
+          "name": "Pacientes del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const juan = j.find(p => p.dni === \"12345678\");",
+                  "pm.test(\"El médico atiende a Juan Pérez\", () => pm.expect(juan).to.exist);",
+                  "pm.collectionVariables.set(\"pacienteArchivosId\", juan.pacienteId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos/me/pacientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos", "me", "pacientes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Subir foto de perfil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Devuelve el id del archivo\", () => pm.expect(j.avatarId).to.match(/^[0-9a-f-]{36}$/));",
+                  "pm.collectionVariables.set(\"avatarArchivoId\", j.avatarId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil/avatar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil", "avatar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/estudio.png"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Descargar la foto con sesión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Tipo detectado\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"image/png\"));",
+                  "pm.test(\"Sin sniffing y en línea\", () => {",
+                  "    pm.expect(pm.response.headers.get(\"X-Content-Type-Options\")).to.eql(\"nosniff\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\"inline\");",
+                  "});",
+                  "pm.test(\"Tiene ETag y es privada\", () => {",
+                  "    pm.expect(pm.response.headers.get(\"ETag\")).to.match(/^\"[0-9a-f]{64}\"$/);",
+                  "    pm.expect(pm.response.headers.get(\"Cache-Control\")).to.include(\"private\");",
+                  "});",
+                  "pm.collectionVariables.set(\"etagArchivo\", pm.response.headers.get(\"ETag\"));",
+                  "pm.collectionVariables.set(\"tamanoArchivo\", pm.response.headers.get(\"Content-Length\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{avatarArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{avatarArchivoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Revalidar con ETag (304)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 304', () => pm.response.to.have.status(304));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "If-None-Match",
+                "value": "{{etagArchivo}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{avatarArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{avatarArchivoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente ve el avatar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{avatarArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{avatarArchivoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Descarga parcial con Range",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 206', () => pm.response.to.have.status(206));",
+                  "pm.test(\"Content-Range con el tamaño total\", () => pm.expect(pm.response.headers.get(\"Content-Range\")).to.match(/^bytes 0-7\\/\\d+$/));",
+                  "pm.test(\"Entrega 8 bytes\", () => pm.expect(pm.response.headers.get(\"Content-Length\")).to.eql(\"8\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Range",
+                "value": "bytes=0-7"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{avatarArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{avatarArchivoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rango inválido (416)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 416', () => pm.response.to.have.status(416));",
+                  "pm.test(\"Informa el tamaño\", () => pm.expect(pm.response.headers.get(\"Content-Range\")).to.match(/^bytes \\*\\/\\d+$/));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Range",
+                "value": "bytes=999999-"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{avatarArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{avatarArchivoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{avatarArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{avatarArchivoId}}"]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Id que no es UUID (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/no-es-uuid",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "no-es-uuid"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Archivo inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/00000000-0000-4000-8000-000000000999",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "archivos",
+                "00000000-0000-4000-8000-000000000999"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ejecutable disfrazado de imagen (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test(\"Explica el rechazo\", () => pm.expect(pm.response.json().message).to.include(\"no está permitido\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil/avatar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil", "avatar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/ejecutable.png"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Texto con extensión de imagen (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil/avatar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil", "avatar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/falsa.png"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Extensión que no coincide con el contenido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/png-disfrazado.pdf"
+                },
+                {
+                  "key": "proposito",
+                  "value": "AVATAR",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Imágenes diagnósticas no se suben por aquí (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test(\"Indica el camino correcto\", () => pm.expect(pm.response.json().message).to.include(\"orden de imagen\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{imagenesToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/estudio.png"
+                },
+                {
+                  "key": "proposito",
+                  "value": "IMAGEN_DIAGNOSTICA",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Los reportes los genera el sistema (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/informe.pdf"
+                },
+                {
+                  "key": "proposito",
+                  "value": "REPORTE",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Propósito inexistente (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/estudio.png"
+                },
+                {
+                  "key": "proposito",
+                  "value": "INVENTADO",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médico con relación adjunta un documento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Queda ligado al paciente\", () => {",
+                  "    pm.expect(j.referenciaTipo).to.eql(\"PACIENTE\");",
+                  "    pm.expect(j.tipoContenido).to.eql(\"application/pdf\");",
+                  "    pm.expect(j.sha256).to.have.lengthOf(64);",
+                  "});",
+                  "pm.collectionVariables.set(\"documentoArchivoId\", j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/informe.pdf"
+                },
+                {
+                  "key": "proposito",
+                  "value": "DOCUMENTO_PACIENTE",
+                  "type": "text"
+                },
+                {
+                  "key": "referenciaId",
+                  "value": "{{pacienteArchivosId}}",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente dueño descarga su documento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es un PDF en línea\", () => {",
+                  "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/pdf\");",
+                  "    pm.expect(pm.response.headers.get(\"Content-Disposition\")).to.include(\"inline\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{documentoArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{documentoArchivoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente no ve el documento (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{documentoArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{documentoArchivoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Administración no ve el documento (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{documentoArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{documentoArchivoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no ve el documento (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{documentoArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{documentoArchivoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no adjunta documentos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/informe.pdf"
+                },
+                {
+                  "key": "proposito",
+                  "value": "DOCUMENTO_PACIENTE",
+                  "type": "text"
+                },
+                {
+                  "key": "referenciaId",
+                  "value": "{{pacienteArchivosId}}",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Metadatos del documento ajeno (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{documentoArchivoId}}/metadatos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "archivos",
+                "{{documentoArchivoId}}",
+                "metadatos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lista de archivos del paciente para el médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Incluye el documento\", () => pm.expect(pm.response.json().some(a => a.id === pm.collectionVariables.get(\"documentoArchivoId\"))).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos?referenciaTipo=PACIENTE&referenciaId={{pacienteArchivosId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos"],
+              "query": [
+                {
+                  "key": "referenciaTipo",
+                  "value": "PACIENTE"
+                },
+                {
+                  "key": "referenciaId",
+                  "value": "{{pacienteArchivosId}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente recibe una lista vacía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Sin archivos visibles\", () => pm.expect(pm.response.json()).to.have.lengthOf(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos?referenciaTipo=PACIENTE&referenciaId={{pacienteArchivosId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos"],
+              "query": [
+                {
+                  "key": "referenciaTipo",
+                  "value": "PACIENTE"
+                },
+                {
+                  "key": "referenciaId",
+                  "value": "{{pacienteArchivosId}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente no elimina el documento (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{documentoArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{documentoArchivoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico elimina el documento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{documentoArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{documentoArchivoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El documento eliminado ya no existe (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{documentoArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{documentoArchivoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Los avatares no se eliminan por el endpoint genérico (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{avatarArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{avatarArchivoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Quitar la foto de perfil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil/avatar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil", "avatar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La foto quitada ya no existe (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/archivos/{{avatarArchivoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "archivos", "{{avatarArchivoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -18297,6 +19589,26 @@
     },
     {
       "key": "comprobanteImagenId",
+      "value": ""
+    },
+    {
+      "key": "pacienteArchivosId",
+      "value": ""
+    },
+    {
+      "key": "avatarArchivoId",
+      "value": ""
+    },
+    {
+      "key": "documentoArchivoId",
+      "value": ""
+    },
+    {
+      "key": "etagArchivo",
+      "value": ""
+    },
+    {
+      "key": "tamanoArchivo",
       "value": ""
     }
   ]

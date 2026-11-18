@@ -1,0 +1,16 @@
+server_tokens off;
+
+log_format tusalud '$remote_addr [$time_local] "$request_method $uri" $status $body_bytes_sent rt=$request_time rid=$request_id';
+
+limit_req_zone ${RATE_KEY} zone=login:10m rate=${RATE_LOGIN};
+limit_req_zone ${RATE_KEY} zone=refresh:10m rate=${RATE_REFRESH};
+limit_req_zone ${RATE_KEY} zone=mfa:10m rate=${RATE_MFA};
+limit_req_zone ${RATE_KEY} zone=registro:10m rate=${RATE_REGISTRO};
+limit_req_zone ${RATE_KEY} zone=general:20m rate=${RATE_GENERAL};
+limit_req_status 429;
+limit_req_log_level warn;
+
+map "${GATEWAY_EXPONER_DOCS}" $docs_cerradas {
+    default 1;
+    "on" 0;
+}
