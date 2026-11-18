@@ -97,6 +97,18 @@ public class CajaController {
         return ResponseEntity.ok(cajaService.resumen(principal));
     }
 
+    @PostMapping("/cobros/desglose")
+    @PreAuthorize("hasRole('CAJA')")
+    @Operation(
+            summary = "Simular el cobro con cobertura",
+            description =
+                    "Calcula el monto cubierto por la aseguradora y el copago que paga el paciente, sin emitir comprobante.")
+    public ResponseEntity<com.codesoftlabs.tusalud.app.dto.response.SegurosResponses.DesgloseResponse> desglosar(
+            @Parameter(hidden = true) @AuthenticationPrincipal UsuarioPrincipal principal,
+            @Valid @RequestBody com.codesoftlabs.tusalud.app.dto.request.SegurosRequests.DesgloseRequest request) {
+        return ResponseEntity.ok(cajaService.desglosar(principal, request));
+    }
+
     @PostMapping("/cobros")
     @PreAuthorize("hasRole('CAJA')")
     @Operation(

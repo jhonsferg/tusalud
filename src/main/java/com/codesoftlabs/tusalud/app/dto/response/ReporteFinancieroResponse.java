@@ -16,7 +16,8 @@ public record ReporteFinancieroResponse(
         List<Item> porMedico,
         Comprobantes comprobantes,
         Cajas cajas,
-        PorCobrar porCobrar) {
+        PorCobrar porCobrar,
+        Seguros seguros) {
 
     public record Dia(LocalDate fecha, BigDecimal total, long transacciones) {}
 
@@ -42,4 +43,16 @@ public record ReporteFinancieroResponse(
     public record PorCobrar(Monto citas, Monto laboratorio, BigDecimal total) {}
 
     public record Monto(long cantidad, BigDecimal monto) {}
+
+    public record PorAseguradora(
+            String nombre, long cuentas, BigDecimal cubierto, BigDecimal copago, BigDecimal pendiente) {}
+
+    public record Tramo(String tramo, long cuentas, BigDecimal monto) {}
+
+    public record Seguros(
+            BigDecimal totalCubierto,
+            BigDecimal totalCopago,
+            BigDecimal carteraPendiente,
+            List<PorAseguradora> porAseguradora,
+            List<Tramo> antiguedad) {}
 }

@@ -34,4 +34,34 @@ public record CobroRequest(
         @NotNull(message = "El método de pago es obligatorio")
         MetodoPagoCaja metodoPago,
 
-        @Valid List<CobroItemRequest> items) {}
+        @Valid List<CobroItemRequest> items,
+
+        Boolean forzarParticular,
+
+        @Size(max = 300, message = "El motivo no puede superar 300 caracteres")
+        String motivoParticular) {
+
+    public CobroRequest(
+            OrigenComprobante origen,
+            UUID referenciaId,
+            UUID pacienteId,
+            TipoComprobante tipoComprobante,
+            TipoDocumentoCliente clienteTipoDoc,
+            String clienteDoc,
+            String clienteNombre,
+            MetodoPagoCaja metodoPago,
+            List<CobroItemRequest> items) {
+        this(
+                origen,
+                referenciaId,
+                pacienteId,
+                tipoComprobante,
+                clienteTipoDoc,
+                clienteDoc,
+                clienteNombre,
+                metodoPago,
+                items,
+                null,
+                null);
+    }
+}

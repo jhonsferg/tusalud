@@ -48,6 +48,13 @@ public enum TipoDocumento {
             Set.of(FormatoDocumento.PDF),
             true,
             EnumSet.of(RolNombre.ROLE_PACIENTE, RolNombre.ROLE_MEDICO)),
+    LIQUIDACION(
+            "liquidacion",
+            "liquidacion",
+            true,
+            Set.of(FormatoDocumento.PDF),
+            false,
+            EnumSet.of(RolNombre.ROLE_FINANZAS, RolNombre.ROLE_GERENCIA, RolNombre.ROLE_ADMIN)),
     REPORTE_EJECUTIVO(
             "reporte-ejecutivo",
             "reporte-ejecutivo",

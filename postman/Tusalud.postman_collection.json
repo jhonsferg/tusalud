@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "6b0d7c1e-3f5a-4e1b-9a7c-2d4e8f9a1c01",
     "name": "TuSalud API",
-    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 23, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
+    "description": "Colección única de pruebas de la API de TuSalud. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 26, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -20462,14 +20462,14 @@
           "response": []
         },
         {
-          "name": "Reporte no se genera por este camino (403)",
+          "name": "Reporte no se genera por este camino (404)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));",
                   "pm.test('No entrega un PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.not.include('application/pdf'));",
                   "pm.test('El mensaje está en español', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
                 ]
@@ -21781,8 +21781,8 @@
                 "exec": [
                   "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
                   "const lista = pm.response.json();",
-                  "pm.test('Están las diez plantillas del sistema', () => {",
-                  "    pm.expect(lista).to.have.length(10);",
+                  "pm.test('Están las once plantillas del sistema', () => {",
+                  "    pm.expect(lista).to.have.length(11);",
                   "    ['comprobante', 'receta', 'resultados-laboratorio', 'informe-imagen', 'constancia', 'resumen-historia', 'reporte-ejecutivo', 'reporte-financiero', 'reporte-operativo', 'reporte-calidad'].forEach(c => pm.expect(lista.map(p => p.codigo)).to.include(c));",
                   "});"
                 ]
@@ -23229,6 +23229,2451 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "26 - Seguros y convenios",
+      "item": [
+        {
+          "name": "Listar aseguradoras",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Trae las aseguradoras demo\", () => pm.expect(j.length).to.be.at.least(4));",
+                  "const demo = j.find(a => a.codigo === \"PACIFICO\");",
+                  "pm.test(\"Existe Pacífico\", () => pm.expect(demo).to.exist);",
+                  "pm.collectionVariables.set(\"aseguradoraDemoId\", demo.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/aseguradoras",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "aseguradoras"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear aseguradora",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const f = (d) => { const x = new Date(Date.now() + d * 86400000); return x.toISOString().slice(0, 10); };",
+                  "pm.collectionVariables.set('segDesde', f(-10));",
+                  "pm.collectionVariables.set('segHasta', f(300));",
+                  "pm.collectionVariables.set('segCodigo', 'PM' + Math.floor(Math.random() * 90000 + 10000));",
+                  "pm.collectionVariables.set('segNumero', 'PM-' + Math.floor(Math.random() * 900000 + 100000));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Código en mayúsculas\", () => pm.expect(j.codigo).to.eql(j.codigo.toUpperCase()));",
+                  "pm.collectionVariables.set(\"segAseguradoraId\", j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/aseguradoras",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "aseguradoras"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{segCodigo}}\",\n  \"nombre\": \"Aseguradora Postman {{segCodigo}}\",\n  \"tipo\": \"PRIVADO\",\n  \"ruc\": \"20555666777\",\n  \"activa\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Código de aseguradora repetido (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/aseguradoras",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "aseguradoras"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{segCodigo}}\",\n  \"nombre\": \"Repetida\",\n  \"tipo\": \"EPS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "RUC inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/aseguradoras",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "aseguradoras"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"ZZ1\",\n  \"nombre\": \"Sin RUC válido\",\n  \"tipo\": \"EPS\",\n  \"ruc\": \"123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Porcentaje mayor a 100 (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/convenios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "convenios"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"aseguradoraId\": \"{{segAseguradoraId}}\",\n  \"nombre\": \"Plan Postman {{segCodigo}}\",\n  \"vigenciaDesde\": \"{{segDesde}}\",\n  \"vigenciaHasta\": \"{{segHasta}}\",\n  \"topeAnual\": 5000,\n  \"activo\": true,\n  \"reglas\": [\n    {\n      \"categoria\": \"CONSULTA\",\n      \"tipo\": \"PORCENTAJE\",\n      \"valor\": 120,\n      \"requierePreautorizacion\": false\n    }\n  ],\n  \"exclusiones\": [\n    \"eco-mama\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear convenio con reglas y exclusiones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Dos reglas y exclusión normalizada\", () => {",
+                  "    pm.expect(j.reglas).to.have.lengthOf(2);",
+                  "    pm.expect(j.exclusiones).to.eql([\"ECO-MAMA\"]);",
+                  "    pm.expect(j.vigente).to.be.true;",
+                  "});",
+                  "pm.collectionVariables.set(\"segConvenioId\", j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/convenios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "convenios"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"aseguradoraId\": \"{{segAseguradoraId}}\",\n  \"nombre\": \"Plan Postman {{segCodigo}}\",\n  \"vigenciaDesde\": \"{{segDesde}}\",\n  \"vigenciaHasta\": \"{{segHasta}}\",\n  \"topeAnual\": 5000,\n  \"activo\": true,\n  \"reglas\": [\n    {\n      \"categoria\": \"CONSULTA\",\n      \"tipo\": \"PORCENTAJE\",\n      \"valor\": 80,\n      \"requierePreautorizacion\": false\n    },\n    {\n      \"categoria\": \"IMAGEN\",\n      \"tipo\": \"PORCENTAJE\",\n      \"valor\": 70,\n      \"topePorServicio\": 800,\n      \"requierePreautorizacion\": true\n    }\n  ],\n  \"exclusiones\": [\n    \"eco-mama\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Categoría repetida en el convenio (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/convenios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "convenios"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"aseguradoraId\": \"{{segAseguradoraId}}\",\n  \"nombre\": \"Plan Postman {{segCodigo}}\",\n  \"vigenciaDesde\": \"{{segDesde}}\",\n  \"vigenciaHasta\": \"{{segHasta}}\",\n  \"topeAnual\": 5000,\n  \"activo\": true,\n  \"reglas\": [\n    {\n      \"categoria\": \"CONSULTA\",\n      \"tipo\": \"PORCENTAJE\",\n      \"valor\": 50,\n      \"requierePreautorizacion\": false\n    },\n    {\n      \"categoria\": \"CONSULTA\",\n      \"tipo\": \"COPAGO_FIJO\",\n      \"valor\": 10,\n      \"requierePreautorizacion\": false\n    }\n  ],\n  \"exclusiones\": [\n    \"eco-mama\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar convenio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Tope actualizado\", () => pm.expect(Number(pm.response.json().topeAnual)).to.eql(8000));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/convenios/{{segConvenioId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "convenios", "{{segConvenioId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"aseguradoraId\": \"{{segAseguradoraId}}\",\n  \"nombre\": \"Plan Postman {{segCodigo}}\",\n  \"vigenciaDesde\": \"{{segDesde}}\",\n  \"vigenciaHasta\": \"{{segHasta}}\",\n  \"topeAnual\": 8000,\n  \"activo\": true,\n  \"reglas\": [\n    {\n      \"categoria\": \"CONSULTA\",\n      \"tipo\": \"PORCENTAJE\",\n      \"valor\": 80,\n      \"requierePreautorizacion\": false\n    },\n    {\n      \"categoria\": \"IMAGEN\",\n      \"tipo\": \"PORCENTAJE\",\n      \"valor\": 70,\n      \"topePorServicio\": 800,\n      \"requierePreautorizacion\": true\n    }\n  ],\n  \"exclusiones\": [\n    \"eco-mama\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar paciente del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const p = j.find(x => /Jorge/.test(x.nombreCompleto));",
+                  "pm.test(\"Encuentra a Jorge Medina\", () => pm.expect(p).to.exist);",
+                  "pm.collectionVariables.set(\"segPacienteId\", p.pacienteId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recepcion/pacientes?q=Medina",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recepcion", "pacientes"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Medina"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar póliza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Activa y con parentesco normalizado\", () => {",
+                  "    pm.expect(j.estado).to.eql(\"ACTIVA\");",
+                  "    pm.expect(j.parentesco).to.eql(\"TITULAR\");",
+                  "});",
+                  "pm.collectionVariables.set(\"segPolizaId\", j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/polizas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "polizas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{segPacienteId}}\",\n  \"convenioId\": \"{{segConvenioId}}\",\n  \"numero\": \"{{segNumero}}\",\n  \"titularNombre\": \"Titular Postman\",\n  \"parentesco\": \"titular\",\n  \"plan\": \"Plan A\",\n  \"vigenciaDesde\": \"{{segDesde}}\",\n  \"vigenciaHasta\": \"{{segHasta}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Póliza repetida (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/polizas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "polizas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{segPacienteId}}\",\n  \"convenioId\": \"{{segConvenioId}}\",\n  \"numero\": \"{{segNumero}}\",\n  \"titularNombre\": \"Otro\",\n  \"parentesco\": \"HIJO\",\n  \"vigenciaDesde\": \"{{segDesde}}\",\n  \"vigenciaHasta\": \"{{segHasta}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Pólizas del paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Incluye la nueva póliza\", () => pm.expect(pm.response.json().some(p => p.id === pm.collectionVariables.get(\"segPolizaId\"))).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/pacientes/{{segPacienteId}}/polizas",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "pacientes",
+                "{{segPacienteId}}",
+                "polizas"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Búsqueda con menos de 2 caracteres (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/polizas?q=a",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "polizas"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "a"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verificar póliza como recepción",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Vigente con código y saldo\", () => {",
+                  "    pm.expect(j.vigente).to.be.true;",
+                  "    pm.expect(j.codigo).to.match(/^VC-[0-9A-F]{10}$/);",
+                  "    pm.expect(Number(j.saldoTope)).to.eql(8000);",
+                  "});",
+                  "pm.collectionVariables.set(\"segCodigoVerificacion\", j.codigo);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/polizas/{{segPolizaId}}/verificaciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "polizas",
+                "{{segPolizaId}}",
+                "verificaciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La verificación es determinista",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Mismo código\", () => pm.expect(pm.response.json().codigo).to.eql(pm.collectionVariables.get(\"segCodigoVerificacion\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/polizas/{{segPolizaId}}/verificaciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "polizas",
+                "{{segPolizaId}}",
+                "verificaciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cobertura vista por el médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Solo aseguradora, estado y exigencias\", () => {",
+                  "    pm.expect(j.tieneCobertura).to.be.true;",
+                  "    pm.expect(j.requierenPreautorizacion).to.include(\"IMAGEN\");",
+                  "    pm.expect(j).to.not.have.property(\"titularNombre\");",
+                  "    pm.expect(j).to.not.have.property(\"numero\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/cobertura/pacientes/{{segPacienteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "cobertura",
+                "pacientes",
+                "{{segPacienteId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médico sin relación no ve la cobertura (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/cobertura/pacientes/{{segPacienteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "cobertura",
+                "pacientes",
+                "{{segPacienteId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medico2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Solicitar preautorización de imagen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Solicitada con código\", () => {",
+                  "    pm.expect(j.estado).to.eql(\"SOLICITADA\");",
+                  "    pm.expect(j.codigo).to.match(/^PA-/);",
+                  "});",
+                  "pm.collectionVariables.set(\"segPreautId\", j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/preautorizaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "preautorizaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{segPacienteId}}\",\n  \"categoria\": \"IMAGEN\",\n  \"descripcion\": \"Resonancia de rodilla\",\n  \"montoEstimado\": 650\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La consulta no exige preautorización (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/preautorizaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "preautorizaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{segPacienteId}}\",\n  \"categoria\": \"CONSULTA\",\n  \"descripcion\": \"No la exige\",\n  \"montoEstimado\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médico sin relación no solicita (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/preautorizaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "preautorizaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medico2Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{segPacienteId}}\",\n  \"categoria\": \"IMAGEN\",\n  \"descripcion\": \"Sin relación\",\n  \"montoEstimado\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Bandeja de preautorizaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Incluye la solicitud\", () => pm.expect(pm.response.json().some(p => p.id === pm.collectionVariables.get(\"segPreautId\"))).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/preautorizaciones?estado=SOLICITADA",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "preautorizaciones"],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "SOLICITADA"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Aprobar sin monto (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/preautorizaciones/{{segPreautId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "preautorizaciones",
+                "{{segPreautId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Aprobar la preautorización",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Aprobada con código de autorización\", () => {",
+                  "    pm.expect(j.estado).to.eql(\"APROBADA\");",
+                  "    pm.expect(j.codigoAutorizacion).to.match(/^AUT-[0-9A-F]{10}$/);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/preautorizaciones/{{segPreautId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "preautorizaciones",
+                "{{segPreautId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"montoAprobado\": 600,\n  \"vigenciaDias\": 15\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Aprobar otra vez (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/preautorizaciones/{{segPreautId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "preautorizaciones",
+                "{{segPreautId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"montoAprobado\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rechazar sin motivo suficiente (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/preautorizaciones/{{segPreautId}}/rechazar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "preautorizaciones",
+                "{{segPreautId}}",
+                "rechazar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"no\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Preautorizaciones del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Ve la aprobada\", () => pm.expect(pm.response.json().some(p => p.id === pm.collectionVariables.get(\"segPreautId\") && p.estado === \"APROBADA\")).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/preautorizaciones/mias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "preautorizaciones", "mias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente ve solo las suyas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"No ve la de otro paciente\", () => pm.expect(pm.response.json().some(p => p.id === pm.collectionVariables.get(\"segPreautId\"))).to.be.false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/preautorizaciones/mias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "preautorizaciones", "mias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cartera por aseguradora",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Cartera con tramos\", () => {",
+                  "    pm.expect(j.length).to.be.at.least(1);",
+                  "    pm.expect(j[0]).to.have.property(\"tramoMas90\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/cartera",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "cartera"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{gerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cuentas de una aseguradora",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Sin datos del paciente\", () => {",
+                  "    pm.expect(j.length).to.be.at.least(1);",
+                  "    pm.expect(JSON.stringify(j)).to.not.match(/dni|pacienteNombre|pacienteId/i);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/aseguradoras/{{aseguradoraDemoId}}/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "aseguradoras",
+                "{{aseguradoraDemoId}}",
+                "cuentas"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Liquidaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const enviada = j.find(l => l.codigo === \"LQ-DEMO-001\");",
+                  "pm.test(\"Existe la liquidación enviada\", () => pm.expect(enviada).to.exist);",
+                  "pm.collectionVariables.set(\"segLiquidacionId\", enviada.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/liquidaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "liquidaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Liquidación sin cuentas pendientes (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/liquidaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "liquidaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"aseguradoraId\": \"{{segAseguradoraId}}\",\n  \"desde\": \"{{segDesde}}\",\n  \"hasta\": \"{{segHasta}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enviar una liquidación ya enviada (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/liquidaciones/{{segLiquidacionId}}/enviar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "liquidaciones",
+                "{{segLiquidacionId}}",
+                "enviar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Pago con glosa sin motivo (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/liquidaciones/{{segLiquidacionId}}/pago",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "liquidaciones",
+                "{{segLiquidacionId}}",
+                "pago"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"montoPagado\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Pago mayor al total (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/liquidaciones/{{segLiquidacionId}}/pago",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "liquidaciones",
+                "{{segLiquidacionId}}",
+                "pago"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"montoPagado\": 99999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cuentas de la liquidación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Trae su cuenta\", () => pm.expect(pm.response.json()).to.have.lengthOf.at.least(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/liquidaciones/{{segLiquidacionId}}/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "liquidaciones",
+                "{{segLiquidacionId}}",
+                "cuentas"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{gerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PDF de la liquidación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es un PDF\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/liquidacion/{{segLiquidacionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "liquidacion",
+                "{{segLiquidacionId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El PDF de la liquidación no lo descarga caja (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/liquidacion/{{segLiquidacionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "liquidacion",
+                "{{segLiquidacionId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resumen para finanzas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Con cartera y pólizas por vencer\", () => {",
+                  "    pm.expect(j).to.have.property(\"carteraPendiente\");",
+                  "    pm.expect(j).to.have.property(\"polizasPorVencer\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resumen para recepción sin cartera",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Sin cartera pero con preautorizaciones\", () => {",
+                  "    pm.expect(j).to.not.have.property(\"carteraPendiente\");",
+                  "    pm.expect(j).to.have.property(\"preautorizacionesPendientes\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El reporte financiero incluye seguros agregados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Sección de seguros sin datos de pacientes\", () => {",
+                  "    pm.expect(j.seguros.porAseguradora).to.be.an(\"array\");",
+                  "    pm.expect(j.seguros.antiguedad).to.have.lengthOf(4);",
+                  "    pm.expect(JSON.stringify(j.seguros)).to.not.match(/dni|paciente/i);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/financiero",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "financiero"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Desglose de una cita inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/caja/cobros/desglose",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "caja", "cobros", "desglose"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cajaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origen\": \"CITA\",\n  \"referenciaId\": \"11111111-1111-4111-8111-111111111111\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El desglose no lo consulta el paciente (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/caja/cobros/desglose",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "caja", "cobros", "desglose"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origen\": \"CITA\",\n  \"referenciaId\": \"11111111-1111-4111-8111-111111111111\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no ve el catálogo (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/aseguradoras",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "aseguradoras"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{pacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no crea aseguradoras (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/aseguradoras",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "aseguradoras"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"MED1\",\n  \"nombre\": \"No permitida\",\n  \"tipo\": \"EPS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no ve la cartera (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/cartera",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "cartera"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Caja no crea liquidaciones (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/liquidaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "liquidaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cajaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"aseguradoraId\": \"{{segAseguradoraId}}\",\n  \"desde\": \"{{segDesde}}\",\n  \"hasta\": \"{{segHasta}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Id que no es UUID (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/convenios/abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "convenios", "abc"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/aseguradoras",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "aseguradoras"]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Suspender la póliza de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Suspendida\", () => pm.expect(pm.response.json().estado).to.eql(\"SUSPENDIDA\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/polizas/{{segPolizaId}}/estado",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "polizas",
+                "{{segPolizaId}}",
+                "estado"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"SUSPENDIDA\",\n  \"motivo\": \"Limpieza de la colección de pruebas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Suspender sin motivo (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/polizas/{{segPolizaId}}/estado",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "polizas",
+                "{{segPolizaId}}",
+                "estado"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"SUSPENDIDA\",\n  \"motivo\": \"x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Desactivar el convenio de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Inactivo\", () => pm.expect(pm.response.json().activo).to.be.false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/convenios/{{segConvenioId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguros", "convenios", "{{segConvenioId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"aseguradoraId\": \"{{segAseguradoraId}}\",\n  \"nombre\": \"Plan Postman {{segCodigo}}\",\n  \"vigenciaDesde\": \"{{segDesde}}\",\n  \"vigenciaHasta\": \"{{segHasta}}\",\n  \"topeAnual\": 5000,\n  \"activo\": false,\n  \"reglas\": [\n    {\n      \"categoria\": \"CONSULTA\",\n      \"tipo\": \"PORCENTAJE\",\n      \"valor\": 80,\n      \"requierePreautorizacion\": false\n    },\n    {\n      \"categoria\": \"IMAGEN\",\n      \"tipo\": \"PORCENTAJE\",\n      \"valor\": 70,\n      \"topePorServicio\": 800,\n      \"requierePreautorizacion\": true\n    }\n  ],\n  \"exclusiones\": [\n    \"eco-mama\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Desactivar la aseguradora de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Inactiva\", () => pm.expect(pm.response.json().activa).to.be.false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguros/aseguradoras/{{segAseguradoraId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguros",
+                "aseguradoras",
+                "{{segAseguradoraId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{finanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{segCodigo}}\",\n  \"nombre\": \"Aseguradora Postman {{segCodigo}}\",\n  \"tipo\": \"PRIVADO\",\n  \"ruc\": \"20555666777\",\n  \"activa\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -23815,6 +26260,54 @@
       "key": "docIntentos",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "segDesde",
+      "value": ""
+    },
+    {
+      "key": "segHasta",
+      "value": ""
+    },
+    {
+      "key": "segCodigo",
+      "value": ""
+    },
+    {
+      "key": "segNumero",
+      "value": ""
+    },
+    {
+      "key": "segAseguradoraId",
+      "value": ""
+    },
+    {
+      "key": "segConvenioId",
+      "value": ""
+    },
+    {
+      "key": "segPacienteId",
+      "value": ""
+    },
+    {
+      "key": "segPolizaId",
+      "value": ""
+    },
+    {
+      "key": "segPreautId",
+      "value": ""
+    },
+    {
+      "key": "segLiquidacionId",
+      "value": ""
+    },
+    {
+      "key": "segCodigoVerificacion",
+      "value": ""
+    },
+    {
+      "key": "aseguradoraDemoId",
+      "value": ""
     }
   ]
 }

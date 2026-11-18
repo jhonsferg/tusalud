@@ -58,6 +58,7 @@ public class ReporteServiceImpl implements ReporteService {
     private static final BigDecimal CIEN = BigDecimal.valueOf(100);
 
     private final ReporteRepository repositorio;
+    private final com.codesoftlabs.tusalud.app.services.seguros.SegurosReporteService segurosReporte;
     private final MedicoRepository medicoRepository;
 
     private record Rango(LocalDate desde, LocalDate hasta, AgrupacionReporte agrupacion) {
@@ -263,7 +264,8 @@ public class ReporteServiceImpl implements ReporteService {
                 comprobantes,
                 new ReporteFinancieroResponse.Cajas(
                         cerradas, escala(faltante), escala(sobrante), escala(sobrante.subtract(faltante)), porCajero),
-                porCobrar);
+                porCobrar,
+                segurosReporte.seguros(r.desde(), r.hasta()));
     }
 
     @Override

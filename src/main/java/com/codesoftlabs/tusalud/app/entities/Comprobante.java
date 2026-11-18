@@ -119,6 +119,12 @@ public class Comprobante {
     @JoinColumn(name = "caja_id", nullable = false)
     private SesionCaja caja;
 
+    @Column(name = "monto_cubierto", precision = 12, scale = 2)
+    private BigDecimal montoCubierto;
+
+    @Column(name = "aseguradora_nombre", length = 120)
+    private String aseguradoraNombre;
+
     @OneToMany(mappedBy = "comprobante", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("posicion ASC")
     @Builder.Default

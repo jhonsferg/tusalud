@@ -104,6 +104,7 @@ public class ImagenesServiceImpl implements ImagenesService {
     private final AuditoriaClinicaService auditoriaClinica;
     private final NotificacionService notificacionService;
     private final ArchivoService archivoService;
+    private final com.codesoftlabs.tusalud.app.services.seguros.PreautorizacionService preautorizacionService;
 
     @Override
     @Transactional(readOnly = true)
@@ -261,6 +262,11 @@ public class ImagenesServiceImpl implements ImagenesService {
         if (orden.getEstado() != EstadoOrdenImagen.SOLICITADA && orden.getEstado() != EstadoOrdenImagen.PROGRAMADA) {
             throw new ConflictException("Solo se puede programar una orden solicitada o ya programada");
         }
+        preautorizacionService.exigirSiCorresponde(
+                orden.getPaciente(),
+                com.codesoftlabs.tusalud.app.entities.enums.CategoriaServicio.IMAGEN,
+                orden.getId(),
+                orden.getPrioridad() == com.codesoftlabs.tusalud.app.entities.enums.PrioridadOrden.URGENTE);
         LocalDateTime inicio = request.programadaPara();
         if (inicio.isBefore(LocalDateTime.now().minusMinutes(5))) {
             throw new DatosInvalidosException("La fecha y hora de la toma no pueden estar en el pasado");

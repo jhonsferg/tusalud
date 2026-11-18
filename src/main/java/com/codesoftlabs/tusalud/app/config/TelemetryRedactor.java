@@ -65,6 +65,7 @@ public final class TelemetryRedactor {
             + "|plantillas(/.*)?"
             + "|hospitalizacion(/.*)?"
             + "|farmacia(/.*)?"
+            + "|seguros(/.*)?"
             + "|citas/[^/]+/(atencion|pagos?)(/.*)?"
             + ")/?$");
 

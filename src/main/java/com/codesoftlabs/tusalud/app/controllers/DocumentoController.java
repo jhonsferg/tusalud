@@ -34,11 +34,12 @@ public class DocumentoController {
     private final DocumentoService documentoService;
 
     @GetMapping("/{tipo}/{id}")
-    @PreAuthorize("hasAnyRole('PACIENTE', 'MEDICO', 'CAJA', 'ADMIN', 'FARMACIA', 'LABORATORIO', 'IMAGENES')")
+    @PreAuthorize(
+            "hasAnyRole('PACIENTE', 'MEDICO', 'CAJA', 'ADMIN', 'FARMACIA', 'LABORATORIO', 'IMAGENES', 'FINANZAS', 'GERENCIA')")
     @Operation(
             summary = "Generar un documento en PDF",
-            description = "Tipos: comprobante, receta, resultados-laboratorio, informe-imagen, constancia y"
-                    + " resumen-historia. El id es el del registro de origen. El documento se genera al momento y no"
+            description = "Tipos: comprobante, receta, resultados-laboratorio, informe-imagen, constancia,"
+                    + " resumen-historia y liquidacion. El id es el del registro de origen. El documento se genera al momento y no"
                     + " se guarda.")
     public ResponseEntity<byte[]> generar(
             @PathVariable String tipo,

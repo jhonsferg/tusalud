@@ -28,6 +28,9 @@ public interface CajaService {
 
     ComprobanteResponse cobrar(UsuarioPrincipal actor, CobroRequest request);
 
+    com.codesoftlabs.tusalud.app.dto.response.SegurosResponses.DesgloseResponse desglosar(
+            UsuarioPrincipal actor, com.codesoftlabs.tusalud.app.dto.request.SegurosRequests.DesgloseRequest request);
+
     List<CuentaPorCobrarResponse> pendientes(String q);
 
     List<ComprobanteResponse> comprobantes(LocalDate desde, LocalDate hasta, String q, EstadoComprobante estado);

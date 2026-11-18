@@ -178,6 +178,28 @@ public class DocumentosReportes {
                     Formato.moneda(cajero.neto()));
             cajeros.fila(cajero.nombre(), cajero.sesiones(), cajero.faltante(), cajero.sobrante(), cajero.neto());
         }
+        ficha.seccion("Seguros y convenios").cabecera("Aseguradora", "Cuentas", "Cubierto", "Copago", "Pendiente");
+        HojaExcel seguros = HojaExcel.de("Seguros", "Aseguradora", "Cuentas", "Cubierto", "Copago", "Pendiente");
+        for (ReporteFinancieroResponse.PorAseguradora aseguradora : r.seguros().porAseguradora()) {
+            ficha.fila(
+                    aseguradora.nombre(),
+                    Formato.numero((double) aseguradora.cuentas(), 0),
+                    Formato.moneda(aseguradora.cubierto()),
+                    Formato.moneda(aseguradora.copago()),
+                    Formato.moneda(aseguradora.pendiente()));
+            seguros.fila(
+                    aseguradora.nombre(),
+                    aseguradora.cuentas(),
+                    aseguradora.cubierto(),
+                    aseguradora.copago(),
+                    aseguradora.pendiente());
+        }
+        ficha.seccion("Antigüedad de la cartera de aseguradoras").cabecera("Tramo", "Cuentas", "Monto");
+        HojaExcel cartera = HojaExcel.de("Cartera", "Tramo", "Cuentas", "Monto");
+        for (ReporteFinancieroResponse.Tramo tramo : r.seguros().antiguedad()) {
+            ficha.fila(tramo.tramo(), Formato.numero((double) tramo.cuentas(), 0), Formato.moneda(tramo.monto()));
+            cartera.fila(tramo.tramo(), tramo.cuentas(), tramo.monto());
+        }
         if (graficos) {
             if (!etiquetas.isEmpty()) {
                 ficha.grafico(1, GraficosPdf.barras("Ingresos por día", etiquetas, valores));
@@ -188,7 +210,7 @@ public class DocumentosReportes {
         }
         return new ReporteArmado(
                 ficha,
-                List.of(resumen, dias, metodos, origenes, especialidades, medicos, cajeros),
+                List.of(resumen, dias, metodos, origenes, especialidades, medicos, cajeros, seguros, cartera),
                 "Reporte financiero",
                 nombre("financiero", r.periodo()));
     }

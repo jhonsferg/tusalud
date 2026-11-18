@@ -89,6 +89,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     private final UsuarioRepository usuarioRepository;
     private final NotificacionService notificacionService;
     private final RelacionAsistencialService relacionAsistencial;
+    private final com.codesoftlabs.tusalud.app.services.seguros.PreautorizacionService preautorizacionService;
 
     @Override
     @Transactional(readOnly = true)
@@ -153,6 +154,8 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
         Paciente paciente = buscarPaciente(request.pacienteId());
         Cama cama = buscarCamaLibre(request.camaId());
         validarSinIngresoActivo(paciente);
+        preautorizacionService.exigirSiCorresponde(
+                paciente, com.codesoftlabs.tusalud.app.entities.enums.CategoriaServicio.HOSPITALIZACION, null, false);
         Medico medico = resolverMedico(actor, request.medicoId());
         LocalDateTime ahora = LocalDateTime.now();
 

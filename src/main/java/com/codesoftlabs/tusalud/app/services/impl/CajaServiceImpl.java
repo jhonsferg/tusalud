@@ -4,11 +4,14 @@ import com.codesoftlabs.tusalud.app.dto.request.AperturaCajaRequest;
 import com.codesoftlabs.tusalud.app.dto.request.CierreCajaRequest;
 import com.codesoftlabs.tusalud.app.dto.request.CobroItemRequest;
 import com.codesoftlabs.tusalud.app.dto.request.CobroRequest;
+import com.codesoftlabs.tusalud.app.dto.request.SegurosRequests.DesgloseRequest;
 import com.codesoftlabs.tusalud.app.dto.response.ComprobanteResponse;
 import com.codesoftlabs.tusalud.app.dto.response.CuentaPorCobrarResponse;
 import com.codesoftlabs.tusalud.app.dto.response.MetodoTotalResponse;
 import com.codesoftlabs.tusalud.app.dto.response.ReporteIngresosResponse;
 import com.codesoftlabs.tusalud.app.dto.response.ResumenCajaResponse;
+import com.codesoftlabs.tusalud.app.dto.response.SegurosResponses.DesgloseResponse;
+import com.codesoftlabs.tusalud.app.dto.response.SegurosResponses.LineaDesglose;
 import com.codesoftlabs.tusalud.app.dto.response.SesionCajaResponse;
 import com.codesoftlabs.tusalud.app.entities.Cita;
 import com.codesoftlabs.tusalud.app.entities.Comprobante;
@@ -21,6 +24,7 @@ import com.codesoftlabs.tusalud.app.entities.Paciente;
 import com.codesoftlabs.tusalud.app.entities.Pago;
 import com.codesoftlabs.tusalud.app.entities.SesionCaja;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
+import com.codesoftlabs.tusalud.app.entities.enums.CategoriaServicio;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoCaja;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoCita;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoComprobante;
@@ -48,6 +52,8 @@ import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.CajaService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
+import com.codesoftlabs.tusalud.app.services.seguros.CoberturaCalculadora;
+import com.codesoftlabs.tusalud.app.services.seguros.CoberturaCobroService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -60,6 +66,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -89,6 +96,7 @@ public class CajaServiceImpl implements CajaService {
     private final PagoRepository pagoRepository;
     private final UsuarioRepository usuarioRepository;
     private final NotificacionService notificacionService;
+    private final CoberturaCobroService coberturaCobro;
 
     @Override
     @Transactional
@@ -196,7 +204,8 @@ public class CajaServiceImpl implements CajaService {
                         "Consulta de " + cita.getEspecialidad().getNombre() + " con "
                                 + cita.getMedico().getUsuario().getNombreCompleto(),
                         1,
-                        cita.getMonto()));
+                        cita.getMonto(),
+                        "CONSULTA"));
             }
             case LABORATORIO -> {
                 orden = ordenParaCobrar(request.referenciaId());
@@ -224,6 +233,30 @@ public class CajaServiceImpl implements CajaService {
         if (total.signum() <= 0) {
             throw new DatosInvalidosException("El total a cobrar debe ser mayor a cero");
         }
+        CategoriaServicio categoria = categoriaDe(request.origen());
+        boolean particular = Boolean.TRUE.equals(request.forzarParticular());
+        if (particular
+                && (request.motivoParticular() == null
+                        || request.motivoParticular().trim().length() < 5)) {
+            throw new DatosInvalidosException("Indique el motivo para cobrar como particular");
+        }
+        String descripcionServicio =
+                lineas.stream().map(LineaCobro::descripcion).collect(Collectors.joining(", "));
+        CoberturaCobroService.Desglose desglose = null;
+        if (categoria != null && paciente != null && !particular) {
+            desglose = coberturaCobro
+                    .evaluar(paciente, categoria, lineasParaCobertura(lineas))
+                    .filter(CoberturaCobroService.Desglose::cubre)
+                    .orElse(null);
+        }
+        if (desglose != null) {
+            total = desglose.resultado().copago();
+            lineas = List.of(new LineaCobro(
+                    "Copago de " + recortar(descripcionServicio, 110) + " con cobertura de "
+                            + desglose.poliza().getConvenio().getAseguradora().getNombre(),
+                    1,
+                    total));
+        }
         String documento = validarDocumento(request, total);
 
         String serie = request.tipoComprobante() == TipoComprobante.FACTURA ? "F001" : "B001";
@@ -247,6 +280,14 @@ public class CajaServiceImpl implements CajaService {
                 .referenciaId(request.referenciaId())
                 .paciente(paciente)
                 .caja(caja)
+                .montoCubierto(desglose == null ? null : desglose.resultado().cubierto())
+                .aseguradoraNombre(
+                        desglose == null
+                                ? null
+                                : desglose.poliza()
+                                        .getConvenio()
+                                        .getAseguradora()
+                                        .getNombre())
                 .build();
         for (LineaCobro linea : lineas) {
             comprobante.agregarItem(ComprobanteItem.builder()
@@ -257,6 +298,16 @@ public class CajaServiceImpl implements CajaService {
                     .build());
         }
         comprobante = comprobanteRepository.save(comprobante);
+        if (desglose != null) {
+            coberturaCobro.registrarCuenta(
+                    comprobante,
+                    paciente,
+                    desglose,
+                    categoria,
+                    request.origen(),
+                    request.referenciaId(),
+                    descripcionServicio);
+        }
 
         if (cita != null) {
             registrarPagoDeCita(cita, comprobante);
@@ -355,6 +406,7 @@ public class CajaServiceImpl implements CajaService {
         if (comprobante.getEstado() != EstadoComprobante.EMITIDO) {
             throw new BusinessLogicException("El comprobante " + comprobante.getCodigo() + " ya está anulado");
         }
+        coberturaCobro.exigirRevertible(comprobante);
         boolean admin = actor.getRoles().contains(RolNombre.ROLE_ADMIN.name());
         SesionCaja caja = comprobante.getCaja();
         if (!admin) {
@@ -369,6 +421,7 @@ public class CajaServiceImpl implements CajaService {
         comprobante.setMotivoAnulacion(motivo.trim());
         comprobante.setAnuladoEn(LocalDateTime.now());
         revertirOrigen(comprobante);
+        coberturaCobro.revertir(comprobante);
         log.info("Comprobante {} anulado por {}", comprobante.getCodigo(), actor.getId());
         return ComprobanteResponse.from(comprobante);
     }
@@ -411,6 +464,97 @@ public class CajaServiceImpl implements CajaService {
                 origenes.entrySet().stream()
                         .map(e -> new ReporteIngresosResponse.Origen(e.getKey(), escala(e.getValue())))
                         .toList());
+    }
+
+    @Override
+    public DesgloseResponse desglosar(UsuarioPrincipal actor, DesgloseRequest request) {
+        Paciente paciente;
+        List<LineaCobro> lineas;
+        switch (request.origen()) {
+            case CITA -> {
+                Cita cita = citaParaCobrar(request.referenciaId());
+                paciente = cita.getPaciente();
+                lineas = List.of(new LineaCobro(
+                        "Consulta de " + cita.getEspecialidad().getNombre() + " con "
+                                + cita.getMedico().getUsuario().getNombreCompleto(),
+                        1,
+                        cita.getMonto(),
+                        "CONSULTA"));
+            }
+            case LABORATORIO -> {
+                OrdenLaboratorio orden = ordenParaCobrar(request.referenciaId());
+                paciente = orden.getPaciente();
+                lineas = lineasDeOrden(orden);
+            }
+            case IMAGEN -> {
+                OrdenImagen orden = ordenImagenParaCobrar(request.referenciaId());
+                paciente = orden.getPaciente();
+                lineas = lineasDeOrdenImagen(orden);
+            }
+            default -> throw new DatosInvalidosException("Este origen no admite cobertura de seguro");
+        }
+        BigDecimal total = escala(lineas.stream().map(LineaCobro::subtotal).reduce(BigDecimal.ZERO, BigDecimal::add));
+        CategoriaServicio categoria = categoriaDe(request.origen());
+        var evaluado = coberturaCobro.evaluar(paciente, categoria, lineasParaCobertura(lineas));
+        if (evaluado.isEmpty() || !evaluado.get().cubre()) {
+            String mensaje = evaluado.isEmpty()
+                    ? "El paciente no tiene una póliza vigente, se cobra como particular"
+                    : "El convenio no cubre este servicio, se cobra como particular";
+            return new DesgloseResponse(
+                    request.origen(),
+                    request.referenciaId(),
+                    total,
+                    false,
+                    evaluado.map(d -> d.poliza().getConvenio().getAseguradora().getNombre())
+                            .orElse(null),
+                    evaluado.map(d -> d.poliza().getConvenio().getNombre()).orElse(null),
+                    null,
+                    escala(BigDecimal.ZERO),
+                    total,
+                    evaluado.map(d -> d.resultado().saldoTopeAnual()).orElse(null),
+                    mensaje,
+                    lineas.stream()
+                            .map(l -> new LineaDesglose(
+                                    l.descripcion(), l.subtotal(), escala(BigDecimal.ZERO), l.subtotal(), null))
+                            .toList());
+        }
+        CoberturaCobroService.Desglose desglose = evaluado.get();
+        String numero = desglose.poliza().getNumero();
+        String enmascarado = numero.length() <= 4 ? numero : "****" + numero.substring(numero.length() - 4);
+        return new DesgloseResponse(
+                request.origen(),
+                request.referenciaId(),
+                desglose.resultado().total(),
+                true,
+                desglose.poliza().getConvenio().getAseguradora().getNombre(),
+                desglose.poliza().getConvenio().getNombre(),
+                enmascarado,
+                desglose.resultado().cubierto(),
+                desglose.resultado().copago(),
+                desglose.resultado().saldoTopeAnual(),
+                "El paciente paga solo el copago",
+                desglose.resultado().lineas().stream()
+                        .map(l -> new LineaDesglose(l.descripcion(), l.monto(), l.cubierto(), l.copago(), l.motivo()))
+                        .toList());
+    }
+
+    private static CategoriaServicio categoriaDe(OrigenComprobante origen) {
+        return switch (origen) {
+            case CITA -> CategoriaServicio.CONSULTA;
+            case LABORATORIO -> CategoriaServicio.LABORATORIO;
+            case IMAGEN -> CategoriaServicio.IMAGEN;
+            default -> null;
+        };
+    }
+
+    private static List<CoberturaCalculadora.Linea> lineasParaCobertura(List<LineaCobro> lineas) {
+        return lineas.stream()
+                .map(l -> new CoberturaCalculadora.Linea(l.codigo(), l.descripcion(), l.subtotal()))
+                .toList();
+    }
+
+    private static String recortar(String texto, int maximo) {
+        return texto.length() <= maximo ? texto : texto.substring(0, maximo - 3) + "...";
     }
 
     private void revertirOrigen(Comprobante comprobante) {
@@ -519,7 +663,10 @@ public class CajaServiceImpl implements CajaService {
         BigDecimal suma = BigDecimal.ZERO;
         for (ItemOrdenImagen item : orden.getItems()) {
             LineaCobro linea = new LineaCobro(
-                    item.getEstudio().getNombre(), 1, item.getEstudio().getPrecio());
+                    item.getEstudio().getNombre(),
+                    1,
+                    item.getEstudio().getPrecio(),
+                    item.getEstudio().getCodigo());
             lineas.add(linea);
             suma = suma.add(linea.subtotal());
         }
@@ -534,7 +681,10 @@ public class CajaServiceImpl implements CajaService {
         BigDecimal suma = BigDecimal.ZERO;
         for (ItemOrdenLab item : orden.getItems()) {
             LineaCobro linea = new LineaCobro(
-                    item.getExamen().getNombre(), 1, item.getExamen().getPrecio());
+                    item.getExamen().getNombre(),
+                    1,
+                    item.getExamen().getPrecio(),
+                    item.getExamen().getCodigo());
             lineas.add(linea);
             suma = suma.add(linea.subtotal());
         }
@@ -617,7 +767,11 @@ public class CajaServiceImpl implements CajaService {
         };
     }
 
-    private record LineaCobro(String descripcion, int cantidad, BigDecimal precioUnitario) {
+    private record LineaCobro(String descripcion, int cantidad, BigDecimal precioUnitario, String codigo) {
+
+        LineaCobro(String descripcion, int cantidad, BigDecimal precioUnitario) {
+            this(descripcion, cantidad, precioUnitario, null);
+        }
 
         static LineaCobro de(CobroItemRequest item) {
             return new LineaCobro(item.descripcion().trim(), item.cantidad(), item.precioUnitario());

@@ -117,6 +117,15 @@ class DocumentoServiceTest {
     private AuditoriaClinicaRepository auditoriaRepository;
 
     @Autowired
+    private com.codesoftlabs.tusalud.app.services.seguros.SegurosCatalogoService segurosCatalogo;
+
+    @Autowired
+    private com.codesoftlabs.tusalud.app.services.seguros.PolizaService segurosPolizas;
+
+    @Autowired
+    private com.codesoftlabs.tusalud.app.services.seguros.LiquidacionService segurosLiquidaciones;
+
+    @Autowired
     private ServiceTestFixture fixture;
 
     private Medico medico;
@@ -397,6 +406,97 @@ class DocumentoServiceTest {
                 .isInstanceOf(ForbiddenOperationException.class);
         assertThatThrownBy(() -> directo(admin, TipoDocumento.INFORME_IMAGEN, orden.id()))
                 .isInstanceOf(ForbiddenOperationException.class);
+    }
+
+    private UUID liquidacionDeUnaCita() {
+        var aseguradora = segurosCatalogo.crearAseguradora(
+                new com.codesoftlabs.tusalud.app.dto.request.SegurosRequests.AseguradoraRequest(
+                        "LQ" + ServiceTestFixture.siguiente(),
+                        "Aseguradora Liquidada",
+                        com.codesoftlabs.tusalud.app.entities.enums.TipoAseguradora.PRIVADO,
+                        "20123456789",
+                        null,
+                        true));
+        var convenio = segurosCatalogo.crearConvenio(
+                new com.codesoftlabs.tusalud.app.dto.request.SegurosRequests.ConvenioRequest(
+                        aseguradora.id(),
+                        "Plan documentos",
+                        java.time.LocalDate.now().minusDays(10),
+                        java.time.LocalDate.now().plusDays(100),
+                        null,
+                        true,
+                        List.of(new com.codesoftlabs.tusalud.app.dto.request.SegurosRequests.ReglaRequest(
+                                com.codesoftlabs.tusalud.app.entities.enums.CategoriaServicio.CONSULTA,
+                                com.codesoftlabs.tusalud.app.entities.enums.TipoCobertura.PORCENTAJE,
+                                new BigDecimal("80"),
+                                null,
+                                false)),
+                        null));
+        UsuarioPrincipal recepcion = fixture.principal(fixture.usuario("recep-doc", RolNombre.ROLE_RECEPCION));
+        segurosPolizas.registrar(
+                recepcion,
+                new com.codesoftlabs.tusalud.app.dto.request.SegurosRequests.PolizaRequest(
+                        paciente.getId(),
+                        convenio.id(),
+                        "DOC-" + ServiceTestFixture.siguiente(),
+                        "Titular",
+                        "TITULAR",
+                        null,
+                        java.time.LocalDate.now().minusDays(1),
+                        java.time.LocalDate.now().plusDays(100)));
+        comprobanteDeCita(cajero);
+        return segurosLiquidaciones
+                .crear(
+                        finanzas,
+                        new com.codesoftlabs.tusalud.app.dto.request.SegurosRequests.LiquidacionCrearRequest(
+                                aseguradora.id(), java.time.LocalDate.now().minusDays(1), java.time.LocalDate.now()))
+                .id();
+    }
+
+    @Test
+    void laLiquidacionSeImprimeEnPdfYSoloLaVenFinanzasGerenciaYAdministrador() throws Exception {
+        UUID id = liquidacionDeUnaCita();
+
+        String contenido = texto(directo(finanzas, TipoDocumento.LIQUIDACION, id));
+        assertThat(contenido)
+                .contains("Liquidación LQ-")
+                .contains("Aseguradora Liquidada")
+                .contains("Total liquidado")
+                .contains("S/ 80.00");
+        assertThat(texto(directo(gerencia, TipoDocumento.LIQUIDACION, id))).contains("Liquidación LQ-");
+        assertThat(texto(directo(admin, TipoDocumento.LIQUIDACION, id))).contains("Liquidación LQ-");
+
+        assertThatThrownBy(() -> directo(cajero, TipoDocumento.LIQUIDACION, id))
+                .isInstanceOf(ForbiddenOperationException.class);
+        assertThatThrownBy(() -> directo(pacientePrincipal, TipoDocumento.LIQUIDACION, id))
+                .isInstanceOf(ForbiddenOperationException.class);
+        assertThatThrownBy(() -> directo(medicoPrincipal, TipoDocumento.LIQUIDACION, id))
+                .isInstanceOf(ForbiddenOperationException.class);
+    }
+
+    @Test
+    void elReporteFinancieroIncluyeLosSegurosEnPdfYExcelSinDatosDePacientes() throws Exception {
+        liquidacionDeUnaCita();
+
+        ExportacionResponse excel = exportar(finanzas, "reporte-financiero", "XLSX", Map.of());
+        assertThat(excel.estado()).as(excel.error()).isEqualTo(EstadoExportacion.LISTA);
+        byte[] libro = exportacionService
+                .descargar(finanzas, excel.id())
+                .objeto()
+                .flujo()
+                .readAllBytes();
+        try (XSSFWorkbook leido = new XSSFWorkbook(new java.io.ByteArrayInputStream(libro))) {
+            var hoja = leido.getSheet("Seguros");
+            assertThat(hoja).isNotNull();
+            assertThat(leido.getSheet("Cartera")).isNotNull();
+            StringBuilder contenido = new StringBuilder();
+            hoja.forEach(fila -> fila.forEach(celda -> contenido.append(celda).append('|')));
+            assertThat(contenido.toString()).contains("Aseguradora Liquidada");
+            assertThat(contenido.toString()).doesNotContain("José Núñez").doesNotContain("12345678");
+        }
+
+        ExportacionResponse pdf = exportar(finanzas, "reporte-financiero", "PDF", Map.of());
+        assertThat(pdf.estado()).as(pdf.error()).isEqualTo(EstadoExportacion.LISTA);
     }
 
     @Test

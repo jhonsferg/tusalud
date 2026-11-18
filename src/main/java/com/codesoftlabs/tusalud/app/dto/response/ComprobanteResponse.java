@@ -32,7 +32,9 @@ public record ComprobanteResponse(
         UUID pacienteId,
         UUID cajaId,
         String cajeroNombre,
-        List<ComprobanteItemResponse> items) {
+        List<ComprobanteItemResponse> items,
+        BigDecimal montoCubierto,
+        String aseguradoraNombre) {
 
     public static ComprobanteResponse from(Comprobante c) {
         return new ComprobanteResponse(
@@ -56,6 +58,8 @@ public record ComprobanteResponse(
                 c.getPaciente() == null ? null : c.getPaciente().getId(),
                 c.getCaja().getId(),
                 c.getCaja().getCajero().getNombreCompleto(),
-                c.getItems().stream().map(ComprobanteItemResponse::from).toList());
+                c.getItems().stream().map(ComprobanteItemResponse::from).toList(),
+                c.getMontoCubierto(),
+                c.getAseguradoraNombre());
     }
 }

@@ -43,12 +43,15 @@ public class DocumentosClinicos {
     private final LaboratorioService laboratorioService;
     private final ImagenesService imagenesService;
     private final CitaService citaService;
+    private final com.codesoftlabs.tusalud.app.repositories.LiquidacionRepository liquidacionRepository;
+    private final com.codesoftlabs.tusalud.app.repositories.CuentaAseguradoraRepository cuentaAseguradoraRepository;
     private final HistoriaClinicaService historiaClinicaService;
 
     @Transactional(readOnly = true)
     public DocumentoPreparado preparar(UsuarioPrincipal actor, TipoDocumento tipo, UUID id) {
         return switch (tipo) {
             case COMPROBANTE -> comprobante(actor, id);
+            case LIQUIDACION -> liquidacion(id);
             case RECETA -> receta(actor, id);
             case RESULTADOS_LABORATORIO -> resultadosLaboratorio(actor, id);
             case INFORME_IMAGEN -> informeImagen(actor, id);
@@ -101,6 +104,33 @@ public class DocumentosClinicos {
         }
         return new DocumentoPreparado(
                 ficha, null, comprobante.getId().toString(), "comprobante-" + comprobante.getCodigo());
+    }
+
+    private DocumentoPreparado liquidacion(UUID id) {
+        com.codesoftlabs.tusalud.app.entities.Liquidacion liquidacion = liquidacionRepository
+                .findConDetalle(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Liquidación", "id", id));
+        FichaDocumento ficha = FichaDocumento.de(TipoDocumento.LIQUIDACION)
+                .titulo("Liquidación " + liquidacion.getCodigo(), "Cuentas por cobrar a la aseguradora")
+                .par("Aseguradora", liquidacion.getAseguradora().getNombre())
+                .par("RUC", Formato.texto(liquidacion.getAseguradora().getRuc()))
+                .par("Periodo", liquidacion.getDesde() + " al " + liquidacion.getHasta())
+                .par("Estado", liquidacion.getEstado().name())
+                .par("Cuentas", String.valueOf(liquidacion.getCantidadCuentas()))
+                .par("Creada por", liquidacion.getCreadaPor().getNombreCompleto());
+        cuentaAseguradoraRepository
+                .deLiquidacion(id)
+                .forEach(cuenta -> ficha.fila(
+                        cuenta.getCategoria().name() + " · " + cuenta.getDescripcion(),
+                        cuenta.getFecha().toLocalDate().toString(),
+                        Formato.moneda(cuenta.getMontoCubierto()),
+                        Formato.moneda(cuenta.getCopago())));
+        ficha.total("Total liquidado", Formato.moneda(liquidacion.getTotal()));
+        if (liquidacion.getMontoPagado() != null) {
+            ficha.total("Pagado", Formato.moneda(liquidacion.getMontoPagado()));
+            ficha.total("Glosa", Formato.moneda(liquidacion.getMontoGlosa()));
+        }
+        return new DocumentoPreparado(ficha, null, id.toString(), "liquidacion-" + liquidacion.getCodigo());
     }
 
     private DocumentoPreparado receta(UsuarioPrincipal actor, UUID id) {
