@@ -15,7 +15,7 @@
     <artifactId>tusalud-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>tusalud-api</name>
-    <description>TuSalud - Sistema de Gestión de Citas y Consultas Médicas - API REST</description>
+    <description>TuSalud - Sistema de Gestión Clínica Integral - API REST</description>
 
     <properties>
         <java.version>25</java.version>

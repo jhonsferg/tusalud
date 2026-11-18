@@ -1,19 +1,79 @@
 # TuSalud
 
-TuSalud es el sistema de gestión de citas y consultas médicas. El repositorio es un monorepo con dos aplicaciones: el backend en Java con Spring Boot, ubicado en la raíz, y el frontend en Angular, ubicado en la carpeta `web`. El backend expone una API REST para administrar especialidades, médicos, horarios de atención y citas, con autenticación JWT sin estado y autorización por roles. Este documento es la única fuente de verdad del proyecto: describe qué hace el sistema, cómo está construido, cómo se configura y cómo se ejecuta y verifica en cada entorno.
+TuSalud es un sistema de gestión clínica integral para clínicas y centros de salud. Nació como un sistema de reserva de citas y hoy cubre la operación diaria de la institución de punta a punta: desde que el paciente reserva y llega a recepción hasta que lo atiende un médico, le piden estudios, se hospitaliza, recibe sus medicamentos y paga o factura a su seguro, y desde que la gerencia revisa los indicadores hasta que recursos humanos programa los turnos del personal. Seguirá creciendo con nuevos módulos y nuevas funcionalidades hasta cubrir todos los aspectos operativos de una clínica.
+
+El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boot y ubicado en la raíz, expone una API REST sin estado con autenticación JWT, autorización por rol y por relación con el paciente, auditoría y almacenamiento de objetos. El frontend, en Angular y ubicado en la carpeta `web`, es un workspace con un portal de acceso y una aplicación independiente para cada actor de la clínica. Un gateway nginx es el único punto de entrada de todo el sistema. Este documento es la única fuente de verdad del proyecto: describe qué hace el sistema, cómo está construido, cómo se extiende, cómo se configura y cómo se ejecuta y verifica en cada entorno.
 
 ## Índice
 
+- [Visión y principios](#visión-y-principios)
+  - [TuSalud en cifras](#tusalud-en-cifras)
+  - [Cómo leer este documento](#cómo-leer-este-documento)
+- [Mapa de módulos](#mapa-de-módulos)
+  - [Atención ambulatoria](#atención-ambulatoria)
+  - [Admisión](#admisión)
+  - [Apoyo diagnóstico](#apoyo-diagnóstico)
+  - [Hospitalización y emergencia](#hospitalización-y-emergencia)
+  - [Farmacia y almacén](#farmacia-y-almacén)
+  - [Caja y facturación](#caja-y-facturación)
+  - [Seguros y convenios](#seguros-y-convenios)
+  - [Recursos humanos](#recursos-humanos)
+  - [Gerencia, reportes y BI](#gerencia-reportes-y-bi)
+  - [Documentos y archivos](#documentos-y-archivos)
+  - [Seguridad y auditoría](#seguridad-y-auditoría)
+  - [Notificaciones y calendario](#notificaciones-y-calendario)
+  - [Portal del paciente](#portal-del-paciente)
+- [Actores y aplicaciones](#actores-y-aplicaciones)
+  - [Varios roles en una misma persona](#varios-roles-en-una-misma-persona)
+  - [Qué contiene cada aplicación](#qué-contiene-cada-aplicación)
+- [Arquitectura](#arquitectura)
+  - [Contexto del sistema](#contexto-del-sistema)
+  - [Contenedores](#contenedores)
+  - [Capas del backend](#capas-del-backend)
+  - [Concurrencia con virtual threads](#concurrencia-con-virtual-threads)
+  - [Workspace del frontend](#workspace-del-frontend)
+- [Modelo de datos](#modelo-de-datos)
+  - [Contexto de identidad y acceso](#contexto-de-identidad-y-acceso)
+  - [Contexto clínico ambulatorio](#contexto-clínico-ambulatorio)
+  - [Contexto de pagos en línea](#contexto-de-pagos-en-línea)
+  - [Contexto de apoyo diagnóstico](#contexto-de-apoyo-diagnóstico)
+  - [Contexto de hospitalización](#contexto-de-hospitalización)
+  - [Contexto de farmacia y almacén](#contexto-de-farmacia-y-almacén)
+  - [Contexto de caja y seguros](#contexto-de-caja-y-seguros)
+  - [Contexto de recursos humanos](#contexto-de-recursos-humanos)
+  - [Contexto de documentos y archivos](#contexto-de-documentos-y-archivos)
+  - [Reglas de integridad](#reglas-de-integridad)
+- [Seguridad](#seguridad)
+  - [Modelo de amenazas resumido](#modelo-de-amenazas-resumido)
+  - [Autenticación y sesión](#autenticación-y-sesión)
+  - [Controles vigentes en el backend](#controles-vigentes-en-el-backend)
+  - [Auditoría y vigilancia](#auditoría-y-vigilancia)
+  - [Archivos y documentos](#archivos-y-documentos)
+  - [Gateway y red](#gateway-y-red)
+  - [Interfaz](#interfaz)
+  - [Observabilidad segura](#observabilidad-segura)
+  - [Límites y decisiones conocidas](#límites-y-decisiones-conocidas)
+- [Guía de extensión](#guía-de-extensión)
+  - [Agregar un módulo completo](#agregar-un-módulo-completo)
+  - [Agregar un rol nuevo](#agregar-un-rol-nuevo)
+  - [Agregar una aplicación para un cargo o una especialidad](#agregar-una-aplicación-para-un-cargo-o-una-especialidad)
+  - [Agregar una plantilla de documento](#agregar-una-plantilla-de-documento)
+  - [Reemplazar una integración](#reemplazar-una-integración)
+  - [Convenciones](#convenciones)
+  - [Lista de verificación antes de fusionar](#lista-de-verificación-antes-de-fusionar)
+- [Hoja de ruta](#hoja-de-ruta)
+  - [Lo ya hecho, por fases](#lo-ya-hecho-por-fases)
+  - [Planificado, en orden de prioridad](#planificado-en-orden-de-prioridad)
+  - [Cómo se incorpora un ítem nuevo](#cómo-se-incorpora-un-ítem-nuevo)
+- [Decisiones de arquitectura](#decisiones-de-arquitectura)
 - [Estructura del monorepo](#estructura-del-monorepo)
 - [Stack tecnológico](#stack-tecnológico)
-- [Arquitectura](#arquitectura)
-- [Modelo de datos](#modelo-de-datos)
 - [Reglas de negocio](#reglas-de-negocio)
-- [Seguridad](#seguridad)
+  - [Registro de citas](#registro-de-citas)
+  - [Ciclo de vida de una cita](#ciclo-de-vida-de-una-cita)
+  - [Otras reglas](#otras-reglas)
 - [API REST](#api-rest)
-- [Diagramas](#diagramas)
-  - [Diagrama de arquitectura](#diagrama-de-arquitectura)
-  - [Diagrama entidad relación](#diagrama-entidad-relación)
+- [Flujos y diagramas de secuencia](#flujos-y-diagramas-de-secuencia)
   - [Diagrama de estados de una cita](#diagrama-de-estados-de-una-cita)
   - [Autenticación de una petición protegida](#autenticación-de-una-petición-protegida)
   - [Autenticación](#autenticación)
@@ -21,6 +81,7 @@ TuSalud es el sistema de gestión de citas y consultas médicas. El repositorio 
   - [Médicos y horarios](#médicos-y-horarios)
   - [Citas](#citas)
   - [Auditoría](#auditoría)
+- [Detalle de los módulos](#detalle-de-los-módulos)
   - [Perfil](#perfil)
   - [Notificaciones en tiempo real](#notificaciones-en-tiempo-real)
   - [Sesiones y alertas de inicio de sesión](#sesiones-y-alertas-de-inicio-de-sesión)
@@ -33,7 +94,7 @@ TuSalud es el sistema de gestión de citas y consultas médicas. El repositorio 
   - [Pagos con Yape y Plin](#pagos-con-yape-y-plin)
   - [Verificación en dos pasos](#verificación-en-dos-pasos)
   - [Renovación del token](#renovación-del-token)
-  - [Calendario de citas](#calendario-de-citas)
+  - [Calendario y disponibilidad](#calendario-y-disponibilidad)
   - [Planificador de eventos](#planificador-de-eventos)
   - [Personal de la institución](#personal-de-la-institución)
   - [Almacén e inventario](#almacén-e-inventario)
@@ -42,40 +103,791 @@ TuSalud es el sistema de gestión de citas y consultas médicas. El repositorio 
   - [Imágenes diagnósticas](#imágenes-diagnósticas)
   - [Reprogramación de citas](#reprogramación-de-citas)
   - [Recepción y turnos](#recepción-y-turnos)
-  - [Caja y facturación](#caja-y-facturación)
+  - [Caja y facturación](#caja-y-facturación-1)
   - [Hospitalización y emergencias](#hospitalización-y-emergencias)
   - [Reportes y BI](#reportes-y-bi)
-  - [Recursos humanos](#recursos-humanos)
+  - [Recursos humanos](#recursos-humanos-1)
   - [Almacenamiento de archivos](#almacenamiento-de-archivos)
   - [Documentos y reportes](#documentos-y-reportes)
   - [Seguridad operativa y motivos](#seguridad-operativa-y-motivos)
+  - [Seguros y convenios](#seguros-y-convenios-1)
 - [Manejo de errores](#manejo-de-errores)
 - [Perfiles y configuración](#perfiles-y-configuración)
+  - [Selección del perfil](#selección-del-perfil)
+  - [Perfiles de Maven](#perfiles-de-maven)
 - [Migraciones con Flyway](#migraciones-con-flyway)
 - [Ejecución local](#ejecución-local)
 - [Docker](#docker)
+  - [Servicios](#servicios)
+  - [Archivos de Compose](#archivos-de-compose)
+  - [Producción](#producción)
+  - [Desarrollo y QA](#desarrollo-y-qa)
+  - [Almacenamiento de objetos](#almacenamiento-de-objetos)
+  - [Gateway](#gateway)
+  - [PostgreSQL 18](#postgresql-18)
+  - [pgAdmin](#pgadmin)
+  - [URLs](#urls)
+  - [Comandos útiles](#comandos-útiles)
 - [Aplicación web](#aplicación-web)
+  - [Requisitos](#requisitos)
+  - [Estructura](#estructura)
+  - [Aplicaciones por rol](#aplicaciones-por-rol)
+  - [Enrutamiento entre aplicaciones](#enrutamiento-entre-aplicaciones)
+  - [Crear una aplicación nueva](#crear-una-aplicación-nueva)
+  - [Arquitectura del frontend](#arquitectura-del-frontend)
+  - [Interceptores HTTP](#interceptores-http)
+  - [Rutas](#rutas)
+  - [Validaciones](#validaciones)
+  - [Interfaz y componentes](#interfaz-y-componentes)
+  - [Sistema de diseño y experiencia por rol](#sistema-de-diseño-y-experiencia-por-rol)
+  - [Pruebas del frontend](#pruebas-del-frontend)
+  - [Entornos](#entornos)
+  - [Comandos](#comandos)
+  - [Desarrollo con recarga en caliente](#desarrollo-con-recarga-en-caliente)
+  - [Imagen Docker y Compose](#imagen-docker-y-compose)
 - [Observabilidad](#observabilidad)
 - [Datos de prueba](#datos-de-prueba)
   - [Datos de demostración](#datos-de-demostración)
 - [Pruebas automatizadas](#pruebas-automatizadas)
 - [Flujo de trabajo con Git](#flujo-de-trabajo-con-git)
+  - [Hooks de Git](#hooks-de-git)
+  - [Formateadores](#formateadores)
 - [Colección Postman](#colección-postman)
 - [Variables de entorno](#variables-de-entorno)
+
+## Visión y principios
+
+La visión es que cada persona que trabaja en una clínica, desde quien recibe al paciente hasta quien dirige la institución, tenga en una sola plataforma exactamente las herramientas que necesita para su trabajo y nada más, y que el paciente tenga un portal claro y seguro para su propia salud. Estos principios guían cada decisión de diseño y se aplican a cada módulo nuevo.
+
+- **Seguridad primero.** Los datos de salud son sensibles. La seguridad no es una capa final sino una condición de diseño: cada endpoint declara quién puede usarlo, cada archivo se valida y se sirve solo tras autorizar, cada acceso a una historia ajena se registra y los secretos no viajan por URLs ni por la telemetría.
+- **Mínimo privilegio y minimización de datos.** Cada rol recibe solo los campos que necesita. Recepción no ve diagnósticos, caja no ve datos clínicos, farmacia solo ve lo ligado a la receta y los reportes gerenciales son agregados sin datos de pacientes. El administrador gestiona la institución pero no lee ni escribe datos clínicos.
+- **Relación asistencial.** Tener el rol correcto no basta para ver los datos de una persona: hace falta una relación real con ella, como haberla atendido, tenerla ingresada a cargo o que otro médico se la haya compartido. Una única regla decide este acceso en todos los módulos clínicos.
+- **Auditoría.** Las lecturas de datos clínicos ajenos, los cambios laborales, los eventos de seguridad y las acciones sensibles quedan registrados con quién, cuándo y por qué. Las acciones que se deshacen, como cancelar o anular, exigen un motivo.
+- **Modularidad por actor.** Cada tipo de personal tiene su propia aplicación web con sus rutas, su menú, su tablero de inicio y sus flujos. El código de administración no se descarga en el navegador de un paciente.
+- **Extensibilidad.** Agregar un módulo, un rol, una aplicación o un documento sigue pasos conocidos y verificables, descritos en la guía de extensión. Las integraciones externas, como el almacenamiento, la verificación de cobertura o la confirmación de pagos con billetera, están detrás de interfaces para poder cambiarlas.
+- **Un solo origen detrás de un gateway.** El navegador habla con un único origen. El gateway sirve las aplicaciones, enruta la API, limita la tasa, aplica las cabeceras de seguridad y nunca expone la base de datos ni el almacén de objetos.
+- **Verificabilidad.** Cada capa tiene sus pruebas: unitarias y de integración en el backend, unitarias en las librerías y aplicaciones del frontend, pruebas de extremo a extremo con un navegador real y una colección de Postman contra el stack completo.
+
+### TuSalud en cifras
+
+Las cifras salen del código y de las corridas de prueba más recientes.
+
+| Medida                               | Valor |
+| ------------------------------------ | ----- |
+| Roles                                | 15    |
+| Aplicaciones web, incluido el portal | 16    |
+| Controladores REST                   | 45    |
+| Endpoints                            | 267   |
+| Entidades JPA                        | 63    |
+| Migraciones de esquema               | 20    |
+| Migraciones de datos de demostración | 14    |
+| Pruebas del backend                  | 654   |
+| Pruebas unitarias del frontend       | 370   |
+| Pruebas de extremo a extremo         | 164   |
+| Carpetas de la colección de Postman  | 27    |
+
+### Cómo leer este documento
+
+- Para entender el producto, lee el mapa de módulos y los actores y aplicaciones.
+- Para entender cómo está construido, lee la arquitectura, el modelo de datos, la seguridad y las decisiones de arquitectura.
+- Para hacer crecer el sistema, lee la guía de extensión y la hoja de ruta.
+- Para operarlo, lee Docker y gateway, perfiles, Flyway, variables de entorno y datos de prueba.
+- Para consultar un detalle, usa la referencia de la API, los flujos y el detalle de cada módulo.
+
+## Mapa de módulos
+
+TuSalud se organiza por áreas operativas de la clínica. Cada área agrupa módulos que comparten actores y datos. La tabla resume el mapa completo y las fichas de más abajo describen cada área con su propósito, sus actores, sus reglas clave, sus endpoints principales, sus pantallas y su estado. El detalle fino de cada módulo está en la sección Detalle de los módulos y los diagramas de secuencia en Flujos y diagramas de secuencia.
+
+| Área                         | Módulos                                                               | Actores principales                      | Estado                             |
+| ---------------------------- | --------------------------------------------------------------------- | ---------------------------------------- | ---------------------------------- |
+| Atención ambulatoria         | Citas, agenda, atención, historia clínica, recetas, valoraciones      | Paciente, médico                         | Operativo                          |
+| Admisión                     | Recepción, turnos, sala de espera, pacientes y citas de mostrador     | Recepción, médico, paciente              | Operativo                          |
+| Apoyo diagnóstico            | Laboratorio clínico, imágenes diagnósticas                            | Laboratorio, imágenes, médico, paciente  | Operativo                          |
+| Hospitalización y emergencia | Camas, ingresos, triaje, evoluciones, altas                           | Enfermería, médico                       | Operativo                          |
+| Farmacia y almacén           | Dispensación, venta libre, inventario por lotes con FEFO              | Farmacia, almacén                        | Operativo                          |
+| Caja y facturación           | Caja, cobros, comprobantes, pagos en línea, cupones                   | Caja, paciente, administrador            | Operativo con billeteras simuladas |
+| Seguros y convenios          | Aseguradoras, convenios, pólizas, preautorizaciones, liquidaciones    | Recepción, caja, finanzas, médico        | Operativo con verificador simulado |
+| Recursos humanos             | Fichas laborales, turnos, ausencias, vacaciones, Mi espacio           | Recursos humanos, todo el personal       | Operativo                          |
+| Gerencia, reportes y BI      | Reportes ejecutivo, financiero, operativo y de calidad                | Gerencia, finanzas, operaciones, calidad | Operativo                          |
+| Documentos y archivos        | Almacén de objetos, PDF con Jasper, Excel con POI, plantillas         | Todos los roles según el documento       | Operativo                          |
+| Seguridad y auditoría        | Autenticación, MFA, sesiones, eventos de seguridad, auditoría clínica | Administrador y todos los usuarios       | Operativo                          |
+| Notificaciones y calendario  | Avisos en tiempo real, calendario personal y bloqueos de agenda       | Todos los roles                          | Operativo                          |
+| Portal del paciente          | Reservar, pagar, resultados, estudios, recetas, seguros, ingresos     | Paciente                                 | Operativo                          |
+
+### Atención ambulatoria
+
+- **Propósito.** Es el corazón histórico del sistema: el paciente elige especialidad, médico y un horario libre; el médico confirma y atiende; la atención queda en la historia clínica con su receta.
+- **Actores.** Paciente, médico y, para la gestión de especialidades, médicos y tarifas, el administrador.
+- **Reglas clave.** La reserva es atómica y serializa las reservas sobre un mismo médico. Una cita no puede cruzarse con otra del médico ni del paciente. El precio de la consulta pertenece a la especialidad y queda fijado en la cita. Cancelar exige un motivo. Una atención no se reescribe pasadas 48 horas ni con la receta dispensada. El paciente consulta su historia pero no la edita. Un médico solo ve pacientes con los que tiene relación asistencial y puede compartir un paciente con otro colega.
+- **Endpoints principales.** `/api/v1/citas`, `/api/v1/medicos`, `/api/v1/especialidades`, `/api/v1/historia-clinica` y `/api/v1/pacientes/{pacienteId}`.
+- **Pantallas.** Paciente: Reservar cita, Mis citas, Reprogramar, Historia clínica, Médicos y especialidades. Médico: Mi agenda, Mis pacientes, Atención y Calendario.
+- **Estado.** Operativo.
+
+### Admisión
+
+- **Propósito.** Es la puerta de entrada de la clínica: registra la llegada de los pacientes, administra la cola de espera con prioridades y atiende el mostrador.
+- **Actores.** Recepción, médico y paciente.
+- **Reglas clave.** Los turnos se numeran por día y prioridad con `A-001`, `P-001` y `U-001`. La cola ordena urgentes, preferentes y normales. Un médico solo opera sus turnos. El mostrador registra pacientes nuevos con una contraseña temporal que se entrega una sola vez y reserva citas con las mismas reglas de horario que el paciente.
+- **Endpoints principales.** `/api/v1/recepcion`.
+- **Pantallas.** Recepción: Panel, Pacientes, Reservar en mostrador y Sala de espera. Médico: Cola de pacientes.
+- **Estado.** Operativo.
+
+### Apoyo diagnóstico
+
+- **Propósito.** El laboratorio clínico y las imágenes diagnósticas atienden las órdenes de los médicos y devuelven resultados e informes al paciente y al médico solicitante.
+- **Actores.** Laboratorio, imágenes, médico, paciente, caja y, para la agenda de salas, recepción y administración sin datos clínicos.
+- **Reglas clave.** Un médico solo pide estudios para pacientes con relación asistencial. Los resultados de laboratorio marcan los valores fuera de rango y conservan una copia del catálogo del momento. Las imágenes se validan por contenido, se guardan en el almacén de objetos y se sirven solo con autorización. El informe de imágenes lleva firma y versiones, y un hallazgo crítico avisa de inmediato al médico. El paciente solo ve lo que ya está publicado o informado.
+- **Endpoints principales.** `/api/v1/laboratorio` y `/api/v1/imagenes`.
+- **Pantallas.** Laboratorio: Órdenes, Solicitar exámenes y Catálogo. Imágenes: Cola, Agenda de salas, Visor, Informe y Catálogo. Paciente: Mis resultados y Mis estudios.
+- **Estado.** Operativo.
+
+### Hospitalización y emergencia
+
+- **Propósito.** Administra las camas, los ingresos, el triaje de emergencia, las evoluciones y las altas.
+- **Actores.** Enfermería, médico y, con datos resumidos, recepción y administración.
+- **Reglas clave.** Un paciente no puede tener dos ingresos activos. El triaje clasifica del nivel 1 rojo al 5 azul y los niveles 1 y 2 avisan a los médicos. El cargo de cama se acumula por tramos. Cada rol escribe solo sus evoluciones. El alta exige diagnóstico e indicaciones y libera la cama a limpieza. Cancelar un ingreso exige un motivo. Enfermería ve las evoluciones pendientes de su turno.
+- **Endpoints principales.** `/api/v1/hospitalizacion`.
+- **Pantallas.** Mapa de camas, Emergencias, Ingresos, Ficha del ingreso y Camas. Paciente: Mis hospitalizaciones.
+- **Estado.** Operativo.
+
+### Farmacia y almacén
+
+- **Propósito.** La farmacia dispensa las recetas y vende productos libres. El almacén controla el inventario por lotes y vencimientos.
+- **Actores.** Farmacia, almacén y, de forma limitada, laboratorio y administración.
+- **Reglas clave.** Las salidas descuentan por FEFO. Un producto con receta solo se vende contra un ítem de receta pendiente. El stock se valida completo antes de descontar. Anular una dispensación devuelve el stock y exige un motivo. Las alertas cubren stock bajo, lotes por vencer y vencidos.
+- **Endpoints principales.** `/api/v1/farmacia`, `/api/v1/almacen`, `/api/v1/almacen/productos` y `/api/v1/almacen/proveedores`.
+- **Pantallas.** Farmacia: Panel, Dispensar e Historial. Almacén: Resumen, Productos, Ingresos, Proveedores y Kardex. Paciente: Mis medicamentos.
+- **Estado.** Operativo.
+
+### Caja y facturación
+
+- **Propósito.** Cobra las consultas, los estudios y los servicios, emite boletas y facturas con IGV incluido y cierra cada turno con su diferencia. Incluye los pagos en línea del paciente.
+- **Actores.** Caja, paciente, administrador y, para los reportes, finanzas.
+- **Reglas clave.** Sin caja abierta no se cobra. Las boletas usan la serie `B001` y las facturas la `F001`. Anular un comprobante exige un motivo y revierte lo que cobró. El cajero solo anula los de su caja abierta. Las tarjetas guardan solo la marca y los últimos cuatro dígitos. Los pagos con Yape y Plin pasan por una interfaz con proveedor simulado.
+- **Endpoints principales.** `/api/v1/caja`, `/api/v1/pagos/qr`, `/api/v1/metodos-pago`, `/api/v1/cupones` y `/api/v1/admin/pagos`.
+- **Pantallas.** Caja: Panel, Cobrar, Comprobantes, Historial y Reporte de ingresos. Paciente: Mis pagos y Métodos de pago. Administración: Pagos y cupones.
+- **Estado.** Operativo, con el proveedor de billeteras simulado.
+
+### Seguros y convenios
+
+- **Propósito.** Permite atender a pacientes con seguro: cobertura por categoría de servicio, copago, preautorizaciones y cobro a las aseguradoras.
+- **Actores.** Recepción, caja, finanzas, médico, administrador y paciente en solo lectura.
+- **Reglas clave.** El cálculo de cobertura respeta porcentajes o copagos fijos, topes anuales, exclusiones y vigencia, con redondeo a céntimos. Caja cobra solo el copago y se genera la cuenta por cobrar a la aseguradora. Las órdenes que el convenio condiciona exigen una preautorización aprobada, con excepción para emergencias. Finanzas arma liquidaciones mensuales con PDF. La verificación de cobertura está detrás de una interfaz y hoy la resuelve una implementación simulada determinista.
+- **Endpoints principales.** `/api/v1/seguros`.
+- **Pantallas.** Recepción: pólizas y verificación. Caja: desglose de cobertura. Finanzas: aseguradoras, convenios, cartera y liquidaciones. Médico: preautorizaciones. Paciente: Mis seguros.
+- **Estado.** Operativo, con el verificador de cobertura simulado.
+
+### Recursos humanos
+
+- **Propósito.** Administra la ficha laboral, los turnos y las ausencias del personal.
+- **Actores.** Recursos humanos, gerencia en lectura, administración sin datos sensibles y cada empleado sobre lo suyo.
+- **Reglas clave.** El sueldo y el contacto de emergencia solo los ven recursos humanos y gerencia. Los turnos detectan cruces, exceso de 48 horas semanales y ausencias. Las ausencias las resuelve recursos humanos con motivo y nadie resuelve la suya. Las vacaciones respetan el saldo anual. Los cambios se auditan sin guardar montos.
+- **Endpoints principales.** `/api/v1/rrhh`.
+- **Pantallas.** Resumen de plantilla, Empleados, Turnos, Ausencias y, para todo el personal, Mi espacio.
+- **Estado.** Operativo.
+
+### Gerencia, reportes y BI
+
+- **Propósito.** Da a los cargos directivos tableros agregados, de solo lectura y sin datos de pacientes, con comparación contra el periodo anterior.
+- **Actores.** Gerencia, finanzas, operaciones, calidad y administración.
+- **Reglas clave.** Cada rol ve solo los reportes de su área. Los rangos están limitados a 366 días. Una prueba comprueba que ningún reporte contiene DNI, correo ni nombre de paciente.
+- **Endpoints principales.** `/api/v1/reportes`.
+- **Pantallas.** Reporte ejecutivo, financiero, operativo y de calidad, con indicadores, gráficos accesibles y un mapa de calor de demanda.
+- **Estado.** Operativo.
+
+### Documentos y archivos
+
+- **Propósito.** Genera documentos y reportes en PDF con JasperReports y en Excel con Apache POI, y guarda todos los archivos de la plataforma en un almacén de objetos compatible con S3.
+- **Actores.** Cada rol descarga solo los documentos que su dato de origen le permite. El administrador gestiona las plantillas.
+- **Reglas clave.** Toda descarga pasa por el backend y se autoriza con las mismas reglas del dato. Los tipos de archivo se validan por contenido. Las exportaciones pesadas son asíncronas y se purgan con una retención. Las plantillas se validan y rechazan scripts y recursos externos. El Excel neutraliza las fórmulas.
+- **Endpoints principales.** `/api/v1/archivos`, `/api/v1/documentos`, `/api/v1/exportaciones` y `/api/v1/plantillas`.
+- **Pantallas.** Botones de documento y exportación en cada módulo, Mis exportaciones y la gestión de plantillas del administrador.
+- **Estado.** Operativo.
+
+### Seguridad y auditoría
+
+- **Propósito.** Protege el acceso y deja evidencia: autenticación con JWT y renovación rotativa, verificación en dos pasos, sesiones, eventos de seguridad y auditoría de lecturas clínicas.
+- **Actores.** Todos los usuarios para su cuenta y el administrador para la vigilancia.
+- **Reglas clave.** Ver la sección Seguridad.
+- **Endpoints principales.** `/api/v1/auth`, `/api/v1/auth/mfa`, `/api/v1/perfil`, `/api/v1/perfil/sesiones`, `/api/v1/admin/seguridad`, `/api/v1/admin/sistema` y `/api/v1/admin/auditoria`.
+- **Pantallas.** Perfil y seguridad de cada usuario, Seguridad y estado del sistema en administración, bloqueo por inactividad y modo privacidad en todas las aplicaciones.
+- **Estado.** Operativo.
+
+### Notificaciones y calendario
+
+- **Propósito.** Mantiene informado a cada usuario en tiempo real y le da una agenda personal.
+- **Actores.** Todos los roles.
+- **Reglas clave.** Los avisos llegan por un canal de eventos y quedan guardados. Los tipos de evento del calendario dependen del rol. Un médico puede bloquear su agenda y el bloqueo quita esos turnos de la disponibilidad. Los recordatorios usan una anticipación elegida en minutos.
+- **Endpoints principales.** `/api/v1/notificaciones` y `/api/v1/calendario`.
+- **Pantallas.** Campana de notificaciones, página Notificaciones y Calendario con vistas de mes, semana, día y agenda.
+- **Estado.** Operativo.
+
+### Portal del paciente
+
+- **Propósito.** Reúne en una aplicación clara y de uso sencillo todo lo que el paciente necesita para su salud.
+- **Actores.** Paciente.
+- **Reglas clave.** El paciente solo ve lo suyo, no edita su historia clínica y recibe aviso para contactar al centro de salud si un dato no es correcto. Los estudios aparecen cuando ya están informados.
+- **Endpoints principales.** Los de cada módulo con autorización de propietario.
+- **Pantallas.** Inicio con la próxima cita y accesos rápidos, Reservar cita, Mis citas, Historia clínica, Mis resultados, Mis estudios, Mis hospitalizaciones, Mis medicamentos, Mis pagos, Mis seguros, Calendario y Perfil.
+- **Estado.** Operativo.
+
+## Actores y aplicaciones
+
+Cada actor tiene su propia aplicación web. Todas se sirven bajo el mismo origen, el portal en la raíz y cada aplicación en su ruta base, así que comparten la sesión guardada en el navegador. La tabla indica para cada rol su aplicación, su página de inicio, lo que hace y lo que por diseño no ve. El control real lo ejerce siempre el backend con `@PreAuthorize`, la relación asistencial y los DTO por rol, y las aplicaciones solo muestran lo que el rol puede usar.
+
+| Rol                | Aplicación    | Base            | Inicio                | Qué hace                                                                                                                                               | Qué no ve                                                                                     |
+| ------------------ | ------------- | --------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| Sin sesión         | `portal`      | `/`             | `/auth/login`         | Inicia sesión, se registra como paciente y verifica el segundo factor. Después lo envía a la aplicación de su rol.                                     | Nada del sistema                                                                              |
+| `ROLE_PACIENTE`    | `paciente`    | `/paciente/`    | `/paciente/inicio`    | Reserva, reprograma y cancela citas, paga, consulta su historia, resultados, estudios, recetas, ingresos y seguros, y usa su calendario.               | Datos de otras personas, administración, agenda ajena y la indicación clínica de sus estudios |
+| `ROLE_MEDICO`      | `medico`      | `/medico/`      | `/medico/inicio`      | Agenda, cola de pacientes, atención con receta, pacientes con relación asistencial, estudios, hospitalización, preautorizaciones y bloqueos de agenda. | Pacientes sin relación, caja, finanzas, sueldos y datos de otros médicos                      |
+| `ROLE_ADMIN`       | `admin`       | `/admin/`       | `/admin/`             | Usuarios y roles, especialidades y tarifas, médicos, cupones, pagos, plantillas, seguridad, estado del sistema, camas, convenios y reportes.           | Historias clínicas, atenciones, resultados, informes, evoluciones y sueldos                   |
+| `ROLE_GERENCIA`    | `gerencia`    | `/gerencia/`    | `/gerencia/inicio`    | Los cuatro reportes, el resumen de recursos humanos y las fichas con sueldo en solo lectura.                                                           | Datos de pacientes y datos clínicos                                                           |
+| `ROLE_FINANZAS`    | `finanzas`    | `/finanzas/`    | `/finanzas/inicio`    | Reporte financiero, aseguradoras, convenios, cartera, liquidaciones y comprobantes.                                                                    | Datos clínicos y reportes de otras áreas                                                      |
+| `ROLE_OPERACIONES` | `operaciones` | `/operaciones/` | `/operaciones/inicio` | Reporte operativo con ocupación, esperas, demanda, agenda e inventario crítico.                                                                        | Datos de pacientes y reportes financieros o de calidad                                        |
+| `ROLE_CALIDAD`     | `calidad`     | `/calidad/`     | `/calidad/inicio`     | Reporte de calidad con valoraciones, tasas de cancelación y ausencia, tiempos de entrega y motivos de anulación.                                       | Nombres de pacientes y datos clínicos                                                         |
+| `ROLE_RRHH`        | `rrhh`        | `/rrhh/`        | `/rrhh/`              | Plantilla, fichas con sueldo, turnos, ausencias y vacaciones.                                                                                          | Datos de pacientes y datos clínicos                                                           |
+| `ROLE_RECEPCION`   | `recepcion`   | `/recepcion/`   | `/recepcion/`         | Llegadas, cola, sala de espera, alta de pacientes, citas de mostrador, pólizas y mapa de camas resumido.                                               | Diagnósticos, motivos de ingreso, evoluciones e historia clínica                              |
+| `ROLE_CAJA`        | `caja`        | `/caja/`        | `/caja/`              | Apertura y cierre de caja, cobros con copago, comprobantes, historial y reporte de ingresos.                                                           | Datos clínicos                                                                                |
+| `ROLE_ENFERMERIA`  | `enfermeria`  | `/enfermeria/`  | `/enfermeria/`        | Mapa de camas, emergencias y triaje, evoluciones de enfermería, evoluciones pendientes y traslados.                                                    | Datos clínicos de pacientes que no están hospitalizados                                       |
+| `ROLE_LABORATORIO` | `laboratorio` | `/laboratorio/` | `/laboratorio/`       | Cola de órdenes, toma de muestra, captura y validación de resultados y catálogo de exámenes.                                                           | Historia clínica y datos que no sean la orden                                                 |
+| `ROLE_IMAGENES`    | `imagenes`    | `/imagenes/`    | `/imagenes/`          | Cola, agenda de salas, toma con carga de imágenes, visor, informes con firma y catálogo.                                                               | Historia clínica y datos que no sean la orden                                                 |
+| `ROLE_FARMACIA`    | `farmacia`    | `/farmacia/`    | `/farmacia/`          | Recetas pendientes, dispensación, venta libre, historial y consulta de stock.                                                                          | El diagnóstico completo: solo ve lo ligado a la receta                                        |
+| `ROLE_ALMACEN`     | `almacen`     | `/almacen/`     | `/almacen/`           | Productos, lotes, ingresos, proveedores, kardex y alertas de reposición.                                                                               | Datos de pacientes                                                                            |
+
+Todo el personal cuenta además con Mi espacio, que muestra sus turnos, sus ausencias y su ficha, con el calendario personal, las notificaciones, el perfil y los documentos que su rol puede exportar.
+
+### Varios roles en una misma persona
+
+Una persona puede tener más de un rol. Al iniciar sesión el portal la envía a su módulo principal, que se elige con esta prioridad: administrador, gerencia, médico, enfermería, finanzas, operaciones, calidad, recursos humanos, laboratorio, imágenes, farmacia, almacén, recepción, caja y paciente. El menú del avatar ofrece Cambiar de módulo con un enlace a cada aplicación a la que tiene acceso.
+
+### Qué contiene cada aplicación
+
+Cada aplicación incluye exactamente las pantallas y permisos de su rol, compuestos desde la librería `@tusalud/features`. Por eso el paquete que descarga un paciente no contiene el código de administración. Esto reduce la superficie expuesta pero no reemplaza la seguridad real, que está en el backend. El enrutamiento entre aplicaciones y la creación de una aplicación nueva se explican en la sección Aplicación web.
+
+## Arquitectura
+
+TuSalud se compone de un gateway, las aplicaciones web, la API, la base de datos, un almacén de objetos y un stack de observabilidad. Los diagramas muestran el sistema de lo general a lo particular: el contexto, los contenedores, las capas del backend y el workspace del frontend.
+
+### Contexto del sistema
+
+```mermaid
+flowchart LR
+    Paciente([Paciente]) --> Sistema
+    Personal([Personal clínico y administrativo]) --> Sistema
+    Directivos([Gerencia y cargos directivos]) --> Sistema
+    Admin([Administración]) --> Sistema
+    Sistema[TuSalud]
+    Sistema -.->|Verificación de cobertura, hoy simulada| Aseguradoras[Aseguradoras]
+    Sistema -.->|Confirmación de pago, hoy simulada| Billeteras[Yape y Plin]
+    Sistema -->|Trazas OTLP| Observabilidad[Jaeger]
+```
+
+### Contenedores
+
+```mermaid
+flowchart LR
+    Navegador[Navegador] -->|HTTP o HTTPS| Gateway[Gateway nginx]
+    Gateway -->|/ y /app/| Web[Aplicaciones web estáticas]
+    Gateway -->|/api/| API[API Spring Boot]
+    Gateway -.->|/storage/ responde 404| Bloqueado[Sin acceso externo]
+    API -->|JDBC| BD[(PostgreSQL 18)]
+    API -->|API S3 en red interna| Almacen[(SeaweedFS)]
+    Init[storage-init] -->|Crea los buckets| Almacen
+    API -.->|OTLP HTTP| Collector[OpenTelemetry Collector]
+    Collector -.->|OTLP gRPC| Jaeger[Jaeger]
+    PgAdmin[pgAdmin, perfil tools] -.-> BD
+```
+
+El gateway es el único servicio que publica puertos. La API, la base de datos y el almacén solo son visibles en la red interna de Docker, con la excepción de PostgreSQL, que se publica únicamente en el loopback del host para el desarrollo local. El detalle del stack, de los archivos de Compose y del gateway está en la sección Docker.
+
+### Capas del backend
+
+```mermaid
+flowchart TB
+    Peticion[Petición HTTP] --> Filtros[Telemetría HTTP y filtro JWT]
+    Filtros --> Autorizacion[Reglas por URL y PreAuthorize]
+    Autorizacion --> Controladores[Controladores y DTO por rol]
+    Controladores --> Servicios[Servicios transaccionales]
+    Servicios --> Relacion[RelacionAsistencialService y auditoría]
+    Servicios --> Repositorios[Repositorios Spring Data]
+    Servicios --> Integraciones[Interfaces de integración]
+    Integraciones --> Storage[StorageService]
+    Integraciones --> Cobertura[VerificadorCobertura]
+    Integraciones --> Billetera[ProveedorBilletera]
+    Servicios --> Documentos[Motor de documentos Jasper y POI]
+    Repositorios --> BD[(PostgreSQL)]
+    Storage --> Almacen[(Almacén S3)]
+```
+
+El proyecto sigue una arquitectura en capas bajo el paquete `com.codesoftlabs.tusalud.app`. Cada petición entra por un controlador, que delega en un servicio con la lógica de negocio y las transacciones, y el servicio accede a la base de datos a través de repositorios con consultas JPQL.
+
+```text
+src/main/java/com/codesoftlabs/tusalud/app/
+├── config/             Seguridad, CORS, OpenAPI, propiedades y telemetría HTTP con su redactor
+├── controllers/        Controladores REST con validaciones y documentación OpenAPI
+├── documentos/         Motor de plantillas Jasper, libros de Excel y documentos por tipo
+├── dto/
+│   ├── request/        Cuerpos de entrada validados con Jakarta Validation
+│   └── response/       Respuestas de la API, una por rol cuando los datos difieren, y formato de error
+├── entities/           Entidades JPA y enumeraciones
+├── exceptions/         Excepciones de negocio y manejador global de errores
+├── repositories/       Repositorios Spring Data con consultas JPQL
+├── security/           JWT, filtro de autenticación, MFA, cifrado de secretos y UserDetailsService
+├── services/
+│   ├── interfaces/     Contratos de servicio
+│   ├── impl/           Implementaciones transaccionales
+│   ├── pagos/          Proveedor de billeteras y su implementación simulada
+│   ├── seguros/        Cálculo de cobertura, pólizas, preautorizaciones, liquidaciones y verificador de cobertura
+│   └── events/         Evento interno que alimenta las notificaciones en tiempo real
+└── storage/            StorageService con implementaciones S3 y local, detección de contenido y nombres seguros
+```
+
+### Concurrencia con virtual threads
+
+La API corre sobre Java 25 con virtual threads activados mediante `spring.threads.virtual.enabled: true`. Tomcat atiende cada petición en un virtual thread en lugar de tomar uno de un pool limitado de hilos del sistema operativo. Mientras una petición espera a PostgreSQL, su hilo virtual se desmonta y el hilo del sistema queda libre para atender otra, de modo que la API sostiene muchas más peticiones concurrentes con la misma memoria. Las tareas asíncronas y programadas de Spring usan el mismo modelo.
+
+Desde Java 24 un bloque `synchronized` ya no fija el hilo virtual a su hilo del sistema, por lo que las librerías que todavía usan `synchronized` no anulan la ventaja. El límite real de concurrencia contra la base de datos lo marca el pool de conexiones de Hikari: cuando todas las conexiones están ocupadas, las peticiones adicionales esperan su turno sin consumir hilos del sistema.
+
+Las entidades nunca se serializan directamente. Cada respuesta se construye con un DTO, lo que evita ciclos en la serialización y problemas con relaciones perezosas. La propiedad `open-in-view` está desactivada, de modo que toda carga de datos ocurre dentro de la transacción del servicio.
+
+### Workspace del frontend
+
+```mermaid
+flowchart TB
+    subgraph Librerias[Librerías compartidas]
+        Core[core: sesión, API, stores, guards y modelos]
+        UI[ui: sistema de diseño, componentes y shell]
+        Features[features: un entry point por dominio]
+    end
+    Portal[portal] --> Core
+    Portal --> UI
+    subgraph Apps[Una aplicación por actor]
+        Paciente[paciente]
+        Medico[medico]
+        Admin[admin]
+        Personal[recepcion, caja, enfermeria, laboratorio, imagenes, farmacia, almacen, rrhh]
+        Directivos[gerencia, finanzas, operaciones, calidad]
+    end
+    Apps --> Features
+    Apps --> UI
+    Apps --> Core
+    Features --> UI
+    Features --> Core
+    UI --> Core
+```
+
+Las dependencias van siempre hacia abajo: una aplicación compone rutas desde `features`, y `features` usa `ui` y `core`. Nunca al revés. La estructura de carpetas, el enrutamiento entre aplicaciones y la creación de una aplicación nueva están en la sección Aplicación web.
+
+## Modelo de datos
+
+El modelo tiene 63 entidades JPA y 20 migraciones de esquema. Todas las tablas usan un identificador UUID. Las relaciones usan carga perezosa, la propiedad `open-in-view` está desactivada y las entidades nunca se serializan directamente: cada respuesta se construye con un DTO. Los diagramas se agrupan por contexto delimitado. Cada contexto se relaciona con los demás a través de `Usuario`, `Paciente`, `Medico` y `Cita`, que aparecen repetidos como puntos de conexión.
+
+### Contexto de identidad y acceso
+
+```mermaid
+erDiagram
+    Usuario }o--o{ Rol : tiene
+    Usuario ||--o{ SesionUsuario : abre
+    Usuario ||--o{ RefreshToken : emite
+    SesionUsuario ||--o{ RefreshToken : agrupa
+    Usuario ||--o| MfaUsuario : configura
+    Usuario ||--o{ MfaCodigoRecuperacion : guarda
+    Usuario ||--o| PreferenciaUsuario : define
+    Usuario ||--o{ EventoSeguridad : genera
+    Usuario ||--o{ Notificacion : recibe
+    Usuario ||--o{ EventoCalendario : agenda
+    Usuario }o--o| Archivo : avatar
+```
+
+### Contexto clínico ambulatorio
+
+```mermaid
+erDiagram
+    Usuario ||--o| Medico : es
+    Usuario ||--o| Paciente : es
+    Medico }o--o{ Especialidad : atiende
+    Medico ||--o{ HorarioAtencion : define
+    Paciente ||--o{ Cita : reserva
+    Medico ||--o{ Cita : recibe
+    Especialidad ||--o{ Cita : clasifica
+    Cita ||--o| Atencion : origina
+    Atencion ||--o{ RecetaItem : receta
+    Cita ||--o| Valoracion : recibe
+    Paciente ||--o{ PacienteCompartido : comparten
+    Medico ||--o{ PacienteCompartido : origen
+    Medico ||--o{ PacienteCompartido : destino
+    Paciente ||--o{ Turno : espera
+    Cita ||--o{ Turno : llega
+    Paciente ||--o{ AuditoriaClinica : consultado
+    Usuario ||--o{ AuditoriaClinica : consulta
+```
+
+### Contexto de pagos en línea
+
+```mermaid
+erDiagram
+    Usuario ||--o{ MetodoPago : guarda
+    Cita ||--o| Pago : genera
+    MetodoPago ||--o{ Pago : usa
+    Cita ||--o{ IntencionPago : inicia
+    IntencionPago }o--o| Pago : confirma
+    Cupon {
+        string codigo
+    }
+```
+
+El pago guarda el código del cupón aplicado y no una clave foránea, y los ítems de receta son una colección incrustada en la atención.
+
+### Contexto de apoyo diagnóstico
+
+```mermaid
+erDiagram
+    Paciente ||--o{ OrdenLaboratorio : tiene
+    Medico ||--o{ OrdenLaboratorio : solicita
+    OrdenLaboratorio ||--o{ ItemOrdenLab : contiene
+    ExamenLab ||--o{ ItemOrdenLab : examina
+    ExamenLab ||--o{ ParametroExamen : define
+    ItemOrdenLab ||--o{ ResultadoLab : produce
+    Paciente ||--o{ OrdenImagen : tiene
+    Medico ||--o{ OrdenImagen : solicita
+    OrdenImagen ||--o{ ItemOrdenImagen : contiene
+    EstudioImagen ||--o{ ItemOrdenImagen : estudia
+    OrdenImagen ||--o{ InformeImagen : informa
+    OrdenImagen ||--o{ ArchivoImagen : adjunta
+    Archivo ||--o{ ArchivoImagen : almacena
+```
+
+### Contexto de hospitalización
+
+```mermaid
+erDiagram
+    Paciente ||--o{ IngresoHospitalario : ingresa
+    Cama ||--o{ IngresoHospitalario : aloja
+    Medico ||--o{ IngresoHospitalario : responsable
+    IngresoHospitalario ||--o{ EvolucionHospitalaria : registra
+    Usuario ||--o{ EvolucionHospitalaria : escribe
+```
+
+### Contexto de farmacia y almacén
+
+```mermaid
+erDiagram
+    Proveedor ||--o{ Ingreso : abastece
+    Ingreso ||--o{ Lote : crea
+    Producto ||--o{ Lote : tiene
+    Producto ||--o{ MovimientoInventario : mueve
+    Lote ||--o{ MovimientoInventario : afecta
+    Paciente ||--o{ Dispensacion : recibe
+    Atencion ||--o{ Dispensacion : respalda
+    Dispensacion ||--o{ DispensacionItem : contiene
+    Producto ||--o{ DispensacionItem : entrega
+```
+
+### Contexto de caja y seguros
+
+```mermaid
+erDiagram
+    Usuario ||--o{ SesionCaja : abre
+    SesionCaja ||--o{ Comprobante : emite
+    Paciente ||--o{ Comprobante : paga
+    Comprobante ||--o{ ComprobanteItem : detalla
+    Aseguradora ||--o{ Convenio : firma
+    Convenio ||--o{ ReglaCobertura : define
+    Paciente ||--o{ Poliza : posee
+    Convenio ||--o{ Poliza : cubre
+    Poliza ||--o{ Preautorizacion : autoriza
+    Poliza ||--o{ VerificacionCobertura : verifica
+    Aseguradora ||--o{ CuentaAseguradora : adeuda
+    Convenio ||--o{ CuentaAseguradora : origina
+    Comprobante ||--o{ CuentaAseguradora : respalda
+    Liquidacion ||--o{ CuentaAseguradora : agrupa
+    Aseguradora ||--o{ Liquidacion : cobra
+```
+
+### Contexto de recursos humanos
+
+```mermaid
+erDiagram
+    Usuario ||--o| Empleado : ficha
+    Empleado ||--o{ TurnoPersonal : trabaja
+    PlantillaTurno ||--o{ TurnoPersonal : define
+    Empleado ||--o{ Ausencia : solicita
+    Empleado ||--o{ AuditoriaRrhh : audita
+```
+
+### Contexto de documentos y archivos
+
+```mermaid
+erDiagram
+    Usuario ||--o{ Archivo : posee
+    Usuario ||--o{ Exportacion : solicita
+    Archivo ||--o| Exportacion : resultado
+    Archivo ||--o| PlantillaDocumento : contenido
+```
+
+### Reglas de integridad
+
+- La tabla `citas` tiene índices por médico y fecha y por paciente y fecha, y el campo `version` aplica bloqueo optimista para que dos operaciones concurrentes no sobrescriban la misma cita.
+- El correo, el DNI, la colegiatura y el número de historia clínica son únicos. Los códigos de negocio, como los comprobantes, los turnos y los ingresos, son correlativos y legibles, y no se usan como identificador.
+- Las líneas de comprobantes, órdenes y resultados guardan su posición, porque un UUID no conserva el orden de creación.
+- Los datos que deben sobrevivir a cambios del catálogo se copian al momento de usarlos: el precio de la consulta en la cita y el nombre, la unidad y el rango de un parámetro en el resultado de laboratorio.
+- Los archivos no se guardan en la base de datos: la tabla `archivos` guarda los metadatos, el bucket, la clave, el tamaño, el hash y el propietario, y los bytes viven en el almacén de objetos.
+
+## Seguridad
+
+La seguridad de TuSalud sigue la defensa en profundidad: el gateway filtra y limita, el backend autentica, autoriza por rol y por relación con el dato, valida cada entrada y audita lo sensible, y la interfaz reduce la exposición. Ninguna capa confía en la anterior. En particular, el frontend nunca es la barrera: oculta lo que el rol no puede usar pero el backend decide siempre.
+
+### Modelo de amenazas resumido
+
+| Amenaza                                              | Controles principales                                                                                                                          |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Robo o adivinación de credenciales                   | BCrypt, verificación en dos pasos, bloqueo por intentos, límite de tasa en el gateway, eventos de seguridad y alertas de dispositivo nuevo     |
+| Robo de sesión                                       | Token de acceso de 15 minutos, refresh token opaco que rota y se guarda solo con hash, sesiones revocables y bloqueo por inactividad           |
+| Acceso a datos de otros pacientes por la URL o el id | UUID no adivinables, relación asistencial en cada módulo clínico, propiedad del dato para el paciente y auditoría de lecturas ajenas           |
+| Exceso de datos expuestos a un rol                   | DTO distintos por rol, minimización por campo, reportes agregados sin datos de pacientes y administrador sin acceso clínico                    |
+| Alteración o falsificación de datos clínicos         | Solo el personal de salud con relación escribe datos clínicos, ventana de 48 horas para reescribir una atención y versiones en los informes    |
+| Archivos maliciosos                                  | Tipo detectado por contenido, rechazo de ejecutables, SVG y HTML, nombres sanitizados, tamaños acotados y descarga siempre por el backend      |
+| Plantillas de documentos maliciosas                  | Validación con lista blanca que rechaza scripts, importaciones peligrosas, entidades externas y recursos externos, con versión y auditoría     |
+| Inyección y mass assignment                          | Consultas parametrizadas, DTO de entrada con validación y campos que el cliente no controla, como estado, precio, rol o propietario            |
+| Fuga por telemetría y logs                           | Redacción de credenciales y datos sensibles en los spans, sin cuerpos en rutas clínicas y de autenticación, y logs con ids en lugar de correos |
+| Abuso y denegación de servicio                       | Límites de tasa y de tamaño en el gateway, límites de filas y de exportaciones por usuario y virtual threads con pool de conexiones acotado    |
+| Exposición de la infraestructura                     | Un solo servicio con puertos publicados, almacén y API solo en red interna, versión de nginx oculta y política de contenido estricta           |
+
+### Autenticación y sesión
+
+- Los tokens de acceso se firman con HMAC-SHA y la clave `JWT_SECRET`, y duran 15 minutos. El refresh token es opaco, dura 7 días, se guarda solo como hash SHA-256 y rota en cada uso. Reutilizar un refresh token ya rotado se detecta.
+- La verificación en dos pasos usa TOTP estándar con una aplicación autenticadora. El secreto se guarda cifrado con AES-GCM y existen códigos de recuperación de un solo uso. Cinco fallos seguidos bloquean el intento durante 5 minutos.
+- Cada usuario ve sus sesiones activas y puede cerrarlas. Un inicio de sesión desde un dispositivo nuevo genera una alerta.
+- Un usuario inactivo no puede iniciar sesión y su token deja de ser válido aunque no haya expirado. Un inicio de sesión con una cuenta inexistente responde igual que uno con contraseña incorrecta.
+
+### Controles vigentes en el backend
+
+- Los tokens se firman con HMAC-SHA usando la clave `JWT_SECRET`, que debe estar codificada en Base64 y tener al menos 256 bits. Cada token incluye el email como sujeto, el emisor, la expiración, el id del usuario, su nombre y sus roles. El token de acceso dura 15 minutos y se renueva con un refresh token rotativo.
+- Un usuario inactivo no puede iniciar sesión y su token deja de ser válido aunque no haya expirado.
+- Las contraseñas se almacenan con BCrypt.
+- Todas las entidades y tablas usan UUID versión 4 como identificador, generado en la aplicación y con `gen_random_uuid()` como valor por defecto en la base. Así los ids no se pueden adivinar ni recorrer en orden. Un id con formato inválido en la ruta responde 400 y uno inexistente responde 404. Los códigos legibles de negocio, como los comprobantes, los turnos y los ingresos, siguen siendo correlativos.
+- CORS permite peticiones desde `http://localhost:4200` con los métodos GET, POST, PUT, DELETE y OPTIONS. El origen se configura con `CORS_ALLOWED_ORIGINS`. Como el gateway sirve el frontend y la API desde el mismo origen, el navegador no necesita CORS en el uso normal.
+- Los archivos nunca se exponen por una dirección pública. El almacén de objetos solo es accesible desde la red interna de Docker y toda descarga pasa por la API, que valida la sesión y la relación con el dato antes de entregar el contenido. Los tipos se detectan por el contenido y no por la extensión, se rechazan SVG, HTML, scripts y ejecutables, y los nombres se sanitizan.
+- El gateway nginx es el único servicio que publica puertos. Limita la tasa de los intentos de inicio de sesión, renovación, registro y verificación en dos pasos, acota el tamaño de las peticiones por ruta, bloquea los métodos poco comunes, oculta la versión de nginx y entrega una política de seguridad de contenido estricta junto con las demás cabeceras de seguridad.
+- La autorización combina reglas por URL en `SecurityConfig` con `@PreAuthorize` en cada método de los controladores.
+- Tener el rol correcto no basta para ver los datos de una persona: hace falta una relación con ella. `RelacionAsistencialService` es la única regla y la cumple un médico que atendió al paciente en una cita no cancelada, que tiene un ingreso activo a su cargo o a quien otro médico le compartió el paciente. Ese acceso se aplica a la historia clínica, el laboratorio, la hospitalización y la lista de pacientes del médico.
+- Los datos clínicos los modifica solo el personal de salud. El paciente consulta su historia y, si algún dato no es correcto, se comunica con el centro de salud. El médico con relación actualiza los datos médicos y queda registrado quién y cuándo, y cada consulta de una historia ajena se guarda en `auditoria_clinica`.
+- Cada rol recibe solo los campos que necesita: recepción y administración no ven diagnósticos ni indicaciones, caja no ve datos clínicos, farmacia solo ve las recetas, el correo y el teléfono de un médico solo los ven el administrador y el propio médico, y las valoraciones públicas abrevian el nombre del paciente. El administrador gestiona la institución pero no lee ni escribe datos clínicos.
+- Una atención no se reescribe pasadas 48 horas ni cuando su receta ya fue dispensada.
+
+### Auditoría y vigilancia
+
+- **Auditoría clínica.** Cada lectura de una historia ajena y cada modificación de datos médicos quedan en `auditoria_clinica` con quién, a quién y cuándo. Las descargas de documentos clínicos se registran igual.
+- **Auditoría de recursos humanos.** Los cambios de fichas y ausencias quedan en `auditoria_rrhh` sin guardar los montos.
+- **Eventos de seguridad.** La tabla `eventos_seguridad` registra inicios de sesión fallidos o repetidos, intentos con cuentas inactivas, dispositivos nuevos, bloqueos, cambios de MFA, de contraseña, de roles y de estado de cuenta, accesos denegados repetidos y descargas masivas. La dirección IP se guarda enmascarada, nunca se guardan contraseñas ni el correo de una cuenta inexistente y una purga programada aplica la retención, de 90 días por defecto. El administrador los consulta con filtros y un resumen.
+- **Motivos obligatorios.** Cancelar una cita, anular una dispensación o un comprobante y cancelar un ingreso o una orden exigen un motivo de entre 5 y 300 caracteres, que queda guardado.
+
+### Archivos y documentos
+
+- Los archivos viven en un almacén de objetos compatible con S3 al que solo accede la API. El tipo se detecta por la firma del contenido, se rechazan SVG, HTML, scripts y ejecutables, los nombres se sanitizan y cada propósito tiene su lista de tipos y su tamaño máximo.
+- Cada descarga se autoriza con las mismas reglas que el dato de origen, no existen direcciones públicas y el token nunca viaja en una URL: el frontend descarga con la cabecera de autorización y muestra el archivo desde un objeto en memoria.
+- Los documentos llevan una marca con el usuario, la fecha y un código de verificación. El Excel neutraliza las celdas que empiezan con `=`, `+`, `-` o `@`.
+- Las plantillas JRXML que sube el administrador se validan contra una lista blanca antes de guardarse y no pueden ejecutar código ni leer recursos externos.
+
+### Gateway y red
+
+- El gateway nginx es el único servicio con puertos publicados. Enruta el frontend, la API con soporte de eventos en tiempo real y bloquea `/storage/`.
+- Limita la tasa de inicio de sesión, renovación, registro y verificación en dos pasos, acota el tamaño de las peticiones por ruta, bloquea métodos poco comunes y archivos ocultos, y oculta la versión de nginx.
+- Entrega una política de seguridad de contenido estricta, `X-Content-Type-Options`, `Referrer-Policy` y las demás cabeceras de seguridad, y admite TLS con HSTS cuando se activa.
+- PostgreSQL solo se publica en el loopback del host.
+
+### Interfaz
+
+- **Bloqueo por inactividad.** Tras un tiempo configurable por aplicación, con aviso y cuenta regresiva, la pantalla se bloquea y exige la contraseña o el código de verificación. Hay también una duración máxima de sesión y el estado se sincroniza entre pestañas.
+- **Modo privacidad.** Un botón de la barra difumina los datos personales sensibles y enmascara el DNI, el teléfono y el correo hasta que el usuario decida mostrarlos, para estaciones compartidas.
+- **Avisos de acceso auditado** al abrir historias clínicas, imágenes y documentos, y confirmación con motivo en las acciones sensibles.
+- Los campos sensibles no usan autocompletado y ningún dato personal aparece en los títulos de pestaña ni en las URLs.
+- Cada aplicación contiene solo el código de su rol y el menú muestra únicamente lo que el rol puede usar.
+
+### Observabilidad segura
+
+La telemetría registra método, ruta, estado y tamaño de cada petición. Los cuerpos y cabeceras solo se registran cuando es seguro, con redacción recursiva de campos sensibles y truncado, y nunca en las rutas de autenticación, perfil, pagos, historia clínica, laboratorio, imágenes, hospitalización, farmacia, archivos y documentos. Los DTO con credenciales ocultan sus valores en `toString`, los logs usan ids en lugar de correos y el Collector elimina las cabeceras sensibles antes de exportar. En desarrollo los parámetros SQL solo se imprimen en el perfil local.
+
+### Límites y decisiones conocidas
+
+- La sesión se guarda en el almacenamiento local del navegador. Es una decisión que permite compartirla entre las aplicaciones del mismo origen. Se compensa con una política de seguridad de contenido estricta, tokens de corta duración y bloqueo por inactividad, pero un XSS lograría leerla.
+- La verificación de cobertura de seguros y la confirmación de pagos con billetera son simuladas detrás de interfaces. Antes de producción deben reemplazarse por integraciones reales.
+- El almacén de objetos es un solo nodo, sin réplica ni copias de seguridad automáticas, y las subidas no pasan por un antivirus. Ambos están en la hoja de ruta.
+- La combinación completa de `compose.yaml` en modo producción con TLS y credenciales reales no se ha probado de punta a punta.
+- La migración que pasó los archivos al almacén de objetos borró los bytes de las imágenes y avatares que estuvieran en la base, porque SQL no puede subir objetos. Las bases de desarrollo previas se recrean.
+- Un evento de seguridad se guarda en la misma transacción de la petición, de modo que se pierde si la petición revierte. Los casos de inicio de sesión fallido y de bloqueo están cubiertos para que no se pierdan.
+
+## Guía de extensión
+
+TuSalud está pensado para crecer. Esta guía describe los pasos verificados para agregar cada tipo de pieza y las convenciones que mantienen el sistema coherente. Antes de empezar, define para el cambio nuevo quién puede hacerlo, qué datos ve cada rol y si el dato es clínico, porque de esas respuestas salen la autorización, los DTO y la auditoría.
+
+### Agregar un módulo completo
+
+1. **Diseña los permisos.** Decide los roles que usan el módulo, los campos que ve cada uno y si hace falta relación asistencial con el paciente. Un dato clínico siempre la exige. Un dato administrativo se limita por rol y por propiedad.
+2. **Entidad y migración.** Crea las entidades en `entities/` con identificador UUID generado con `@GeneratedValue` de tipo UUID, y una migración Flyway nueva en `src/main/resources/db/migration` con el siguiente número libre, hoy la `V21`. Los enumerados van en `entities/enums/`. Agrega los índices que necesiten tus consultas.
+3. **Repositorio.** Crea el repositorio en `repositories/` con consultas JPQL y parámetros nombrados. Ordena siempre de forma explícita, porque un UUID no conserva el orden de creación.
+4. **DTO por rol.** Crea los DTO de entrada con Jakarta Validation en `dto/request/` y los de salida en `dto/response/`. Si dos roles deben ver campos distintos, usa dos DTO o campos opcionales que el servicio rellena según el rol. Nunca devuelvas una entidad ni aceptes campos que el cliente no debe controlar, como estado, precio, propietario o rol.
+5. **Servicio.** Define la interfaz en `services/interfaces/` y la implementación transaccional en `services/impl/`. Aplica las reglas de negocio y las transiciones de estado validando al actor. Para un dato clínico, usa `RelacionAsistencialService` en lugar de comprobar solo el rol, y registra la lectura ajena con `AuditoriaClinicaService`. Para acciones que se deshacen, exige un motivo. Para avisar a alguien, usa `NotificacionService` y agrega el tipo a `TipoNotificacion`.
+6. **Controlador.** Crea el controlador en `controllers/` con `@PreAuthorize` en cada método, `@Tag` y `@Operation` en español y respuestas documentadas. Un id con formato inválido responde 400 sin trabajo extra y uno inexistente debe responder 404 con el mensaje en español de las excepciones de negocio.
+7. **Telemetría.** Si el módulo recibe o devuelve cuerpos con datos clínicos o credenciales, agrega su ruta a `RUTAS_SIN_CUERPO` en `TelemetryRedactor`.
+8. **Documentos y archivos.** Si genera documentos, agrega un valor a `TipoDocumento` con los roles permitidos y una plantilla, como se explica más abajo. Si recibe archivos, usa `ArchivoService` con un propósito nuevo que declare tipos permitidos, tamaño máximo y regla de autorización.
+9. **Pruebas del backend.** Escribe pruebas de servicio con las reglas y los casos borde, y una prueba de seguridad por rol que verifique el 401, el 403, el acceso a datos ajenos por id y los campos que cada rol no debe ver. El backend debe seguir verde con `./mvnw test` y `./mvnw spotless:check`.
+10. **Datos de demostración.** Si el módulo necesita datos de ejemplo, agrégalos en una migración de `db/demo` con el siguiente número libre, hoy la `V114`. Nunca crees datos iniciales desde código Java: la carga de datos es siempre SQL versionado.
+11. **Postman.** Agrega una carpeta numerada a `postman/Tusalud.postman_collection.json`, hoy la `27`, con los casos felices y los 400, 401, 403, 404 y 409. La colección debe pasar dos veces seguidas sin reiniciar la base, por lo que cada caso crea y limpia sus propios datos.
+12. **Frontend, modelos y datos.** En `web/projects/core` agrega los modelos TypeScript con ids de tipo texto, el cliente de la API y el store con `AsyncState`.
+13. **Frontend, pantallas.** En `web/projects/features` crea un entry point nuevo con su `ng-package.json` y su `public-api.ts`, que exporte las rutas del dominio. Las pantallas usan los componentes de `@tusalud/ui`, como `tablero`, `dialogo-motivo`, `carga-archivos` y `boton-documento`.
+14. **Frontend, aplicaciones.** Agrega las rutas del dominio en el `app.routes.ts` de cada aplicación cuyo rol lo use, con su guard de rol. Agrega los ítems de menú en su `nav.config.ts` y los pasos de la guía de bienvenida de ese rol. Si el módulo aporta indicadores, agrégalos al inicio de la aplicación.
+15. **Pruebas del frontend.** Escribe pruebas unitarias del cliente, del store y de los componentes, y una prueba de humo de las rutas del entry point. Escribe pruebas e2e en `web/e2e` que usen cuentas de `support.ts`, el helper `ir` para construir las URLs y datos propios para que sean repetibles.
+16. **Documentación.** Agrega la ficha del módulo al mapa de módulos, su detalle a la sección Detalle de los módulos, sus endpoints a la tabla de la API, la fila de la hoja de ruta y los conteos de pruebas al README.
+
+### Agregar un rol nuevo
+
+1. Agrega el valor a `RolNombre` y una migración que inserte el rol en la tabla `roles`.
+2. Registra su descripción en `UsuarioAdminServiceImpl` y los tipos de evento de calendario que le corresponden en `EventoCalendarioServiceImpl`. Verifica que el alta de personal de administración admita el rol nuevo.
+3. En el frontend agrega el rol al tipo `Rol` y a las constantes de `auth.model.ts`, a `HOME_BY_ROLE` en `auth.service.ts`, a `MODULOS` en `modulos.ts` con su aplicación, ruta base, etiqueta, icono y prioridad, a los pasos de `tour.service.ts` y a los tipos de evento de `evento-calendario.ts`.
+4. Revisa los `@PreAuthorize` de los controladores que el rol debe usar y escribe la prueba de seguridad que demuestra qué ve y qué no ve.
+5. Agrega una cuenta de ejemplo en una migración de demostración y a `CUENTAS` en `web/e2e/support.ts`, y documenta el rol en la tabla de actores.
+
+### Agregar una aplicación para un cargo o una especialidad
+
+Una aplicación nueva se justifica cuando un actor tiene flujos propios. Una especialidad con pantallas específicas, como un odontograma o las curvas de crecimiento pediátricas, se agrega como una aplicación más.
+
+1. Genera el proyecto con `ng generate application nombre` y copia el bloque del `angular.json` de una aplicación existente para heredar sus configuraciones de build, la ruta base y los entornos compartidos.
+2. Crea los archivos de la aplicación copiándolos de una existente: `app.config.ts`, `app.routes.ts`, `app.id.ts`, `nav.config.ts` y el spec de humo. `app.routes.ts` compone las rutas desde `@tusalud/features` y protege la entrada con `entradaModulo`.
+3. Registra el módulo en `MODULOS` de `@tusalud/core` con su rol, su ruta base, su etiqueta y su icono.
+4. Agrega la aplicación a los scripts `build:all` y `test:apps` de `web/package.json`, a la lista de bases de la plantilla del gateway y al `Dockerfile` del frontend.
+5. Si la aplicación necesita una pantalla que ninguna otra usará, créala dentro del proyecto. Si puede reutilizarse, créala en un entry point de `@tusalud/features`.
+6. Agrega los e2e de la aplicación y actualiza la tabla de actores.
+
+### Agregar una plantilla de documento
+
+1. Agrega un valor a `TipoDocumento` con su código, el nombre de la plantilla, si es clínico, los formatos permitidos y los roles que pueden descargarlo.
+2. Crea la plantilla `nombre.jrxml` en `src/main/resources/reportes/`. La plantilla recibe un conjunto de datos armado en Java y nunca ejecuta una consulta SQL ni scripts. Usa fuentes con soporte de tildes.
+3. Arma los datos en la clase de documentos que corresponda y aplica la misma autorización que el dato de origen.
+4. El administrador puede reemplazar la plantilla desde la página de plantillas. La que sube se valida con `ValidadorPlantilla` y se puede restaurar a la empaquetada.
+5. Agrega las pruebas de `MotorPlantillasTest` y de autorización de `DocumentoServiceTest`, y el botón de documento en la pantalla correspondiente.
+
+### Reemplazar una integración
+
+Las dependencias externas están detrás de interfaces para poder cambiarlas sin tocar el dominio.
+
+| Integración               | Interfaz               | Implementaciones                           | Cómo cambiarla                                                                                       |
+| ------------------------- | ---------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| Almacén de archivos       | `StorageService`       | `S3StorageService` y `LocalStorageService` | Se elige con `app.storage.tipo`. Cualquier almacén compatible con S3 funciona cambiando el endpoint. |
+| Verificación de cobertura | `VerificadorCobertura` | `VerificadorCoberturaSimulado`             | Crear una implementación que consulte a la aseguradora y marcarla como el bean activo.               |
+| Pagos con billetera       | `ProveedorBilletera`   | `BilleteraSimulada`                        | Crear una implementación que confirme con el proveedor real y mantener la validación del código.     |
+
+Una integración nueva debe incluir una prueba de contrato contra la interfaz, mantener la autorización y la auditoría en el servicio y no cambiar los DTO.
+
+### Convenciones
+
+- **Nombres.** Los paquetes, clases, métodos y rutas están en español para el dominio. Los endpoints cuelgan de `/api/v1/` con el nombre del módulo en minúsculas. Las clases siguen el sufijo de su capa, como `Controller`, `Service` y `Repository`, y los DTO terminan en `Request` o `Response`.
+- **Migraciones.** Se numeran de forma correlativa sin huecos. El esquema usa el rango V1 a V20 y la siguiente es la V21. Los datos de demostración usan el rango V100 a V113 y la siguiente es la V114. Una migración ya fusionada no se edita: cada cambio posterior es una migración nueva. Durante el desarrollo temprano, antes de contar con datos reales, las migraciones se reescribieron en sitio, por ejemplo al pasar a UUID, y por eso las bases anteriores se recrean con `docker compose down -v`.
+- **Pruebas.** Las pruebas del backend terminan en `Test` y las de seguridad por módulo en `SeguridadTest`. Cada módulo cubre servicio, seguridad y casos borde. Los e2e usan datos propios y no dependen del estado ni de la hora.
+- **Mensajes.** Los errores de negocio y de validación se escriben en español, claros para el usuario y sin datos sensibles.
+- **Estilo.** El código Java se formatea con Spotless y el resto con Prettier, y los hooks de Git lo verifican. El código no lleva comentarios.
+
+### Lista de verificación antes de fusionar
+
+- Cada endpoint nuevo tiene `@PreAuthorize` y una prueba de 401 y 403.
+- Un dato clínico exige relación asistencial y una lectura ajena se audita.
+- Cada rol recibe solo los campos que necesita y lo demuestra una prueba.
+- Los ids son UUID y las consultas ordenan de forma explícita.
+- Las acciones que se deshacen exigen un motivo.
+- Las rutas con datos sensibles están en `RUTAS_SIN_CUERPO` de la telemetría.
+- La migración es nueva, correlativa e inmutable, y los datos de demostración son SQL.
+- `./mvnw test`, `./mvnw spotless:check`, `npm run test:all` y el build de producción de las aplicaciones tocadas pasan sin avisos.
+- Los e2e nuevos son repetibles y la suite completa pasa por el gateway.
+- La carpeta de Postman pasa dos veces seguidas.
+- El README tiene la ficha, los endpoints, la hoja de ruta y los conteos actualizados.
+
+## Hoja de ruta
+
+La hoja de ruta muestra cómo evolucionó el sistema y hacia dónde va. Cada ítem está marcado como hecho, en curso o planificado, sin fechas comprometidas. El orden de lo planificado indica la prioridad actual.
+
+### Lo ya hecho, por fases
+
+| Fase | Contenido                                                                                                                                                            | Estado |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| 1    | Reserva de citas, agenda de médicos, especialidades con tarifa, atención, historia clínica, recetas, pagos con tarjeta y cupones, notificaciones, auditoría y perfil | Hecho  |
+| 2    | Pagos con Yape y Plin simulados, verificación en dos pasos, renovación de sesión, calendario y planificador, pacientes compartidos, reprogramación y valoraciones    | Hecho  |
+| 3    | Roles de personal con almacén, farmacia y laboratorio clínico                                                                                                        | Hecho  |
+| 4    | Recepción y turnos, caja y facturación, hospitalización y emergencias                                                                                                | Hecho  |
+| 5    | Identificadores UUID, auditoría clínica y relación asistencial, minimización de datos por rol y telemetría enmascarada                                               | Hecho  |
+| 6    | Frontend dividido en un portal y una aplicación por actor, con las librerías `core`, `ui` y `features`                                                               | Hecho  |
+| 7    | Cargos directivos: reportes y BI, recursos humanos, turnos y ausencias                                                                                               | Hecho  |
+| 8    | Imágenes diagnósticas con visor e informes                                                                                                                           | Hecho  |
+| 9    | Almacén de objetos con SeaweedFS y gateway nginx como único punto de entrada                                                                                         | Hecho  |
+| 10   | Documentos y reportes en PDF con Jasper y en Excel con POI, exportaciones asíncronas y plantillas                                                                    | Hecho  |
+| 11   | Rediseño de la interfaz con sistema de diseño, inicio por rol, bloqueo por inactividad y modo privacidad                                                             | Hecho  |
+| 12   | Seguridad operativa: eventos de seguridad, estado del sistema, evoluciones pendientes y motivos obligatorios                                                         | Hecho  |
+| 13   | Seguros y convenios con copago, preautorizaciones, cartera y liquidaciones                                                                                           | Hecho  |
+| 14   | Reescritura de la documentación como sistema clínico integral                                                                                                        | Hecho  |
+
+### Planificado, en orden de prioridad
+
+| Ítem                                                                                                                                                 | Estado      |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| Telemedicina con videoconsulta de uno a uno entre médico y paciente, con señalización en el backend y sala vinculada a la cita                       | Planificado |
+| Flujos propios por especialidad como aplicaciones nuevas: odontología con odontograma y presupuesto, y pediatría con curvas de crecimiento y vacunas | Planificado |
+| Antivirus para las subidas de archivos                                                                                                               | Planificado |
+| Copias de seguridad de la base de datos y del almacén de objetos, y réplica del almacén                                                              | Planificado |
+| Prueba de punta a punta de `compose.yaml` en modo producción con TLS y credenciales reales                                                           | Planificado |
+| Más reportes y BI, con tableros guardados y exportaciones programadas                                                                                | Planificado |
+| Integración real de verificación de cobertura con aseguradoras y de confirmación de pagos con billeteras                                             | Planificado |
+| Comprobantes electrónicos conectados al proveedor tributario                                                                                         | Planificado |
+| Recetas electrónicas con firma                                                                                                                       | Planificado |
+| Citas recurrentes y lista de espera                                                                                                                  | Planificado |
+| Mensajería interna entre el personal                                                                                                                 | Planificado |
+| Encuestas de satisfacción del paciente                                                                                                               | Planificado |
+| Quirófano y esterilización                                                                                                                           | Planificado |
+| Ambulancias y traslados                                                                                                                              | Planificado |
+| Conmutador de densidad de tablas, prefijo propio de las librerías y recarga automática del navegador en el desarrollo con varias aplicaciones        | Planificado |
+
+### Cómo se incorpora un ítem nuevo
+
+Cada ítem se convierte en un módulo siguiendo la guía de extensión. Al terminarlo se actualiza esta tabla, el mapa de módulos, la tabla de actores si hay un rol o una aplicación nuevos, y los conteos de pruebas.
+
+## Decisiones de arquitectura
+
+Estas son las decisiones que más condicionan el diseño y el motivo de cada una. Se revisan cuando cambia el contexto que las motivó.
+
+| Decisión                                                       | Motivo                                                                                                                                                                                                      |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Identificadores UUID versión 4 en todas las entidades          | Los ids numéricos se adivinan y se recorren en orden, lo que facilita el acceso a datos ajenos. Con UUID el id deja de ser una pista, y la autorización por relación sigue siendo la defensa real.          |
+| Migraciones reescritas en sitio durante el desarrollo temprano | Mientras no había datos reales, reescribir el esquema inicial fue más simple y seguro que convertir claves en tablas ya pobladas. Desde la fusión de la V20 cada cambio es una migración nueva e inmutable. |
+| Una aplicación web por actor                                   | Cada actor tiene flujos, vocabulario y densidad propios. Separarlos reduce la superficie que descarga cada usuario y permite que un equipo evolucione una aplicación sin tocar las demás.                   |
+| Librerías `core`, `ui` y `features` con entry points           | Comparten sesión, componentes y dominios sin duplicar código. Un entry point por componente o dominio evita que cada aplicación cargue lo que no usa.                                                       |
+| Un portal único de acceso y navegación entre aplicaciones      | El login es el mismo para todos. Tras autenticarse, una carga completa lleva al usuario a su módulo, y compartir el origen permite compartir la sesión.                                                     |
+| Gateway nginx como único punto de entrada                      | Un solo origen elimina el CORS cruzado y concentra el TLS, las cabeceras, los límites de tasa y de tamaño, y oculta la infraestructura interna.                                                             |
+| SeaweedFS con API S3 en lugar de MinIO                         | La edición comunitaria de MinIO quedó archivada y sin imágenes oficiales. SeaweedFS es de código abierto con licencia Apache 2.0 y compatible con S3, y la interfaz `StorageService` permite cambiarlo.     |
+| Descarga de archivos siempre por el backend                    | Las direcciones prefirmadas incluyen el host en la firma, complican el proxy y se escapan de la autorización por relación. Servir desde el backend mantiene una sola regla y la auditoría.                  |
+| Relación asistencial como única regla de acceso clínico        | Evita que cada módulo reinvente su propia comprobación. Una sola implementación se prueba mejor y no deja huecos entre módulos.                                                                             |
+| DTO distintos por rol y datos mínimos                          | Un rol nunca debería recibir un campo que no necesita, aunque la interfaz no lo muestre.                                                                                                                    |
+| El administrador sin acceso a datos clínicos                   | Administrar la institución no requiere leer historias. Separarlo reduce el daño de una cuenta de administración comprometida.                                                                               |
+| JasperReports con conjuntos de datos armados en Java           | Las plantillas no ejecutan consultas ni scripts, así que una plantilla subida por un administrador no puede leer datos que no se le entregaron.                                                             |
+| Exportaciones pesadas asíncronas con retención                 | Evitan peticiones largas y dejan un resultado descargable que se purga solo, sin acumular archivos con datos.                                                                                               |
+| Verificador de cobertura y proveedor de billeteras simulados   | No existe una integración real disponible. Las interfaces permiten desarrollar y probar todo el flujo y reemplazar la implementación sin tocar el dominio.                                                  |
+| Virtual threads sobre Java 25                                  | Las peticiones esperan a la base de datos sin ocupar hilos del sistema, y el pool de conexiones acota la concurrencia real.                                                                                 |
+| Datos de demostración solo en SQL de Flyway                    | Una única fuente de datos de ejemplo, versionada y sin código de arranque que pueda ejecutarse por error en producción.                                                                                     |
+| Bloqueo por inactividad y modo privacidad en la interfaz       | Las estaciones de una clínica son compartidas y las pantallas están a la vista. Estas medidas reducen la exposición sin depender del usuario.                                                               |
 
 ## Estructura del monorepo
 
 ```text
 tusalud/
-├── src/                Código fuente y pruebas del backend
+├── src/                Código fuente y pruebas del backend, con las migraciones de Flyway en db/migration y db/demo
 ├── .githooks/          Hooks de Git para formatear antes de commit y push
-├── docker/             Configuración del agente y del Collector de OpenTelemetry, y de pgAdmin
+├── docker/             Gateway nginx, almacén de objetos, agente y Collector de OpenTelemetry, y pgAdmin
+├── scripts/            Utilidades del repositorio, como la generación del certificado de desarrollo
 ├── postman/            Colección de Postman
-├── web/                Workspace de Angular con el portal, una aplicación por rol y las librerías compartidas
+├── web/                Workspace de Angular con el portal, una aplicación por rol, las librerías compartidas y las pruebas e2e
 ├── compose.yaml        Stack completo en modo producción
 ├── compose.dev.yaml    Sobrescritura para el perfil dev
+├── compose.hot.yaml    Sobrescritura para el desarrollo con el frontend montado desde el código fuente
 ├── compose.qa.yaml     Sobrescritura para el perfil qa
 ├── Dockerfile          Imagen del backend
+├── users.txt           Usuarios, roles y datos de ejemplo para probar
 └── pom.xml             Build de Maven del backend
 ```
 
@@ -108,49 +920,9 @@ El backend y el frontend se construyen por separado. El `.dockerignore` de la ra
 | palantir-java-format              | 2.102.0                      |
 | Prettier                          | 3.9.10                       |
 
-## Arquitectura
-
-El proyecto sigue una arquitectura en capas bajo el paquete `com.codesoftlabs.tusalud.app`. Cada petición entra por un controlador, que delega en un servicio con la lógica de negocio y las transacciones, y el servicio accede a la base de datos a través de repositorios con consultas JPQL.
-
-```text
-src/main/java/com/codesoftlabs/tusalud/app/
-├── config/             Seguridad, CORS, OpenAPI, datos iniciales y telemetría HTTP
-├── controllers/        Controladores REST con validaciones y documentación OpenAPI
-├── dto/
-│   ├── request/        Cuerpos de entrada validados con Jakarta Validation
-│   └── response/       Respuestas de la API y formato estándar de error
-├── entities/           Entidades JPA y enumeraciones
-├── exceptions/         Excepciones de negocio y manejador global de errores
-├── repositories/       Repositorios Spring Data con consultas JPQL
-├── security/           JWT, filtro de autenticación y UserDetailsService
-└── services/
-    ├── interfaces/     Contratos de servicio
-    └── impl/           Implementaciones transaccionales
-```
-
-### Concurrencia con virtual threads
-
-La API corre sobre Java 25 con virtual threads activados mediante `spring.threads.virtual.enabled: true`. Tomcat atiende cada petición en un virtual thread en lugar de tomar uno de un pool limitado de hilos del sistema operativo. Mientras una petición espera a PostgreSQL, su hilo virtual se desmonta y el hilo del sistema queda libre para atender otra, de modo que la API sostiene muchas más peticiones concurrentes con la misma memoria. Las tareas asíncronas y programadas de Spring usan el mismo modelo.
-
-Desde Java 24 un bloque `synchronized` ya no fija el hilo virtual a su hilo del sistema, por lo que las librerías que todavía usan `synchronized` no anulan la ventaja. El límite real de concurrencia contra la base de datos lo marca el pool de conexiones de Hikari: cuando todas las conexiones están ocupadas, las peticiones adicionales esperan su turno sin consumir hilos del sistema.
-
-Las entidades nunca se serializan directamente. Cada respuesta se construye con un DTO, lo que evita ciclos en la serialización y problemas con relaciones perezosas. La propiedad `open-in-view` está desactivada, de modo que toda carga de datos ocurre dentro de la transacción del servicio.
-
-## Modelo de datos
-
-| Entidad           | Atributos principales                                                                                         | Relaciones                                                                                      |
-| ----------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `Usuario`         | `nombre`, `apellido`, `email` único e indexado, `password` con hash BCrypt, `telefono`, `estado`, `createdAt` | Muchos a muchos con `Rol`                                                                       |
-| `Rol`             | `nombre`: `ROLE_ADMIN`, `ROLE_MEDICO` o `ROLE_PACIENTE`                                                       | Asignado a usuarios                                                                             |
-| `Especialidad`    | `nombre` único, `descripcion`, `precioConsulta`                                                               | Muchos a muchos con `Medico`                                                                    |
-| `Medico`          | `colegiatura` CMP única, `consultorio`                                                                        | Uno a uno con `Usuario`, muchos a muchos con `Especialidad`, uno a muchos con `HorarioAtencion` |
-| `Paciente`        | `dni` único, `historialClinicoNumero` único, `fechaNacimiento`                                                | Uno a uno con `Usuario`                                                                         |
-| `HorarioAtencion` | `diaSemana`, `horaInicio`, `horaFin`, `duracionCitaMinutos`                                                   | Muchos a uno con `Medico`                                                                       |
-| `Cita`            | `fechaHora`, `motivo`, `estado`, `monto`, `createdAt`, `updatedAt`, `version`                                 | Muchos a uno con `Medico`, con `Paciente` y con `Especialidad`                                  |
-
-Todas las relaciones usan carga perezosa. La tabla `citas` tiene índices por médico y fecha y por paciente y fecha, y el campo `version` aplica bloqueo optimista para que dos operaciones concurrentes no sobrescriban la misma cita.
-
 ## Reglas de negocio
+
+Esta sección reúne las reglas de la atención ambulatoria, que es el núcleo histórico del sistema. Las reglas de los demás módulos están en la sección Detalle de los módulos.
 
 ### Registro de citas
 
@@ -183,29 +955,6 @@ Un paciente no puede cancelar una cita cuya fecha ya pasó, mientras que un admi
 - Los bloques de horario de un médico no pueden cruzarse en un mismo día, la hora de fin debe ser posterior a la de inicio y el bloque debe admitir al menos una cita.
 - Una especialidad con médicos asignados no puede eliminarse.
 - La disponibilidad de un médico se calcula a partir de sus bloques y descarta los turnos ocupados y, si la fecha es hoy, los turnos que ya pasaron.
-
-## Seguridad
-
-La API es completamente sin estado. Spring Security 7 trabaja con `SessionCreationPolicy.STATELESS`, CSRF desactivado y un filtro `JwtAuthenticationFilter` que valida el header `Authorization: Bearer <token>` en cada petición.
-
-- Los tokens se firman con HMAC-SHA usando la clave `JWT_SECRET`, que debe estar codificada en Base64 y tener al menos 256 bits. Cada token incluye el email como sujeto, el emisor, la expiración, el id del usuario, su nombre y sus roles. El token de acceso dura 15 minutos y se renueva con un refresh token rotativo.
-- Un usuario inactivo no puede iniciar sesión y su token deja de ser válido aunque no haya expirado.
-- Las contraseñas se almacenan con BCrypt.
-- Todas las entidades y tablas usan UUID versión 4 como identificador, generado en la aplicación y con `gen_random_uuid()` como valor por defecto en la base. Así los ids no se pueden adivinar ni recorrer en orden. Un id con formato inválido en la ruta responde 400 y uno inexistente responde 404. Los códigos legibles de negocio, como los comprobantes, los turnos y los ingresos, siguen siendo correlativos.
-- CORS permite peticiones desde `http://localhost:4200` con los métodos GET, POST, PUT, DELETE y OPTIONS. El origen se configura con `CORS_ALLOWED_ORIGINS`. Como el gateway sirve el frontend y la API desde el mismo origen, el navegador no necesita CORS en el uso normal.
-- Los archivos nunca se exponen por una dirección pública. El almacén de objetos solo es accesible desde la red interna de Docker y toda descarga pasa por la API, que valida la sesión y la relación con el dato antes de entregar el contenido. Los tipos se detectan por el contenido y no por la extensión, se rechazan SVG, HTML, scripts y ejecutables, y los nombres se sanitizan.
-- El gateway nginx es el único servicio que publica puertos. Limita la tasa de los intentos de inicio de sesión, renovación, registro y verificación en dos pasos, acota el tamaño de las peticiones por ruta, bloquea los métodos poco comunes, oculta la versión de nginx y entrega una política de seguridad de contenido estricta junto con las demás cabeceras de seguridad.
-- La autorización combina reglas por URL en `SecurityConfig` con `@PreAuthorize` en cada método de los controladores.
-- Tener el rol correcto no basta para ver los datos de una persona: hace falta una relación con ella. `RelacionAsistencialService` es la única regla y la cumple un médico que atendió al paciente en una cita no cancelada, que tiene un ingreso activo a su cargo o a quien otro médico le compartió el paciente. Ese acceso se aplica a la historia clínica, el laboratorio, la hospitalización y la lista de pacientes del médico.
-- Los datos clínicos los modifica solo el personal de salud. El paciente consulta su historia y, si algún dato no es correcto, se comunica con el centro de salud. El médico con relación actualiza los datos médicos y queda registrado quién y cuándo, y cada consulta de una historia ajena se guarda en `auditoria_clinica`.
-- Cada rol recibe solo los campos que necesita: recepción y administración no ven diagnósticos ni indicaciones, caja no ve datos clínicos, farmacia solo ve las recetas, el correo y el teléfono de un médico solo los ven el administrador y el propio médico, y las valoraciones públicas abrevian el nombre del paciente. El administrador gestiona la institución pero no lee ni escribe datos clínicos.
-- Una atención no se reescribe pasadas 48 horas ni cuando su receta ya fue dispensada.
-
-| Rol             | Permisos                                                                                                                                               |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `ROLE_ADMIN`    | Gestiona especialidades y sus tarifas, médicos, horarios, roles de usuario, cupones y pagos, consulta la auditoría y cancela o confirma cualquier cita |
-| `ROLE_MEDICO`   | Consulta su agenda, confirma y atiende sus citas, y comparte pacientes con otros médicos                                                               |
-| `ROLE_PACIENTE` | Consulta disponibilidad, agenda citas y consulta o cancela las suyas                                                                                   |
 
 ## API REST
 
@@ -473,108 +1222,9 @@ curl -X POST http://localhost:8080/api/v1/citas \
   -d '{"medicoId":1,"especialidadId":1,"fechaHora":"2026-10-20T10:00:00","motivo":"Control de presión arterial"}'
 ```
 
-## Diagramas
+## Flujos y diagramas de secuencia
 
-Los diagramas de esta sección usan Mermaid y GitHub los muestra directamente. Primero describen la arquitectura, el modelo de datos y el ciclo de vida de una cita. Después documentan cada endpoint con un diagrama de secuencia que muestra las clases que atraviesa la petición, las consultas que ejecuta y las respuestas de error posibles.
-
-### Diagrama de arquitectura
-
-```mermaid
-flowchart LR
-    Cliente[Cliente Angular, Postman o curl] -->|HTTP o HTTPS| Gateway[Gateway nginx]
-    Gateway -->|/| Web[Frontend estático]
-    Gateway -->|/api| Tomcat
-    subgraph API[tusalud-api]
-        Tomcat --> Telemetria[HttpTelemetryFilter]
-        Telemetria --> JWT[JwtAuthenticationFilter]
-        JWT --> Autorizacion[Reglas por URL y PreAuthorize]
-        Autorizacion --> Controladores
-        Controladores --> Servicios
-        Servicios --> Repositorios
-        Controladores -.->|Excepciones| Errores[GlobalExceptionHandler]
-    end
-    Repositorios -->|JDBC| PostgreSQL[(PostgreSQL 18)]
-    Servicios -->|API S3 en red interna| Almacen[(SeaweedFS)]
-    API -.->|OTLP HTTP 4318| Collector[OpenTelemetry Collector]
-    Collector -.->|OTLP gRPC 4317| Jaeger
-```
-
-### Diagrama entidad relación
-
-```mermaid
-erDiagram
-    USUARIOS ||--o{ USUARIO_ROLES : tiene
-    ROLES ||--o{ USUARIO_ROLES : asignado
-    USUARIOS ||--o| MEDICOS : es
-    USUARIOS ||--o| PACIENTES : es
-    ESPECIALIDADES ||--o{ MEDICO_ESPECIALIDADES : ofrece
-    MEDICOS ||--o{ MEDICO_ESPECIALIDADES : atiende
-    ESPECIALIDADES ||--o{ CITAS : tarifa
-    MEDICOS ||--o{ HORARIOS_ATENCION : define
-    MEDICOS ||--o{ CITAS : atiende
-    PACIENTES ||--o{ CITAS : reserva
-
-    USUARIOS {
-        uuid id PK
-        varchar nombre
-        varchar apellido
-        varchar email UK
-        varchar password
-        varchar telefono
-        varchar estado
-        timestamp created_at
-    }
-    ROLES {
-        uuid id PK
-        varchar nombre UK
-    }
-    USUARIO_ROLES {
-        uuid usuario_id FK
-        uuid rol_id FK
-    }
-    ESPECIALIDADES {
-        uuid id PK
-        varchar nombre UK
-        varchar descripcion
-        numeric precio_consulta
-    }
-    MEDICO_ESPECIALIDADES {
-        uuid medico_id FK
-        uuid especialidad_id FK
-    }
-    MEDICOS {
-        uuid id PK
-        varchar colegiatura UK
-        varchar consultorio
-        uuid usuario_id FK
-    }
-    PACIENTES {
-        uuid id PK
-        varchar dni UK
-        varchar historial_clinico_numero UK
-        date fecha_nacimiento
-        uuid usuario_id FK
-    }
-    HORARIOS_ATENCION {
-        uuid id PK
-        varchar dia_semana
-        time hora_inicio
-        time hora_fin
-        int duracion_cita_minutos
-        uuid medico_id FK
-    }
-    CITAS {
-        uuid id PK
-        timestamp fecha_hora
-        varchar motivo
-        varchar estado
-        numeric monto
-        uuid medico_id FK
-        uuid paciente_id FK
-        uuid especialidad_id FK
-        bigint version
-    }
-```
+Los diagramas de esta sección usan Mermaid y GitHub los muestra directamente. Primero muestran el ciclo de vida de una cita y la autenticación de una petición protegida. Después documentan los endpoints de autenticación, especialidades, médicos, citas y auditoría con un diagrama de secuencia que muestra las clases que atraviesa la petición, las consultas que ejecuta y las respuestas de error posibles. La arquitectura y el modelo de datos tienen sus propias secciones.
 
 ### Diagrama de estados de una cita
 
@@ -1274,6 +1924,10 @@ sequenceDiagram
     end
 ```
 
+## Detalle de los módulos
+
+Cada subsección describe las reglas, los endpoints y el comportamiento fino de un módulo. El mapa de módulos las enlaza por área.
+
 ### Perfil
 
 `PerfilController` permite a cualquier usuario autenticado consultar y mantener sus propios datos. La identidad sale siempre del token, de modo que nadie puede leer ni modificar el perfil de otra persona.
@@ -1344,7 +1998,7 @@ El token de acceso vive 15 minutos con `JWT_EXPIRATION_MS` y el refresh token 7 
 
 El frontend renueva el token un minuto antes de que venza y, si una petición recibe un 401, renueva y la repite una vez. Las peticiones simultáneas comparten una sola renovación para no disparar la detección de reuso. Si el refresh token es rechazado, la sesión se cierra.
 
-### Calendario de citas
+### Calendario y disponibilidad
 
 `GET /api/v1/medicos/{id}/disponibilidad/rango` devuelve las horas libres de hasta 62 días en una sola petición y `GET /api/v1/medicos/me/agenda` acepta un rango de fechas. Cada cita informa su `duracionMinutos`. Reservar o reprogramar rechaza con 409 una cita que se cruce con otra cita activa del paciente, aunque sea con otro médico.
 
@@ -1403,7 +2057,7 @@ El módulo de imágenes atiende radiografías, ecografías, tomografías y reson
 - El catálogo de estudios guarda código, nombre, modalidad, región, preparación para el paciente, precio y duración. Lo editan el personal de imágenes y el administrador, y el médico lo consulta al solicitar.
 - Un médico solicita un estudio para un paciente con el que tiene relación asistencial, con su indicación clínica y una prioridad normal o urgente. Una orden urgente avisa al personal de imágenes.
 - La orden avanza por los estados solicitada, programada, realizada, informada o cancelada. Programar exige fecha, hora y sala, y responde 409 si la sala ya está ocupada en ese horario, calculado con la duración de los estudios. La toma exige al menos una imagen cargada.
-- Las imágenes se cargan como JPEG, PNG o PDF de hasta 5 MB, hasta 12 por orden. El tipo se valida por el contenido del archivo y no por su extensión, y el nombre se sanea. Se guardan en la base de datos y solo se sirven con sesión y con acceso a la orden, con las cabeceras `X-Content-Type-Options`, `Cache-Control` sin almacenamiento y una política de contenido que bloquea todo. Nunca hay enlaces públicos.
+- Las imágenes se cargan como JPEG, PNG o PDF de hasta 5 MB, hasta 12 por orden. El tipo se valida por el contenido del archivo y no por su extensión, y el nombre se sanea. Se guardan en el almacén de objetos y solo se sirven con sesión y con acceso a la orden, con las cabeceras `X-Content-Type-Options`, `Cache-Control` sin almacenamiento y una política de contenido que bloquea todo. Nunca hay enlaces públicos.
 - El visor web permite acercar, alejar, ajustar brillo y contraste, invertir los colores y ver a pantalla completa. Los PDF se muestran en el mismo visor.
 - El informe lleva hallazgos, conclusión, la marca de hallazgo crítico y la firma con el nombre y la colegiatura del radiólogo. Un informe emitido solo se corrige con un motivo y cada corrección crea una versión nueva, de modo que el historial se conserva. Un hallazgo crítico avisa de inmediato al médico solicitante. El informe se puede imprimir.
 - El paciente ve la preparación mientras el estudio está solicitado o programado y, solo cuando está informado, el informe y las imágenes, sin la indicación clínica ni la marca de hallazgo crítico. Administración y recepción ven únicamente la agenda de salas, sin datos clínicos. Un médico con relación asistencial ve todo de sus pacientes y esa consulta queda en la auditoría clínica.
@@ -1932,34 +2586,13 @@ Cada aplicación tiene solo cinco archivos propios: `app.config.ts`, `app.routes
 
 ### Aplicaciones por rol
 
-Todas las aplicaciones se sirven bajo el mismo origen, cada una en su ruta base, y el portal en la raíz. Como comparten el origen, comparten también la sesión guardada en `localStorage`.
-
-| Rol              | Aplicación    | Ruta base       | Página de inicio                  |
-| ---------------- | ------------- | --------------- | --------------------------------- |
-| Sin sesión       | `portal`      | `/`             | `/auth/login`                     |
-| Paciente         | `paciente`    | `/paciente/`    | `/paciente/citas`                 |
-| Médico           | `medico`      | `/medico/`      | `/medico/agenda`                  |
-| Administrador    | `admin`       | `/admin/`       | `/admin/panel`                    |
-| Gerencia         | `gerencia`    | `/gerencia/`    | `/gerencia/reportes/ejecutivo`    |
-| Finanzas         | `finanzas`    | `/finanzas/`    | `/finanzas/reportes/financiero`   |
-| Operaciones      | `operaciones` | `/operaciones/` | `/operaciones/reportes/operativo` |
-| Calidad          | `calidad`     | `/calidad/`     | `/calidad/reportes/calidad`       |
-| Recursos humanos | `rrhh`        | `/rrhh/`        | `/rrhh/`                          |
-| Recepción        | `recepcion`   | `/recepcion/`   | `/recepcion/`                     |
-| Caja             | `caja`        | `/caja/`        | `/caja/`                          |
-| Enfermería       | `enfermeria`  | `/enfermeria/`  | `/enfermeria/`                    |
-| Laboratorio      | `laboratorio` | `/laboratorio/` | `/laboratorio/`                   |
-| Imágenes         | `imagenes`    | `/imagenes/`    | `/imagenes/`                      |
-| Farmacia         | `farmacia`    | `/farmacia/`    | `/farmacia/`                      |
-| Almacén          | `almacen`     | `/almacen/`     | `/almacen/`                       |
-
-Cada aplicación incluye exactamente las pantallas y permisos de su rol y nada más, de modo que el paquete que descarga un paciente no contiene el código de administración. Esto reduce la superficie expuesta, pero no reemplaza la seguridad real: el control de acceso lo hace siempre el backend con `@PreAuthorize` y la relación asistencial. El frontend solo oculta lo que el rol no puede usar.
+La tabla completa de roles, aplicaciones, rutas base y páginas de inicio está en la sección Actores y aplicaciones. Todas las aplicaciones se sirven bajo el mismo origen, cada una en su ruta base, y el portal en la raíz, por lo que comparten la sesión guardada en `localStorage`.
 
 La página `Mis exportaciones` está en `/mis-exportaciones` de las aplicaciones de administración, gerencia, finanzas, operaciones, calidad, caja, almacén, recursos humanos y médico, y la gestión de plantillas está solo en `/admin/plantillas`.
 
 ### Enrutamiento entre aplicaciones
 
-- Tras iniciar sesión, el portal calcula el módulo principal del usuario y navega a su ruta base con una carga completa de la página. Si el usuario tiene varios roles, el módulo principal sigue la prioridad administrador, médico, enfermería, laboratorio, farmacia, almacén, recepción, caja y paciente, y el menú del avatar ofrece Cambiar de módulo con un enlace a cada aplicación a la que tiene acceso.
+- Tras iniciar sesión, el portal calcula el módulo principal del usuario y navega a su ruta base con una carga completa de la página. Si el usuario tiene varios roles, el módulo principal sigue la prioridad administrador, gerencia, médico, enfermería, finanzas, operaciones, calidad, recursos humanos, laboratorio, imágenes, farmacia, almacén, recepción, caja y paciente, y el menú del avatar ofrece Cambiar de módulo con un enlace a cada aplicación a la que tiene acceso.
 - Cada aplicación protege su entrada con `entradaModulo`. Sin sesión envía al login con el `returnUrl` de la pantalla pedida, y con sesión pero sin ningún rol de esa aplicación envía al módulo principal del usuario. El `returnUrl` solo se acepta si apunta a un módulo al que el rol tiene acceso.
 - Dentro de una aplicación siguen funcionando los guards por rol de las rutas. Cerrar sesión desde cualquier aplicación lleva al portal.
 - Los nombres de ruta de cada dominio coinciden con el de su aplicación, por ejemplo `caja` dentro de `/caja/`. Para no repetir el segmento, cada aplicación configura un prefijo oculto con `provideTusalud({ prefijoOculto })`: un serializador de URL lo quita al escribir la dirección y lo restaura al leerla. Por eso la pantalla de cobro vive en `/caja/cobrar` y no en `/caja/caja/cobrar`, y las de hospitalización de enfermería en `/enfermeria/emergencias`. El código de las pantallas no cambia.
@@ -2127,7 +2760,7 @@ Las 370 pruebas unitarias corren con Vitest, repartidas entre los proyectos, y c
 npm test
 ```
 
-Las 158 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal los flujos de almacén, farmacia y laboratorio, los de recepción, caja y hospitalización, el recorrido completo de un estudio de imagen con carga de imágenes e informe, los reportes gerenciales, los turnos, las ausencias y Mi espacio, y la subida y descarga de archivos, el aislamiento del almacén, las cabeceras de seguridad, el límite de tasa y los tamaños del gateway, y la seguridad operativa con los eventos de seguridad, el estado del sistema, las evoluciones pendientes y los motivos obligatorios. Requieren el stack levantado con datos de prueba y atraviesan el portal y las aplicaciones por sus rutas base. El helper `ir` de `e2e/support.ts` construye la dirección real de cada pantalla a partir de la aplicación en la que está el usuario y de su prefijo oculto.
+Las 164 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal los flujos de almacén, farmacia y laboratorio, los de recepción, caja y hospitalización, el recorrido completo de un estudio de imagen con carga de imágenes e informe, los reportes gerenciales, los turnos, las ausencias y Mi espacio, y la subida y descarga de archivos, el aislamiento del almacén, las cabeceras de seguridad, el límite de tasa y los tamaños del gateway, y la seguridad operativa con los eventos de seguridad, el estado del sistema, las evoluciones pendientes y los motivos obligatorios. Requieren el stack levantado con datos de prueba y atraviesan el portal y las aplicaciones por sus rutas base. El helper `ir` de `e2e/support.ts` construye la dirección real de cada pantalla a partir de la aplicación en la que está el usuario y de su prefijo oculto.
 
 Las ocho pruebas de documentos exportan un reporte a PDF y a Excel desde la web, descargan un comprobante y un listado, bajan los resultados de laboratorio, comprueban que un paciente o un médico sin relación no obtiene la receta ajena, que el token en la dirección no autentica y que una exportación es solo de quien la pidió, y suben, rechazan y restauran una plantilla. Cada una limpia lo que crea para poder repetirse.
 
@@ -2354,7 +2987,7 @@ Para usarla en Postman, importa el archivo y ejecuta la colección completa con 
 
 | Carpeta                                                 | Contenido                                                                                                                                                                                                               |
 | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `00 - Autenticación`                                    | Login de los cinco usuarios de prueba, registro de un paciente y errores 400 y 401                                                                                                                                      |
+| `00 - Autenticación`                                    | Login de los usuarios de prueba, registro de un paciente y errores 400 y 401                                                                                                                                            |
 | `01 - Especialidades`                                   | Alta, consulta, actualización, duplicado, acceso sin permiso y eliminación                                                                                                                                              |
 | `02 - Médicos y Horarios`                               | Listados, alta de médico, bloques de horario, solapamiento y disponibilidad                                                                                                                                             |
 | `03 - Citas (Paciente)`                                 | Reserva en el primer turno libre, conflictos y acceso a citas ajenas                                                                                                                                                    |

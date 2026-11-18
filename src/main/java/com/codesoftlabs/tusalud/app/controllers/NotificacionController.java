@@ -37,7 +37,9 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 @Validated
 @PreAuthorize("isAuthenticated()")
-@Tag(name = "Notificaciones", description = "Avisos del usuario autenticado sobre citas, pagos y seguridad")
+@Tag(
+        name = "Notificaciones",
+        description = "Avisos en tiempo real del usuario autenticado sobre su actividad en la clínica")
 public class NotificacionController {
 
     private final NotificacionService notificacionService;

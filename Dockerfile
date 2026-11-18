@@ -55,7 +55,7 @@ COPY --from=build /layers/application/ ./
 FROM base AS runtime
 ARG MAVEN_PROFILE=prod
 LABEL org.opencontainers.image.title="tusalud-api" \
-      org.opencontainers.image.description="API REST de TuSalud" \
+      org.opencontainers.image.description="API REST del sistema de gestión clínica TuSalud" \
       org.opencontainers.image.source="https://github.com/jhonsferg/tusalud" \
       org.opencontainers.image.vendor="CodeSoftLabs"
 USER spring:spring

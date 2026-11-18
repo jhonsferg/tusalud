@@ -1,6 +1,7 @@
 {
   "name": "tusalud",
   "version": "0.0.0",
+  "description": "Portal y aplicaciones web de TuSalud, sistema de gestión clínica integral",
   "scripts": {
     "ng": "ng",
     "format": "prettier --write .",

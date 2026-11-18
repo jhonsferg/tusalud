@@ -1,9 +1,34 @@
-USUARIOS DE PRUEBA DE TUSALUD
-=============================
+USUARIOS DE PRUEBA DE TUSALUD, SISTEMA DE GESTION CLINICA INTEGRAL
+==================================================================
 
-Los datos son ficticios y los carga Flyway con la migración V100 en los perfiles local, dev y qa.
+Este archivo lista los usuarios, roles y datos de ejemplo con los que se prueba todo el sistema: la atención ambulatoria, la admisión, el apoyo diagnóstico, la hospitalización, la farmacia y el almacén, la caja y los seguros, los recursos humanos, los reportes gerenciales y la administración.
+
+Los datos son ficticios y los carga Flyway con las migraciones de db/demo, de la V100 a la V113, en los perfiles local, dev y qa.
 Para cargarlos: docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml up -d --build
 Para reiniciarlos desde cero: docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml down -v
+Todo se abre en http://localhost:4200, que es el gateway. El portal de acceso está en la raíz y, al iniciar sesión, cada usuario entra a la aplicación de su rol.
+
+RESUMEN POR ROL
+---------------
+Rol                Correo                      Aplicación     Para qué sirve
+ROLE_ADMIN         admin@tusalud.com           /admin/        Administra usuarios, roles, tarifas, plantillas, seguridad y convenios
+ROLE_MEDICO        dr.garcia@tusalud.com       /medico/       Atiende citas, receta, pide estudios y hospitaliza. Hay siete médicos
+ROLE_PACIENTE      juan.perez@correo.com       /paciente/     Reserva, paga y consulta su historia, resultados, estudios y seguros
+ROLE_RECEPCION     recepcion@tusalud.com       /recepcion/    Registra llegadas, cola de espera, pacientes y pólizas
+ROLE_CAJA          caja@tusalud.com            /caja/         Cobra, emite comprobantes y cierra la caja
+ROLE_ENFERMERIA    enfermeria@tusalud.com      /enfermeria/   Mapa de camas, triaje y evoluciones de enfermería
+ROLE_LABORATORIO   lab@tusalud.com             /laboratorio/  Procesa las órdenes y valida los resultados
+ROLE_IMAGENES      imagenes@tusalud.com        /imagenes/     Programa estudios, carga imágenes y emite informes
+ROLE_FARMACIA      farmacia@tusalud.com        /farmacia/     Dispensa recetas y vende productos
+ROLE_ALMACEN       almacen@tusalud.com         /almacen/      Controla el inventario, los lotes y los proveedores
+ROLE_GERENCIA      gerencia@tusalud.com        /gerencia/     Ve los cuatro reportes y el resumen de recursos humanos
+ROLE_FINANZAS      finanzas@tusalud.com        /finanzas/     Reporte financiero, convenios, cartera y liquidaciones
+ROLE_OPERACIONES   operaciones@tusalud.com     /operaciones/  Reporte operativo: ocupación, esperas, demanda e inventario
+ROLE_CALIDAD       calidad@tusalud.com         /calidad/      Reporte de calidad: valoraciones, cancelaciones y tiempos
+ROLE_RRHH          rrhh@tusalud.com            /rrhh/         Fichas laborales, turnos, ausencias y vacaciones
+
+Las contraseñas están en cada sección: Admin123! para el administrador, Medico123! para los médicos, Paciente123! para los pacientes y Personal123! para todo el personal.
+Todo el personal cuenta además con Mi espacio, donde ve sus turnos, solicita ausencias y consulta su ficha.
 
 ADMINISTRADOR
 -------------
@@ -110,9 +135,9 @@ Datos de ejemplo: 19 productos con lotes vigentes, por vencer y vencidos, 5 rece
 RECEPCION, CAJA Y ENFERMERIA
 ----------------------------
 Rol                Nombre          Correo                    Contraseña     Entra a
-ROLE_RECEPCION     Carla Núñez     recepcion@tusalud.com     Personal123!   /recepcion
-ROLE_CAJA          Jorge Paredes   caja@tusalud.com          Personal123!   /caja
-ROLE_ENFERMERIA    Lucía Campos    enfermeria@tusalud.com    Personal123!   /hospitalizacion
+ROLE_RECEPCION     Carla Núñez     recepcion@tusalud.com     Personal123!   /recepcion/
+ROLE_CAJA          Jorge Paredes   caja@tusalud.com          Personal123!   /caja/
+ROLE_ENFERMERIA    Lucía Campos    enfermeria@tusalud.com    Personal123!   /enfermeria/
 
 Datos de ejemplo: seis citas de hoy con turnos en espera, llamado, atendido y ausente, una caja cerrada ayer con un faltante de S/ 5.00 y seis comprobantes entre boletas, una factura y una anulada, catorce camas con dos ingresos activos y emergencias de nivel 2 y 4 sin cama, y un alta histórica.
 
@@ -134,7 +159,7 @@ Rol                Nombre              Correo                    Contraseña    
 ROLE_IMAGENES      Renato Villanueva   imagenes@tusalud.com      Personal123!   /imagenes/
 
 Hace de tecnólogo y de radiólogo: programa los estudios, carga las imágenes, registra la toma y emite los informes firmados.
-Datos de ejemplo: 15 estudios de radiografía, ecografía, tomografía y resonancia, y 6 órdenes para Juan Pérez, Carlos Mendoza y Sofía Ramírez en todos los estados, con imágenes de ejemplo, informes y un hallazgo crítico corregido en una segunda versión.
+Datos de ejemplo: 15 estudios de radiografía, ecografía, tomografía y resonancia, y 6 órdenes para Juan Pérez, Carlos Mendoza y Sofía Ramírez en todos los estados, con informes y un hallazgo crítico corregido en una segunda versión. Los estudios de ejemplo no traen imágenes cargadas, porque Flyway no puede subir objetos al almacén: se cargan desde la aplicación de imágenes.
 
 SEGUROS Y CONVENIOS
 -------------------

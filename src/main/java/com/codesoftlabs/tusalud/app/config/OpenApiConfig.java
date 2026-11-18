@@ -19,9 +19,10 @@ public class OpenApiConfig {
     public OpenAPI tusaludOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("TuSalud API - Sistema de Gestión de Citas y Consultas Médicas")
+                        .title("TuSalud API - Sistema de Gestión Clínica Integral")
                         .description("""
-                                API REST para la gestión de especialidades, médicos, horarios de atención y citas.
+                                API REST del sistema clínico: atención ambulatoria, admisión, apoyo diagnóstico, hospitalización,
+                                farmacia y almacén, caja y seguros, recursos humanos, reportes y documentos.
                                 Autenticación stateless con JWT: obtenga un token en /api/v1/auth/login y
                                 use el botón 'Authorize' con el valor del token.""")
                         .version("v1")
