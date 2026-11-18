@@ -2,7 +2,14 @@
   title="Kardex"
   subtitle="Historial de entradas, salidas y ajustes de inventario"
   icon="pi-arrows-v"
-/>
+>
+  <app-boton-exportar
+    tipo="kardex"
+    formato="XLSX"
+    etiqueta="Exportar a Excel"
+    [parametros]="parametrosExportacion()"
+  />
+</app-page-header>
 
 <div class="panel">
   <div class="filtros">

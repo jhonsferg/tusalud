@@ -28,11 +28,13 @@ import { CitaActions } from '@tusalud/ui/services';
 import { citaAEvento } from '@tusalud/ui/utils';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { EstadoCitaTag } from '@tusalud/ui/estado-cita-tag';
+import { BotonExportar } from '@tusalud/ui/boton-exportar';
 import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-agenda',
   imports: [
+    BotonExportar,
     DatePipe,
     FormsModule,
     RouterLink,

@@ -16,6 +16,8 @@ spring:
       path: /h2-console
 
 app:
+  documentos:
+    sincronico: true
   jwt:
     secret: ${JWT_SECRET:7M+c4b4GZSekiWHhQKtFdWMk3BbcEwa1YQ0PqmCFie75dy5ko50rildSWFTsI18NTxineFm3/IIKY1lyrZn89g==}
 

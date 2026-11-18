@@ -2,7 +2,20 @@
   title="Reporte ejecutivo"
   subtitle="Los indicadores clave de la institución frente al periodo anterior"
   icon="pi-chart-line"
-/>
+>
+  <app-boton-exportar
+    tipo="reporte-ejecutivo"
+    formato="PDF"
+    [parametros]="parametros()"
+    [deshabilitado]="!filtro()"
+  />
+  <app-boton-exportar
+    tipo="reporte-ejecutivo"
+    formato="XLSX"
+    [parametros]="parametros()"
+    [deshabilitado]="!filtro()"
+  />
+</app-page-header>
 
 <app-filtros-reporte (cambio)="cargar($event)" />
 

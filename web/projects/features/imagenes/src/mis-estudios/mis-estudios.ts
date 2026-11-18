@@ -10,14 +10,15 @@ import {
   ImagenesStore,
   OrdenImagenResponse,
 } from '@tusalud/core';
+import { BotonDocumento } from '@tusalud/ui/boton-documento';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { PageHeader } from '@tusalud/ui/page-header';
-import { ICONO_ESTADO_IMAGEN, SEVERIDAD_IMAGEN, imprimirInforme } from '../imagenes.utils';
+import { ICONO_ESTADO_IMAGEN, SEVERIDAD_IMAGEN } from '../imagenes.utils';
 import { VisorImagen } from '../visor/visor-imagen';
 
 @Component({
   selector: 'app-mis-estudios',
-  imports: [DatePipe, Button, Tag, EmptyState, PageHeader, VisorImagen],
+  imports: [BotonDocumento, DatePipe, Button, Tag, EmptyState, PageHeader, VisorImagen],
   templateUrl: './mis-estudios.html',
   styleUrl: './mis-estudios.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,9 +49,5 @@ export class MisEstudios implements OnInit {
 
   protected alternarInforme(orden: OrdenImagenResponse): void {
     this.informeAbierto.set(this.informeAbierto() === orden.id ? null : orden.id);
-  }
-
-  protected imprimir(orden: OrdenImagenResponse): void {
-    imprimirInforme(orden);
   }
 }

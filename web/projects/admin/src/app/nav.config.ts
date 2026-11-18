@@ -213,6 +213,17 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Documentos',
+    items: [
+      {
+        label: 'Plantillas de documentos',
+        icon: 'pi-file-edit',
+        link: '/plantillas',
+        roles: ['ROLE_ADMIN'],
+      },
+    ],
+  },
+  {
     title: 'Directorio',
     items: [
       {
@@ -303,6 +314,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         link: '/notificaciones',
         roles: ['ROLE_ADMIN'],
         badge: 'notificaciones',
+      },
+      {
+        label: 'Mis exportaciones',
+        icon: 'pi-file-export',
+        link: '/mis-exportaciones',
+        roles: ['ROLE_ADMIN'],
       },
       {
         label: 'Mi perfil',

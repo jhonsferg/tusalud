@@ -1,5 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { UIChart } from 'primeng/chart';
 import { TableModule } from 'primeng/table';
 import { Tag } from 'primeng/tag';
@@ -7,13 +7,24 @@ import { Tag } from 'primeng/tag';
 import { FiltroReporte, ReportesStore } from '@tusalud/core';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { Kpi } from '@tusalud/ui/kpi';
+import { BotonExportar } from '@tusalud/ui/boton-exportar';
 import { PageHeader } from '@tusalud/ui/page-header';
 import { FiltrosReporte } from '../shared/filtros-reporte/filtros-reporte';
 import { OPCIONES_BARRAS } from '../shared/formato';
 
 @Component({
   selector: 'app-reporte-calidad',
-  imports: [DecimalPipe, UIChart, TableModule, Tag, EmptyState, Kpi, PageHeader, FiltrosReporte],
+  imports: [
+    BotonExportar,
+    DecimalPipe,
+    UIChart,
+    TableModule,
+    Tag,
+    EmptyState,
+    Kpi,
+    PageHeader,
+    FiltrosReporte,
+  ],
   templateUrl: './calidad.html',
   styleUrl: './calidad.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,7 +52,16 @@ export class ReporteCalidad {
     return tasa >= 25 ? 'danger' : tasa >= 10 ? 'warn' : 'success';
   }
 
+  protected readonly filtro = signal<FiltroReporte | null>(null);
+  protected readonly parametros = computed(() => {
+    const actual = this.filtro();
+    return actual
+      ? { desde: actual.desde, hasta: actual.hasta, agrupacion: actual.agrupacion }
+      : {};
+  });
+
   protected cargar(filtro: FiltroReporte): void {
+    this.filtro.set(filtro);
     this.store.cargarCalidad(filtro);
   }
 }

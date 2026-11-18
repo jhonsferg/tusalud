@@ -1,0 +1,91 @@
+<app-page-header
+  title="Mis exportaciones"
+  subtitle="Reportes y listados generados. Se conservan unos días y solo tú puedes descargarlos."
+  icon="pi-file-export"
+/>
+
+<div class="panel">
+  @if (store.lista.error(); as error) {
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar tus exportaciones"
+      [message]="error.message"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="store.cargar()" />
+    </app-empty-state>
+  } @else {
+    <p-table
+      [value]="store.lista.value() ?? []"
+      [loading]="store.lista.loading() && !store.lista.hasValue()"
+      [paginator]="(store.lista.value() ?? []).length > 10"
+      [rows]="10"
+      [rowHover]="true"
+      responsiveLayout="scroll"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Exportación</th>
+          <th>Formato</th>
+          <th>Estado</th>
+          <th class="text-right">Tamaño</th>
+          <th>Solicitada</th>
+          <th>Vence</th>
+          <th style="width: 8rem"></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-e>
+        <tr>
+          <td>
+            <div class="font-semibold">{{ nombreTipo(e.tipo) }}</div>
+            @if (e.nombre) {
+              <small class="text-muted">{{ e.nombre }}</small>
+            }
+            @if (e.estado === 'ERROR' && e.error) {
+              <small class="error block">{{ e.error }}</small>
+            }
+          </td>
+          <td>{{ e.formato === 'XLSX' ? 'Excel' : 'PDF' }}</td>
+          <td>
+            <p-tag [value]="etiquetaDeEstado(e.estado)" [severity]="severidad(e.estado)" />
+          </td>
+          <td class="text-right">{{ tamano(e.tamano) }}</td>
+          <td>{{ e.creadaEn | date: 'd MMM y, HH:mm' }}</td>
+          <td>{{ e.expiraEn ? (e.expiraEn | date: 'd MMM y') : '' }}</td>
+          <td class="text-right acciones">
+            @if (e.estado === 'LISTA') {
+              <p-button
+                icon="pi pi-download"
+                [text]="true"
+                [rounded]="true"
+                [ariaLabel]="'Descargar ' + nombreTipo(e.tipo)"
+                (onClick)="descargar(e)"
+              />
+            }
+            @if (e.estado !== 'PROCESANDO' && e.estado !== 'SOLICITADA') {
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                [rounded]="true"
+                severity="danger"
+                [ariaLabel]="'Eliminar ' + nombreTipo(e.tipo)"
+                (onClick)="eliminar(e)"
+              />
+            }
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="7">
+            <app-empty-state
+              icon="pi-file-export"
+              title="Aún no tienes exportaciones"
+              message="Exporta un reporte o un listado y aparecerá aquí."
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

@@ -8,11 +8,13 @@ import { Tag } from 'primeng/tag';
 import { FarmaciaStore } from '@tusalud/core';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { Kpi } from '@tusalud/ui/kpi';
+import { BotonDocumento } from '@tusalud/ui/boton-documento';
 import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-farmacia-panel',
   imports: [
+    BotonDocumento,
     CurrencyPipe,
     DatePipe,
     RouterLink,

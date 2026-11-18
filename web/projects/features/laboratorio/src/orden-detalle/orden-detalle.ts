@@ -27,6 +27,7 @@ import {
   optionalIdAttribute,
   ParametroExamen,
 } from '@tusalud/core';
+import { BotonDocumento } from '@tusalud/ui/boton-documento';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { ICONO_ORDEN, rangoReferencia, SEVERIDAD_ORDEN } from '@tusalud/ui/utils';
 import { PageHeader } from '@tusalud/ui/page-header';
@@ -34,6 +35,7 @@ import { PageHeader } from '@tusalud/ui/page-header';
 @Component({
   selector: 'app-orden-detalle',
   imports: [
+    BotonDocumento,
     CurrencyPipe,
     DatePipe,
     ReactiveFormsModule,

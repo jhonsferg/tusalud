@@ -72,7 +72,15 @@
             [severity]="receta.estado === 'PARCIAL' ? 'info' : 'warn'"
           />
         </td>
-        <td class="text-right">
+        <td class="text-right acciones">
+          <app-boton-documento
+            tipo="receta"
+            [registro]="receta.atencionId"
+            [soloIcono]="true"
+            icono="pi-print"
+            accion="imprimir"
+            [ariaEtiqueta]="'Imprimir la receta de ' + receta.pacienteNombre"
+          />
           <p-button
             label="Dispensar"
             icon="pi pi-check"

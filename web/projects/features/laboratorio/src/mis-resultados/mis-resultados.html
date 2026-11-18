@@ -48,6 +48,12 @@
               size="small"
               (onClick)="seleccionada.set(orden)"
             />
+            <app-boton-documento
+              tipo="resultados-laboratorio"
+              [registro]="orden.id"
+              etiqueta="PDF"
+              [ariaEtiqueta]="'Descargar el PDF de resultados de ' + orden.codigo"
+            />
           } @else {
             <small class="text-muted">Te avisaremos cuando los resultados estén listos.</small>
           }

@@ -80,13 +80,17 @@
                 size="small"
                 (onClick)="alternarInforme(orden)"
               />
-              <p-button
-                label="Imprimir"
-                icon="pi pi-print"
-                size="small"
-                [outlined]="true"
-                severity="secondary"
-                (onClick)="imprimir(orden)"
+              <app-boton-documento
+                tipo="informe-imagen"
+                [registro]="orden.id"
+                accion="imprimir"
+                etiqueta="Imprimir"
+                icono="pi-print"
+              />
+              <app-boton-documento
+                tipo="informe-imagen"
+                [registro]="orden.id"
+                etiqueta="Descargar PDF"
               />
             </div>
             @if (informeAbierto() === orden.id && orden.informe; as informe) {

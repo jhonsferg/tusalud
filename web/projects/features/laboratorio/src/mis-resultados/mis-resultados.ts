@@ -5,13 +5,14 @@ import { Dialog } from 'primeng/dialog';
 import { Tag } from 'primeng/tag';
 
 import { ETIQUETA_ESTADO_ORDEN, LaboratorioStore, OrdenResponse } from '@tusalud/core';
+import { BotonDocumento } from '@tusalud/ui/boton-documento';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { ICONO_ORDEN, rangoReferencia, SEVERIDAD_ORDEN } from '@tusalud/ui/utils';
 import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-mis-resultados',
-  imports: [DatePipe, Button, Dialog, Tag, EmptyState, PageHeader],
+  imports: [BotonDocumento, DatePipe, Button, Dialog, Tag, EmptyState, PageHeader],
   templateUrl: './mis-resultados.html',
   styleUrl: './mis-resultados.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

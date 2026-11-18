@@ -1,5 +1,5 @@
 import { OrdenImagenResponse } from '@tusalud/core';
-import { construirHtmlInforme, resumenEstudios, tamanoLegible } from './imagenes.utils';
+import { resumenEstudios, tamanoLegible } from './imagenes.utils';
 
 function orden(sobreescribir: Partial<OrdenImagenResponse> = {}): OrdenImagenResponse {
   return {
@@ -44,25 +44,5 @@ describe('utilidades de imágenes diagnósticas', () => {
 
   it('resume los estudios de una orden', () => {
     expect(resumenEstudios(orden())).toBe('Radiografía de tórax');
-  });
-
-  it('escapa el contenido al construir el informe imprimible', () => {
-    const html = construirHtmlInforme(orden());
-
-    expect(html).not.toContain('<script>');
-    expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
-    expect(html).toContain('Juan &lt;Pérez&gt;');
-    expect(html).toContain('Tos &quot;persistente&quot;');
-    expect(html).toContain('Colegiatura CMP-45210');
-    expect(html).toContain('IMG-000001');
-  });
-
-  it('marca el hallazgo crítico en el informe', () => {
-    expect(construirHtmlInforme(orden({ hallazgoCritico: true }))).toContain(
-      'Hallazgo crítico comunicado',
-    );
-    expect(construirHtmlInforme(orden({ hallazgoCritico: false }))).not.toContain(
-      'Hallazgo crítico comunicado',
-    );
   });
 });

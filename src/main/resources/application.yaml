@@ -50,6 +50,11 @@ app:
   pagos:
     simulacion-habilitada: ${PAGOS_SIMULACION_HABILITADA:true}
     expiracion-qr-minutos: 5
+  documentos:
+    retencion-exportaciones: ${DOCUMENTOS_RETENCION:7d}
+    maximo-concurrentes: 3
+    maximo-por-hora: 20
+    sincronico: false
   storage:
     tipo: ${STORAGE_TIPO:local}
     endpoint: ${STORAGE_ENDPOINT:}

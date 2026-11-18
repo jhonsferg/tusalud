@@ -119,6 +119,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         badge: 'notificaciones',
       },
       {
+        label: 'Mis exportaciones',
+        icon: 'pi-file-export',
+        link: '/mis-exportaciones',
+        roles: ['ROLE_MEDICO'],
+      },
+      {
         label: 'Mi perfil',
         icon: 'pi-user',
         link: '/perfil',

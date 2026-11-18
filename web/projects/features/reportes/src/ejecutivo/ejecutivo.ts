@@ -1,10 +1,11 @@
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { UIChart } from 'primeng/chart';
 
 import { AuthService, FiltroReporte, ReportesStore } from '@tusalud/core';
 import { EmptyState } from '@tusalud/ui/empty-state';
+import { BotonExportar } from '@tusalud/ui/boton-exportar';
 import { PageHeader } from '@tusalud/ui/page-header';
 import { FiltrosReporte } from '../shared/filtros-reporte/filtros-reporte';
 import { KpiVariacion } from '../shared/kpi-variacion/kpi-variacion';
@@ -13,6 +14,7 @@ import { OPCIONES_BARRAS, OPCIONES_LINEA, etiquetaFecha } from '../shared/format
 @Component({
   selector: 'app-reporte-ejecutivo',
   imports: [
+    BotonExportar,
     CurrencyPipe,
     DecimalPipe,
     RouterLink,
@@ -64,7 +66,16 @@ export class ReporteEjecutivo {
     };
   });
 
+  protected readonly filtro = signal<FiltroReporte | null>(null);
+  protected readonly parametros = computed(() => {
+    const actual = this.filtro();
+    return actual
+      ? { desde: actual.desde, hasta: actual.hasta, agrupacion: actual.agrupacion }
+      : {};
+  });
+
   protected cargar(filtro: FiltroReporte): void {
+    this.filtro.set(filtro);
     this.store.cargarEjecutivo(filtro);
   }
 }

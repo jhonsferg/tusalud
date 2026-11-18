@@ -30,6 +30,7 @@ import {
   toIsoDate,
 } from '@tusalud/core';
 import { EmptyState } from '@tusalud/ui/empty-state';
+import { BotonExportar } from '@tusalud/ui/boton-exportar';
 import { PageHeader } from '@tusalud/ui/page-header';
 import { severidadAusencia } from '../shared/ausencia';
 
@@ -42,6 +43,7 @@ interface FilaCalendario {
 @Component({
   selector: 'app-ausencias',
   imports: [
+    BotonExportar,
     DatePipe,
     FormsModule,
     Button,
@@ -94,6 +96,11 @@ export class Ausencias implements OnInit {
   protected readonly motivo = signal('');
   protected readonly procesando = signal(false);
   protected readonly error = signal<string | null>(null);
+
+  protected readonly parametrosExportacion = computed(() => ({
+    estado: this.estado(),
+    area: this.area(),
+  }));
 
   protected readonly diasMes = computed(() => {
     const inicio = this.mes();

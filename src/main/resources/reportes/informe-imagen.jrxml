@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="informe-imagen" language="java" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="40" bottomMargin="40" whenNoDataType="AllSectionsNoDetail" uuid="00000000-0000-4000-8000-000000000049">
+	<style name="base" default="true" fontName="DejaVu Sans" fontSize="9" pdfEncoding="Identity-H" pdfEmbedded="true" forecolor="#0F172A"/>
+	<style name="marca" style="base" fontSize="20" bold="true" forecolor="#1D4ED8"/>
+	<style name="titulo" style="base" fontSize="14" bold="true"/>
+	<style name="tenue" style="base" fontSize="8" forecolor="#475569"/>
+	<style name="etiqueta" style="base" fontSize="8" bold="true" forecolor="#475569"/>
+	<style name="cabecera" style="base" fontSize="8" bold="true" forecolor="#1E3A8A"/>
+	<style name="alerta" style="base" fontSize="10" bold="true" forecolor="#B91C1C" backcolor="#FEE2E2" mode="Opaque"/>
+	<style name="total" style="base" fontSize="11" bold="true" forecolor="#1D4ED8"/>
+	<style name="dato" style="base"/>
+	<style name="datoFuera" style="base" bold="true" forecolor="#B91C1C"/>
+	<style name="datoH" style="base" fontSize="8" bold="true" forecolor="#1E3A8A" backcolor="#EEF2FF" mode="Opaque"/>
+	<style name="datoS" style="base" fontSize="11" bold="true" forecolor="#1D4ED8"/>
+	<style name="datoT" style="base" bold="true"/>
+	<parameter name="titulo" class="java.lang.String"/>
+	<parameter name="subtitulo" class="java.lang.String"/>
+	<parameter name="generadoPor" class="java.lang.String"/>
+	<parameter name="generadoEn" class="java.lang.String"/>
+	<parameter name="codigo" class="java.lang.String"/>
+	<parameter name="nota" class="java.lang.String"/>
+	<parameter name="notaTitulo" class="java.lang.String"/>
+	<parameter name="firma1" class="java.lang.String"/>
+	<parameter name="firma2" class="java.lang.String"/>
+	<parameter name="banner" class="java.lang.String"/>
+	<parameter name="l1" class="java.lang.String"/>
+	<parameter name="l2" class="java.lang.String"/>
+	<parameter name="l3" class="java.lang.String"/>
+	<parameter name="l4" class="java.lang.String"/>
+	<parameter name="l5" class="java.lang.String"/>
+	<parameter name="l6" class="java.lang.String"/>
+	<parameter name="l7" class="java.lang.String"/>
+	<parameter name="l8" class="java.lang.String"/>
+	<parameter name="v1" class="java.lang.String"/>
+	<parameter name="v2" class="java.lang.String"/>
+	<parameter name="v3" class="java.lang.String"/>
+	<parameter name="v4" class="java.lang.String"/>
+	<parameter name="v5" class="java.lang.String"/>
+	<parameter name="v6" class="java.lang.String"/>
+	<parameter name="v7" class="java.lang.String"/>
+	<parameter name="v8" class="java.lang.String"/>
+	<parameter name="tl1" class="java.lang.String"/>
+	<parameter name="tl2" class="java.lang.String"/>
+	<parameter name="tl3" class="java.lang.String"/>
+	<parameter name="tv1" class="java.lang.String"/>
+	<parameter name="tv2" class="java.lang.String"/>
+	<parameter name="tv3" class="java.lang.String"/>
+	<parameter name="g1" class="java.awt.Image"/>
+	<parameter name="g2" class="java.awt.Image"/>
+	<field name="c1" class="java.lang.String"/>
+	<field name="c2" class="java.lang.String"/>
+	<field name="c3" class="java.lang.String"/>
+	<field name="c4" class="java.lang.String"/>
+	<field name="c5" class="java.lang.String"/>
+	<field name="c6" class="java.lang.String"/>
+	<field name="tipo" class="java.lang.String"/>
+	<field name="fuera" class="java.lang.String"/>
+	<title height="166">
+			<element kind="rectangle" uuid="00000000-0000-4000-8000-000000000001" mode="Opaque" backcolor="#1D4ED8" x="0" y="0" width="515" height="4">
+				<pen lineWidth="0"/>
+			</element>
+			<element kind="staticText" uuid="00000000-0000-4000-8000-000000000002" x="0" y="10" width="200" height="26" style="marca" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[TuSalud]]></text>
+			</element>
+			<element kind="staticText" uuid="00000000-0000-4000-8000-000000000003" x="0" y="34" width="260" height="14" style="tenue" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[Sistema de gestión clínica]]></text>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000004" x="260" y="10" width="255" height="22" style="titulo" hTextAlign="Right" vTextAlign="Top">
+				<expression><![CDATA[$P{titulo}]]></expression>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000005" x="260" y="34" width="255" height="14" style="tenue" hTextAlign="Right" vTextAlign="Top">
+				<expression><![CDATA[$P{subtitulo}]]></expression>
+			</element>
+			<element kind="line" uuid="00000000-0000-4000-8000-000000000006" x="0" y="56" width="515" height="0">
+				<pen lineWidth="0.75" lineColor="#1D4ED8"/>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000007" x="0" y="62" width="515" height="22" style="alerta" hTextAlign="Center" vTextAlign="Top">
+				<expression><![CDATA[$P{banner}]]></expression>
+				<printWhenExpression><![CDATA[$P{banner} != null && !$P{banner}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000008" x="0" y="90" width="88" height="15" style="etiqueta" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{l1}]]></expression>
+				<printWhenExpression><![CDATA[$P{l1} != null && !$P{l1}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000009" x="88" y="90" width="168" height="15" style="base" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{v1}]]></expression>
+				<printWhenExpression><![CDATA[$P{l1} != null && !$P{l1}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000010" x="262" y="90" width="88" height="15" style="etiqueta" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{l2}]]></expression>
+				<printWhenExpression><![CDATA[$P{l2} != null && !$P{l2}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000011" x="350" y="90" width="168" height="15" style="base" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{v2}]]></expression>
+				<printWhenExpression><![CDATA[$P{l2} != null && !$P{l2}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000012" x="0" y="107" width="88" height="15" style="etiqueta" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{l3}]]></expression>
+				<printWhenExpression><![CDATA[$P{l3} != null && !$P{l3}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000013" x="88" y="107" width="168" height="15" style="base" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{v3}]]></expression>
+				<printWhenExpression><![CDATA[$P{l3} != null && !$P{l3}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000014" x="262" y="107" width="88" height="15" style="etiqueta" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{l4}]]></expression>
+				<printWhenExpression><![CDATA[$P{l4} != null && !$P{l4}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000015" x="350" y="107" width="168" height="15" style="base" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{v4}]]></expression>
+				<printWhenExpression><![CDATA[$P{l4} != null && !$P{l4}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000016" x="0" y="124" width="88" height="15" style="etiqueta" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{l5}]]></expression>
+				<printWhenExpression><![CDATA[$P{l5} != null && !$P{l5}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000017" x="88" y="124" width="168" height="15" style="base" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{v5}]]></expression>
+				<printWhenExpression><![CDATA[$P{l5} != null && !$P{l5}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000018" x="262" y="124" width="88" height="15" style="etiqueta" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{l6}]]></expression>
+				<printWhenExpression><![CDATA[$P{l6} != null && !$P{l6}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000019" x="350" y="124" width="168" height="15" style="base" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{v6}]]></expression>
+				<printWhenExpression><![CDATA[$P{l6} != null && !$P{l6}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000020" x="0" y="141" width="88" height="15" style="etiqueta" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{l7}]]></expression>
+				<printWhenExpression><![CDATA[$P{l7} != null && !$P{l7}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000021" x="88" y="141" width="168" height="15" style="base" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{v7}]]></expression>
+				<printWhenExpression><![CDATA[$P{l7} != null && !$P{l7}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000022" x="262" y="141" width="88" height="15" style="etiqueta" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{l8}]]></expression>
+				<printWhenExpression><![CDATA[$P{l8} != null && !$P{l8}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000023" x="350" y="141" width="168" height="15" style="base" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{v8}]]></expression>
+				<printWhenExpression><![CDATA[$P{l8} != null && !$P{l8}.isEmpty()]]></printWhenExpression>
+			</element>
+
+	</title>
+	<columnHeader height="22">
+			<element kind="rectangle" uuid="00000000-0000-4000-8000-000000000024" mode="Opaque" backcolor="#EEF2FF" x="0" y="0" width="70" height="20">
+				<pen lineWidth="0"/>
+			</element>
+			<element kind="staticText" uuid="00000000-0000-4000-8000-000000000025" x="4" y="0" width="62" height="20" style="cabecera" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[Código]]></text>
+			</element>
+			<element kind="rectangle" uuid="00000000-0000-4000-8000-000000000028" mode="Opaque" backcolor="#EEF2FF" x="70" y="0" width="260" height="20">
+				<pen lineWidth="0"/>
+			</element>
+			<element kind="staticText" uuid="00000000-0000-4000-8000-000000000029" x="74" y="0" width="252" height="20" style="cabecera" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[Estudio]]></text>
+			</element>
+			<element kind="rectangle" uuid="00000000-0000-4000-8000-000000000032" mode="Opaque" backcolor="#EEF2FF" x="330" y="0" width="60" height="20">
+				<pen lineWidth="0"/>
+			</element>
+			<element kind="staticText" uuid="00000000-0000-4000-8000-000000000033" x="334" y="0" width="52" height="20" style="cabecera" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[Modalidad]]></text>
+			</element>
+			<element kind="rectangle" uuid="00000000-0000-4000-8000-000000000036" mode="Opaque" backcolor="#EEF2FF" x="390" y="0" width="125" height="20">
+				<pen lineWidth="0"/>
+			</element>
+			<element kind="staticText" uuid="00000000-0000-4000-8000-000000000037" x="394" y="0" width="117" height="20" style="cabecera" hTextAlign="Left" vTextAlign="Middle">
+				<text><![CDATA[Región]]></text>
+			</element>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Prevent">
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000026" x="4" y="2" width="62" height="14" style="dato" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$F{c1}]]></expression>
+				<printWhenExpression><![CDATA[$F{fuera}.equals("0")]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000027" x="4" y="2" width="62" height="14" style="datoFuera" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$F{c1}]]></expression>
+				<printWhenExpression><![CDATA[$F{fuera}.equals("1")]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000030" x="74" y="2" width="252" height="14" style="dato" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$F{c2}]]></expression>
+				<printWhenExpression><![CDATA[$F{fuera}.equals("0")]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000031" x="74" y="2" width="252" height="14" style="datoFuera" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$F{c2}]]></expression>
+				<printWhenExpression><![CDATA[$F{fuera}.equals("1")]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000034" x="334" y="2" width="52" height="14" style="dato" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$F{c3}]]></expression>
+				<printWhenExpression><![CDATA[$F{fuera}.equals("0")]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000035" x="334" y="2" width="52" height="14" style="datoFuera" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$F{c3}]]></expression>
+				<printWhenExpression><![CDATA[$F{fuera}.equals("1")]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000038" x="394" y="2" width="117" height="14" style="dato" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$F{c4}]]></expression>
+				<printWhenExpression><![CDATA[$F{fuera}.equals("0")]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000039" x="394" y="2" width="117" height="14" style="datoFuera" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$F{c4}]]></expression>
+				<printWhenExpression><![CDATA[$F{fuera}.equals("1")]]></printWhenExpression>
+			</element>
+		</band>
+	</detail>
+	<pageFooter height="28">
+			<element kind="line" uuid="00000000-0000-4000-8000-000000000045" x="0" y="4" width="515" height="0">
+				<pen lineWidth="0.75" lineColor="#CBD5E1"/>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000046" x="0" y="8" width="260" height="14" style="tenue" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA["Generado por " + $P{generadoPor} + " · " + $P{generadoEn}]]></expression>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000047" x="250" y="8" width="170" height="14" style="tenue" hTextAlign="Center" vTextAlign="Top">
+				<expression><![CDATA["Código de verificación " + $P{codigo}]]></expression>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000048" x="420" y="8" width="95" height="14" style="tenue" hTextAlign="Right" vTextAlign="Top">
+				<expression><![CDATA["Página " + $V{PAGE_NUMBER}]]></expression>
+			</element>
+	</pageFooter>
+	<summary height="96">
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000040" x="0" y="6" width="515" height="14" style="cabecera" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{notaTitulo}]]></expression>
+				<printWhenExpression><![CDATA[$P{notaTitulo} != null && !$P{notaTitulo}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" textAdjust="StretchHeight" uuid="00000000-0000-4000-8000-000000000041" x="0" y="22" width="515" height="40" style="base" hTextAlign="Left" vTextAlign="Top">
+				<expression><![CDATA[$P{nota}]]></expression>
+				<printWhenExpression><![CDATA[$P{nota} != null && !$P{nota}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="line" uuid="00000000-0000-4000-8000-000000000042" x="300" y="60" width="215" height="0">
+				<pen lineWidth="0.75" lineColor="#475569"/>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000043" x="300" y="64" width="215" height="14" style="cabecera" hTextAlign="Center" vTextAlign="Top">
+				<expression><![CDATA[$P{firma1}]]></expression>
+				<printWhenExpression><![CDATA[$P{firma1} != null && !$P{firma1}.isEmpty()]]></printWhenExpression>
+			</element>
+			<element kind="textField" uuid="00000000-0000-4000-8000-000000000044" x="300" y="78" width="215" height="14" style="tenue" hTextAlign="Center" vTextAlign="Top">
+				<expression><![CDATA[$P{firma2}]]></expression>
+				<printWhenExpression><![CDATA[$P{firma2} != null && !$P{firma2}.isEmpty()]]></printWhenExpression>
+			</element>
+	</summary>
+</jasperReport>

@@ -4,7 +4,17 @@
   icon="pi-filter"
   backLink="/laboratorio"
   backLabel="Volver a las órdenes"
-/>
+>
+  @if (orden(); as o) {
+    @if (o.estado === 'COMPLETADA') {
+      <app-boton-documento
+        tipo="resultados-laboratorio"
+        [registro]="o.id"
+        etiqueta="Descargar PDF"
+      />
+    }
+  }
+</app-page-header>
 
 @if (store.orden.error(); as error) {
   <div class="panel">

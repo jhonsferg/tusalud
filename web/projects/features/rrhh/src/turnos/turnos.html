@@ -4,7 +4,14 @@
   icon="pi-clock"
   backLink="/rrhh"
   backLabel="Volver al resumen"
-/>
+>
+  <app-boton-exportar
+    tipo="turnos"
+    formato="XLSX"
+    etiqueta="Exportar a Excel"
+    [parametros]="parametrosExportacion()"
+  />
+</app-page-header>
 
 <div class="barra panel">
   <div class="semana">

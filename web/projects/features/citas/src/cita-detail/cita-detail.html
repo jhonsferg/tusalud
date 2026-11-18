@@ -38,6 +38,14 @@
         <p class="motivo">{{ cita.motivo }}</p>
 
         <div class="actions">
+          @if (puedeConstancia(cita)) {
+            <app-boton-documento
+              tipo="constancia"
+              [registro]="cita.id"
+              etiqueta="Constancia"
+              icono="pi-file"
+            />
+          }
           @if (puedePagar(cita)) {
             <p-button
               label="Pagar cita"
@@ -150,6 +158,20 @@
 
             @if (atencion.receta.length > 0) {
               <h4>Receta médica</h4>
+              <div class="acciones-receta">
+                <app-boton-documento
+                  tipo="receta"
+                  [registro]="atencion.id"
+                  accion="imprimir"
+                  etiqueta="Imprimir receta"
+                  icono="pi-print"
+                />
+                <app-boton-documento
+                  tipo="receta"
+                  [registro]="atencion.id"
+                  etiqueta="Descargar PDF"
+                />
+              </div>
               <ul class="receta">
                 @for (item of atencion.receta; track $index) {
                   <li>

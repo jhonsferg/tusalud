@@ -17,7 +17,16 @@
             >DNI {{ r.dni }} · {{ r.medicoNombre }} · {{ r.fecha | date: 'd MMM y' }}</small
           >
         </div>
-        <p-button label="Cambiar" [text]="true" size="small" (onClick)="elegirReceta(null)" />
+        <div class="acciones-receta">
+          <app-boton-documento
+            tipo="receta"
+            [registro]="r.atencionId"
+            accion="imprimir"
+            etiqueta="Imprimir receta"
+            icono="pi-print"
+          />
+          <p-button label="Cambiar" [text]="true" size="small" (onClick)="elegirReceta(null)" />
+        </div>
       </div>
     } @else {
       <input

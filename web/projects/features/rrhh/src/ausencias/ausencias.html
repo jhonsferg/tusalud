@@ -4,7 +4,14 @@
   icon="pi-calendar-minus"
   backLink="/rrhh"
   backLabel="Volver al resumen"
-/>
+>
+  <app-boton-exportar
+    tipo="ausencias"
+    formato="XLSX"
+    etiqueta="Exportar a Excel"
+    [parametros]="parametrosExportacion()"
+  />
+</app-page-header>
 
 <div class="panel">
   <div class="filtros">

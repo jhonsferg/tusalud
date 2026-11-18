@@ -104,6 +104,45 @@ describe('interceptores', () => {
       expect(TestBed.inject(NotificationService).notifications()[0]?.type).toBe('error');
     });
 
+    it('lee el mensaje de un error recibido como blob', async () => {
+      setup(true);
+      let error: ApiError | undefined;
+      http
+        .get('/api/v1/documentos/receta/x', { responseType: 'blob' })
+        .subscribe({ error: (e: ApiError) => (error = e) });
+      controller.expectOne('/api/v1/documentos/receta/x').flush(
+        new Blob([JSON.stringify({ status: 403, message: 'No tienes acceso a este documento' })], {
+          type: 'application/json',
+        }),
+        { status: 403, statusText: 'Forbidden' },
+      );
+
+      await vi.waitFor(() => expect(error).toBeDefined());
+      expect(error?.status).toBe(403);
+      expect(error?.message).toBe('No tienes acceso a este documento');
+      expect(TestBed.inject(NotificationService).notifications()[0]?.message).toBe(
+        'No tienes acceso a este documento',
+      );
+    });
+
+    it('conserva un mensaje genérico si el blob de error no es JSON', async () => {
+      setup(true);
+      let error: ApiError | undefined;
+      http
+        .get('/api/v1/documentos/receta/x', { responseType: 'blob' })
+        .subscribe({ error: (e: ApiError) => (error = e) });
+      controller
+        .expectOne('/api/v1/documentos/receta/x')
+        .flush(new Blob(['<html>'], { type: 'application/json' }), {
+          status: 500,
+          statusText: 'Server Error',
+        });
+
+      await vi.waitFor(() => expect(error).toBeDefined());
+      expect(error?.status).toBe(500);
+      expect(error?.message.length).toBeGreaterThan(0);
+    });
+
     it('no notifica cuando la petición lo indica', () => {
       setup(false);
       http

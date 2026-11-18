@@ -24,7 +24,7 @@ exec weed server \
     -dir=/data \
     -ip.bind=0.0.0.0 \
     -master.volumeSizeLimitMB="${STORAGE_VOLUME_MB:-1024}" \
-    -volume.max="${STORAGE_MAX_VOLUMES:-30}" \
+    -volume.max="${STORAGE_MAX_VOLUMES:-100}" \
     -filer \
     -s3 \
     -s3.config=/tmp/s3.json \

@@ -29,6 +29,7 @@ export const ICONO_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   ORDEN_IMAGEN: 'pi-image',
   ESTUDIO_INFORMADO: 'pi-file-check',
   HALLAZGO_CRITICO: 'pi-exclamation-triangle',
+  EXPORTACION_LISTA: 'pi-file-export',
   SISTEMA: 'pi-info-circle',
 };
 
@@ -61,5 +62,6 @@ export const COLOR_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   ORDEN_IMAGEN: '#0ea5e9',
   ESTUDIO_INFORMADO: '#10b981',
   HALLAZGO_CRITICO: '#dc2626',
+  EXPORTACION_LISTA: '#0891b2',
   SISTEMA: '#64748b',
 };

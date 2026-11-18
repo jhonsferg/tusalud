@@ -31,12 +31,14 @@ import {
   TipoComprobante,
   TipoDocumento,
 } from '@tusalud/core';
+import { BotonDocumento } from '@tusalud/ui/boton-documento';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-cobrar',
   imports: [
+    BotonDocumento,
     CurrencyPipe,
     DatePipe,
     FormsModule,
@@ -187,9 +189,5 @@ export class Cobrar implements OnInit {
           this.error.set(error.message);
         },
       });
-  }
-
-  protected imprimir(): void {
-    window.print();
   }
 }

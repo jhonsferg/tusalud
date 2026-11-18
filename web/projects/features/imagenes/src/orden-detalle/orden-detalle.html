@@ -114,13 +114,14 @@
       />
     }
     @if (o.estado === 'INFORMADA') {
-      <p-button
-        label="Imprimir informe"
-        icon="pi pi-print"
-        [outlined]="true"
-        severity="secondary"
-        (onClick)="imprimir(o)"
+      <app-boton-documento
+        tipo="informe-imagen"
+        [registro]="o.id"
+        accion="imprimir"
+        etiqueta="Imprimir informe"
+        icono="pi-print"
       />
+      <app-boton-documento tipo="informe-imagen" [registro]="o.id" etiqueta="Descargar PDF" />
     }
     @if (puedeCancelar()) {
       <p-button

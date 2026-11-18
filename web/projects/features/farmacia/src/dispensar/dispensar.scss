@@ -129,3 +129,16 @@ h3 {
     font-weight: 700;
   }
 }
+
+.acciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.acciones-receta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

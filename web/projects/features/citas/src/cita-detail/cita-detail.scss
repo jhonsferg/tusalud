@@ -152,3 +152,10 @@ h3 i {
     flex-direction: column;
   }
 }
+
+.acciones-receta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}

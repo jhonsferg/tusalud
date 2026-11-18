@@ -35,11 +35,13 @@ import {
   TIPOS_PRODUCTO,
 } from '@tusalud/core';
 import { EmptyState } from '@tusalud/ui/empty-state';
+import { BotonExportar } from '@tusalud/ui/boton-exportar';
 import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-productos',
   imports: [
+    BotonExportar,
     CurrencyPipe,
     DatePipe,
     FormsModule,
@@ -73,6 +75,11 @@ export class Productos implements OnInit {
   protected readonly busqueda = signal('');
   protected readonly tipo = signal<TipoProducto | null>(null);
   protected readonly soloBajoStock = signal(false);
+  protected readonly parametrosExportacion = computed(() => ({
+    q: this.busqueda().trim(),
+    tipo: this.tipo(),
+    bajoStock: this.soloBajoStock() ? 'true' : null,
+  }));
   private readonly cambio = new Subject<void>();
 
   protected readonly tipos = TIPOS_PRODUCTO.map((valor) => ({

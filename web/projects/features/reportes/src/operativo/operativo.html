@@ -2,7 +2,20 @@
   title="Reporte operativo"
   subtitle="Ocupación, esperas, demanda, agenda e inventario crítico"
   icon="pi-sitemap"
-/>
+>
+  <app-boton-exportar
+    tipo="reporte-operativo"
+    formato="PDF"
+    [parametros]="parametros()"
+    [deshabilitado]="!filtro()"
+  />
+  <app-boton-exportar
+    tipo="reporte-operativo"
+    formato="XLSX"
+    [parametros]="parametros()"
+    [deshabilitado]="!filtro()"
+  />
+</app-page-header>
 
 <app-filtros-reporte (cambio)="cargar($event)" />
 

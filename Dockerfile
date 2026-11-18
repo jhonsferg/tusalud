@@ -22,7 +22,7 @@ RUN jdeps --ignore-missing-deps -q --recursive --multi-release 25 --print-module
         --class-path "$(find /layers -path '*/lib/*.jar' | tr '\n' ':')" \
         "$(find /layers -maxdepth 2 -name '*.jar' | head -1)" > /tmp/modules \
     && jlink \
-        --add-modules "$(cat /tmp/modules),java.instrument,java.management,java.net.http,java.security.jgss,java.security.sasl,jdk.jfr,jdk.localedata,jdk.management,jdk.naming.dns,jdk.unsupported,jdk.zipfs" \
+        --add-modules "$(cat /tmp/modules),java.instrument,java.management,java.net.http,java.security.jgss,java.security.sasl,jdk.compiler,jdk.jfr,jdk.localedata,jdk.management,jdk.naming.dns,jdk.unsupported,jdk.zipfs" \
         --include-locales=en,es \
         --strip-debug \
         --no-man-pages \
@@ -37,8 +37,10 @@ ARG OTEL_JAVA_AGENT_SHA256=f787eb6c7f3d18e69a431e108a15278d25ee37f83d68b678f621e
 ENV JAVA_HOME=/opt/java \
     PATH=/opt/java/bin:$PATH \
     TZ=America/Lima \
-    LANG=C.UTF-8
-RUN addgroup -S -g 10001 spring && adduser -S -u 10001 -G spring -h /app spring && mkdir -m 755 /otel
+    LANG=C.UTF-8 \
+    JAVA_TOOL_OPTIONS=-Djava.awt.headless=true
+RUN apk add --no-cache fontconfig freetype ttf-dejavu \
+    && addgroup -S -g 10001 spring && adduser -S -u 10001 -G spring -h /app spring && mkdir -m 755 /otel
 WORKDIR /app
 COPY --from=jre /jre /opt/java
 ADD --checksum=sha256:${OTEL_JAVA_AGENT_SHA256} --chmod=644 \

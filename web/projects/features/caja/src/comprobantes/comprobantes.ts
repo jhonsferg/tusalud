@@ -1,5 +1,12 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Button } from 'primeng/button';
@@ -23,12 +30,16 @@ import {
   NotificationService,
   toIsoDate,
 } from '@tusalud/core';
+import { BotonDocumento } from '@tusalud/ui/boton-documento';
+import { BotonExportar } from '@tusalud/ui/boton-exportar';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-comprobantes',
   imports: [
+    BotonDocumento,
+    BotonExportar,
     CurrencyPipe,
     DatePipe,
     FormsModule,
@@ -57,6 +68,15 @@ export class Comprobantes implements OnInit {
   protected readonly busqueda = signal('');
   protected readonly estado = signal<string | null>(null);
   protected readonly rango = signal<Date[] | null>(null);
+  protected readonly parametrosExportacion = computed(() => {
+    const [inicio, fin] = this.rango() ?? [];
+    return {
+      q: this.busqueda().trim(),
+      estado: this.estado(),
+      desde: inicio ? toIsoDate(inicio) : null,
+      hasta: fin ? toIsoDate(fin) : inicio ? toIsoDate(inicio) : null,
+    };
+  });
   private readonly cambio = new Subject<void>();
   protected readonly estados = [
     { label: 'Emitidos', value: 'EMITIDO' },
@@ -129,9 +149,5 @@ export class Comprobantes implements OnInit {
         this.error.set(error.message);
       },
     });
-  }
-
-  protected imprimir(): void {
-    window.print();
   }
 }

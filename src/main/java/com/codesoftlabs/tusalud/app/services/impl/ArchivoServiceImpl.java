@@ -358,6 +358,12 @@ public class ArchivoServiceImpl implements ArchivoService {
     }
 
     private void autorizarReporte(UsuarioPrincipal actor, Archivo archivo) {
+        if ("EXPORTACION".equals(archivo.getReferenciaTipo())) {
+            if (!archivo.getSubidoPor().getId().equals(actor.getId())) {
+                throw new ForbiddenOperationException("No tiene acceso a este archivo");
+            }
+            return;
+        }
         if (archivo.getSubidoPor().getId().equals(actor.getId()) || tieneRol(actor, RolNombre.ROLE_ADMIN)) {
             return;
         }

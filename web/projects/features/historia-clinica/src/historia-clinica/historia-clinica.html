@@ -13,6 +13,13 @@
       [routerLink]="['/imagenes/paciente', pacienteId]"
     />
   }
+  @if (store.historia.value(); as resumen) {
+    <app-boton-documento
+      tipo="resumen-historia"
+      [registro]="resumen.paciente.pacienteId"
+      etiqueta="Resumen en PDF"
+    />
+  }
 </app-page-header>
 
 @if (store.historia.error(); as error) {
@@ -224,6 +231,15 @@
 
             @if (atencion.receta.length > 0) {
               <h4>Receta</h4>
+              <div class="acciones-receta">
+                <app-boton-documento
+                  tipo="receta"
+                  [registro]="atencion.id"
+                  accion="imprimir"
+                  etiqueta="Imprimir receta"
+                  icono="pi-print"
+                />
+              </div>
               <ul class="receta">
                 @for (item of atencion.receta; track $index) {
                   <li>

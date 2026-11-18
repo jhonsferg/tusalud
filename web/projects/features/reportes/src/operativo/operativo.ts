@@ -1,11 +1,12 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { UIChart } from 'primeng/chart';
 import { TableModule } from 'primeng/table';
 
 import { NOMBRES_DIAS_SEMANA, ETIQUETA_AREA, FiltroReporte, ReportesStore } from '@tusalud/core';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { Kpi } from '@tusalud/ui/kpi';
+import { BotonExportar } from '@tusalud/ui/boton-exportar';
 import { PageHeader } from '@tusalud/ui/page-header';
 import { FiltrosReporte } from '../shared/filtros-reporte/filtros-reporte';
 import {
@@ -25,7 +26,16 @@ interface CeldaCalor {
 
 @Component({
   selector: 'app-reporte-operativo',
-  imports: [DecimalPipe, UIChart, TableModule, EmptyState, Kpi, PageHeader, FiltrosReporte],
+  imports: [
+    BotonExportar,
+    DecimalPipe,
+    UIChart,
+    TableModule,
+    EmptyState,
+    Kpi,
+    PageHeader,
+    FiltrosReporte,
+  ],
   templateUrl: './operativo.html',
   styleUrl: './operativo.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -127,7 +137,16 @@ export class ReporteOperativo {
     return this.calor().get(dia + '-' + hora) ?? { citas: 0, intensidad: 0 };
   }
 
+  protected readonly filtro = signal<FiltroReporte | null>(null);
+  protected readonly parametros = computed(() => {
+    const actual = this.filtro();
+    return actual
+      ? { desde: actual.desde, hasta: actual.hasta, agrupacion: actual.agrupacion }
+      : {};
+  });
+
   protected cargar(filtro: FiltroReporte): void {
+    this.filtro.set(filtro);
     this.store.cargarOperativo(filtro);
   }
 }

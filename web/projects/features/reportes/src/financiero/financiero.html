@@ -2,7 +2,20 @@
   title="Reporte financiero"
   subtitle="Lo cobrado por día, método, origen, especialidad y médico"
   icon="pi-money-bill"
-/>
+>
+  <app-boton-exportar
+    tipo="reporte-financiero"
+    formato="PDF"
+    [parametros]="parametros()"
+    [deshabilitado]="!filtro()"
+  />
+  <app-boton-exportar
+    tipo="reporte-financiero"
+    formato="XLSX"
+    [parametros]="parametros()"
+    [deshabilitado]="!filtro()"
+  />
+</app-page-header>
 
 <app-filtros-reporte (cambio)="cargar($event)" />
 

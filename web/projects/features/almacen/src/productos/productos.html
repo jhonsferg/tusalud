@@ -3,6 +3,12 @@
   subtitle="Catálogo de medicamentos, insumos, reactivos y materiales"
   icon="pi-box"
 >
+  <app-boton-exportar
+    tipo="stock"
+    formato="XLSX"
+    etiqueta="Exportar a Excel"
+    [parametros]="parametrosExportacion()"
+  />
   @if (gestiona()) {
     <p-button label="Nuevo producto" icon="pi pi-plus" (onClick)="abrirNuevo()" />
   }

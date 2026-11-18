@@ -94,6 +94,15 @@ export const routes: Routes = [
         redirectTo: 'mi-espacio/ausencias',
       },
       {
+        path: 'mis-exportaciones',
+        loadChildren: () =>
+          import('@tusalud/features/exportaciones').then((m) => m.EXPORTACIONES_ROUTES),
+      },
+      {
+        path: 'plantillas',
+        loadChildren: () => import('@tusalud/features/plantillas').then((m) => m.PLANTILLAS_ROUTES),
+      },
+      {
         path: 'notificaciones',
         loadChildren: () =>
           import('@tusalud/features/notificaciones').then((m) => m.NOTIFICACIONES_ROUTES),

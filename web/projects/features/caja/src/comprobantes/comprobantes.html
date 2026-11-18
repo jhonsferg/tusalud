@@ -4,7 +4,14 @@
   icon="pi-receipt"
   backLink="/caja"
   backLabel="Volver a caja"
-/>
+>
+  <app-boton-exportar
+    tipo="listado-comprobantes"
+    formato="XLSX"
+    etiqueta="Exportar a Excel"
+    [parametros]="parametrosExportacion()"
+  />
+</app-page-header>
 
 <div class="panel">
   <div class="filtros">
@@ -93,6 +100,12 @@
             [ariaLabel]="'Ver ' + c.codigo"
             (onClick)="detalle.set(c)"
           />
+          <app-boton-documento
+            tipo="comprobante"
+            [registro]="c.id"
+            [soloIcono]="true"
+            [ariaEtiqueta]="'Descargar el PDF de ' + c.codigo"
+          />
           @if (c.estado === 'EMITIDO') {
             <p-button
               icon="pi pi-undo"
@@ -160,12 +173,19 @@
     </div>
   }
   <ng-template #footer>
-    <p-button
-      label="Imprimir"
-      icon="pi pi-print"
-      [outlined]="true"
-      severity="secondary"
-      (onClick)="imprimir()"
+    <app-boton-documento
+      tipo="comprobante"
+      [registro]="detalle()?.id ?? ''"
+      [deshabilitado]="!detalle()"
+      accion="imprimir"
+      etiqueta="Imprimir"
+      icono="pi-print"
+    />
+    <app-boton-documento
+      tipo="comprobante"
+      [registro]="detalle()?.id ?? ''"
+      [deshabilitado]="!detalle()"
+      etiqueta="Descargar PDF"
     />
     <p-button label="Cerrar" (onClick)="detalle.set(null)" />
   </ng-template>

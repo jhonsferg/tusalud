@@ -34,5 +34,6 @@ public enum TipoNotificacion {
     ORDEN_IMAGEN,
     ESTUDIO_INFORMADO,
     HALLAZGO_CRITICO,
+    EXPORTACION_LISTA,
     SISTEMA
 }

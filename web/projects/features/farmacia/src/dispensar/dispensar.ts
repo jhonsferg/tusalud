@@ -38,6 +38,7 @@ import {
   RecetaFarmaciaResponse,
 } from '@tusalud/core';
 import { EmptyState } from '@tusalud/ui/empty-state';
+import { BotonDocumento } from '@tusalud/ui/boton-documento';
 import { PageHeader } from '@tusalud/ui/page-header';
 
 function normalizar(texto: string): string {
@@ -50,6 +51,7 @@ function normalizar(texto: string): string {
 @Component({
   selector: 'app-dispensar',
   imports: [
+    BotonDocumento,
     CurrencyPipe,
     DatePipe,
     FormsModule,

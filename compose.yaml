@@ -96,7 +96,7 @@ services:
       STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-}
       STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-}
       STORAGE_VOLUME_MB: ${STORAGE_VOLUME_MB:-1024}
-      STORAGE_MAX_VOLUMES: ${STORAGE_MAX_VOLUMES:-30}
+      STORAGE_MAX_VOLUMES: ${STORAGE_MAX_VOLUMES:-100}
     volumes:
       - ./docker/storage/arrancar.sh:/etc/seaweedfs/arrancar.sh:ro
       - storage-data:/data

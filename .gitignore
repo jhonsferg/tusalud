@@ -26,3 +26,5 @@ Thumbs.db
 
 docker/gateway/certs/*
 !docker/gateway/certs/.gitkeep
+
+.claude/worktrees/

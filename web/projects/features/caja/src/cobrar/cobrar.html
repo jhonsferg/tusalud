@@ -205,12 +205,19 @@
     </div>
   }
   <ng-template #footer>
-    <p-button
-      label="Imprimir"
-      icon="pi pi-print"
-      [outlined]="true"
-      severity="secondary"
-      (onClick)="imprimir()"
+    <app-boton-documento
+      tipo="comprobante"
+      [registro]="emitido()?.id ?? ''"
+      [deshabilitado]="!emitido()"
+      accion="imprimir"
+      etiqueta="Imprimir"
+      icono="pi-print"
+    />
+    <app-boton-documento
+      tipo="comprobante"
+      [registro]="emitido()?.id ?? ''"
+      [deshabilitado]="!emitido()"
+      etiqueta="Descargar PDF"
     />
     <p-button label="Listo" (onClick)="emitido.set(null)" />
   </ng-template>

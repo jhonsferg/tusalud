@@ -19119,6 +19119,3184 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "24 - Documentos y exportaciones",
+      "item": [
+        {
+          "name": "Login gerencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('docGerenciaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión para esta carpeta.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"gerencia@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login caja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('docCajaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión para esta carpeta.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"caja@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('docAdminToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión para esta carpeta.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login paciente Carlos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('docPacienteToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión para esta carpeta.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"carlos.mendoza@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login paciente Sofía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('docPaciente2Token', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión para esta carpeta.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sofia.ramirez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login médico García",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('docMedicoToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión para esta carpeta.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login laboratorio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('docLaboratorioToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión para esta carpeta.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"lab@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login imágenes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('docImagenesToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Inicio de sesión para esta carpeta.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"imagenes@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Historia de Carlos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const conReceta = j.atenciones.find(a => a.receta.length > 0);",
+                  "pm.test('Carlos tiene una atención con receta', () => pm.expect(conReceta).to.exist);",
+                  "pm.collectionVariables.set('docAtencionPropiaId', conReceta.id);",
+                  "pm.collectionVariables.set('docPacientePropioId', j.paciente.pacienteId);",
+                  "pm.collectionVariables.set('docCitaPropiaId', conReceta.citaId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historia-clinica",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "historia-clinica"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Historia de Sofía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const conReceta = pm.response.json().atenciones.find(a => a.receta.length > 0);",
+                  "pm.test('Sofía tiene una atención con receta', () => pm.expect(conReceta).to.exist);",
+                  "pm.collectionVariables.set('docAtencionAjenaId', conReceta.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historia-clinica",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "historia-clinica"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPaciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Comprobante emitido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "const comprobante = (lista.content || lista)[0];",
+                  "pm.test('Hay un comprobante', () => pm.expect(comprobante).to.exist);",
+                  "pm.collectionVariables.set('docComprobanteId', comprobante.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/caja/comprobantes?size=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "caja", "comprobantes"],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Orden de laboratorio completada de Carlos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "const orden = (lista.content || lista).find(o => o.estado === 'COMPLETADA' && o.pacienteNombre.startsWith('Carlos'));",
+                  "pm.test('Hay una orden completada de Carlos', () => pm.expect(orden).to.exist);",
+                  "pm.collectionVariables.set('docOrdenLabId', orden.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/laboratorio/ordenes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "laboratorio", "ordenes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docLaboratorioToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Orden de imágenes informada de Carlos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "const orden = (lista.content || lista).find(o => o.estado === 'INFORMADA' && o.pacienteNombre.startsWith('Carlos'));",
+                  "pm.test('Hay una orden informada de Carlos', () => pm.expect(orden).to.exist);",
+                  "pm.collectionVariables.set('docOrdenImagenId', orden.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/imagenes/ordenes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "imagenes", "ordenes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docImagenesToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Receta del paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF con nombre de archivo', () => {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                  "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('inline');",
+                  "    pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');",
+                  "});",
+                  "pm.test('Tiene contenido y empieza como PDF', () => {",
+                  "    pm.expect(pm.response.stream.length).to.be.above(1500);",
+                  "    pm.expect(pm.response.stream.subarray(0, 5).toString('latin1')).to.eql('%PDF-');",
+                  "});",
+                  "pm.test('Se guarda sin caché compartida', () => pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/receta/{{docAtencionPropiaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "receta",
+                "{{docAtencionPropiaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Receta para el médico tratante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF con nombre de archivo', () => {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                  "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('inline');",
+                  "    pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');",
+                  "});",
+                  "pm.test('Tiene contenido y empieza como PDF', () => {",
+                  "    pm.expect(pm.response.stream.length).to.be.above(1500);",
+                  "    pm.expect(pm.response.stream.subarray(0, 5).toString('latin1')).to.eql('%PDF-');",
+                  "});",
+                  "pm.test('Se guarda sin caché compartida', () => pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/receta/{{docAtencionPropiaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "receta",
+                "{{docAtencionPropiaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Comprobante para caja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF con nombre de archivo', () => {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                  "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('inline');",
+                  "    pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');",
+                  "});",
+                  "pm.test('Tiene contenido y empieza como PDF', () => {",
+                  "    pm.expect(pm.response.stream.length).to.be.above(1500);",
+                  "    pm.expect(pm.response.stream.subarray(0, 5).toString('latin1')).to.eql('%PDF-');",
+                  "});",
+                  "pm.test('Se guarda sin caché compartida', () => pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/comprobante/{{docComprobanteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "comprobante",
+                "{{docComprobanteId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resultados de laboratorio del paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF con nombre de archivo', () => {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                  "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('inline');",
+                  "    pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');",
+                  "});",
+                  "pm.test('Tiene contenido y empieza como PDF', () => {",
+                  "    pm.expect(pm.response.stream.length).to.be.above(1500);",
+                  "    pm.expect(pm.response.stream.subarray(0, 5).toString('latin1')).to.eql('%PDF-');",
+                  "});",
+                  "pm.test('Se guarda sin caché compartida', () => pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/resultados-laboratorio/{{docOrdenLabId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "resultados-laboratorio",
+                "{{docOrdenLabId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Informe de imágenes del paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF con nombre de archivo', () => {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                  "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('inline');",
+                  "    pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');",
+                  "});",
+                  "pm.test('Tiene contenido y empieza como PDF', () => {",
+                  "    pm.expect(pm.response.stream.length).to.be.above(1500);",
+                  "    pm.expect(pm.response.stream.subarray(0, 5).toString('latin1')).to.eql('%PDF-');",
+                  "});",
+                  "pm.test('Se guarda sin caché compartida', () => pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/informe-imagen/{{docOrdenImagenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "informe-imagen",
+                "{{docOrdenImagenId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Constancia de la cita atendida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF con nombre de archivo', () => {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                  "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('inline');",
+                  "    pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');",
+                  "});",
+                  "pm.test('Tiene contenido y empieza como PDF', () => {",
+                  "    pm.expect(pm.response.stream.length).to.be.above(1500);",
+                  "    pm.expect(pm.response.stream.subarray(0, 5).toString('latin1')).to.eql('%PDF-');",
+                  "});",
+                  "pm.test('Se guarda sin caché compartida', () => pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/constancia/{{docCitaPropiaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "constancia",
+                "{{docCitaPropiaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resumen de la historia clínica",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF con nombre de archivo', () => {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                  "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('inline');",
+                  "    pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');",
+                  "});",
+                  "pm.test('Tiene contenido y empieza como PDF', () => {",
+                  "    pm.expect(pm.response.stream.length).to.be.above(1500);",
+                  "    pm.expect(pm.response.stream.subarray(0, 5).toString('latin1')).to.eql('%PDF-');",
+                  "});",
+                  "pm.test('Se guarda sin caché compartida', () => pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/resumen-historia/{{docPacientePropioId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "resumen-historia",
+                "{{docPacientePropioId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico tratante descarga el resumen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF con nombre de archivo', () => {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                  "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('inline');",
+                  "    pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');",
+                  "});",
+                  "pm.test('Tiene contenido y empieza como PDF', () => {",
+                  "    pm.expect(pm.response.stream.length).to.be.above(1500);",
+                  "    pm.expect(pm.response.stream.subarray(0, 5).toString('latin1')).to.eql('%PDF-');",
+                  "});",
+                  "pm.test('Se guarda sin caché compartida', () => pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/resumen-historia/{{docPacientePropioId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "resumen-historia",
+                "{{docPacientePropioId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente no obtiene la receta (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('No entrega un PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.not.include('application/pdf'));",
+                  "pm.test('El mensaje está en español', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/receta/{{docAtencionPropiaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "receta",
+                "{{docAtencionPropiaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPaciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médico sin relación no obtiene la receta (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('No entrega un PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.not.include('application/pdf'));",
+                  "pm.test('El mensaje está en español', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/receta/{{docAtencionAjenaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "receta",
+                "{{docAtencionAjenaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Caja no obtiene una receta (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('No entrega un PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.not.include('application/pdf'));",
+                  "pm.test('El mensaje está en español', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/receta/{{docAtencionPropiaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "receta",
+                "{{docAtencionPropiaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente no obtiene el comprobante de otro (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('No entrega un PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.not.include('application/pdf'));",
+                  "pm.test('El mensaje está en español', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/comprobante/{{docComprobanteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "comprobante",
+                "{{docComprobanteId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia no obtiene documentos clínicos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('No entrega un PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.not.include('application/pdf'));",
+                  "pm.test('El mensaje está en español', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/resultados-laboratorio/{{docOrdenLabId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "resultados-laboratorio",
+                "{{docOrdenLabId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Id que no es UUID (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('No entrega un PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.not.include('application/pdf'));",
+                  "pm.test('El mensaje está en español', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/receta/no-es-uuid",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos", "receta", "no-es-uuid"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atención inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));",
+                  "pm.test('No entrega un PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.not.include('application/pdf'));",
+                  "pm.test('El mensaje está en español', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/receta/00000000-0000-4000-8000-000000000000",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "receta",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Tipo de documento inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));",
+                  "pm.test('No entrega un PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.not.include('application/pdf'));",
+                  "pm.test('El mensaje está en español', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/inexistente/00000000-0000-4000-8000-000000000000",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "inexistente",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reporte no se genera por este camino (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('No entrega un PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.not.include('application/pdf'));",
+                  "pm.test('El mensaje está en español', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/reporte-ejecutivo/00000000-0000-4000-8000-000000000000",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "reporte-ejecutivo",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/receta/{{docAtencionPropiaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "receta",
+                "{{docAtencionPropiaId}}"
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "El token en la URL no autentica (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/receta/{{docAtencionPropiaId}}?token={{docPacienteToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "receta",
+                "{{docAtencionPropiaId}}"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{docPacienteToken}}"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Solicitar el reporte ejecutivo en PDF",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Se acepta la solicitud', () => pm.expect(pm.response.code).to.be.oneOf([200, 201, 202]));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve el id y un estado', () => { pm.expect(j.id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/); pm.expect(j.estado).to.be.oneOf(['SOLICITADA', 'PROCESANDO', 'LISTA']); });",
+                  "pm.collectionVariables.set('docExportacionId', j.id);",
+                  "pm.collectionVariables.set('docIntentos', '0');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"reporte-ejecutivo\",\n  \"formato\": \"PDF\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar hasta que esté lista",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const hasta = Date.now() + 700;",
+                  "while (Date.now() < hasta) {}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const intentos = parseInt(pm.collectionVariables.get('docIntentos') || '0', 10) + 1;",
+                  "pm.collectionVariables.set('docIntentos', String(intentos));",
+                  "if (['SOLICITADA', 'PROCESANDO'].includes(j.estado) && intentos < 40) {",
+                  "    postman.setNextRequest('Consultar hasta que esté lista');",
+                  "} else {",
+                  "    pm.test('La exportación terminó bien', () => pm.expect(j.estado).to.eql('LISTA'));",
+                  "    pm.test('Informa nombre, tamaño y vencimiento', () => {",
+                  "        pm.expect(j.nombre).to.match(/\\.pdf$/);",
+                  "        pm.expect(j.tamano).to.be.above(1500);",
+                  "        pm.expect(j.expiraEn).to.be.a(\"string\");",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/{{docExportacionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones", "{{docExportacionId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Descargar el reporte exportado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF con nombre de archivo', () => {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                  "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('attachment');",
+                  "    pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');",
+                  "});",
+                  "pm.test('Tiene contenido y empieza como PDF', () => {",
+                  "    pm.expect(pm.response.stream.length).to.be.above(1500);",
+                  "    pm.expect(pm.response.stream.subarray(0, 5).toString('latin1')).to.eql('%PDF-');",
+                  "});",
+                  "pm.test('Se guarda sin caché compartida', () => pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/{{docExportacionId}}/descargar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "exportaciones",
+                "{{docExportacionId}}",
+                "descargar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Solicitar el reporte ejecutivo en Excel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Se acepta la solicitud', () => pm.expect(pm.response.code).to.be.oneOf([200, 201, 202]));",
+                  "pm.collectionVariables.set('docExportacionExcelId', pm.response.json().id);",
+                  "pm.collectionVariables.set('docIntentos', '0');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"reporte-ejecutivo\",\n  \"formato\": \"XLSX\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar el Excel hasta que esté listo",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const hasta = Date.now() + 700;",
+                  "while (Date.now() < hasta) {}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const intentos = parseInt(pm.collectionVariables.get('docIntentos') || '0', 10) + 1;",
+                  "pm.collectionVariables.set('docIntentos', String(intentos));",
+                  "if (['SOLICITADA', 'PROCESANDO'].includes(j.estado) && intentos < 40) {",
+                  "    postman.setNextRequest('Consultar el Excel hasta que esté listo');",
+                  "} else {",
+                  "    pm.test('El Excel terminó bien', () => pm.expect(j.estado).to.eql('LISTA'));",
+                  "    pm.test('Es un archivo xlsx', () => pm.expect(j.nombre).to.match(/\\.xlsx$/));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/{{docExportacionExcelId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "exportaciones",
+                "{{docExportacionExcelId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Descargar el Excel exportado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un libro de Excel adjunto', () => {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('spreadsheetml');",
+                  "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('attachment');",
+                  "    pm.expect(pm.response.stream.subarray(0, 2).toString('latin1')).to.eql('PK');",
+                  "    pm.expect(pm.response.stream.length).to.be.above(3000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/{{docExportacionExcelId}}/descargar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "exportaciones",
+                "{{docExportacionExcelId}}",
+                "descargar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mis exportaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('Aparecen las dos exportaciones', () => {",
+                  "    const ids = lista.map(e => e.id);",
+                  "    pm.expect(ids).to.include(pm.collectionVariables.get('docExportacionId'));",
+                  "    pm.expect(ids).to.include(pm.collectionVariables.get('docExportacionExcelId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Caja no ve la exportación de gerencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Se niega el acceso', () => pm.expect(pm.response.code).to.be.oneOf([403, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/{{docExportacionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones", "{{docExportacionId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador tampoco descarga exportaciones ajenas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Se niega el acceso', () => pm.expect(pm.response.code).to.be.oneOf([403, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/{{docExportacionId}}/descargar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "exportaciones",
+                "{{docExportacionId}}",
+                "descargar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Caja no borra la exportación de gerencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Se niega el acceso', () => pm.expect(pm.response.code).to.be.oneOf([403, 404]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/{{docExportacionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones", "{{docExportacionId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Caja no pide reportes gerenciales (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"reporte-ejecutivo\",\n  \"formato\": \"PDF\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no pide exportaciones (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"kardex\",\n  \"formato\": \"XLSX\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Tipo de exportación inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Explica el problema', () => pm.expect(pm.response.json().message).to.include('tipo'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"inexistente\",\n  \"formato\": \"PDF\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Formato no disponible (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Explica el formato', () => pm.expect(pm.response.json().message).to.include('formato'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"listado-comprobantes\",\n  \"formato\": \"PDF\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Fecha con formato inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"listado-comprobantes\",\n  \"formato\": \"XLSX\",\n  \"parametros\": {\n    \"desde\": \"2026-13-45\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sin cuerpo válido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Exportación inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/00000000-0000-4000-8000-000000000000",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "exportaciones",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Id de exportación que no es UUID (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/no-es-uuid",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones", "no-es-uuid"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Exportaciones sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Caja exporta el listado de comprobantes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Se acepta la solicitud', () => pm.expect(pm.response.code).to.be.oneOf([200, 201, 202]));",
+                  "pm.collectionVariables.set('docExportacionCajaId', pm.response.json().id);",
+                  "pm.collectionVariables.set('docIntentos', '0');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"listado-comprobantes\",\n  \"formato\": \"XLSX\",\n  \"parametros\": {\n    \"estado\": \"EMITIDO\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar el listado hasta que esté listo",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const hasta = Date.now() + 700;",
+                  "while (Date.now() < hasta) {}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const intentos = parseInt(pm.collectionVariables.get('docIntentos') || '0', 10) + 1;",
+                  "pm.collectionVariables.set('docIntentos', String(intentos));",
+                  "if (['SOLICITADA', 'PROCESANDO'].includes(j.estado) && intentos < 40) {",
+                  "    postman.setNextRequest('Consultar el listado hasta que esté listo');",
+                  "} else {",
+                  "    pm.test('El listado terminó bien', () => pm.expect(j.estado).to.eql('LISTA'));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/{{docExportacionCajaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones", "{{docExportacionCajaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Descargar el listado de comprobantes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un libro de Excel', () => pm.expect(pm.response.stream.subarray(0, 2).toString('latin1')).to.eql('PK'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/{{docExportacionCajaId}}/descargar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "exportaciones",
+                "{{docExportacionCajaId}}",
+                "descargar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar el reporte en PDF",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/{{docExportacionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones", "{{docExportacionId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar el reporte en Excel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/{{docExportacionExcelId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "exportaciones",
+                "{{docExportacionExcelId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar el listado de comprobantes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/{{docExportacionCajaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones", "{{docExportacionCajaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La exportación eliminada ya no existe (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/{{docExportacionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones", "{{docExportacionId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La descarga de una exportación eliminada falla (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones/{{docExportacionId}}/descargar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "exportaciones",
+                "{{docExportacionId}}",
+                "descargar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar plantillas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('Están las diez plantillas del sistema', () => {",
+                  "    pm.expect(lista).to.have.length(10);",
+                  "    ['comprobante', 'receta', 'resultados-laboratorio', 'informe-imagen', 'constancia', 'resumen-historia', 'reporte-ejecutivo', 'reporte-financiero', 'reporte-operativo', 'reporte-calidad'].forEach(c => pm.expect(lista.map(p => p.codigo)).to.include(c));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/plantillas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "plantillas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia no ve las plantillas (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('No entrega un PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.not.include('application/pdf'));",
+                  "pm.test('El mensaje está en español', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/plantillas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "plantillas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Caja no descarga plantillas (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('No entrega un PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.not.include('application/pdf'));",
+                  "pm.test('El mensaje está en español', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/plantillas/constancia/descargar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "plantillas", "constancia", "descargar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Plantilla inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));",
+                  "pm.test('No entrega un PDF', () => pm.expect(pm.response.headers.get('Content-Type') || '').to.not.include('application/pdf'));",
+                  "pm.test('El mensaje está en español', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/plantillas/nada/descargar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "plantillas", "nada", "descargar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Descargar la plantilla de constancia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un JRXML adjunto', () => {",
+                  "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('constancia.jrxml');",
+                  "    pm.expect(pm.response.text()).to.include('<jasperReport');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/plantillas/constancia/descargar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "plantillas", "constancia", "descargar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Restaurar una plantilla que ya es la predeterminada (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/plantillas/constancia/restaurar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "plantillas", "constancia", "restaurar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Plantilla con imports no se acepta (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Explica el rechazo', () => pm.expect(pm.response.json().message).to.be.a('string').and.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/plantillas/constancia",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "plantillas", "constancia"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/plantilla-invalida.jrxml"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un archivo que no es XML no se acepta (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/plantillas/constancia",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "plantillas", "constancia"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/falsa.png"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia no reemplaza plantillas (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/plantillas/constancia",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "plantillas", "constancia"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/plantilla-valida.jrxml"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reemplazar con una plantilla válida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda personalizada con nueva versión', () => { pm.expect(j.personalizada).to.eql(true); pm.expect(j.version).to.be.above(0); });",
+                  "pm.test('Guarda el motivo', () => pm.expect(j.motivo).to.eql('Prueba de Postman'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/plantillas/constancia",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "plantillas", "constancia"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/plantilla-valida.jrxml"
+                },
+                {
+                  "key": "motivo",
+                  "value": "Prueba de Postman",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La constancia se genera con la plantilla nueva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF con nombre de archivo', () => {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                  "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('inline');",
+                  "    pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');",
+                  "});",
+                  "pm.test('Tiene contenido y empieza como PDF', () => {",
+                  "    pm.expect(pm.response.stream.length).to.be.above(1500);",
+                  "    pm.expect(pm.response.stream.subarray(0, 5).toString('latin1')).to.eql('%PDF-');",
+                  "});",
+                  "pm.test('Se guarda sin caché compartida', () => pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/constancia/{{docCitaPropiaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "constancia",
+                "{{docCitaPropiaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Historial de la plantilla",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const h = pm.response.json();",
+                  "pm.test('Hay una versión vigente con el motivo', () => { const vigente = h.find(v => v.activa); pm.expect(vigente).to.exist; pm.expect(vigente.motivo).to.eql('Prueba de Postman'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/plantillas/constancia/historial",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "plantillas", "constancia", "historial"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Restaurar la plantilla predeterminada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Vuelve a ser la predeterminada', () => pm.expect(pm.response.json().personalizada).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/plantillas/constancia/restaurar?motivo=Fin%20de%20la%20prueba",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "plantillas", "constancia", "restaurar"],
+              "query": [
+                {
+                  "key": "motivo",
+                  "value": "Fin%20de%20la%20prueba"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La constancia se sigue generando tras restaurar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF con nombre de archivo', () => {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                  "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('inline');",
+                  "    pm.expect(pm.response.headers.get('X-Content-Type-Options')).to.eql('nosniff');",
+                  "});",
+                  "pm.test('Tiene contenido y empieza como PDF', () => {",
+                  "    pm.expect(pm.response.stream.length).to.be.above(1500);",
+                  "    pm.expect(pm.response.stream.subarray(0, 5).toString('latin1')).to.eql('%PDF-');",
+                  "});",
+                  "pm.test('Se guarda sin caché compartida', () => pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/constancia/{{docCitaPropiaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "constancia",
+                "{{docCitaPropiaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{docPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -19610,6 +22788,101 @@
     {
       "key": "tamanoArchivo",
       "value": ""
+    },
+    {
+      "key": "docGerenciaToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docCajaToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docAdminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docPacienteToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docPaciente2Token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docMedicoToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docLaboratorioToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docImagenesToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docAtencionPropiaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docAtencionAjenaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docCitaPropiaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docPacientePropioId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docComprobanteId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docOrdenLabId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docOrdenImagenId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docExportacionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docExportacionExcelId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docExportacionCajaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "docIntentos",
+      "value": "",
+      "type": "string"
     }
   ]
 }

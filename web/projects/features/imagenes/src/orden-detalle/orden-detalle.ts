@@ -36,19 +36,16 @@ import {
   toIsoDateTime,
 } from '@tusalud/core';
 import { CargaArchivos } from '@tusalud/ui/carga-archivos';
+import { BotonDocumento } from '@tusalud/ui/boton-documento';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { PageHeader } from '@tusalud/ui/page-header';
-import {
-  ICONO_ESTADO_IMAGEN,
-  SEVERIDAD_IMAGEN,
-  imprimirInforme,
-  tamanoLegible,
-} from '../imagenes.utils';
+import { ICONO_ESTADO_IMAGEN, SEVERIDAD_IMAGEN, tamanoLegible } from '../imagenes.utils';
 import { VisorImagen } from '../visor/visor-imagen';
 
 @Component({
   selector: 'app-orden-imagen-detalle',
   imports: [
+    BotonDocumento,
     CargaArchivos,
     CurrencyPipe,
     DatePipe,
@@ -310,10 +307,6 @@ export class OrdenImagenDetalle {
           this.errorInforme.set(error.message);
         },
       });
-  }
-
-  protected imprimir(orden: OrdenImagenResponse): void {
-    imprimirInforme(orden);
   }
 
   protected cancelar(orden: OrdenImagenResponse): void {

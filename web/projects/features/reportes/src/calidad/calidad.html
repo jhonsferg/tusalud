@@ -2,7 +2,20 @@
   title="Reporte de calidad"
   subtitle="Valoraciones, cancelaciones, ausencias y tiempos de entrega"
   icon="pi-verified"
-/>
+>
+  <app-boton-exportar
+    tipo="reporte-calidad"
+    formato="PDF"
+    [parametros]="parametros()"
+    [deshabilitado]="!filtro()"
+  />
+  <app-boton-exportar
+    tipo="reporte-calidad"
+    formato="XLSX"
+    [parametros]="parametros()"
+    [deshabilitado]="!filtro()"
+  />
+</app-page-header>
 
 <app-filtros-reporte (cambio)="cargar($event)" />
 

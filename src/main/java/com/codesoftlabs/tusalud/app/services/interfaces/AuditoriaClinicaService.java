@@ -10,6 +10,7 @@ public interface AuditoriaClinicaService {
     String IMAGENES_CONSULTADAS = "IMAGENES_CONSULTADAS";
     String DOCUMENTO_CARGADO = "DOCUMENTO_CARGADO";
     String DOCUMENTO_CONSULTADO = "DOCUMENTO_CONSULTADO";
+    String DOCUMENTO_GENERADO = "DOCUMENTO_GENERADO";
 
     void registrar(UsuarioPrincipal actor, UUID pacienteId, String accion, String detalle);
 }

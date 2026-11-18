@@ -27,6 +27,7 @@ import {
 import { CitaActions } from '@tusalud/ui/services';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { EstadoCitaTag } from '@tusalud/ui/estado-cita-tag';
+import { BotonDocumento } from '@tusalud/ui/boton-documento';
 import { PageHeader } from '@tusalud/ui/page-header';
 import { PagoDialog } from '@tusalud/ui/pago-dialog';
 import { ValoracionDialog } from '@tusalud/ui/valoracion-dialog';
@@ -34,6 +35,7 @@ import { ValoracionDialog } from '@tusalud/ui/valoracion-dialog';
 @Component({
   selector: 'app-cita-detail',
   imports: [
+    BotonDocumento,
     CurrencyPipe,
     DatePipe,
     FormsModule,
@@ -113,6 +115,10 @@ export class CitaDetail {
       (this.auth.isAdmin() || this.auth.isPaciente()) &&
       new Date(cita.fechaHora).getTime() > Date.now()
     );
+  }
+
+  protected puedeConstancia(cita: CitaResponse): boolean {
+    return (this.auth.isPaciente() || this.auth.isMedico()) && cita.estado !== 'CANCELADA';
   }
 
   protected puedePagar(cita: CitaResponse): boolean {

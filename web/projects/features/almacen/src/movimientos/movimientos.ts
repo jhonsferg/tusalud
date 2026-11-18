@@ -15,11 +15,22 @@ import { Tag } from 'primeng/tag';
 
 import { AlmacenStore, TipoMovimiento, toIsoDate } from '@tusalud/core';
 import { EmptyState } from '@tusalud/ui/empty-state';
+import { BotonExportar } from '@tusalud/ui/boton-exportar';
 import { PageHeader } from '@tusalud/ui/page-header';
 
 @Component({
   selector: 'app-movimientos',
-  imports: [DatePipe, FormsModule, DatePicker, Select, TableModule, Tag, EmptyState, PageHeader],
+  imports: [
+    BotonExportar,
+    DatePipe,
+    FormsModule,
+    DatePicker,
+    Select,
+    TableModule,
+    Tag,
+    EmptyState,
+    PageHeader,
+  ],
   templateUrl: './movimientos.html',
   styleUrl: './movimientos.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,6 +41,15 @@ export class Movimientos implements OnInit {
   protected readonly productoId = signal<string | null>(null);
   protected readonly tipo = signal<TipoMovimiento | null>(null);
   protected readonly rango = signal<Date[] | null>(null);
+  protected readonly parametrosExportacion = computed(() => {
+    const [inicio, fin] = this.rango() ?? [];
+    return {
+      productoId: this.productoId(),
+      tipo: this.tipo(),
+      desde: inicio ? toIsoDate(inicio) : null,
+      hasta: fin ? toIsoDate(fin) : inicio ? toIsoDate(inicio) : null,
+    };
+  });
 
   protected readonly tipos = [
     { label: 'Entradas', value: 'ENTRADA' },

@@ -27,6 +27,7 @@ export type TipoNotificacion =
   | 'ORDEN_IMAGEN'
   | 'ESTUDIO_INFORMADO'
   | 'HALLAZGO_CRITICO'
+  | 'EXPORTACION_LISTA'
   | 'SISTEMA';
 
 export interface NotificacionResponse {

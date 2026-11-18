@@ -155,7 +155,10 @@ class HttpTelemetryFilterTest {
                 "/api/v1/citas/3fa85f64-5717-4562-b3fc-2c963f66afa6/atencion",
                 "/api/v1/laboratorio/ordenes",
                 "/api/v1/hospitalizacion/ingresos",
-                "/api/v1/farmacia/dispensaciones"
+                "/api/v1/farmacia/dispensaciones",
+                "/api/v1/documentos/receta/3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "/api/v1/exportaciones",
+                "/api/v1/plantillas/receta"
             })
     void noRegistraElCuerpoEnRutasSensiblesPeroSiLosTamanos(String ruta) throws Exception {
         String requestJson = "{\"dato\":\"valor-privado\"}";

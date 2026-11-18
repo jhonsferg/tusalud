@@ -28,6 +28,7 @@ import {
   toIsoDate,
 } from '@tusalud/core';
 import { EmptyState } from '@tusalud/ui/empty-state';
+import { BotonExportar } from '@tusalud/ui/boton-exportar';
 import { PageHeader } from '@tusalud/ui/page-header';
 import { horaCorta, lunesDe, sumarDias } from '../shared/ausencia';
 
@@ -36,6 +37,7 @@ const MAXIMO_HORAS_SEMANA = 48;
 @Component({
   selector: 'app-turnos',
   imports: [
+    BotonExportar,
     DatePipe,
     FormsModule,
     Button,
@@ -72,6 +74,11 @@ export class Turnos implements OnInit {
     Array.from({ length: 7 }, (_, i) => sumarDias(this.inicio(), i)),
   );
   protected readonly fin = computed(() => sumarDias(this.inicio(), 6));
+  protected readonly parametrosExportacion = computed(() => ({
+    desde: toIsoDate(this.inicio()),
+    hasta: toIsoDate(this.fin()),
+    area: this.area(),
+  }));
 
   protected readonly plantillas = computed(() =>
     (this.store.plantillas.value() ?? []).map((p) => ({
