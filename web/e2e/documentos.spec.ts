@@ -41,6 +41,7 @@ test.describe('documentos y exportaciones', () => {
   }) => {
     await iniciarSesion(page, 'gerencia');
     await eliminarExportaciones(page, 'gerencia');
+    await ir(page, '/reportes/ejecutivo');
     await expect(page.getByRole('heading', { level: 1, name: 'Reporte ejecutivo' })).toBeVisible();
 
     const pdf = page.waitForEvent('download');
@@ -295,5 +296,5 @@ async function omitirGuiaYEntrar(page: Page, email: string, password: string): P
   await page.getByLabel('Email').fill(email);
   await page.locator('#login-password').fill(password);
   await page.getByRole('button', { name: 'Iniciar sesión' }).click();
-  await expect(page).toHaveURL(/\/paciente\/citas$/);
+  await expect(page).toHaveURL(/\/paciente\/inicio$/);
 }
