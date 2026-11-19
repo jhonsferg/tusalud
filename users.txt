@@ -186,3 +186,15 @@ En desarrollo el correo no sale a internet: llega a Mailpit en http://localhost:
 Para ver un aviso real de punta a punta, activa el correo de juan.perez@correo.com, cambia su contraseña en Mi perfil y mira el correo de seguridad en Mailpit. Los avisos no urgentes se detienen entre las 22:00 y las 07:00 por defecto, y las alertas de seguridad no.
 Para probar los respaldos en desarrollo, ejecuta docker exec tusalud-backup /opt/respaldos/respaldar.sh y luego docker exec tusalud-backup /opt/respaldos/probar-restauracion.sh. Los resultados aparecen en Respaldos.
 Datos de ejemplo: ninguno. Los canales, las plantillas personalizadas y los respaldos nacen vacíos, para que no existan registros que aparenten una protección que no se hizo.
+
+FACTURACION ELECTRONICA CON SUNAT
+---------------------------------
+Sin usuarios nuevos. La caja cobra desde Cobrar en /caja/ y cada boleta o factura genera su comprobante electrónico, que se ve en Comprobantes electrónicos de /caja/ y de /finanzas/. Finanzas y administración configuran al emisor y las series en Configuración fiscal, emiten notas desde el detalle de un comprobante aceptado, comunican bajas, revisan Resúmenes y bajas y exportan el Registro de ventas. Gerencia consulta el Registro de ventas. El paciente descarga sus boletas en Mis comprobantes de /paciente/.
+En desarrollo el envío usa un SUNAT simulado y un certificado de prueba. Para ver un rechazo, cobra una factura con el RUC 20123456789, que tiene un dígito verificador incorrecto, y corrígela con 20100070970 desde el detalle. Una factura sin dirección se acepta con observaciones. El botón Procesar envíos ahora adelanta la cola, que de todos modos corre cada diez segundos.
+Datos de ejemplo: el emisor TuSalud con el RUC 20601234565 habilitado en simulación y las series F001, B001, FC01, BC01, FD01 y BD01.
+
+PROTECCION DE DATOS PERSONALES
+------------------------------
+Sin usuarios nuevos. El paciente entra a Mi privacidad en /paciente/privacidad para aceptar la política, autorizar o revocar finalidades opcionales, hacer solicitudes de acceso, rectificación, cancelación u oposición y ver quién accedió a sus datos. calidad@tusalud.com y admin@tusalud.com atienden las solicitudes en Solicitudes ARCO, mantienen el Registro de tratamientos, la Retención de datos, los Incidentes de datos y la Política de privacidad. La política vigente se lee sin sesión en /privacidad.
+Para probar el flujo completo, juan.perez@correo.com crea una solicitud de acceso, calidad la asume y la resuelve, y el paciente descarga el archivo con sus datos desde el detalle de la solicitud. En una cancelación el paciente ve antes qué se conserva por obligación legal.
+Datos de ejemplo: la política de privacidad versión 1 publicada, 3 bancos de datos, 5 finalidades, 3 encargados de tratamiento y las políticas de retención. Los textos y los plazos son de demostración y deben validarse con un asesor legal.
