@@ -76,6 +76,55 @@ app:
     descanso-max-dias: ${DESCANSO_MAX_DIAS:30}
     descanso-retroactivo-dias: ${DESCANSO_RETROACTIVO_DIAS:3}
     verificacion-por-minuto: ${VERIFICACION_POR_MINUTO:20}
+  canales:
+    worker-habilitado: ${CANALES_WORKER_HABILITADO:true}
+    url-base: ${CANALES_URL_BASE:http://localhost:4600}
+    secreto: ${CANALES_SECRETO:secreto-de-desarrollo-para-enlaces-de-baja}
+    webhook-secreto: ${CANALES_WEBHOOK_SECRETO:}
+    centro: ${CANALES_CENTRO:TuSalud}
+    limite-por-hora: ${CANALES_LIMITE_POR_HORA:10}
+    reintentos:
+      maximo: 5
+      base-seg: 30
+      techo-seg: 3600
+    codigo:
+      ttl-min: 10
+      max-intentos: 5
+      reenvios-por-hora: 5
+      espera-seg: 60
+    correo:
+      proveedor: ${CANALES_CORREO_PROVEEDOR:simulado}
+      remitente: ${CANALES_CORREO_REMITENTE:no-responder@tusalud.local}
+      nombre-remitente: ${CANALES_CORREO_NOMBRE:TuSalud}
+    sms:
+      proveedor: ${CANALES_SMS_PROVEEDOR:simulado}
+      http:
+        url: ${CANALES_SMS_URL:}
+        autenticacion: ${CANALES_SMS_AUTENTICACION:NONE}
+        usuario: ${CANALES_SMS_USUARIO:}
+        secreto: ${CANALES_SMS_SECRETO:}
+        formato: ${CANALES_SMS_FORMATO:FORM}
+        cuerpo: ${CANALES_SMS_CUERPO:}
+        campo-id-externo: ${CANALES_SMS_CAMPO_ID:sid}
+        tiempo-limite-seg: 10
+    whatsapp:
+      proveedor: ${CANALES_WHATSAPP_PROVEEDOR:simulado}
+      http:
+        url: ${CANALES_WHATSAPP_URL:}
+        autenticacion: ${CANALES_WHATSAPP_AUTENTICACION:BEARER}
+        usuario: ${CANALES_WHATSAPP_USUARIO:}
+        secreto: ${CANALES_WHATSAPP_SECRETO:}
+        formato: ${CANALES_WHATSAPP_FORMATO:JSON}
+        cuerpo: ${CANALES_WHATSAPP_CUERPO:}
+        campo-id-externo: ${CANALES_WHATSAPP_CAMPO_ID:messages.0.id}
+        tiempo-limite-seg: 10
+  respaldos:
+    token: ${RESPALDO_TOKEN:}
+    vigilancia-habilitada: ${RESPALDOS_VIGILANCIA_HABILITADA:true}
+    max-horas-sin-respaldo: ${RESPALDOS_MAX_HORAS:26}
+    max-dias-sin-prueba: ${RESPALDOS_MAX_DIAS_SIN_PRUEBA:8}
+    rpo-objetivo-horas: 24
+    rto-objetivo-minutos: 60
   documentos:
     retencion-exportaciones: ${DOCUMENTOS_RETENCION:7d}
     maximo-concurrentes: 3

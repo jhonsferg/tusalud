@@ -78,6 +78,31 @@ services:
       TURN_HABILITADO: ${TURN_HABILITADO:-true}
       TELEMEDICINA_VENTANA_ANTES_MIN: ${TELEMEDICINA_VENTANA_ANTES_MIN:-10}
       TELEMEDICINA_VENTANA_DESPUES_MIN: ${TELEMEDICINA_VENTANA_DESPUES_MIN:-30}
+      CANALES_URL_BASE: ${CANALES_URL_BASE:-}
+      CANALES_SECRETO: ${CANALES_SECRETO:-}
+      CANALES_WEBHOOK_SECRETO: ${CANALES_WEBHOOK_SECRETO:-}
+      CANALES_CENTRO: ${CANALES_CENTRO:-TuSalud}
+      CANALES_CORREO_PROVEEDOR: ${CANALES_CORREO_PROVEEDOR:-simulado}
+      CANALES_CORREO_REMITENTE: ${CANALES_CORREO_REMITENTE:-no-responder@tusalud.local}
+      CANALES_SMS_PROVEEDOR: ${CANALES_SMS_PROVEEDOR:-simulado}
+      CANALES_SMS_URL: ${CANALES_SMS_URL:-}
+      CANALES_SMS_AUTENTICACION: ${CANALES_SMS_AUTENTICACION:-NONE}
+      CANALES_SMS_USUARIO: ${CANALES_SMS_USUARIO:-}
+      CANALES_SMS_SECRETO: ${CANALES_SMS_SECRETO:-}
+      CANALES_SMS_FORMATO: ${CANALES_SMS_FORMATO:-FORM}
+      CANALES_SMS_CUERPO: ${CANALES_SMS_CUERPO:-}
+      CANALES_WHATSAPP_PROVEEDOR: ${CANALES_WHATSAPP_PROVEEDOR:-simulado}
+      CANALES_WHATSAPP_URL: ${CANALES_WHATSAPP_URL:-}
+      CANALES_WHATSAPP_SECRETO: ${CANALES_WHATSAPP_SECRETO:-}
+      CANALES_WHATSAPP_CUERPO: ${CANALES_WHATSAPP_CUERPO:-}
+      SPRING_MAIL_HOST: ${SMTP_HOST:-}
+      SPRING_MAIL_PORT: ${SMTP_PORT:-587}
+      SPRING_MAIL_USERNAME: ${SMTP_USUARIO:-}
+      SPRING_MAIL_PASSWORD: ${SMTP_CLAVE:-}
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: ${SMTP_AUTENTICACION:-true}
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: ${SMTP_STARTTLS:-true}
+      RESPALDO_TOKEN: ${RESPALDO_TOKEN:-}
+      RESPALDOS_MAX_HORAS: ${RESPALDOS_MAX_HORAS:-26}
       STORAGE_TIPO: s3
       STORAGE_ENDPOINT: http://storage:8333
       STORAGE_REGION: ${STORAGE_REGION:-us-east-1}
@@ -128,6 +153,44 @@ services:
       STORAGE_BUCKETS: avatares imagenes documentos reportes plantillas
     volumes:
       - ./docker/storage/crear-buckets.sh:/etc/seaweedfs/crear-buckets.sh:ro
+
+  backup:
+    build:
+      context: ./docker/backup
+      dockerfile: Dockerfile
+    image: tusalud-backup:prod
+    container_name: tusalud-backup
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      storage:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: tusalud
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      STORAGE_ENDPOINT: http://storage:8333
+      STORAGE_REGION: ${STORAGE_REGION:-us-east-1}
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-}
+      STORAGE_BUCKETS: avatares imagenes documentos reportes plantillas
+      RESPALDO_PASSPHRASE: ${RESPALDO_PASSPHRASE:-}
+      RESPALDO_TOKEN: ${RESPALDO_TOKEN:-}
+      API_URL: http://app:8080
+      BACKUP_CRON: ${BACKUP_CRON:-0 2 * * *}
+      TEST_CRON: ${TEST_CRON:-30 3 * * 0}
+      RETENCION_DIARIOS: ${RETENCION_DIARIOS:-7}
+      RETENCION_SEMANALES: ${RETENCION_SEMANALES:-4}
+      RETENCION_MENSUALES: ${RETENCION_MENSUALES:-6}
+      RESPALDO_REMOTO_ENDPOINT: ${RESPALDO_REMOTO_ENDPOINT:-}
+      RESPALDO_REMOTO_BUCKET: ${RESPALDO_REMOTO_BUCKET:-}
+      RESPALDO_REMOTO_ACCESS_KEY: ${RESPALDO_REMOTO_ACCESS_KEY:-}
+      RESPALDO_REMOTO_SECRET_KEY: ${RESPALDO_REMOTO_SECRET_KEY:-}
+    volumes:
+      - backup-data:/respaldos
 
   web:
     build:
@@ -229,3 +292,4 @@ volumes:
   postgres-data:
   pgadmin-data:
   storage-data:
+  backup-data:

@@ -16,6 +16,12 @@ spring:
       path: /h2-console
 
 app:
+  canales:
+    worker-habilitado: false
+    webhook-secreto: secreto-webhook-de-pruebas
+  respaldos:
+    token: token-de-pruebas-de-respaldo
+    vigilancia-habilitada: false
   telemedicina:
     turn:
       secreto: ${TURN_SECRET:secreto-turn-solo-desarrollo}

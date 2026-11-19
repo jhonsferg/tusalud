@@ -11,10 +11,39 @@ services:
       STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-tusalud-dev-access}
       STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-tusalud-dev-secret-0123456789}
       TURN_SECRET: ${TURN_SECRET:-secreto-turn-solo-desarrollo}
+      CANALES_URL_BASE: ${CANALES_URL_BASE:-http://localhost:${WEB_PORT:-4200}}
+      CANALES_SECRETO: ${CANALES_SECRETO:-secreto-de-desarrollo-para-enlaces-de-baja}
+      CANALES_WEBHOOK_SECRETO: ${CANALES_WEBHOOK_SECRETO:-secreto-webhook-solo-desarrollo}
+      CANALES_CORREO_PROVEEDOR: ${CANALES_CORREO_PROVEEDOR:-smtp}
+      SPRING_MAIL_HOST: ${SMTP_HOST:-mailpit}
+      SPRING_MAIL_PORT: ${SMTP_PORT:-1025}
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "false"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "false"
+      RESPALDO_TOKEN: ${RESPALDO_TOKEN:-token-de-respaldo-solo-desarrollo}
       TELEMEDICINA_VENTANA_ANTES_MIN: ${TELEMEDICINA_VENTANA_ANTES_MIN:-43200}
       OTEL_RESOURCE_ATTRIBUTES: service.namespace=tusalud,deployment.environment.name=dev
     ports:
       - "${APP_PORT:-8080}:8080"
+
+  mailpit:
+    image: axllent/mailpit:v1.29
+    container_name: tusalud-mailpit
+    restart: unless-stopped
+    environment:
+      MP_MAX_MESSAGES: 500
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+    ports:
+      - "127.0.0.1:${MAILPIT_UI_PORT:-8025}:8025"
+
+  backup:
+    image: tusalud-backup:dev
+    environment:
+      RESPALDO_PASSPHRASE: ${RESPALDO_PASSPHRASE:-clave-de-respaldo-solo-desarrollo}
+      RESPALDO_TOKEN: ${RESPALDO_TOKEN:-token-de-respaldo-solo-desarrollo}
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-tusalud-dev-access}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-tusalud-dev-secret-0123456789}
+      ITERACIONES_CLAVE: ${ITERACIONES_CLAVE:-10000}
 
   storage:
     environment:

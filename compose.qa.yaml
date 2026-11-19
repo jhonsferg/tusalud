@@ -11,7 +11,20 @@ services:
       STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-tusalud-qa-access}
       STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-tusalud-qa-secret-0123456789}
       TURN_SECRET: ${TURN_SECRET:-secreto-turn-solo-qa}
+      CANALES_URL_BASE: ${CANALES_URL_BASE:-http://localhost:${WEB_PORT:-4200}}
+      CANALES_SECRETO: ${CANALES_SECRETO:-secreto-de-qa-para-enlaces-de-baja}
+      CANALES_WEBHOOK_SECRETO: ${CANALES_WEBHOOK_SECRETO:-secreto-webhook-solo-qa}
+      RESPALDO_TOKEN: ${RESPALDO_TOKEN:-token-de-respaldo-solo-qa}
       OTEL_RESOURCE_ATTRIBUTES: service.namespace=tusalud,deployment.environment.name=qa
+
+  backup:
+    image: tusalud-backup:qa
+    environment:
+      RESPALDO_PASSPHRASE: ${RESPALDO_PASSPHRASE:-clave-de-respaldo-solo-qa}
+      RESPALDO_TOKEN: ${RESPALDO_TOKEN:-token-de-respaldo-solo-qa}
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-tusalud-qa-access}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-tusalud-qa-secret-0123456789}
+      ITERACIONES_CLAVE: ${ITERACIONES_CLAVE:-10000}
 
   storage:
     environment:

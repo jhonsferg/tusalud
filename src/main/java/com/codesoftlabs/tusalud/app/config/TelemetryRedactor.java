@@ -45,7 +45,10 @@ public final class TelemetryRedactor {
             "qr",
             "cvc",
             "otp",
-            "totp");
+            "totp",
+            "destino",
+            "telefono",
+            "firma");
 
     private static final List<String> FRAGMENTOS_SENSIBLES =
             List.of("pass", "secret", "secreto", "token", "cvv", "cvc", "tarjeta", "recuperacion");
@@ -53,7 +56,9 @@ public final class TelemetryRedactor {
     private static final Pattern RUTAS_SIN_CUERPO = Pattern.compile("^/api/v1/(" + "auth(/.*)?" + "|perfil(/.*)?"
             + "|metodos-pago(/.*)?"
             + "|pagos(/.*)?"
-            + "|admin/(usuarios|personal|roles|pagos|seguridad|sistema|almacenamiento)(/.*)?"
+            + "|admin/(usuarios|personal|roles|pagos|seguridad|sistema|almacenamiento|canales)(/.*)?"
+            + "|canales(/.*)?"
+            + "|respaldos(/.*)?"
             + "|recepcion/pacientes(/.*)?"
             + "|historia-clinica(/.*)?"
             + "|pacientes/[^/]+/(historia-clinica|datos-medicos)(/.*)?"

@@ -145,6 +145,12 @@ location ~ ^/api/v1/verificacion/ {
     include /etc/nginx/conf.d/proxy-api.inc;
 }
 
+location ~ ^/api/v1/(canales/(baja|webhook/[A-Za-z]+)|respaldos/ejecuciones)$ {
+    limit_req zone=verificacion burst=${RATE_BURST_AUTH} nodelay;
+    include /etc/nginx/conf.d/cabeceras.inc;
+    include /etc/nginx/conf.d/proxy-api.inc;
+}
+
 location = /api/v1/perfil/password {
     limit_req zone=login burst=${RATE_BURST_AUTH} nodelay;
     include /etc/nginx/conf.d/cabeceras.inc;

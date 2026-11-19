@@ -33,6 +33,8 @@ app:
     clave-cifrado: ${MFA_CLAVE_CIFRADO:}
   pagos:
     simulacion-habilitada: ${PAGOS_SIMULACION_HABILITADA:false}
+  canales:
+    secreto: ${CANALES_SECRETO:}
   storage:
     tipo: ${STORAGE_TIPO:s3}
 

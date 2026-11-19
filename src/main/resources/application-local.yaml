@@ -10,6 +10,7 @@ spring:
       pool-name: TusaludHikariPool
   flyway:
     locations: classpath:db/migration,classpath:db/demo
+    out-of-order: true
   jpa:
     hibernate:
       ddl-auto: validate
