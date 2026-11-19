@@ -50,6 +50,8 @@ import com.codesoftlabs.tusalud.app.repositories.PagoRepository;
 import com.codesoftlabs.tusalud.app.repositories.SesionCajaRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
+import com.codesoftlabs.tusalud.app.services.facturacion.ConfiguracionFiscalService;
+import com.codesoftlabs.tusalud.app.services.facturacion.FacturacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.CajaService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import com.codesoftlabs.tusalud.app.services.seguros.CoberturaCalculadora;
@@ -97,6 +99,8 @@ public class CajaServiceImpl implements CajaService {
     private final UsuarioRepository usuarioRepository;
     private final NotificacionService notificacionService;
     private final CoberturaCobroService coberturaCobro;
+    private final FacturacionService facturacion;
+    private final ConfiguracionFiscalService configuracionFiscal;
 
     @Override
     @Transactional
@@ -261,7 +265,12 @@ public class CajaServiceImpl implements CajaService {
 
         String serie = request.tipoComprobante() == TipoComprobante.FACTURA ? "F001" : "B001";
         int numero = comprobanteRepository.ultimoNumero(serie) + 1;
-        BigDecimal subtotal = total.divide(FACTOR_IGV, 2, RoundingMode.HALF_UP);
+        boolean gravado = configuracionFiscal
+                .vigente()
+                .map(c -> c.getAfectacionServicios()
+                        == com.codesoftlabs.tusalud.app.entities.enums.FacturacionEnums.Afectacion.GRAVADO)
+                .orElse(true);
+        BigDecimal subtotal = gravado ? total.divide(FACTOR_IGV, 2, RoundingMode.HALF_UP) : total;
         Comprobante comprobante = Comprobante.builder()
                 .tipo(request.tipoComprobante())
                 .serie(serie)
@@ -298,6 +307,7 @@ public class CajaServiceImpl implements CajaService {
                     .build());
         }
         comprobante = comprobanteRepository.save(comprobante);
+        facturacion.registrarDesdeComprobante(comprobante);
         if (desglose != null) {
             coberturaCobro.registrarCuenta(
                     comprobante,
@@ -417,6 +427,7 @@ public class CajaServiceImpl implements CajaService {
                 throw new ForbiddenOperationException("Solo puedes anular comprobantes de tu propia caja");
             }
         }
+        facturacion.anularPorComprobante(actor, comprobante, motivo.trim());
         comprobante.setEstado(EstadoComprobante.ANULADO);
         comprobante.setMotivoAnulacion(motivo.trim());
         comprobante.setAnuladoEn(LocalDateTime.now());

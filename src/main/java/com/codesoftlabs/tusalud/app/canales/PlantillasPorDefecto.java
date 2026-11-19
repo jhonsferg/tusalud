@@ -40,6 +40,14 @@ public final class PlantillasPorDefecto {
                 TipoNotificacion.DOCUMENTO_EMITIDO,
                 new Texto("Tiene un documento nuevo", "Se emitió un documento a su nombre."));
         TEXTOS.put(
+                TipoNotificacion.COMPROBANTE_EMITIDO,
+                new Texto("Tiene un comprobante nuevo", "Se emitió un comprobante de pago a su nombre."));
+        TEXTOS.put(
+                TipoNotificacion.ARCO_RESUELTA,
+                new Texto(
+                        "Respondimos su solicitud de privacidad",
+                        "Su solicitud sobre sus datos personales ya tiene respuesta."));
+        TEXTOS.put(
                 TipoNotificacion.CONSENTIMIENTO_PENDIENTE,
                 new Texto("Tiene un documento por firmar", "Tiene un documento pendiente de su firma."));
         TEXTOS.put(

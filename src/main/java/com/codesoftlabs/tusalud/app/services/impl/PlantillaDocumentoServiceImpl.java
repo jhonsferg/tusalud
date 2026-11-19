@@ -36,6 +36,7 @@ public class PlantillaDocumentoServiceImpl implements PlantillaDocumentoService 
             Map.entry("resultados-laboratorio", "Resultados de laboratorio"),
             Map.entry("informe-imagen", "Informe de imágenes diagnósticas"),
             Map.entry("constancia", "Constancia de atención"),
+            Map.entry("comprobante-electronico", "Comprobante electrónico"),
             Map.entry("certificado-medico", "Certificado médico"),
             Map.entry("descanso-medico", "Descanso médico"),
             Map.entry("informe-medico", "Informe médico"),

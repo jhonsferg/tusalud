@@ -35,6 +35,9 @@ app:
     simulacion-habilitada: ${PAGOS_SIMULACION_HABILITADA:false}
   canales:
     secreto: ${CANALES_SECRETO:}
+  facturacion:
+    certificado:
+      generar-de-prueba: false
   storage:
     tipo: ${STORAGE_TIPO:s3}
 

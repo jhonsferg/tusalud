@@ -25,6 +25,7 @@
         <jasperreports.version>7.1.1</jasperreports.version>
         <zxing.version>3.5.3</zxing.version>
         <poi.version>5.5.1</poi.version>
+        <bouncycastle.version>1.82</bouncycastle.version>
         <spotless.version>3.10.4</spotless.version>
         <palantir-java-format.version>2.102.0</palantir-java-format.version>
     </properties>
@@ -143,6 +144,11 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
             <version>${poi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>

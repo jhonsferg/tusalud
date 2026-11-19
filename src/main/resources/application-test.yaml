@@ -16,6 +16,10 @@ spring:
       path: /h2-console
 
 app:
+  facturacion:
+    cola-habilitada: false
+  privacidad:
+    retencion-habilitada: false
   canales:
     worker-habilitado: false
     webhook-secreto: secreto-webhook-de-pruebas

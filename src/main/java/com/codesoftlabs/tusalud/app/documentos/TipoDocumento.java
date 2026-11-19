@@ -13,6 +13,18 @@ public enum TipoDocumento {
             Set.of(FormatoDocumento.PDF),
             false,
             EnumSet.of(RolNombre.ROLE_CAJA, RolNombre.ROLE_ADMIN, RolNombre.ROLE_PACIENTE)),
+    COMPROBANTE_ELECTRONICO(
+            "comprobante-electronico",
+            "comprobante-electronico",
+            false,
+            Set.of(FormatoDocumento.PDF),
+            false,
+            EnumSet.of(
+                    RolNombre.ROLE_CAJA,
+                    RolNombre.ROLE_FINANZAS,
+                    RolNombre.ROLE_GERENCIA,
+                    RolNombre.ROLE_ADMIN,
+                    RolNombre.ROLE_PACIENTE)),
     RECETA(
             "receta",
             "receta",

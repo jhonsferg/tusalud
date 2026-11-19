@@ -118,6 +118,27 @@ app:
         cuerpo: ${CANALES_WHATSAPP_CUERPO:}
         campo-id-externo: ${CANALES_WHATSAPP_CAMPO_ID:messages.0.id}
         tiempo-limite-seg: 10
+  facturacion:
+    sede-por-defecto: ${FACTURACION_SEDE:PRINCIPAL}
+    url-verificacion: ${FACTURACION_URL_CONSULTA:https://e-consulta.sunat.gob.pe/ol-ti-itconsvalicpe/ConsValiCpe.htm}
+    cola-habilitada: ${FACTURACION_COLA_HABILITADA:true}
+    cron-resumen: ${FACTURACION_CRON_RESUMEN:0 30 0 * * *}
+    certificado:
+      ruta: ${FACTURACION_CERTIFICADO_RUTA:}
+      clave: ${FACTURACION_CERTIFICADO_CLAVE:}
+      alias: ${FACTURACION_CERTIFICADO_ALIAS:}
+      generar-de-prueba: ${FACTURACION_CERTIFICADO_PRUEBA:true}
+    sol:
+      usuario: ${FACTURACION_SOL_USUARIO:}
+      clave: ${FACTURACION_SOL_CLAVE:}
+    cola:
+      intervalo-ms: ${FACTURACION_COLA_INTERVALO_MS:10000}
+      intentos-maximos: 6
+      retroceso-base-segundos: 30
+  privacidad:
+    cron-retencion: ${PRIVACIDAD_CRON_RETENCION:0 15 2 * * *}
+    retencion-habilitada: ${PRIVACIDAD_RETENCION_HABILITADA:true}
+    horas-notificar-autoridad: 48
   respaldos:
     token: ${RESPALDO_TOKEN:}
     vigilancia-habilitada: ${RESPALDOS_VIGILANCIA_HABILITADA:true}
