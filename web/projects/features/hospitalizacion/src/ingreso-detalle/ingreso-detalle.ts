@@ -24,11 +24,13 @@ import { Textarea } from 'primeng/textarea';
 
 import {
   AuthService,
+  DocumentosMedicosApiService,
   HospitalizacionStore,
   NotificationService,
   optionalIdAttribute,
   Cie10Response,
 } from '@tusalud/core';
+import { ResumenIngreso } from '@tusalud/features/documentos-medicos';
 import { COLOR_TRIAJE } from '@tusalud/ui/utils';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { PageHeader } from '@tusalud/ui/page-header';
@@ -37,6 +39,7 @@ import { SecurityNotice } from '@tusalud/ui/tablero';
 @Component({
   selector: 'app-ingreso-detalle',
   imports: [
+    ResumenIngreso,
     SecurityNotice,
     CurrencyPipe,
     DatePipe,
@@ -68,6 +71,11 @@ export class IngresoDetalle {
 
   protected readonly colores = COLOR_TRIAJE;
   protected readonly ingreso = this.store.ingreso.value;
+  private readonly documentos = inject(DocumentosMedicosApiService);
+  protected readonly preparandoEpicrisis = signal(false);
+  protected readonly puedeEpicrisis = computed(
+    () => this.ingreso()?.estado === 'ALTA' && this.auth.isMedico(),
+  );
   protected readonly activo = computed(() => this.ingreso()?.estado === 'ACTIVO');
   protected readonly tipoEvolucion = computed<'MEDICA' | 'ENFERMERIA' | null>(() =>
     this.auth.isMedico() ? 'MEDICA' : this.auth.isEnfermeria() ? 'ENFERMERIA' : null,
@@ -225,6 +233,21 @@ export class IngresoDetalle {
         this.notifications.success('El paciente fue trasladado.');
       },
       error: () => undefined,
+    });
+  }
+
+  protected prepararEpicrisis(): void {
+    const ingreso = this.ingreso();
+    if (!ingreso) {
+      return;
+    }
+    this.preparandoEpicrisis.set(true);
+    this.documentos.epicrisisBorrador(ingreso.id).subscribe({
+      next: (detalle) => {
+        this.preparandoEpicrisis.set(false);
+        void this.router.navigate(['/documentos', detalle.resumen.id]);
+      },
+      error: () => this.preparandoEpicrisis.set(false),
     });
   }
 }

@@ -114,6 +114,22 @@ export const routes: Routes = [
           import('@tusalud/features/exportaciones').then((m) => m.EXPORTACIONES_ROUTES),
       },
       {
+        path: 'establecimientos',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () =>
+          import('@tusalud/features/documentos-medicos').then(
+            (m) => m.ESTABLECIMIENTOS_ADMIN_ROUTES,
+          ),
+      },
+      {
+        path: 'consentimientos',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () =>
+          import('@tusalud/features/documentos-medicos').then(
+            (m) => m.PLANTILLAS_CONSENTIMIENTO_ADMIN_ROUTES,
+          ),
+      },
+      {
         path: 'plantillas',
         loadChildren: () => import('@tusalud/features/plantillas').then((m) => m.PLANTILLAS_ROUTES),
       },

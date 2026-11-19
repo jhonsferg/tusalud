@@ -82,6 +82,20 @@ export const routes: Routes = [
           import('@tusalud/features/seguros').then((m) => m.SEGUROS_PACIENTE_ROUTES),
       },
       {
+        path: 'mis-documentos',
+        canMatch: [roleGuard('ROLE_PACIENTE')],
+        loadChildren: () =>
+          import('@tusalud/features/documentos-medicos').then((m) => m.DOCUMENTOS_PACIENTE_ROUTES),
+      },
+      {
+        path: 'mis-consentimientos',
+        canMatch: [roleGuard('ROLE_PACIENTE')],
+        loadChildren: () =>
+          import('@tusalud/features/documentos-medicos').then(
+            (m) => m.CONSENTIMIENTOS_PACIENTE_ROUTES,
+          ),
+      },
+      {
         path: 'calendario',
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },

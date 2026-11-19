@@ -124,6 +124,18 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         link: '/preautorizaciones',
         roles: ['ROLE_MEDICO'],
       },
+      {
+        label: 'Documentos médicos',
+        icon: 'pi-file-check',
+        link: '/documentos',
+        roles: ['ROLE_MEDICO'],
+      },
+      {
+        label: 'Consentimientos',
+        icon: 'pi-pencil',
+        link: '/consentimientos',
+        roles: ['ROLE_MEDICO'],
+      },
     ],
   },
   {

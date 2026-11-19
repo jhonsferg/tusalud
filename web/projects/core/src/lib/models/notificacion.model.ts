@@ -33,6 +33,9 @@ export type TipoNotificacion =
   | 'TELECONSULTA_PROXIMA'
   | 'TELECONSULTA_SALA_ABIERTA'
   | 'TELECONSULTA_PACIENTE_EN_SALA'
+  | 'DOCUMENTO_EMITIDO'
+  | 'CONSENTIMIENTO_PENDIENTE'
+  | 'CONSENTIMIENTO_FIRMADO'
   | 'SISTEMA';
 
 export interface NotificacionResponse {

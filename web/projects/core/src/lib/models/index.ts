@@ -22,6 +22,7 @@ export * from './hospitalizacion.model';
 export * from './reportes.model';
 export * from './rrhh.model';
 export * from './documentos.model';
+export * from './documentos-medicos.model';
 export * from './seguridad-operativa.model';
 export * from './seguros.model';
 export * from './teleconsulta.model';

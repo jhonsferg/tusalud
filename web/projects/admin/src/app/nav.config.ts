@@ -240,6 +240,18 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         link: '/plantillas',
         roles: ['ROLE_ADMIN'],
       },
+      {
+        label: 'Establecimientos de salud',
+        icon: 'pi-building',
+        link: '/establecimientos',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Plantillas de consentimiento',
+        icon: 'pi-pencil',
+        link: '/consentimientos',
+        roles: ['ROLE_ADMIN'],
+      },
     ],
   },
   {

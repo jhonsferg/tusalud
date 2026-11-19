@@ -307,6 +307,12 @@ export class InicioPaciente implements OnInit {
       detalle: 'Elige médico y horario',
     },
     {
+      label: 'Mis documentos',
+      icono: 'pi-file-check',
+      enlace: '/mis-documentos',
+      detalle: 'Certificados y descansos',
+    },
+    {
       label: 'Mis resultados',
       icono: 'pi-filter',
       enlace: '/mis-resultados',

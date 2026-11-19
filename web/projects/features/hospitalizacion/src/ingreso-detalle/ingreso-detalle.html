@@ -229,6 +229,24 @@
       </ul>
     </section>
   }
+
+  @if (ingreso(); as ing) {
+    <section class="panel">
+      <app-resumen-ingreso [ingresoId]="ing.id" />
+      @if (puedeEpicrisis()) {
+        <div class="acciones-epicrisis">
+          <p-button
+            label="Preparar la epicrisis"
+            icon="pi pi-file-edit"
+            size="small"
+            [outlined]="true"
+            [loading]="preparandoEpicrisis()"
+            (onClick)="prepararEpicrisis()"
+          />
+        </div>
+      }
+    </section>
+  }
 } @else if (store.ingreso.error(); as problema) {
   <div class="panel">
     <app-empty-state

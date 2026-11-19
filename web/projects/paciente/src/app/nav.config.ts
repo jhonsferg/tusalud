@@ -119,6 +119,18 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         link: '/mis-seguros',
         roles: ['ROLE_PACIENTE'],
       },
+      {
+        label: 'Mis documentos',
+        icon: 'pi-file-check',
+        link: '/mis-documentos',
+        roles: ['ROLE_PACIENTE'],
+      },
+      {
+        label: 'Mis consentimientos',
+        icon: 'pi-pencil',
+        link: '/mis-consentimientos',
+        roles: ['ROLE_PACIENTE'],
+      },
     ],
   },
   {

@@ -228,6 +228,18 @@ export class InicioMedico implements OnInit {
       detalle: 'Historias clínicas',
     },
     {
+      label: 'Documentos médicos',
+      icono: 'pi-file-check',
+      enlace: '/documentos',
+      detalle: 'Certificados y descansos',
+    },
+    {
+      label: 'Consentimientos',
+      icono: 'pi-pencil',
+      enlace: '/consentimientos',
+      detalle: 'Firma del paciente',
+    },
+    {
       label: 'Solicitar exámenes',
       icono: 'pi-send',
       enlace: '/laboratorio/solicitar',

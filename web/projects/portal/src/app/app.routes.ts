@@ -11,6 +11,11 @@ export const routes: Routes = [
     loadChildren: () => import('./auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
   {
+    path: 'verificar',
+    loadChildren: () =>
+      import('@tusalud/features/documentos-medicos').then((m) => m.VERIFICACION_PUBLICA_ROUTES),
+  },
+  {
     path: 'acceso-denegado',
     title: 'Acceso denegado',
     loadComponent: () => import('@tusalud/ui/forbidden').then((m) => m.Forbidden),

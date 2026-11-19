@@ -21781,8 +21781,8 @@
                 "exec": [
                   "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
                   "const lista = pm.response.json();",
-                  "pm.test('Están las doce plantillas del sistema', () => {",
-                  "    pm.expect(lista).to.have.length(12);",
+                  "pm.test('Están las diecinueve plantillas del sistema', () => {",
+                  "    pm.expect(lista).to.have.length(19);",
                   "    ['comprobante', 'receta', 'resultados-laboratorio', 'informe-imagen', 'constancia', 'resumen-historia', 'reporte-ejecutivo', 'reporte-financiero', 'reporte-operativo', 'reporte-calidad'].forEach(c => pm.expect(lista.map(p => p.codigo)).to.include(c));",
                   "});"
                 ]
@@ -28840,6 +28840,4353 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "29 - Documentos médicos y consentimientos",
+      "item": [
+        {
+          "name": "Login del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"dmMedicoToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login del segundo médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"dmMedico2Token\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dra.lopez@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login del paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"dmPacienteToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de otro paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"dmPaciente2Token\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria.rodriguez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de recepción",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"dmRecepcionToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recepcion@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login del administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"dmAdminToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médicos para reservar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const garcia = pm.response.json().find(m => /García/.test(m.apellido));",
+                  "pm.test(\"Existe el médico con especialidad\", () => pm.expect(garcia.especialidades).to.not.be.empty);",
+                  "pm.collectionVariables.set(\"dmMedicoId\", garcia.id);",
+                  "pm.collectionVariables.set(\"dmEspecialidadId\", garcia.especialidades[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reservar una cita presencial",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let fecha;",
+                  "do {",
+                  "    fecha = new Date();",
+                  "    fecha.setDate(fecha.getDate() + 70 + Math.floor(Math.random() * 60));",
+                  "} while (fecha.getDay() === 0 || fecha.getDay() === 6);",
+                  "const dos = (n) => String(n).padStart(2, \"0\");",
+                  "const hora = 8 + Math.floor(Math.random() * 4);",
+                  "const minutos = Math.random() < 0.5 ? \"00\" : \"30\";",
+                  "pm.collectionVariables.set(\"dmFechaHora\", fecha.getFullYear() + \"-\" + dos(fecha.getMonth() + 1) + \"-\" + dos(fecha.getDate()) + \"T\" + dos(hora) + \":\" + minutos + \":00\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"dmCitaId\", pm.response.json().id);",
+                  "pm.collectionVariables.set(\"dmPacienteId\", pm.response.json().pacienteId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": \"{{dmMedicoId}}\",\n  \"especialidadId\": \"{{dmEspecialidadId}}\",\n  \"fechaHora\": \"{{dmFechaHora}}\",\n  \"motivo\": \"Control para documentos médicos\",\n  \"modalidad\": \"PRESENCIAL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirmar la cita",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{dmCitaId}}/confirmar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{dmCitaId}}", "confirmar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Establecimientos del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test(\"Trae el catálogo de demostración\", () => pm.expect(lista.length).to.be.at.least(7));",
+                  "const activo = lista.find(e => e.activo);",
+                  "pm.collectionVariables.set(\"dmDestinoId\", activo.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/establecimientos-salud",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "establecimientos-salud"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no crea establecimientos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/establecimientos-salud",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "establecimientos-salud"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"No permitido\",\n  \"nivel\": \"PRIMER_NIVEL\",\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no crea establecimientos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/establecimientos-salud",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "establecimientos-salud"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"No permitido\",\n  \"nivel\": \"PRIMER_NIVEL\",\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador crea un establecimiento",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"dmSufijo\", String(Date.now()).slice(-8));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"dmEstablecimientoId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/establecimientos-salud",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "establecimientos-salud"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Clínica {{dmSufijo}}\",\n  \"codigoIpress\": \"{{dmSufijo}}\",\n  \"nivel\": \"SEGUNDO_NIVEL\",\n  \"distrito\": \"Miraflores\",\n  \"contacto\": \"central@clinica.test\",\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador desactiva el establecimiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Queda inactivo\", () => pm.expect(pm.response.json().activo).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/establecimientos-salud/{{dmEstablecimientoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "establecimientos-salud",
+                "{{dmEstablecimientoId}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Clínica {{dmSufijo}}\",\n  \"codigoIpress\": \"{{dmSufijo}}\",\n  \"nivel\": \"SEGUNDO_NIVEL\",\n  \"distrito\": \"Miraflores\",\n  \"contacto\": \"central@clinica.test\",\n  \"activo\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear un documento sin sesión es 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"tipo\": \"CERTIFICADO\",\n  \"autorizaDiagnostico\": false,\n  \"contenido\": {\n    \"motivo\": \"Atención ambulatoria por cuadro viral\",\n    \"vigenciaDias\": 7\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no crea documentos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"tipo\": \"CERTIFICADO\",\n  \"autorizaDiagnostico\": false,\n  \"contenido\": {\n    \"motivo\": \"Atención ambulatoria por cuadro viral\",\n    \"vigenciaDias\": 7\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un médico sin relación asistencial no crea el documento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403 o 404', () => pm.expect([403, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"tipo\": \"CERTIFICADO\",\n  \"autorizaDiagnostico\": false,\n  \"contenido\": {\n    \"motivo\": \"Atención ambulatoria por cuadro viral\",\n    \"vigenciaDias\": 7\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedico2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un certificado sin motivo es 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"tipo\": \"CERTIFICADO\",\n  \"autorizaDiagnostico\": false,\n  \"contenido\": {\n    \"vigenciaDias\": 7\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear el borrador del certificado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const d = pm.response.json();",
+                  "pm.test(\"Queda en borrador y sin numerar\", () => { pm.expect(d.resumen.estado).to.eql(\"BORRADOR\"); pm.expect(d.resumen.numero == null).to.be.true; });",
+                  "pm.collectionVariables.set(\"dmCertId\", d.resumen.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"tipo\": \"CERTIFICADO\",\n  \"autorizaDiagnostico\": false,\n  \"contenido\": {\n    \"motivo\": \"Atención ambulatoria por cuadro viral\",\n    \"vigenciaDias\": 7\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar el borrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Guarda el cambio\", () => pm.expect(pm.response.json().contenido.vigenciaDias).to.eql(10));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmCertId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos", "{{dmCertId}}"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"autorizaDiagnostico\": false,\n  \"contenido\": {\n    \"motivo\": \"Atención ambulatoria por cuadro viral agudo\",\n    \"vigenciaDias\": 10\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Emitir el certificado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json();",
+                  "pm.test(\"Queda emitido con numeración correlativa\", () => { pm.expect(d.resumen.estado).to.eql(\"EMITIDO\"); pm.expect(d.resumen.numero).to.match(/^CM-\\d{4}-\\d{6}$/); });",
+                  "pm.test(\"Tiene un código de verificación aleatorio\", () => pm.expect(d.codigoVerificacion).to.match(/^[A-Z0-9]{4}(-[A-Z0-9]{4}){3}$/));",
+                  "pm.test(\"Registra al médico emisor con su colegiatura\", () => pm.expect(d.resumen.medicoColegiatura).to.not.be.empty);",
+                  "pm.collectionVariables.set(\"dmCertCodigo\", d.codigoVerificacion);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmCertId}}/emitir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmCertId}}",
+                "emitir"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un documento emitido no se edita",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400 o 409', () => pm.expect([400, 409]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmCertId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos", "{{dmCertId}}"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"autorizaDiagnostico\": false,\n  \"contenido\": {\n    \"motivo\": \"Cambio posterior\",\n    \"vigenciaDias\": 3\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un documento emitido no se emite otra vez",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400 o 409', () => pm.expect([400, 409]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmCertId}}/emitir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmCertId}}",
+                "emitir"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico lee el documento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmCertId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos", "{{dmCertId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente ve sus documentos emitidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Incluye el certificado\", () => pm.expect(pm.response.json().some(d => d.id === pm.collectionVariables.get(\"dmCertId\") && d.estado === \"EMITIDO\")).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/mios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos", "mios"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente descarga el PDF del certificado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es un PDF\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\"));",
+                  "pm.test(\"Trae contenido\", () => pm.expect(pm.response.responseSize).to.be.above(1500));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmCertId}}/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos", "{{dmCertId}}", "pdf"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente no ve el documento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403 o 404', () => pm.expect([403, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmCertId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos", "{{dmCertId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPaciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un médico sin relación no ve el documento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403 o 404', () => pm.expect([403, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmCertId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos", "{{dmCertId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedico2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no ve el documento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403 o 404', () => pm.expect([403, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmCertId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos", "{{dmCertId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador no ve el documento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403 o 404', () => pm.expect([403, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmCertId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos", "{{dmCertId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente no descarga el PDF",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403 o 404', () => pm.expect([403, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmCertId}}/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos", "{{dmCertId}}", "pdf"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPaciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no lista documentos de un paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos?pacienteId={{dmPacienteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"],
+              "query": [
+                {
+                  "key": "pacienteId",
+                  "value": "{{dmPacienteId}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro médico no anula un documento ajeno",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403 o 404', () => pm.expect([403, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmCertId}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmCertId}}",
+                "anular"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Intento de anulación ajena\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedico2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La verificación pública no pide sesión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const v = pm.response.json();",
+                  "pm.test(\"Es válido\", () => pm.expect(v.resultado).to.eql(\"VALIDO\"));",
+                  "pm.test(\"Solo expone el tipo, la fecha, el médico, el CMP y el establecimiento\", () => pm.expect(Object.keys(v).sort()).to.eql([\"colegiatura\", \"emitidoEn\", \"establecimiento\", \"medico\", \"resultado\", \"tipo\"]));",
+                  "pm.test(\"Nunca revela datos del paciente\", () => pm.expect(JSON.stringify(v)).to.not.match(/Pérez|12345678|juan/i));",
+                  "pm.collectionVariables.set(\"dmFormaValida\", Object.keys(v).sort().join(\",\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/verificacion/{{dmCertCodigo}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "verificacion", "{{dmCertCodigo}}"]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Un código inexistente responde con la misma forma",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const v = pm.response.json();",
+                  "pm.test(\"No se encuentra\", () => pm.expect(v.resultado).to.eql(\"NO_ENCONTRADO\"));",
+                  "pm.test(\"Misma forma que un código válido\", () => pm.expect(Object.keys(v).sort().join(\",\")).to.eql(pm.collectionVariables.get(\"dmFormaValida\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/verificacion/ZZZZ-ZZZZ-ZZZZ-ZZZZ",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "verificacion", "ZZZZ-ZZZZ-ZZZZ-ZZZZ"]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Un código con formato inválido responde igual",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"No se encuentra\", () => pm.expect(pm.response.json().resultado).to.eql(\"NO_ENCONTRADO\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/verificacion/abc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "verificacion", "abc"]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Crear un descanso con el rango invertido",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const f = (d) => { const x = new Date(); x.setDate(x.getDate() + d); return x.getFullYear() + \"-\" + String(x.getMonth() + 1).padStart(2, \"0\") + \"-\" + String(x.getDate()).padStart(2, \"0\"); };",
+                  "const base = 10 + Math.floor(Math.random() * 20000);",
+                  "pm.collectionVariables.set(\"dmHoy\", f(base));",
+                  "pm.collectionVariables.set(\"dmMas2\", f(base + 2));",
+                  "pm.collectionVariables.set(\"dmMas1\", f(base + 1));",
+                  "pm.collectionVariables.set(\"dmMas5\", f(base + 5));",
+                  "pm.collectionVariables.set(\"dmHaceVeinte\", f(-20));",
+                  "pm.collectionVariables.set(\"dmHaceDiecinueve\", f(-19));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"dmDescansoMalId\", pm.response.json().resumen.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"tipo\": \"DESCANSO\",\n  \"autorizaDiagnostico\": false,\n  \"contenido\": {\n    \"tipoDescanso\": \"ENFERMEDAD\",\n    \"desde\": \"{{dmMas2}}\",\n    \"hasta\": \"{{dmHoy}}\",\n    \"contingencia\": \"Enfermedad común\",\n    \"indicacion\": \"Reposo absoluto en domicilio\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Emitir un descanso con el rango invertido es 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmDescansoMalId}}/emitir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmDescansoMalId}}",
+                "emitir"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear un descanso demasiado retroactivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"dmDescansoRetroId\", pm.response.json().resumen.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"tipo\": \"DESCANSO\",\n  \"autorizaDiagnostico\": false,\n  \"contenido\": {\n    \"tipoDescanso\": \"ENFERMEDAD\",\n    \"desde\": \"{{dmHaceVeinte}}\",\n    \"hasta\": \"{{dmHaceDiecinueve}}\",\n    \"contingencia\": \"Enfermedad común\",\n    \"indicacion\": \"Reposo absoluto en domicilio\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Emitir un descanso retroactivo fuera del límite es 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmDescansoRetroId}}/emitir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmDescansoRetroId}}",
+                "emitir"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear un descanso válido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"dmDescansoId\", pm.response.json().resumen.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"tipo\": \"DESCANSO\",\n  \"autorizaDiagnostico\": false,\n  \"contenido\": {\n    \"tipoDescanso\": \"ENFERMEDAD\",\n    \"desde\": \"{{dmHoy}}\",\n    \"hasta\": \"{{dmMas2}}\",\n    \"contingencia\": \"Enfermedad común\",\n    \"indicacion\": \"Reposo absoluto en domicilio\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Emitir el descanso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Numeración propia del tipo\", () => pm.expect(pm.response.json().resumen.numero).to.match(/^DM-\\d{4}-\\d{6}$/));",
+                  "pm.collectionVariables.set(\"dmDescansoCodigo\", pm.response.json().codigoVerificacion);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmDescansoId}}/emitir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmDescansoId}}",
+                "emitir"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear un descanso solapado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"dmDescansoSolapadoId\", pm.response.json().resumen.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"tipo\": \"DESCANSO\",\n  \"autorizaDiagnostico\": false,\n  \"contenido\": {\n    \"tipoDescanso\": \"ENFERMEDAD\",\n    \"desde\": \"{{dmMas1}}\",\n    \"hasta\": \"{{dmMas5}}\",\n    \"contingencia\": \"Enfermedad común\",\n    \"indicacion\": \"Reposo absoluto en domicilio\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Emitir un descanso solapado es 409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmDescansoSolapadoId}}/emitir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmDescansoSolapadoId}}",
+                "emitir"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Anular el descanso sin motivo es 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmDescansoId}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmDescansoId}}",
+                "anular"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Anular el descanso con motivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Queda anulado con su motivo\", () => { const r = pm.response.json().resumen; pm.expect(r.estado).to.eql(\"ANULADO\"); pm.expect(r.motivoAnulacion).to.include(\"equivocadas\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmDescansoId}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmDescansoId}}",
+                "anular"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Fechas equivocadas en el descanso\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Anular otra vez es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400 o 409', () => pm.expect([400, 409]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmDescansoId}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmDescansoId}}",
+                "anular"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Segundo intento de anulación\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La verificación pública informa el documento anulado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Está anulado\", () => pm.expect(pm.response.json().resultado).to.eql(\"ANULADO\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/verificacion/{{dmDescansoCodigo}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "verificacion", "{{dmDescansoCodigo}}"]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente ve el documento anulado con su motivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json().find(x => x.id === pm.collectionVariables.get(\"dmDescansoId\"));",
+                  "pm.test(\"Aparece anulado\", () => { pm.expect(d.estado).to.eql(\"ANULADO\"); pm.expect(d.motivoAnulacion).to.not.be.empty; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/mios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos", "mios"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear el reemplazo del descanso anulado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"dmReemplazoId\", pm.response.json().resumen.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"tipo\": \"DESCANSO\",\n  \"autorizaDiagnostico\": false,\n  \"documentoOrigenId\": \"{{dmDescansoId}}\",\n  \"contenido\": {\n    \"tipoDescanso\": \"ENFERMEDAD\",\n    \"desde\": \"{{dmHoy}}\",\n    \"hasta\": \"{{dmMas2}}\",\n    \"contingencia\": \"Enfermedad común\",\n    \"indicacion\": \"Reposo absoluto en domicilio\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Emitir el reemplazo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Referencia al documento anulado\", () => pm.expect(pm.response.json().documentoOrigenId).to.eql(pm.collectionVariables.get(\"dmDescansoId\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmReemplazoId}}/emitir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmReemplazoId}}",
+                "emitir"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un informe sin autorización del paciente no se emite",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201 o 400', () => pm.expect([201, 400]).to.include(pm.response.code));",
+                  "pm.collectionVariables.set(\"dmInformeId\", pm.response.code === 201 ? pm.response.json().resumen.id : \"\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"tipo\": \"INFORME\",\n  \"autorizaDiagnostico\": false,\n  \"contenido\": {\n    \"destinatario\": \"Junta médica\",\n    \"resumen\": \"Paciente estable\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear una referencia a un establecimiento inactivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201 o 400', () => pm.expect([201, 400]).to.include(pm.response.code));",
+                  "pm.collectionVariables.set(\"dmRefInactivaId\", pm.response.code === 201 ? pm.response.json().resumen.id : \"\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"tipo\": \"REFERENCIA\",\n  \"autorizaDiagnostico\": false,\n  \"contenido\": {\n    \"destinoId\": \"{{dmEstablecimientoId}}\",\n    \"especialidad\": \"Cardiología\",\n    \"prioridad\": \"PREFERENTE\",\n    \"motivo\": \"Evaluación especializada\",\n    \"resumenClinico\": \"Paciente estable con control pendiente\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Emitir hacia un establecimiento inactivo es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400 o 404 o 405', () => pm.expect([400, 404, 405]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmRefInactivaId}}/emitir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmRefInactivaId}}",
+                "emitir"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear la referencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"dmRefId\", pm.response.json().resumen.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"tipo\": \"REFERENCIA\",\n  \"autorizaDiagnostico\": false,\n  \"contenido\": {\n    \"destinoId\": \"{{dmDestinoId}}\",\n    \"especialidad\": \"Cardiología\",\n    \"prioridad\": \"PREFERENTE\",\n    \"motivo\": \"Evaluación especializada\",\n    \"resumenClinico\": \"Paciente estable con control pendiente\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Emitir la referencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json().resumen;",
+                  "pm.test(\"Nace como enviada\", () => pm.expect(r.referencia.estado).to.eql(\"ENVIADA\"));",
+                  "pm.test(\"Numeración RF\", () => pm.expect(r.numero).to.match(/^RF-\\d{4}-\\d{6}$/));",
+                  "pm.collectionVariables.set(\"dmReferenciaId\", r.referencia.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmRefId}}/emitir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmRefId}}",
+                "emitir"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no cambia el estado de la referencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmRefId}}/referencia/estado",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmRefId}}",
+                "referencia",
+                "estado"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"RECIBIDA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Marcar la referencia como recibida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmRefId}}/referencia/estado",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmRefId}}",
+                "referencia",
+                "estado"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"RECIBIDA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Rechazar sin motivo es 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmRefId}}/referencia/estado",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmRefId}}",
+                "referencia",
+                "estado"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"RECHAZADA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear la contrarreferencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"dmContraId\", pm.response.json().resumen.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"tipo\": \"CONTRARREFERENCIA\",\n  \"autorizaDiagnostico\": false,\n  \"referenciaId\": \"{{dmReferenciaId}}\",\n  \"contenido\": {\n    \"resumen\": \"Se atendió en el establecimiento y se indicó seguimiento ambulatorio\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Emitir la contrarreferencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Numeración CR\", () => pm.expect(pm.response.json().resumen.numero).to.match(/^CR-\\d{4}-\\d{6}$/));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmContraId}}/emitir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmContraId}}",
+                "emitir"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La referencia queda atendida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Atendida\", () => pm.expect(pm.response.json().resumen.referencia.estado).to.eql(\"ATENDIDA\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmRefId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos", "{{dmRefId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una referencia atendida no cambia de estado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/{{dmRefId}}/referencia/estado",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "{{dmRefId}}",
+                "referencia",
+                "estado"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"RECIBIDA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico ve lo que emitió",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Incluye el certificado\", () => pm.expect(pm.response.json().some(d => d.id === pm.collectionVariables.get(\"dmCertId\"))).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/emitidos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos", "emitidos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico lista los documentos del paciente con relación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Hay documentos\", () => pm.expect(pm.response.json().length).to.be.above(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos?pacienteId={{dmPacienteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "documentos-medicos"],
+              "query": [
+                {
+                  "key": "pacienteId",
+                  "value": "{{dmPacienteId}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un resumen de ingreso inexistente no filtra datos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403 o 404', () => pm.expect([403, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos-medicos/ingreso/00000000-0000-4000-8000-000000000999/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos-medicos",
+                "ingreso",
+                "00000000-0000-4000-8000-000000000999",
+                "resumen"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Plantillas de consentimiento del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test(\"Trae las seis plantillas de demostración\", () => pm.expect(lista.filter(p => p.activa).length).to.be.at.least(6));",
+                  "const sinTestigo = lista.find(p => p.activa && !p.requiereTestigo);",
+                  "pm.collectionVariables.set(\"dmPlantillaId\", sinTestigo.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/plantillas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "plantillas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no ve las plantillas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/plantillas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "plantillas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no ve las plantillas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/plantillas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "plantillas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no crea plantillas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/plantillas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "plantillas"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"PRUEBA-{{dmSufijo}}\",\n  \"nombre\": \"Consentimiento de prueba {{dmSufijo}}\",\n  \"texto\": \"Texto completo del consentimiento informado para el procedimiento de prueba.\",\n  \"riesgos\": \"Riesgos descritos en lenguaje claro.\",\n  \"beneficios\": \"Beneficios esperados.\",\n  \"alternativas\": \"Alternativas disponibles.\",\n  \"requiereTestigo\": true,\n  \"vigenciaDias\": 30,\n  \"activa\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador crea una plantilla con testigo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"dmPlantillaTestigoId\", pm.response.json().id);",
+                  "pm.test(\"Versión 1\", () => pm.expect(pm.response.json().version).to.eql(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/plantillas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "plantillas"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"PRUEBA-{{dmSufijo}}\",\n  \"nombre\": \"Consentimiento de prueba {{dmSufijo}}\",\n  \"texto\": \"Texto completo del consentimiento informado para el procedimiento de prueba.\",\n  \"riesgos\": \"Riesgos descritos en lenguaje claro.\",\n  \"beneficios\": \"Beneficios esperados.\",\n  \"alternativas\": \"Alternativas disponibles.\",\n  \"requiereTestigo\": true,\n  \"vigenciaDias\": 30,\n  \"activa\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador actualiza la plantilla y sube la versión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Versión 2\", () => pm.expect(pm.response.json().version).to.eql(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/plantillas/{{dmPlantillaTestigoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "consentimientos",
+                "plantillas",
+                "{{dmPlantillaTestigoId}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"PRUEBA-{{dmSufijo}}\",\n  \"nombre\": \"Consentimiento de prueba {{dmSufijo}}\",\n  \"texto\": \"Texto revisado del consentimiento informado para el procedimiento de prueba.\",\n  \"riesgos\": \"Riesgos descritos en lenguaje claro.\",\n  \"beneficios\": \"Beneficios esperados.\",\n  \"alternativas\": \"Alternativas disponibles.\",\n  \"requiereTestigo\": true,\n  \"vigenciaDias\": 30,\n  \"activa\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador no ve consentimientos de pacientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos?pacienteId={{dmPacienteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos"],
+              "query": [
+                {
+                  "key": "pacienteId",
+                  "value": "{{dmPacienteId}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Solicitar un consentimiento con una plantilla inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400 o 404', () => pm.expect([400, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plantillaId\": \"00000000-0000-4000-8000-000000000999\",\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"procedimiento\": \"Sutura\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no solicita consentimientos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plantillaId\": \"{{dmPlantillaId}}\",\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"procedimiento\": \"Sutura\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Solicitar el consentimiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test(\"Queda pendiente de firma\", () => pm.expect(pm.response.json().estado).to.eql(\"PENDIENTE_FIRMA\"));",
+                  "pm.collectionVariables.set(\"dmConsId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plantillaId\": \"{{dmPlantillaId}}\",\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"procedimiento\": \"Sutura menor de herida cortante\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente ve su consentimiento pendiente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Incluye el pendiente\", () => pm.expect(pm.response.json().some(c => c.id === pm.collectionVariables.get(\"dmConsId\") && c.estado === \"PENDIENTE_FIRMA\")).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/mios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "mios"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente no firma",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403 o 404', () => pm.expect([403, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsId}}/firma",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "{{dmConsId}}", "firma"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firmaPng\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABQCAYAAAAnSfh8AAADsklEQVR4nO3bW27bQBBEUe4gn9lD9r+/BDCcQJb5mBl2d1WH9+MAsSSKleaUJVH09uPnrw1AT/IAANbJAwBYJw8AYJ08AIB18gAA1skDAFgnD3Di9wl1NsDCZliIs+JSYuDFZlaG0fJSYuClwA5lmC2vS25AZjMow2w5KTHwaRMX4c6rKiXG4/39h6oId0tIifForz9UFyGqfJQYj/X6Q2UJoktHifFI7zdUlCCrbBQYj7N3Y2YRsl8pKTEeZe/GilfIrILxVhqPcnRHdAkqi0WB8Rhnd0YVQfGqSInxCGd3RhRP+Za2Q4HvXMgCXP45YdRVUuqrvOSDHpiPw8zQzMiDZhaX20J0yDAyH0qMJaMPXFl4LgvQLUfHGcLUzIO7LjyHPDMzcp4lzMxu0K28e7mV++52HgHmVjfsUty9vKr9ruy/w2whJA9QqLoIUb/cKDEOyQMUqypC9DsTSoxd8gDFKkqQ9bGCEuMbeQCBzBJknxOgwPhCHkCkomBZJaPE+EceQCS6aNVn4ykxPsgDCEUVTvFVGgXGB3kAsbvFU34P3qXEXa4VaEkewMDq4nJYmM6lOLrQxzlzO/IABmYXl9NiVO9/Zj5Oc/tvyAOYmF10TovQJcedOapztyUPYKTz4nPIMjoj5zm2Iw9gqFNx9zKr9z+aw32mLcgDmOpU3r3M6lnd2V49x1bkARrotLCqs0aVjxIvkgdAqMoSRJeOAi+QB0C4iiJkvWJS4knyAAiX/Xa08vnVs7QnD4AUWSWo+KxKgSfIAyBNdBEqTzRR4kHyAEgVVQTFWWJKPEAeAKkiiqf8HrxDgaXXCaj/88gXeZGF8iIR9RxHZlM+K/UQUGN2cckW5EUW9Ryv5lM+N/UgUGd20TmU9z23eoZ35piSRz0M1LJZeDdyu+SwmKX6wKBet/Lu5VbvfzRH+kzVBwUa3cr7nlk9r6ptL6kPCvScS+uQNaKAaSVWHxBgVmWJI4uXUmL1wQBmVRU4o3Dhz6k+GMCK7BJnfm6lwEBRwSp+Qdx6LvVBAFa1eIs7uK/l51EfBOAO+5NMg/tbfh71AQDusv6aZ2K/S8+hHj4QYbWADhewUGA83koRHcr7nmN6e/XggSh7hZzhkn1qW/XQgUgdy/uefWo7dWggWsfyvuce3k4dGsjSpbhHmYe2UQcGsnUo7l7WoW3UgQF8NVVidVgA3w2XWB0UwHcUGGhuqMTqkACOXZZYHRDAscsz6OqAAM6dllgdDsC1wxKrgwEYs3s12R9Dw32G8CYgZQAAAABJRU5ErkJggg==\",\n  \"firmanteTipo\": \"PACIENTE\",\n  \"nombre\": \"Juan Pérez\",\n  \"dni\": \"12345678\",\n  \"via\": \"APP_PACIENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPaciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una firma vacía es rechazada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsId}}/firma",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "{{dmConsId}}", "firma"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firmaPng\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABQCAYAAAAnSfh8AAABJUlEQVR4nO3OMQ3AMAAEsTDoWA7lD7AcbnlF8uDd53m/A9xpHgC6eQDo5gGgmweAbh4AunkA6OYBoJsHgG4eALp5AOjmAaCbB4BuHgC6eQDo5gGgmweAbh4AunkA6OYBoJsHgG4eALp5AOjmAaCbB4BuHgC6eQDo5gGgmweAbh4AunkA6OYBoJsHgG4eALp5AOjmAaCbB4BuHgC6eQDo5gGgmweAbh4AunkA6OYBoJsHgG4eALp5AOjmAaCbB4BuHgC6eQDo5gGgmweAbh4AunkA6OYBoJsHgG4eALp5AOjmAaCbB4BuHgC6eQDo5gGgmweAbh4AunkA6OYBoJsHgG4eALp5AOjmAaCbB4BuHgC6eQDo5gGgmweAbh4AunkA6OYBoPsBvPRxWtmhf+0AAAAASUVORK5CYII=\",\n  \"firmanteTipo\": \"PACIENTE\",\n  \"nombre\": \"Juan Pérez\",\n  \"dni\": \"12345678\",\n  \"via\": \"APP_PACIENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una firma que no es una imagen es rechazada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsId}}/firma",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "{{dmConsId}}", "firma"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firmaPng\": \"data:image/png;base64,AAAA\",\n  \"firmanteTipo\": \"PACIENTE\",\n  \"nombre\": \"Juan Pérez\",\n  \"dni\": \"12345678\",\n  \"via\": \"APP_PACIENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El DNI del firmante debe coincidir con el del paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsId}}/firma",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "{{dmConsId}}", "firma"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firmaPng\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABQCAYAAAAnSfh8AAADsklEQVR4nO3bW27bQBBEUe4gn9lD9r+/BDCcQJb5mBl2d1WH9+MAsSSKleaUJVH09uPnrw1AT/IAANbJAwBYJw8AYJ08AIB18gAA1skDAFgnD3Di9wl1NsDCZliIs+JSYuDFZlaG0fJSYuClwA5lmC2vS25AZjMow2w5KTHwaRMX4c6rKiXG4/39h6oId0tIifForz9UFyGqfJQYj/X6Q2UJoktHifFI7zdUlCCrbBQYj7N3Y2YRsl8pKTEeZe/GilfIrILxVhqPcnRHdAkqi0WB8Rhnd0YVQfGqSInxCGd3RhRP+Za2Q4HvXMgCXP45YdRVUuqrvOSDHpiPw8zQzMiDZhaX20J0yDAyH0qMJaMPXFl4LgvQLUfHGcLUzIO7LjyHPDMzcp4lzMxu0K28e7mV++52HgHmVjfsUty9vKr9ruy/w2whJA9QqLoIUb/cKDEOyQMUqypC9DsTSoxd8gDFKkqQ9bGCEuMbeQCBzBJknxOgwPhCHkCkomBZJaPE+EceQCS6aNVn4ykxPsgDCEUVTvFVGgXGB3kAsbvFU34P3qXEXa4VaEkewMDq4nJYmM6lOLrQxzlzO/IABmYXl9NiVO9/Zj5Oc/tvyAOYmF10TovQJcedOapztyUPYKTz4nPIMjoj5zm2Iw9gqFNx9zKr9z+aw32mLcgDmOpU3r3M6lnd2V49x1bkARrotLCqs0aVjxIvkgdAqMoSRJeOAi+QB0C4iiJkvWJS4knyAAiX/Xa08vnVs7QnD4AUWSWo+KxKgSfIAyBNdBEqTzRR4kHyAEgVVQTFWWJKPEAeAKkiiqf8HrxDgaXXCaj/88gXeZGF8iIR9RxHZlM+K/UQUGN2cckW5EUW9Ryv5lM+N/UgUGd20TmU9z23eoZ35piSRz0M1LJZeDdyu+SwmKX6wKBet/Lu5VbvfzRH+kzVBwUa3cr7nlk9r6ptL6kPCvScS+uQNaKAaSVWHxBgVmWJI4uXUmL1wQBmVRU4o3Dhz6k+GMCK7BJnfm6lwEBRwSp+Qdx6LvVBAFa1eIs7uK/l51EfBOAO+5NMg/tbfh71AQDusv6aZ2K/S8+hHj4QYbWADhewUGA83koRHcr7nmN6e/XggSh7hZzhkn1qW/XQgUgdy/uefWo7dWggWsfyvuce3k4dGsjSpbhHmYe2UQcGsnUo7l7WoW3UgQF8NVVidVgA3w2XWB0UwHcUGGhuqMTqkACOXZZYHRDAscsz6OqAAM6dllgdDsC1wxKrgwEYs3s12R9Dw32G8CYgZQAAAABJRU5ErkJggg==\",\n  \"firmanteTipo\": \"PACIENTE\",\n  \"nombre\": \"Juan Pérez\",\n  \"dni\": \"87654321\",\n  \"via\": \"APP_PACIENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un representante sin parentesco es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsId}}/firma",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "{{dmConsId}}", "firma"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firmaPng\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABQCAYAAAAnSfh8AAADsklEQVR4nO3bW27bQBBEUe4gn9lD9r+/BDCcQJb5mBl2d1WH9+MAsSSKleaUJVH09uPnrw1AT/IAANbJAwBYJw8AYJ08AIB18gAA1skDAFgnD3Di9wl1NsDCZliIs+JSYuDFZlaG0fJSYuClwA5lmC2vS25AZjMow2w5KTHwaRMX4c6rKiXG4/39h6oId0tIifForz9UFyGqfJQYj/X6Q2UJoktHifFI7zdUlCCrbBQYj7N3Y2YRsl8pKTEeZe/GilfIrILxVhqPcnRHdAkqi0WB8Rhnd0YVQfGqSInxCGd3RhRP+Za2Q4HvXMgCXP45YdRVUuqrvOSDHpiPw8zQzMiDZhaX20J0yDAyH0qMJaMPXFl4LgvQLUfHGcLUzIO7LjyHPDMzcp4lzMxu0K28e7mV++52HgHmVjfsUty9vKr9ruy/w2whJA9QqLoIUb/cKDEOyQMUqypC9DsTSoxd8gDFKkqQ9bGCEuMbeQCBzBJknxOgwPhCHkCkomBZJaPE+EceQCS6aNVn4ykxPsgDCEUVTvFVGgXGB3kAsbvFU34P3qXEXa4VaEkewMDq4nJYmM6lOLrQxzlzO/IABmYXl9NiVO9/Zj5Oc/tvyAOYmF10TovQJcedOapztyUPYKTz4nPIMjoj5zm2Iw9gqFNx9zKr9z+aw32mLcgDmOpU3r3M6lnd2V49x1bkARrotLCqs0aVjxIvkgdAqMoSRJeOAi+QB0C4iiJkvWJS4knyAAiX/Xa08vnVs7QnD4AUWSWo+KxKgSfIAyBNdBEqTzRR4kHyAEgVVQTFWWJKPEAeAKkiiqf8HrxDgaXXCaj/88gXeZGF8iIR9RxHZlM+K/UQUGN2cckW5EUW9Ryv5lM+N/UgUGd20TmU9z23eoZ35piSRz0M1LJZeDdyu+SwmKX6wKBet/Lu5VbvfzRH+kzVBwUa3cr7nlk9r6ptL6kPCvScS+uQNaKAaSVWHxBgVmWJI4uXUmL1wQBmVRU4o3Dhz6k+GMCK7BJnfm6lwEBRwSp+Qdx6LvVBAFa1eIs7uK/l51EfBOAO+5NMg/tbfh71AQDusv6aZ2K/S8+hHj4QYbWADhewUGA83koRHcr7nmN6e/XggSh7hZzhkn1qW/XQgUgdy/uefWo7dWggWsfyvuce3k4dGsjSpbhHmYe2UQcGsnUo7l7WoW3UgQF8NVVidVgA3w2XWB0UwHcUGGhuqMTqkACOXZZYHRDAscsz6OqAAM6dllgdDsC1wxKrgwEYs3s12R9Dw32G8CYgZQAAAABJRU5ErkJggg==\",\n  \"firmanteTipo\": \"REPRESENTANTE\",\n  \"nombre\": \"Rosa Pérez\",\n  \"dni\": \"45678912\",\n  \"via\": \"APP_PACIENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente firma con la imagen de su firma",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json();",
+                  "pm.test(\"Queda firmado desde la app del paciente\", () => { pm.expect(d.resumen.estado).to.eql(\"FIRMADO\"); pm.expect(d.resumen.firmadoVia).to.eql(\"APP_PACIENTE\"); });",
+                  "pm.test(\"Conserva el texto aceptado y su versión\", () => { pm.expect(d.textoAceptado).to.not.be.empty; pm.expect(d.plantillaVersion).to.be.above(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsId}}/firma",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "{{dmConsId}}", "firma"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firmaPng\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABQCAYAAAAnSfh8AAADsklEQVR4nO3bW27bQBBEUe4gn9lD9r+/BDCcQJb5mBl2d1WH9+MAsSSKleaUJVH09uPnrw1AT/IAANbJAwBYJw8AYJ08AIB18gAA1skDAFgnD3Di9wl1NsDCZliIs+JSYuDFZlaG0fJSYuClwA5lmC2vS25AZjMow2w5KTHwaRMX4c6rKiXG4/39h6oId0tIifForz9UFyGqfJQYj/X6Q2UJoktHifFI7zdUlCCrbBQYj7N3Y2YRsl8pKTEeZe/GilfIrILxVhqPcnRHdAkqi0WB8Rhnd0YVQfGqSInxCGd3RhRP+Za2Q4HvXMgCXP45YdRVUuqrvOSDHpiPw8zQzMiDZhaX20J0yDAyH0qMJaMPXFl4LgvQLUfHGcLUzIO7LjyHPDMzcp4lzMxu0K28e7mV++52HgHmVjfsUty9vKr9ruy/w2whJA9QqLoIUb/cKDEOyQMUqypC9DsTSoxd8gDFKkqQ9bGCEuMbeQCBzBJknxOgwPhCHkCkomBZJaPE+EceQCS6aNVn4ykxPsgDCEUVTvFVGgXGB3kAsbvFU34P3qXEXa4VaEkewMDq4nJYmM6lOLrQxzlzO/IABmYXl9NiVO9/Zj5Oc/tvyAOYmF10TovQJcedOapztyUPYKTz4nPIMjoj5zm2Iw9gqFNx9zKr9z+aw32mLcgDmOpU3r3M6lnd2V49x1bkARrotLCqs0aVjxIvkgdAqMoSRJeOAi+QB0C4iiJkvWJS4knyAAiX/Xa08vnVs7QnD4AUWSWo+KxKgSfIAyBNdBEqTzRR4kHyAEgVVQTFWWJKPEAeAKkiiqf8HrxDgaXXCaj/88gXeZGF8iIR9RxHZlM+K/UQUGN2cckW5EUW9Ryv5lM+N/UgUGd20TmU9z23eoZ35piSRz0M1LJZeDdyu+SwmKX6wKBet/Lu5VbvfzRH+kzVBwUa3cr7nlk9r6ptL6kPCvScS+uQNaKAaSVWHxBgVmWJI4uXUmL1wQBmVRU4o3Dhz6k+GMCK7BJnfm6lwEBRwSp+Qdx6LvVBAFa1eIs7uK/l51EfBOAO+5NMg/tbfh71AQDusv6aZ2K/S8+hHj4QYbWADhewUGA83koRHcr7nmN6e/XggSh7hZzhkn1qW/XQgUgdy/uefWo7dWggWsfyvuce3k4dGsjSpbhHmYe2UQcGsnUo7l7WoW3UgQF8NVVidVgA3w2XWB0UwHcUGGhuqMTqkACOXZZYHRDAscsz6OqAAM6dllgdDsC1wxKrgwEYs3s12R9Dw32G8CYgZQAAAABJRU5ErkJggg==\",\n  \"firmanteTipo\": \"PACIENTE\",\n  \"nombre\": \"Juan Pérez\",\n  \"dni\": \"12345678\",\n  \"via\": \"APP_PACIENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un consentimiento firmado no se firma otra vez",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400 o 409', () => pm.expect([400, 409]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsId}}/firma",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "{{dmConsId}}", "firma"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firmaPng\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABQCAYAAAAnSfh8AAADsklEQVR4nO3bW27bQBBEUe4gn9lD9r+/BDCcQJb5mBl2d1WH9+MAsSSKleaUJVH09uPnrw1AT/IAANbJAwBYJw8AYJ08AIB18gAA1skDAFgnD3Di9wl1NsDCZliIs+JSYuDFZlaG0fJSYuClwA5lmC2vS25AZjMow2w5KTHwaRMX4c6rKiXG4/39h6oId0tIifForz9UFyGqfJQYj/X6Q2UJoktHifFI7zdUlCCrbBQYj7N3Y2YRsl8pKTEeZe/GilfIrILxVhqPcnRHdAkqi0WB8Rhnd0YVQfGqSInxCGd3RhRP+Za2Q4HvXMgCXP45YdRVUuqrvOSDHpiPw8zQzMiDZhaX20J0yDAyH0qMJaMPXFl4LgvQLUfHGcLUzIO7LjyHPDMzcp4lzMxu0K28e7mV++52HgHmVjfsUty9vKr9ruy/w2whJA9QqLoIUb/cKDEOyQMUqypC9DsTSoxd8gDFKkqQ9bGCEuMbeQCBzBJknxOgwPhCHkCkomBZJaPE+EceQCS6aNVn4ykxPsgDCEUVTvFVGgXGB3kAsbvFU34P3qXEXa4VaEkewMDq4nJYmM6lOLrQxzlzO/IABmYXl9NiVO9/Zj5Oc/tvyAOYmF10TovQJcedOapztyUPYKTz4nPIMjoj5zm2Iw9gqFNx9zKr9z+aw32mLcgDmOpU3r3M6lnd2V49x1bkARrotLCqs0aVjxIvkgdAqMoSRJeOAi+QB0C4iiJkvWJS4knyAAiX/Xa08vnVs7QnD4AUWSWo+KxKgSfIAyBNdBEqTzRR4kHyAEgVVQTFWWJKPEAeAKkiiqf8HrxDgaXXCaj/88gXeZGF8iIR9RxHZlM+K/UQUGN2cckW5EUW9Ryv5lM+N/UgUGd20TmU9z23eoZ35piSRz0M1LJZeDdyu+SwmKX6wKBet/Lu5VbvfzRH+kzVBwUa3cr7nlk9r6ptL6kPCvScS+uQNaKAaSVWHxBgVmWJI4uXUmL1wQBmVRU4o3Dhz6k+GMCK7BJnfm6lwEBRwSp+Qdx6LvVBAFa1eIs7uK/l51EfBOAO+5NMg/tbfh71AQDusv6aZ2K/S8+hHj4QYbWADhewUGA83koRHcr7nmN6e/XggSh7hZzhkn1qW/XQgUgdy/uefWo7dWggWsfyvuce3k4dGsjSpbhHmYe2UQcGsnUo7l7WoW3UgQF8NVVidVgA3w2XWB0UwHcUGGhuqMTqkACOXZZYHRDAscsz6OqAAM6dllgdDsC1wxKrgwEYs3s12R9Dw32G8CYgZQAAAABJRU5ErkJggg==\",\n  \"firmanteTipo\": \"PACIENTE\",\n  \"nombre\": \"Juan Pérez\",\n  \"dni\": \"12345678\",\n  \"via\": \"APP_PACIENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente descarga el PDF firmado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es un PDF\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\"));",
+                  "pm.test(\"Trae contenido\", () => pm.expect(pm.response.responseSize).to.be.above(1500));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsId}}/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "{{dmConsId}}", "pdf"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no ve el consentimiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "{{dmConsId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un médico sin relación no ve el consentimiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403 o 404', () => pm.expect([403, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos", "{{dmConsId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedico2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Revocar sin motivo es 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsId}}/revocar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "consentimientos",
+                "{{dmConsId}}",
+                "revocar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente revoca su consentimiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Queda revocado con su motivo\", () => { const d = pm.response.json(); pm.expect(d.resumen.estado).to.eql(\"REVOCADO\"); pm.expect(d.motivoRevocacion).to.include(\"procedimiento\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsId}}/revocar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "consentimientos",
+                "{{dmConsId}}",
+                "revocar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Decidí no realizarme el procedimiento\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Solicitar un consentimiento con testigo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"dmConsTestigoId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "consentimientos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plantillaId\": \"{{dmPlantillaTestigoId}}\",\n  \"pacienteId\": \"{{dmPacienteId}}\",\n  \"procedimiento\": \"Procedimiento invasivo con testigo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sin testigo la firma es rechazada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsTestigoId}}/firma",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "consentimientos",
+                "{{dmConsTestigoId}}",
+                "firma"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firmaPng\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABQCAYAAAAnSfh8AAADsklEQVR4nO3bW27bQBBEUe4gn9lD9r+/BDCcQJb5mBl2d1WH9+MAsSSKleaUJVH09uPnrw1AT/IAANbJAwBYJw8AYJ08AIB18gAA1skDAFgnD3Di9wl1NsDCZliIs+JSYuDFZlaG0fJSYuClwA5lmC2vS25AZjMow2w5KTHwaRMX4c6rKiXG4/39h6oId0tIifForz9UFyGqfJQYj/X6Q2UJoktHifFI7zdUlCCrbBQYj7N3Y2YRsl8pKTEeZe/GilfIrILxVhqPcnRHdAkqi0WB8Rhnd0YVQfGqSInxCGd3RhRP+Za2Q4HvXMgCXP45YdRVUuqrvOSDHpiPw8zQzMiDZhaX20J0yDAyH0qMJaMPXFl4LgvQLUfHGcLUzIO7LjyHPDMzcp4lzMxu0K28e7mV++52HgHmVjfsUty9vKr9ruy/w2whJA9QqLoIUb/cKDEOyQMUqypC9DsTSoxd8gDFKkqQ9bGCEuMbeQCBzBJknxOgwPhCHkCkomBZJaPE+EceQCS6aNVn4ykxPsgDCEUVTvFVGgXGB3kAsbvFU34P3qXEXa4VaEkewMDq4nJYmM6lOLrQxzlzO/IABmYXl9NiVO9/Zj5Oc/tvyAOYmF10TovQJcedOapztyUPYKTz4nPIMjoj5zm2Iw9gqFNx9zKr9z+aw32mLcgDmOpU3r3M6lnd2V49x1bkARrotLCqs0aVjxIvkgdAqMoSRJeOAi+QB0C4iiJkvWJS4knyAAiX/Xa08vnVs7QnD4AUWSWo+KxKgSfIAyBNdBEqTzRR4kHyAEgVVQTFWWJKPEAeAKkiiqf8HrxDgaXXCaj/88gXeZGF8iIR9RxHZlM+K/UQUGN2cckW5EUW9Ryv5lM+N/UgUGd20TmU9z23eoZ35piSRz0M1LJZeDdyu+SwmKX6wKBet/Lu5VbvfzRH+kzVBwUa3cr7nlk9r6ptL6kPCvScS+uQNaKAaSVWHxBgVmWJI4uXUmL1wQBmVRU4o3Dhz6k+GMCK7BJnfm6lwEBRwSp+Qdx6LvVBAFa1eIs7uK/l51EfBOAO+5NMg/tbfh71AQDusv6aZ2K/S8+hHj4QYbWADhewUGA83koRHcr7nmN6e/XggSh7hZzhkn1qW/XQgUgdy/uefWo7dWggWsfyvuce3k4dGsjSpbhHmYe2UQcGsnUo7l7WoW3UgQF8NVVidVgA3w2XWB0UwHcUGGhuqMTqkACOXZZYHRDAscsz6OqAAM6dllgdDsC1wxKrgwEYs3s12R9Dw32G8CYgZQAAAABJRU5ErkJggg==\",\n  \"firmanteTipo\": \"PACIENTE\",\n  \"nombre\": \"Juan Pérez\",\n  \"dni\": \"12345678\",\n  \"via\": \"CONSULTORIO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico registra la firma en consultorio con testigo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Firmado en consultorio\", () => pm.expect(pm.response.json().resumen.firmadoVia).to.eql(\"CONSULTORIO\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsTestigoId}}/firma",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "consentimientos",
+                "{{dmConsTestigoId}}",
+                "firma"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firmaPng\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABQCAYAAAAnSfh8AAADsklEQVR4nO3bW27bQBBEUe4gn9lD9r+/BDCcQJb5mBl2d1WH9+MAsSSKleaUJVH09uPnrw1AT/IAANbJAwBYJw8AYJ08AIB18gAA1skDAFgnD3Di9wl1NsDCZliIs+JSYuDFZlaG0fJSYuClwA5lmC2vS25AZjMow2w5KTHwaRMX4c6rKiXG4/39h6oId0tIifForz9UFyGqfJQYj/X6Q2UJoktHifFI7zdUlCCrbBQYj7N3Y2YRsl8pKTEeZe/GilfIrILxVhqPcnRHdAkqi0WB8Rhnd0YVQfGqSInxCGd3RhRP+Za2Q4HvXMgCXP45YdRVUuqrvOSDHpiPw8zQzMiDZhaX20J0yDAyH0qMJaMPXFl4LgvQLUfHGcLUzIO7LjyHPDMzcp4lzMxu0K28e7mV++52HgHmVjfsUty9vKr9ruy/w2whJA9QqLoIUb/cKDEOyQMUqypC9DsTSoxd8gDFKkqQ9bGCEuMbeQCBzBJknxOgwPhCHkCkomBZJaPE+EceQCS6aNVn4ykxPsgDCEUVTvFVGgXGB3kAsbvFU34P3qXEXa4VaEkewMDq4nJYmM6lOLrQxzlzO/IABmYXl9NiVO9/Zj5Oc/tvyAOYmF10TovQJcedOapztyUPYKTz4nPIMjoj5zm2Iw9gqFNx9zKr9z+aw32mLcgDmOpU3r3M6lnd2V49x1bkARrotLCqs0aVjxIvkgdAqMoSRJeOAi+QB0C4iiJkvWJS4knyAAiX/Xa08vnVs7QnD4AUWSWo+KxKgSfIAyBNdBEqTzRR4kHyAEgVVQTFWWJKPEAeAKkiiqf8HrxDgaXXCaj/88gXeZGF8iIR9RxHZlM+K/UQUGN2cckW5EUW9Ryv5lM+N/UgUGd20TmU9z23eoZ35piSRz0M1LJZeDdyu+SwmKX6wKBet/Lu5VbvfzRH+kzVBwUa3cr7nlk9r6ptL6kPCvScS+uQNaKAaSVWHxBgVmWJI4uXUmL1wQBmVRU4o3Dhz6k+GMCK7BJnfm6lwEBRwSp+Qdx6LvVBAFa1eIs7uK/l51EfBOAO+5NMg/tbfh71AQDusv6aZ2K/S8+hHj4QYbWADhewUGA83koRHcr7nmN6e/XggSh7hZzhkn1qW/XQgUgdy/uefWo7dWggWsfyvuce3k4dGsjSpbhHmYe2UQcGsnUo7l7WoW3UgQF8NVVidVgA3w2XWB0UwHcUGGhuqMTqkACOXZZYHRDAscsz6OqAAM6dllgdDsC1wxKrgwEYs3s12R9Dw32G8CYgZQAAAABJRU5ErkJggg==\",\n  \"firmanteTipo\": \"PACIENTE\",\n  \"nombre\": \"Juan Pérez\",\n  \"dni\": \"12345678\",\n  \"via\": \"CONSULTORIO\",\n  \"testigoNombre\": \"Carlos Mendoza\",\n  \"testigoDni\": \"40506070\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico revoca con motivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{dmConsTestigoId}}/revocar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "consentimientos",
+                "{{dmConsTestigoId}}",
+                "revocar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"El paciente desistió del procedimiento\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{dmMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -29538,6 +33885,196 @@
     {
       "key": "cieCitaId",
       "value": ""
+    },
+    {
+      "key": "dmMedicoToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmMedico2Token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmPacienteToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmPaciente2Token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmRecepcionToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmAdminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmMedicoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmEspecialidadId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmFechaHora",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmCitaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmPacienteId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmDestinoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmSufijo",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmEstablecimientoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmCertId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmCertCodigo",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmFormaValida",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmHoy",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmMas1",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmMas2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmMas5",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmHaceVeinte",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmHaceDiecinueve",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmDescansoMalId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmDescansoRetroId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmDescansoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmDescansoCodigo",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmDescansoSolapadoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmReemplazoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmInformeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmRefInactivaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmRefId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmReferenciaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmContraId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmPlantillaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmPlantillaTestigoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmConsId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "dmConsTestigoId",
+      "value": "",
+      "type": "string"
     }
   ]
 }

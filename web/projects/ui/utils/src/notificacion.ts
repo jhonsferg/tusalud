@@ -35,6 +35,9 @@ export const ICONO_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   TELECONSULTA_PROXIMA: 'pi-video',
   TELECONSULTA_SALA_ABIERTA: 'pi-video',
   TELECONSULTA_PACIENTE_EN_SALA: 'pi-user',
+  DOCUMENTO_EMITIDO: 'pi-file-check',
+  CONSENTIMIENTO_PENDIENTE: 'pi-pencil',
+  CONSENTIMIENTO_FIRMADO: 'pi-verified',
   SISTEMA: 'pi-info-circle',
 };
 
@@ -73,5 +76,8 @@ export const COLOR_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   TELECONSULTA_PROXIMA: '#0891b2',
   TELECONSULTA_SALA_ABIERTA: '#0891b2',
   TELECONSULTA_PACIENTE_EN_SALA: '#0d9488',
+  DOCUMENTO_EMITIDO: '#1d4ed8',
+  CONSENTIMIENTO_PENDIENTE: '#d97706',
+  CONSENTIMIENTO_FIRMADO: '#15803d',
   SISTEMA: '#64748b',
 };
