@@ -178,3 +178,11 @@ Sin usuarios nuevos: el médico emite desde Documentos y Consentimientos de /med
 Para probar el flujo completo, el paciente juan.perez@correo.com reserva una cita con el Dr. García y el médico la confirma, lo que crea la relación asistencial. Después el Dr. García emite un certificado o un descanso, el paciente lo descarga y cualquiera lo verifica en /verificar con el código del documento o con el QR del PDF.
 Para firmar un consentimiento, el Dr. García solicita uno a Juan Pérez, cuyo DNI es 12345678, y el paciente lo lee y lo firma dibujando con el mouse o el dedo en Mis consentimientos.
 Datos de ejemplo: 8 establecimientos de salud, uno de ellos inactivo, y 6 plantillas de consentimiento, que son anestesia local, pequeña cirugía, endoscopía, transfusión, procedimiento invasivo y hospitalización.
+
+CANALES DE NOTIFICACION Y RESPALDOS
+-----------------------------------
+Sin usuarios nuevos. Cualquier usuario activa sus canales en Mi perfil, pestaña Avisos: elige correo, SMS o WhatsApp, acepta recibir avisos y escribe el código de seis dígitos que le llega. El administrador edita los textos en Plantillas de mensajes y administración y operaciones revisan Entregas de avisos. El administrador y operaciones ven los respaldos en Respaldos.
+En desarrollo el correo no sale a internet: llega a Mailpit en http://localhost:8025, donde se lee el código del correo y los avisos. Los códigos y avisos de SMS y WhatsApp usan un proveedor simulado y el administrador los ve en el bloque Bandeja del proveedor simulado de Entregas de avisos.
+Para ver un aviso real de punta a punta, activa el correo de juan.perez@correo.com, cambia su contraseña en Mi perfil y mira el correo de seguridad en Mailpit. Los avisos no urgentes se detienen entre las 22:00 y las 07:00 por defecto, y las alertas de seguridad no.
+Para probar los respaldos en desarrollo, ejecuta docker exec tusalud-backup /opt/respaldos/respaldar.sh y luego docker exec tusalud-backup /opt/respaldos/probar-restauracion.sh. Los resultados aparecen en Respaldos.
+Datos de ejemplo: ninguno. Los canales, las plantillas personalizadas y los respaldos nacen vacíos, para que no existan registros que aparenten una protección que no se hizo.

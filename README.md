@@ -20,6 +20,8 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Telemedicina](#telemedicina)
   - [Codificación clínica CIE-10](#codificación-clínica-cie-10)
   - [Documentos médicos y consentimientos](#documentos-médicos-y-consentimientos)
+  - [Canales de notificación](#canales-de-notificación)
+  - [Respaldos y recuperación](#respaldos-y-recuperación)
   - [Recursos humanos](#recursos-humanos)
   - [Gerencia, reportes y BI](#gerencia-reportes-y-bi)
   - [Documentos y archivos](#documentos-y-archivos)
@@ -46,6 +48,7 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Contexto de recursos humanos](#contexto-de-recursos-humanos)
   - [Contexto de documentos y archivos](#contexto-de-documentos-y-archivos)
   - [Contexto de codificación clínica](#contexto-de-codificación-clínica)
+  - [Contexto de canales y respaldos](#contexto-de-canales-y-respaldos)
   - [Reglas de integridad](#reglas-de-integridad)
 - [Seguridad](#seguridad)
   - [Modelo de amenazas resumido](#modelo-de-amenazas-resumido)
@@ -118,6 +121,8 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Telemedicina](#telemedicina-1)
   - [Codificación clínica CIE-10](#codificación-clínica-cie-10-1)
   - [Documentos médicos y consentimientos](#documentos-médicos-y-consentimientos-1)
+  - [Canales de notificación](#canales-de-notificación-1)
+  - [Respaldos y recuperación](#respaldos-y-recuperación-1)
 - [Manejo de errores](#manejo-de-errores)
 - [Perfiles y configuración](#perfiles-y-configuración)
   - [Selección del perfil](#selección-del-perfil)
@@ -183,15 +188,15 @@ Las cifras salen del código y de las corridas de prueba más recientes.
 | ------------------------------------ | ----- |
 | Roles                                | 15    |
 | Aplicaciones web, incluido el portal | 16    |
-| Controladores REST                   | 52    |
-| Endpoints                            | 311   |
-| Entidades JPA                        | 74    |
-| Migraciones de esquema               | 23    |
+| Controladores REST                   | 57    |
+| Endpoints                            | 331   |
+| Entidades JPA                        | 80    |
+| Migraciones de esquema               | 24    |
 | Migraciones de datos de demostración | 16    |
-| Pruebas del backend                  | 753   |
-| Pruebas unitarias del frontend       | 416   |
-| Pruebas de extremo a extremo         | 176   |
-| Carpetas de la colección de Postman  | 30    |
+| Pruebas del backend                  | 806   |
+| Pruebas unitarias del frontend       | 440   |
+| Pruebas de extremo a extremo         | 185   |
+| Carpetas de la colección de Postman  | 31    |
 
 ### Cómo leer este documento
 
@@ -205,23 +210,25 @@ Las cifras salen del código y de las corridas de prueba más recientes.
 
 TuSalud se organiza por áreas operativas de la clínica. Cada área agrupa módulos que comparten actores y datos. La tabla resume el mapa completo y las fichas de más abajo describen cada área con su propósito, sus actores, sus reglas clave, sus endpoints principales, sus pantallas y su estado. El detalle fino de cada módulo está en la sección Detalle de los módulos y los diagramas de secuencia en Flujos y diagramas de secuencia.
 
-| Área                         | Módulos                                                                                                    | Actores principales                         | Estado                             |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ---------------------------------- |
-| Atención ambulatoria         | Citas, agenda, atención, historia clínica, recetas, valoraciones                                           | Paciente, médico                            | Operativo                          |
-| Admisión                     | Recepción, turnos, sala de espera, pacientes y citas de mostrador                                          | Recepción, médico, paciente                 | Operativo                          |
-| Apoyo diagnóstico            | Laboratorio clínico, imágenes diagnósticas                                                                 | Laboratorio, imágenes, médico, paciente     | Operativo                          |
-| Hospitalización y emergencia | Camas, ingresos, triaje, evoluciones, altas                                                                | Enfermería, médico                          | Operativo                          |
-| Farmacia y almacén           | Dispensación, venta libre, inventario por lotes con FEFO                                                   | Farmacia, almacén                           | Operativo                          |
-| Caja y facturación           | Caja, cobros, comprobantes, pagos en línea, cupones                                                        | Caja, paciente, administrador               | Operativo con billeteras simuladas |
-| Seguros y convenios          | Aseguradoras, convenios, pólizas, preautorizaciones, liquidaciones                                         | Recepción, caja, finanzas, médico           | Operativo con verificador simulado |
-| Codificación clínica         | Catálogo CIE-10, diagnósticos de la atención, reporte de morbilidad                                        | Médico, administrador, gerencia, calidad    | Operativo con catálogo de muestra  |
-| Documentos médicos           | Certificados, descansos, informes, referencias, epicrisis, consentimientos con firma, verificación pública | Médico, paciente, administrador, enfermería | Operativo                          |
-| Recursos humanos             | Fichas laborales, turnos, ausencias, vacaciones, Mi espacio                                                | Recursos humanos, todo el personal          | Operativo                          |
-| Gerencia, reportes y BI      | Reportes ejecutivo, financiero, operativo, de calidad y de morbilidad                                      | Gerencia, finanzas, operaciones, calidad    | Operativo                          |
-| Documentos y archivos        | Almacén de objetos, PDF con Jasper, Excel con POI, plantillas                                              | Todos los roles según el documento          | Operativo                          |
-| Seguridad y auditoría        | Autenticación, MFA, sesiones, eventos de seguridad, auditoría clínica                                      | Administrador y todos los usuarios          | Operativo                          |
-| Notificaciones y calendario  | Avisos en tiempo real, calendario personal y bloqueos de agenda                                            | Todos los roles                             | Operativo                          |
-| Portal del paciente          | Reservar, pagar, resultados, estudios, recetas, seguros, ingresos                                          | Paciente                                    | Operativo                          |
+| Área                         | Módulos                                                                                                    | Actores principales                            | Estado                                                |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ----------------------------------------------------- |
+| Atención ambulatoria         | Citas, agenda, atención, historia clínica, recetas, valoraciones                                           | Paciente, médico                               | Operativo                                             |
+| Admisión                     | Recepción, turnos, sala de espera, pacientes y citas de mostrador                                          | Recepción, médico, paciente                    | Operativo                                             |
+| Apoyo diagnóstico            | Laboratorio clínico, imágenes diagnósticas                                                                 | Laboratorio, imágenes, médico, paciente        | Operativo                                             |
+| Hospitalización y emergencia | Camas, ingresos, triaje, evoluciones, altas                                                                | Enfermería, médico                             | Operativo                                             |
+| Farmacia y almacén           | Dispensación, venta libre, inventario por lotes con FEFO                                                   | Farmacia, almacén                              | Operativo                                             |
+| Caja y facturación           | Caja, cobros, comprobantes, pagos en línea, cupones                                                        | Caja, paciente, administrador                  | Operativo con billeteras simuladas                    |
+| Seguros y convenios          | Aseguradoras, convenios, pólizas, preautorizaciones, liquidaciones                                         | Recepción, caja, finanzas, médico              | Operativo con verificador simulado                    |
+| Codificación clínica         | Catálogo CIE-10, diagnósticos de la atención, reporte de morbilidad                                        | Médico, administrador, gerencia, calidad       | Operativo con catálogo de muestra                     |
+| Documentos médicos           | Certificados, descansos, informes, referencias, epicrisis, consentimientos con firma, verificación pública | Médico, paciente, administrador, enfermería    | Operativo                                             |
+| Canales de notificación      | Avisos por correo, SMS y WhatsApp con consentimiento, preferencias, plantillas y bitácora de entregas      | Todos los usuarios, administrador, operaciones | Operativo con proveedores de SMS y WhatsApp simulados |
+| Respaldos y recuperación     | Respaldos cifrados de la base y del almacén, retención, prueba de restauración automática y alertas        | Administrador, operaciones                     | Operativo                                             |
+| Recursos humanos             | Fichas laborales, turnos, ausencias, vacaciones, Mi espacio                                                | Recursos humanos, todo el personal             | Operativo                                             |
+| Gerencia, reportes y BI      | Reportes ejecutivo, financiero, operativo, de calidad y de morbilidad                                      | Gerencia, finanzas, operaciones, calidad       | Operativo                                             |
+| Documentos y archivos        | Almacén de objetos, PDF con Jasper, Excel con POI, plantillas                                              | Todos los roles según el documento             | Operativo                                             |
+| Seguridad y auditoría        | Autenticación, MFA, sesiones, eventos de seguridad, auditoría clínica                                      | Administrador y todos los usuarios             | Operativo                                             |
+| Notificaciones y calendario  | Avisos en tiempo real, calendario personal y bloqueos de agenda                                            | Todos los roles                                | Operativo                                             |
+| Portal del paciente          | Reservar, pagar, resultados, estudios, recetas, seguros, ingresos                                          | Paciente                                       | Operativo                                             |
 
 ### Atención ambulatoria
 
@@ -312,6 +319,24 @@ TuSalud se organiza por áreas operativas de la clínica. Cada área agrupa mód
 - **Endpoints principales.** `/api/v1/documentos-medicos`, `/api/v1/consentimientos`, `/api/v1/establecimientos-salud` y `/api/v1/verificacion/{codigo}`.
 - **Pantallas.** Médico: Documentos, Consentimientos y la sección de documentos en la ficha del ingreso. Paciente: Mis documentos y Mis consentimientos con firma en lienzo. Administrador: Establecimientos de salud y Plantillas de consentimiento. Portal: la verificación pública en `/verificar`.
 - **Estado.** Operativo. El catálogo de establecimientos y las seis plantillas de consentimiento son datos de demostración.
+
+### Canales de notificación
+
+- **Propósito.** Lleva los avisos del sistema fuera de la aplicación, a un correo, a un teléfono o a WhatsApp, sin exponer datos clínicos y respetando lo que cada persona consintió.
+- **Actores.** Cada usuario activa y verifica sus canales y elige qué avisos quiere recibir. El administrador mantiene las plantillas de los mensajes. El administrador y operaciones consultan la bitácora de entregas, y solo el administrador reintenta las fallidas.
+- **Reglas clave.** Un canal externo solo recibe mensajes con el consentimiento explícito del usuario y su destino verificado con un código de seis dígitos. El correo es siempre el de la cuenta. Los mensajes son genéricos, con el nombre de pila y un enlace a la aplicación, y nunca llevan diagnósticos, resultados ni datos clínicos. Las alertas de seguridad no se pueden desactivar y se envían a todo canal activo y verificado. Los avisos no urgentes respetan un horario de silencio nocturno y un máximo por hora para cada destinatario. Cada mensaje trae un enlace de baja firmado y, en el correo, las cabeceras de baja con un clic.
+- **Endpoints principales.** `/api/v1/canales`, `/api/v1/canales/entregas`, `/api/v1/admin/canales` y los públicos `/api/v1/canales/baja` y `/api/v1/canales/webhook/{canal}`.
+- **Pantallas.** Todos los roles: la pestaña Avisos del perfil con los canales, la matriz de preferencias y el horario de silencio. Administrador: Plantillas de mensajes y Entregas de avisos. Operaciones: Entregas de avisos. Portal: la página pública de baja en `/baja`.
+- **Estado.** Operativo. El correo sale por SMTP y en desarrollo lo recibe Mailpit. Los proveedores de SMS y WhatsApp se configuran por HTTP y por defecto usan una simulación que guarda los mensajes en memoria. Falta contratar un proveedor real.
+
+### Respaldos y recuperación
+
+- **Propósito.** Protege los datos de la clínica con respaldos automáticos cifrados de la base y del almacén de objetos, y comprueba cada semana que se pueden restaurar.
+- **Actores.** El contenedor de respaldos ejecuta y reporta. El administrador y operaciones consultan el estado y el historial y reciben una alerta cuando algo falla o vence.
+- **Reglas clave.** Cada respaldo se cifra, lleva su checksum y su manifiesto y se conserva según una retención diaria, semanal y mensual. Una prueba de restauración levanta una base temporal aislada, restaura el último respaldo, valida las migraciones, las tablas, los conteos y los checksums del almacén, y reporta el resultado. La API solo acepta esos reportes con un secreto compartido. Un respaldo fallido o vencido y una prueba vencida generan una alerta de seguridad.
+- **Endpoints principales.** `/api/v1/respaldos`, `/api/v1/respaldos/estado` y `/api/v1/respaldos/ejecuciones`.
+- **Pantallas.** Administrador y operaciones: Respaldos, con un semáforo, el último respaldo y la última prueba exitosos, los objetivos de recuperación, el historial y el plan de recuperación.
+- **Estado.** Operativo. La copia a un segundo destino S3 es opcional y no se ha probado contra un destino real.
 
 ### Recursos humanos
 
@@ -691,6 +716,24 @@ erDiagram
     SecuenciaDocumentoMedico ||--o{ DocumentoMedico : numera
 ```
 
+### Contexto de canales y respaldos
+
+```mermaid
+erDiagram
+    Usuario ||--o{ ContactoCanal : verifica
+    Usuario ||--o{ PreferenciaCanal : elige
+    Usuario ||--o| ConfiguracionCanales : silencio
+    Usuario ||--o{ PlantillaMensaje : edita
+    Notificacion ||--o{ EntregaNotificacion : origina
+    Usuario ||--o{ EntregaNotificacion : recibe
+    RespaldoEjecucion }o--o{ Notificacion : alerta
+```
+
+- `contactos_canal` guarda el destino, la fecha del consentimiento y de la verificación, la baja, el rebote y el hash del código vigente con sus intentos. `preferencias_canal` guarda un interruptor por usuario, tipo de aviso y canal, y `configuracion_canales` el horario de silencio.
+- `plantillas_mensaje` conserva cada versión y marca una sola como activa. Si un tipo y un canal no tienen versión activa, se usa el texto predeterminado del código.
+- `entregas_notificacion` es una bandeja de salida: la entrega nace pendiente en la misma transacción que el aviso, una clave de idempotencia única impide duplicarla y no guarda el texto del mensaje, solo el destino enmascarado, el estado, los intentos y el motivo.
+- `respaldo_ejecuciones` guarda cada respaldo y cada prueba de restauración con su duración, tamaño, checksum y validaciones.
+
 ### Reglas de integridad
 
 - La tabla `citas` tiene índices por médico y fecha y por paciente y fecha, y el campo `version` aplica bloqueo optimista para que dos operaciones concurrentes no sobrescriban la misma cita.
@@ -742,6 +785,8 @@ La seguridad de TuSalud sigue la defensa en profundidad: el gateway filtra y lim
 - Los datos clínicos los modifica solo el personal de salud. El paciente consulta su historia y, si algún dato no es correcto, se comunica con el centro de salud. El médico con relación actualiza los datos médicos y queda registrado quién y cuándo, y cada consulta de una historia ajena se guarda en `auditoria_clinica`.
 - Cada rol recibe solo los campos que necesita: recepción y administración no ven diagnósticos ni indicaciones, caja no ve datos clínicos, farmacia solo ve las recetas, el correo y el teléfono de un médico solo los ven el administrador y el propio médico, y las valoraciones públicas abrevian el nombre del paciente. El administrador gestiona la institución pero no lee ni escribe datos clínicos.
 - Una atención no se reescribe pasadas 48 horas ni cuando su receta ya fue dispensada.
+- Los canales externos exigen consentimiento y destino verificado, no llevan datos clínicos y ocultan los destinos con máscara en toda respuesta y en la bitácora. Los códigos de verificación se guardan con HMAC, caducan en 10 minutos y admiten cinco intentos. El enlace de baja y el webhook de entrega van firmados con HMAC-SHA256, el webhook además exige una marca de tiempo de menos de cinco minutos y la comparación de firmas es de tiempo constante.
+- Los respaldos se cifran con AES-256 y una clave derivada con PBKDF2 antes de salir del contenedor de respaldos, y la API solo acepta sus reportes con el secreto compartido de la cabecera `X-Respaldo-Token`.
 - La teleconsulta solo admite al médico y al paciente de la cita. El canal de señalización se abre con un ticket de un solo uso y 30 segundos que nunca viaja en el token de sesión, valida el tipo y el tamaño de cada mensaje, limita su tasa y cierra las conexiones inactivas. El audio y el video no pasan por el servidor ni se graban, el chat no se conserva y las credenciales del servidor TURN caducan en una hora.
 
 ### Auditoría y vigilancia
@@ -761,7 +806,7 @@ La seguridad de TuSalud sigue la defensa en profundidad: el gateway filtra y lim
 ### Gateway y red
 
 - El gateway nginx es el único servicio con puertos publicados. Enruta el frontend, la API con soporte de eventos en tiempo real y bloquea `/storage/`.
-- Limita la tasa de inicio de sesión, renovación, registro y verificación en dos pasos, acota el tamaño de las peticiones por ruta, bloquea métodos poco comunes y archivos ocultos, y oculta la versión de nginx.
+- Limita la tasa de inicio de sesión, renovación, registro y verificación en dos pasos, aplica la zona `verificacion` también a la baja de canales, al webhook de entrega y al reporte de respaldos, acota el tamaño de las peticiones por ruta, bloquea métodos poco comunes y archivos ocultos, y oculta la versión de nginx.
 - Entrega una política de seguridad de contenido estricta, `X-Content-Type-Options`, `Referrer-Policy` y las demás cabeceras de seguridad, y admite TLS con HSTS cuando se activa.
 - PostgreSQL solo se publica en el loopback del host.
 
@@ -775,13 +820,14 @@ La seguridad de TuSalud sigue la defensa en profundidad: el gateway filtra y lim
 
 ### Observabilidad segura
 
-La telemetría registra método, ruta, estado y tamaño de cada petición. Los cuerpos y cabeceras solo se registran cuando es seguro, con redacción recursiva de campos sensibles y truncado, y nunca en las rutas de autenticación, perfil, pagos, historia clínica, laboratorio, imágenes, hospitalización, farmacia, archivos y documentos. Los DTO con credenciales ocultan sus valores en `toString`, los logs usan ids en lugar de correos y el Collector elimina las cabeceras sensibles antes de exportar. En desarrollo los parámetros SQL solo se imprimen en el perfil local.
+La telemetría registra método, ruta, estado y tamaño de cada petición. Los cuerpos y cabeceras solo se registran cuando es seguro, con redacción recursiva de campos sensibles y truncado, y nunca en las rutas de autenticación, perfil, pagos, historia clínica, laboratorio, imágenes, hospitalización, farmacia, archivos, documentos, canales y respaldos. Los DTO con credenciales ocultan sus valores en `toString`, los logs usan ids en lugar de correos y el Collector elimina las cabeceras sensibles antes de exportar. En desarrollo los parámetros SQL solo se imprimen en el perfil local.
 
 ### Límites y decisiones conocidas
 
 - La sesión se guarda en el almacenamiento local del navegador. Es una decisión que permite compartirla entre las aplicaciones del mismo origen. Se compensa con una política de seguridad de contenido estricta, tokens de corta duración y bloqueo por inactividad, pero un XSS lograría leerla.
 - La verificación de cobertura de seguros y la confirmación de pagos con billetera son simuladas detrás de interfaces. Antes de producción deben reemplazarse por integraciones reales.
-- El almacén de objetos es un solo nodo, sin réplica ni copias de seguridad automáticas, y las subidas no pasan por un antivirus. Ambos están en la hoja de ruta.
+- El almacén de objetos es un solo nodo y las subidas no pasan por un antivirus, y ambos puntos están en la hoja de ruta. Los respaldos automáticos existen, pero la copia a un segundo destino es opcional y no se ha probado contra un destino real.
+- Los canales de SMS y WhatsApp usan un proveedor simulado hasta que se configure uno real, y el webhook de estado solo entiende el formato propio descrito en el detalle del módulo. Un enlace de baja firmado no caduca, porque debe seguir funcionando en correos antiguos.
 - La combinación completa de `compose.yaml` en modo producción con TLS y credenciales reales no se ha probado de punta a punta.
 - La migración que pasó los archivos al almacén de objetos borró los bytes de las imágenes y avatares que estuvieran en la base, porque SQL no puede subir objetos. Las bases de desarrollo previas se recrean.
 - Un evento de seguridad se guarda en la misma transacción de la petición, de modo que se pierde si la petición revierte. Los casos de inicio de sesión fallido y de bloqueo están cubiertos para que no se pierdan.
@@ -895,6 +941,7 @@ La hoja de ruta muestra cómo evolucionó el sistema y hacia dónde va. Cada ít
 | 15   | Reescritura de la documentación como sistema clínico integral                                                                                                        | Hecho  |
 | 16   | Codificación clínica con CIE-10, diagnósticos por atención y reporte de morbilidad                                                                                   | Hecho  |
 | 17   | Documentos médicos formales y consentimientos informados con firma manuscrita y verificación pública                                                                 | Hecho  |
+| 18   | Canales externos de notificación por correo, SMS y WhatsApp, y respaldos cifrados con prueba de restauración automática                                              | Hecho  |
 
 ### Planificado, en orden de prioridad
 
@@ -902,7 +949,8 @@ La hoja de ruta muestra cómo evolucionó el sistema y hacia dónde va. Cada ít
 | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | Flujos propios por especialidad como aplicaciones nuevas: odontología con odontograma y presupuesto, y pediatría con curvas de crecimiento y vacunas | Planificado |
 | Antivirus para las subidas de archivos                                                                                                               | Planificado |
-| Copias de seguridad de la base de datos y del almacén de objetos, y réplica del almacén                                                              | Planificado |
+| Réplica del almacén de objetos a otro sitio y ensayo de recuperación ante desastres en una máquina nueva                                             | Planificado |
+| Contratar y conectar un proveedor real de SMS y WhatsApp y el servidor de correo de producción                                                       | Planificado |
 | Prueba de punta a punta de `compose.yaml` en modo producción con TLS y credenciales reales                                                           | Planificado |
 | Más reportes y BI, con tableros guardados y exportaciones programadas                                                                                | Planificado |
 | Integración real de verificación de cobertura con aseguradoras y de confirmación de pagos con billeteras                                             | Planificado |
@@ -950,7 +998,7 @@ Estas son las decisiones que más condicionan el diseño y el motivo de cada una
 tusalud/
 ├── src/                Código fuente y pruebas del backend, con las migraciones de Flyway en db/migration y db/demo
 ├── .githooks/          Hooks de Git para formatear antes de commit y push
-├── docker/             Gateway nginx, almacén de objetos, agente y Collector de OpenTelemetry, y pgAdmin
+├── docker/             Gateway nginx, almacén de objetos, contenedor de respaldos, agente y Collector de OpenTelemetry, y pgAdmin
 ├── scripts/            Utilidades del repositorio, como la generación del certificado de desarrollo
 ├── postman/            Colección de Postman
 ├── web/                Workspace de Angular con el portal, una aplicación por rol, las librerías compartidas y las pruebas e2e
@@ -1116,6 +1164,11 @@ La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y
 | `/mis-documentos`, `/mis-consentimientos`                                 | Paciente                                                                                      | Documentos descargables y consentimientos con firma                                                       |
 | `/establecimientos`, `/consentimientos`                                   | Admin                                                                                         | Catálogo de establecimientos y plantillas de consentimiento                                               |
 | `/verificar`, `/verificar/:codigo`                                        | Público                                                                                       | Verificación de un documento médico                                                                       |
+| `/baja`                                                                   | Público                                                                                       | Confirmación de la baja de un canal desde el enlace de un mensaje                                         |
+| `/perfil`, pestaña Avisos                                                 | Todos los roles                                                                               | Canales, preferencias por tipo de aviso y horario de silencio                                             |
+| `/canales/plantillas`                                                     | Admin                                                                                         | Plantillas de los mensajes por tipo de aviso y canal, con versiones                                       |
+| `/canales/entregas`                                                       | Admin, operaciones                                                                            | Bitácora y resumen de las entregas por canal                                                              |
+| `/respaldos`                                                              | Admin, operaciones                                                                            | Estado de los respaldos, historial y plan de recuperación                                                 |
 | `/rrhh`                                                                   | Recursos humanos, gerencia, admin                                                             | Resumen de la plantilla                                                                                   |
 | `/rrhh/empleados`                                                         | Recursos humanos, gerencia, admin                                                             | Fichas laborales                                                                                          |
 | `/rrhh/turnos`                                                            | Recursos humanos, admin                                                                       | Turnos semanales del personal                                                                             |
@@ -1220,6 +1273,20 @@ La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y
 | `GET`                                                                     | `/api/v1/establecimientos-salud`                                                              | Médico, admin                                                                                             | 200       |
 | `POST`                                                                    | `/api/v1/establecimientos-salud`, `PUT /{id}`                                                 | Admin                                                                                                     | 201       |
 | `GET`                                                                     | `/api/v1/verificacion/{codigo}`                                                               | Público, con límite de tasa                                                                               | 200       |
+| `GET`                                                                     | `/api/v1/canales/mis-canales`                                                                 | Autenticado                                                                                               | 200       |
+| `POST`                                                                    | `/api/v1/canales/contactos/{canal}/solicitar`, `/{canal}/verificar`                           | Autenticado, con consentimiento y código                                                                  | 200       |
+| `DELETE`                                                                  | `/api/v1/canales/contactos/{canal}`                                                           | Autenticado                                                                                               | 200       |
+| `PUT`                                                                     | `/api/v1/canales/preferencias`                                                                | Autenticado, las alertas de seguridad no se desactivan                                                    | 200       |
+| `POST`                                                                    | `/api/v1/canales/baja?t=`                                                                     | Público, con token firmado                                                                                | 200       |
+| `POST`                                                                    | `/api/v1/canales/webhook/{canal}`                                                             | Público, con firma HMAC y marca de tiempo                                                                 | 204       |
+| `GET`                                                                     | `/api/v1/canales/entregas`, `/entregas/resumen`                                               | Admin, operaciones                                                                                        | 200       |
+| `POST`                                                                    | `/api/v1/canales/entregas/{id}/reintentar`                                                    | Admin                                                                                                     | 200       |
+| `GET`                                                                     | `/api/v1/admin/canales/plantillas`, `/plantillas/{tipo}/{canal}/historial`, `/proveedores`    | Admin                                                                                                     | 200       |
+| `PUT`                                                                     | `/api/v1/admin/canales/plantillas/{tipo}/{canal}`                                             | Admin                                                                                                     | 200       |
+| `DELETE`                                                                  | `/api/v1/admin/canales/plantillas/{tipo}/{canal}`, `/admin/canales/simulacion`                | Admin                                                                                                     | 200       |
+| `GET`                                                                     | `/api/v1/admin/canales/simulacion`                                                            | Admin                                                                                                     | 200       |
+| `GET`                                                                     | `/api/v1/respaldos`, `/respaldos/estado`                                                      | Admin, operaciones                                                                                        | 200       |
+| `POST`                                                                    | `/api/v1/respaldos/ejecuciones`                                                               | Contenedor de respaldos, con la cabecera `X-Respaldo-Token`                                               | 201       |
 | `GET`                                                                     | `/api/v1/admin/cie10/resumen`, `/admin/cie10/plantilla.csv`                                   | Admin                                                                                                     | 200       |
 | `POST`                                                                    | `/api/v1/admin/cie10/importaciones/vista-previa`, `/admin/cie10/importaciones`                | Admin                                                                                                     | 200       |
 | `GET`                                                                     | `/api/v1/rrhh/resumen`, `/rrhh/empleados`, `/rrhh/empleados/{id}`                             | Recursos humanos, gerencia, admin                                                                         | 200       |
@@ -2418,6 +2485,78 @@ El módulo emite documentos clínicos con identidad verificable y registra conse
 
 **Límites conocidos.** La firma manuscrita no es una firma digital con certificado, así que no equivale a la firma electrónica de la ley peruana. El estado VENCIDO se calcula al consultar, sin un proceso programado. No hay envío real de correos ni mensajes, y la epicrisis no se arma sin alta.
 
+### Canales de notificación
+
+Cada notificación interna pasa por `NotificacionService.crear`, que publica un `NotificacionCreadaEvent`. `DespachadorCanales` escucha ese evento dentro de la misma transacción y, para cada canal del usuario con consentimiento y destino verificado, escribe una entrega pendiente en `entregas_notificacion`. Es una bandeja de salida: si la transacción se revierte, la entrega también. `ColaEntregas` procesa los pendientes cada 10 segundos con `EntregaProcesador`, que vuelve a comprobar el consentimiento y la preferencia, arma el mensaje con la plantilla vigente y lo envía por el canal.
+
+| Pieza                   | Función                                                                                                                                        |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CanalNotificacion`     | Interfaz de un canal. `CanalCorreo` usa SMTP, o la simulación si el proveedor es `simulado`, y `CanalMensajeria` sirve a SMS y WhatsApp        |
+| `ProveedorHttpGenerico` | Proveedor HTTP configurable con autenticación `NONE`, `BEARER` o `BASIC`, cuerpo `JSON` o `FORM` con los marcadores `{destino}` y `{texto}`    |
+| `ProveedorSimulado`     | Guarda los mensajes en memoria para desarrollo y pruebas. Un destino que termina en 0000 falla de forma temporal y en 9999 de forma permanente |
+| `PoliticaCanales`       | Define qué tipos de aviso salen por canales externos, cuáles son obligatorios y urgentes, y qué canales están activos por defecto              |
+
+**Qué se envía.** Los tipos con salida externa son las citas, los recordatorios, las teleconsultas, los resultados disponibles, los documentos emitidos, los consentimientos pendientes y las alertas de seguridad, que incluyen cambio de contraseña, cambios de verificación en dos pasos, actividad inusual, cambios de accesos y alertas de respaldos. Los demás avisos quedan solo dentro de la aplicación. El correo está activo por defecto para todos los tipos y SMS y WhatsApp solo para los recordatorios, las teleconsultas y la seguridad.
+
+**Qué dice.** El texto sale de una plantilla por tipo y canal con las únicas variables `nombre`, `enlace` y `centro`. Ninguna lleva el título ni el cuerpo de la notificación interna, de modo que un mensaje externo nunca contiene datos clínicos aunque el aviso interno los tuviera. El administrador edita las plantillas, que se versionan, y puede volver al texto predeterminado. El correo se envía en texto y en HTML con la marca, y el HTML escapa todo el contenido.
+
+**Entrega y reintentos.** Una entrega pasa por PENDIENTE, ENVIADO, ENTREGADO, FALLIDO o REBOTADO. Un fallo temporal reintenta con retroceso exponencial desde 30 segundos hasta un techo de una hora y falla tras cinco intentos. Un rechazo permanente falla de inmediato. Cada entrega tiene una clave de idempotencia con el id del aviso y el canal. El máximo por hora y destinatario es configurable con `CANALES_LIMITE_POR_HORA` y no aplica a las alertas de seguridad. Un aviso no urgente creado durante el silencio queda programado para cuando termine.
+
+**Verificación del destino.** `POST /api/v1/canales/contactos/{canal}/solicitar` registra el consentimiento y envía un código de seis dígitos que caduca en 10 minutos. Se permite un código nuevo cada 60 segundos y cinco por hora, y la verificación admite cinco intentos. El teléfono se normaliza al formato internacional y un número peruano de nueve dígitos recibe el prefijo +51.
+
+**Estado desde el proveedor.** `POST /api/v1/canales/webhook/{canal}` recibe `{"idExterno":"...","estado":"ENTREGADO"}`, con `FALLIDO` o `REBOTADO` para los otros casos. Exige las cabeceras `X-Marca-Tiempo`, en segundos, y `X-Firma`, con el formato `sha256=` seguido del HMAC-SHA256 hexadecimal de la marca de tiempo, un punto y el cuerpo, calculado con `CANALES_WEBHOOK_SECRETO`. Sin ese secreto el endpoint rechaza todo. Un rebote da de baja el destino. Para un proveedor con otro formato de eventos hay que agregar un adaptador que lo traduzca a este.
+
+**Baja.** Todo mensaje incluye un enlace a `/baja?t=` del portal con un token firmado. La página pide confirmar y hace un POST, para que los programas que previsualizan enlaces no den de baja a nadie. El correo agrega las cabeceras `List-Unsubscribe` y `List-Unsubscribe-Post`.
+
+**Configuración del correo.** Con `CANALES_CORREO_PROVEEDOR=smtp` la API usa el servidor de `SPRING_MAIL_HOST`. En desarrollo Compose levanta Mailpit, que recibe los correos sin enviarlos y los muestra en `http://localhost:8025`. Para SMS y WhatsApp se define `CANALES_SMS_PROVEEDOR=http` con la URL, la autenticación y la plantilla del cuerpo del proveedor elegido. Un ejemplo para un proveedor de formulario con autenticación básica:
+
+```bash
+CANALES_SMS_PROVEEDOR=http
+CANALES_SMS_URL=https://proveedor.example/mensajes
+CANALES_SMS_AUTENTICACION=BASIC
+CANALES_SMS_USUARIO=cuenta
+CANALES_SMS_SECRETO=clave
+CANALES_SMS_FORMATO=FORM
+CANALES_SMS_CUERPO=To={destino}&From=%2B15550001111&Body={texto}
+CANALES_SMS_CAMPO_ID=sid
+```
+
+Para la API de WhatsApp Cloud el formato es `JSON`, la autenticación `BEARER` y el cuerpo `{"messaging_product":"whatsapp","to":"{destino}","type":"text","text":{"body":"{texto}"}}`, con `messages.0.id` como campo del id externo. Los mensajes de WhatsApp fuera de la ventana de conversación exigen plantillas aprobadas por el proveedor, algo que depende de la cuenta contratada.
+
+### Respaldos y recuperación
+
+El servicio `backup` de Compose es una imagen basada en PostgreSQL 18 con las herramientas de cliente, `rclone`, `openssl` y `jq`, que ejecuta los scripts de `docker/backup/scripts` con cron.
+
+| Script                   | Qué hace                                                                                                                                                                                                  |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `respaldar.sh`           | Vuelca la base con `pg_dump` en formato personalizado comprimido, copia los cinco buckets del almacén con `rclone`, cifra los dos paquetes, escribe el manifiesto, aplica la retención y reporta a la API |
+| `probar-restauracion.sh` | Levanta una base temporal aislada dentro del contenedor, restaura el último respaldo, valida y reporta. Borra todo al terminar                                                                            |
+| `restaurar.sh`           | Restaura un respaldo sobre la base real o sobre una base nueva, y opcionalmente repone el almacén. Exige `--confirmar`                                                                                    |
+
+Cada respaldo vive en `/respaldos/diario/AAAAMMDD-HHMMSS` del volumen `backup-data` y contiene `base.dump.enc`, `almacen.tar.gz.enc` y `manifiesto.json`. El manifiesto guarda el checksum SHA-256 de cada paquete, las migraciones y tablas de la base, el conteo de las tablas principales y la cantidad de objetos del almacén. Los domingos el respaldo se copia también a `semanal` y el día 1 a `mensual`. La retención conserva 7 diarios, 4 semanales y 6 mensuales y se ajusta con `RETENCION_DIARIOS`, `RETENCION_SEMANALES` y `RETENCION_MENSUALES`. Con `RESPALDO_REMOTO_ENDPOINT` y `RESPALDO_REMOTO_BUCKET` cada respaldo se copia además a otro bucket S3. El cifrado es AES-256 con una clave derivada con PBKDF2 de `RESPALDO_PASSPHRASE`, o del archivo de `RESPALDO_PASSPHRASE_FILE`, y sin esa clave el contenedor se niega a arrancar. Quien pierda la clave pierde los respaldos, así que debe guardarse aparte de ellos.
+
+**La prueba de restauración** verifica los checksums, restaura la base en un servidor PostgreSQL temporal y comprueba que el historial de Flyway no tenga migraciones fallidas y coincida con el manifiesto, que el número de tablas sea el esperado, que los conteos de usuarios, pacientes, médicos, citas, atenciones y archivos coincidan con una tolerancia del 1 por ciento más 5 registros, y que los objetos del almacén coincidan en cantidad y en checksum. Un respaldo alterado, truncado o con otra clave falla la prueba.
+
+**Cron.** `BACKUP_CRON` programa el respaldo, por defecto `0 2 * * *`, y `TEST_CRON` la prueba, por defecto `30 3 * * 0`, con la hora de Lima. Se pueden ejecutar a mano:
+
+```bash
+docker exec tusalud-backup /opt/respaldos/respaldar.sh
+docker exec tusalud-backup /opt/respaldos/probar-restauracion.sh
+docker exec tusalud-backup /opt/respaldos/restaurar.sh /respaldos/diario/AAAAMMDD-HHMMSS --base tusalud_revision --confirmar
+```
+
+**Registro y alertas.** Los scripts reportan a `POST /api/v1/respaldos/ejecuciones` con el secreto `RESPALDO_TOKEN`, que debe ser el mismo en la API y en el contenedor y sin el cual la API rechaza todo. Cada ejecución queda en `respaldo_ejecuciones`. Un respaldo o una prueba fallidos avisan de inmediato al administrador y a operaciones con una notificación de seguridad. Una tarea horaria avisa si pasan más de `RESPALDOS_MAX_HORAS` horas, 26 por defecto, sin un respaldo exitoso, o más de `RESPALDOS_MAX_DIAS_SIN_PRUEBA` días, 8 por defecto, sin una prueba exitosa, y no repite el aviso en 12 horas. La pantalla Respaldos muestra un semáforo: verde si hay un respaldo reciente y una restauración probada, amarillo si falta una de las dos o la prueba venció, y rojo si el respaldo venció o el último falló.
+
+**Plan de recuperación ante desastres.** Los objetivos son un RPO de 24 horas, porque se respalda una vez al día, y un RTO de 60 minutos. El procedimiento ante la pérdida del servidor o de los datos es:
+
+1. Levantar el stack en un servidor nuevo con `docker compose up -d postgres storage storage-init backup`, con las mismas variables, incluida la clave de respaldo.
+2. Copiar al volumen `backup-data` el respaldo elegido, desde el volumen guardado o desde el bucket remoto.
+3. Ejecutar `restaurar.sh` con `--confirmar` y `--almacen` para reponer la base y los objetos.
+4. Levantar la API, que valida las migraciones al arrancar, y luego el gateway y la aplicación web.
+5. Entrar con un usuario administrador, revisar que los últimos datos esperados estén y registrar el incidente.
+
+Para recortar el RPO basta con programar `BACKUP_CRON` con más frecuencia. El RTO real depende del tamaño de la base y del almacén, y se mide con la duración que reporta cada prueba de restauración.
+
 ## Manejo de errores
 
 `GlobalExceptionHandler` traduce cada excepción a una respuesta con el mismo formato. Los errores 401 y 403 que produce Spring Security antes de llegar a un controlador usan ese mismo formato.
@@ -2541,6 +2680,7 @@ Reglas de uso:
 - `baseline-on-migrate` está activo con la versión 1, de modo que una base que ya existía con el esquema anterior se adopta sin volver a ejecutar `V1`.
 - La configuración `test` desactiva Flyway porque las pruebas usan H2 con el esquema generado por Hibernate y sus propios inicializadores.
 - Producción solo aplica `db/migration`, de modo que nunca recibe datos de demostración.
+- Los perfiles `local`, `dev` y `qa` activan `out-of-order`, porque una migración nueva de esquema, como la V24, tiene un número menor que las de demostración ya aplicadas, como la V115, y Flyway la rechazaría en una base que ya existía. Producción no lo activa.
 
 Para volver a un estado limpio con los datos de demostración basta con recrear el volumen de PostgreSQL:
 
@@ -2587,6 +2727,8 @@ Para enviar trazas a Jaeger desde el IDE, levanta también `otel-collector` y `j
 | `postgres`       | `postgres:18-alpine`                                          | 5432                                                                          |
 | `otel-collector` | `otel/opentelemetry-collector-contrib:0.162.0`                | 4317 gRPC, 4318 HTTP y 13133 health                                           |
 | `jaeger`         | `jaegertracing/jaeger:2.22.0`                                 | 16686                                                                         |
+| `backup`         | `tusalud-backup`, construida con `docker/backup/Dockerfile`   | Ninguno, guarda en el volumen `backup-data`                                   |
+| `mailpit`        | `axllent/mailpit`, solo en desarrollo                         | 8025 en el loopback para ver los correos                                      |
 | `pgadmin`        | `dpage/pgadmin4`, solo con el perfil `tools`                  | 5050                                                                          |
 
 El `Dockerfile` de la API está optimizado en tamaño, arranque y seguridad. La imagen final pesa unos 330 MB:
@@ -2703,20 +2845,23 @@ pgAdmin queda en `http://localhost:5050` con el usuario `admin@tusalud.com` y la
 | Swagger UI                                     | `http://localhost:4200/swagger-ui.html` |
 | OpenAPI                                        | `http://localhost:4200/v3/api-docs`     |
 | Administración del almacén, solo en desarrollo | `http://127.0.0.1:9333`                 |
+| Correos de desarrollo en Mailpit               | `http://127.0.0.1:8025`                 |
 | Jaeger                                         | `http://localhost:16686`                |
 | OTel Collector health                          | `http://localhost:13133`                |
 | pgAdmin                                        | `http://localhost:5050`                 |
 
 ### Comandos útiles
 
-| Comando                                      | Descripción                                            |
-| -------------------------------------------- | ------------------------------------------------------ |
-| `docker compose ps`                          | Muestra el estado de los contenedores                  |
-| `docker compose logs -f app`                 | Sigue los logs de la API                               |
-| `docker compose up -d --build app`           | Reconstruye la API después de cambiar código           |
-| `docker compose up -d --build --no-deps web` | Reconstruye solo la aplicación web, sin recrear la API |
-| `docker compose down`                        | Detiene el stack y conserva los datos                  |
-| `docker compose down -v`                     | Detiene el stack y borra los datos                     |
+| Comando                                                            | Descripción                                            |
+| ------------------------------------------------------------------ | ------------------------------------------------------ |
+| `docker compose ps`                                                | Muestra el estado de los contenedores                  |
+| `docker compose logs -f app`                                       | Sigue los logs de la API                               |
+| `docker compose up -d --build app`                                 | Reconstruye la API después de cambiar código           |
+| `docker compose up -d --build --no-deps web`                       | Reconstruye solo la aplicación web, sin recrear la API |
+| `docker exec tusalud-backup /opt/respaldos/respaldar.sh`           | Hace un respaldo ahora                                 |
+| `docker exec tusalud-backup /opt/respaldos/probar-restauracion.sh` | Prueba la restauración del último respaldo             |
+| `docker compose down`                                              | Detiene el stack y conserva los datos                  |
+| `docker compose down -v`                                           | Detiene el stack y borra los datos                     |
 
 ## Aplicación web
 
@@ -3094,36 +3239,38 @@ docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml up -d --b
 ./mvnw test
 ```
 
-Las 753 pruebas usan el perfil `test` con H2 en memoria y no necesitan PostgreSQL ni Docker.
+Las 806 pruebas usan el perfil `test` con H2 en memoria y no necesitan PostgreSQL ni Docker.
 
-| Clase                                                                   | Qué verifica                                                                                                                                                                                    |
-| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `VirtualThreadsTest`                                                    | Que Tomcat atiende las peticiones con virtual threads                                                                                                                                           |
-| `TusaludApplicationTests`                                               | Que el contexto de Spring arranca                                                                                                                                                               |
-| `ValidadorPlantillaTest`                                                | La lista blanca de plantillas: scripts, importaciones, entidades externas, tamaño y recursos externos                                                                                           |
-| `MotorPlantillasTest`                                                   | La compilación y el llenado de las diecinueve plantillas, las tildes en el PDF y el límite de filas                                                                                             |
-| `LibroExcelTest`                                                        | La escritura en flujo, la neutralización de fórmulas y el reempaquetado del libro                                                                                                               |
-| `DocumentoServiceTest`                                                  | La autorización de cada documento, las exportaciones, la purga, los límites y las plantillas                                                                                                    |
-| `SeguridadOperativaSeguridadTest`, `EventoSeguridadServiceTest`         | Eventos de seguridad sin correos ni claves, enmascarado de IP, umbrales, purga, permisos de administración, estado del sistema, evoluciones pendientes y motivos obligatorios                   |
-| `CoberturaCalculadoraTest`, `SegurosServiceTest`                        | El cálculo de cobertura con porcentaje, copago fijo, topes, exclusiones y redondeo, las pólizas, las preautorizaciones, el cobro del copago, la reversión y las liquidaciones                   |
-| `SegurosSeguridadTest`                                                  | Los permisos por rol, el acceso a pólizas ajenas y lo que ve el médico                                                                                                                          |
-| `DocumentosMedicosServiceTest`, `ConsentimientosServiceTest`            | El ciclo de borrador, emisión y anulación, la inmutabilidad, los hashes, las validaciones del descanso, la autorización del diagnóstico, la firma, el representante, el testigo y la revocación |
-| `SecuenciasDocumentosMedicosConcurrenciaTest`                           | Que la numeración correlativa no repite números con emisiones simultáneas                                                                                                                       |
-| `DocumentosMedicosSeguridadTest`                                        | La verificación pública sin datos del paciente, los roles, el acceso a documentos ajenos y la auditoría                                                                                         |
-| `DocumentosSeguridadTest`                                               | El acceso por rol, los intentos de acceso a datos ajenos y el aislamiento entre usuarios                                                                                                        |
-| `CitaRepositoryTest`                                                    | Las consultas JPQL de citas, médicos, horarios y auditoría contra datos reales                                                                                                                  |
-| `SecurityIntegrationTest`                                               | Respuestas 401 y 403, rutas públicas, CORS, contenido del token y login con BCrypt                                                                                                              |
-| `CitaServiceImplTest`                                                   | Reserva de citas, conflictos de horario con rollback, permisos, transiciones de estado y disponibilidad                                                                                         |
-| `AuthServiceImplTest`                                                   | Registro de pacientes, duplicados y login                                                                                                                                                       |
-| `MedicoEspecialidadServiceImplTest`                                     | Especialidades, alta de médicos y validación de horarios                                                                                                                                        |
-| `HttpTelemetryFilterTest`, `DtoCredencialesToStringTest`                | Que los spans enmascaran credenciales y no registran cuerpos clínicos ni de autenticación, y que los DTO ocultan sus secretos                                                                   |
-| `RecepcionServiceTest`, `AdmisionServiceTest`, `RecepcionSeguridadTest` | Llegadas, numeración y cola de turnos, registro de pacientes y citas de mostrador, y permisos por rol                                                                                           |
-| `CajaServiceTest`, `CajaSeguridadTest`                                  | Apertura y cierre, cobros con IGV, anulación, cuentas por cobrar, reporte y permisos                                                                                                            |
-| `HospitalizacionServiceTest`, `HospitalizacionSeguridadTest`            | Camas, ingresos, traslados con cargo por tramos, triaje, evoluciones por rol, alta y permisos                                                                                                   |
-| `ImagenesServiceTest`, `ImagenesSeguridadTest`                          | Catálogo, programación con choque de sala, carga validada por contenido, informes con versiones, acceso por relación, minimización por rol y cobro                                              |
-| `DetectorContenidoTest`, `NombresArchivoTest`                           | Detección por firma de imágenes, PDF, Office, CSV y JRXML, rechazo de ejecutables, SVG, HTML y XML con DOCTYPE, y sanitización de nombres                                                       |
-| `LocalStorageServiceTest`, `S3StorageServiceTest`                       | Guardado, lectura por rangos, borrado, claves con recorrido de directorio y errores del almacén con un cliente S3 simulado                                                                      |
-| `ArchivoServiceTest`, `ArchivosSeguridadTest`                           | Validación por propósito, acceso por relación y propietario, rangos, ETag, avatar del perfil y accesos indebidos por HTTP                                                                       |
+| Clase                                                                   | Qué verifica                                                                                                                                                                                                                                                                              |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VirtualThreadsTest`                                                    | Que Tomcat atiende las peticiones con virtual threads                                                                                                                                                                                                                                     |
+| `TusaludApplicationTests`                                               | Que el contexto de Spring arranca                                                                                                                                                                                                                                                         |
+| `ValidadorPlantillaTest`                                                | La lista blanca de plantillas: scripts, importaciones, entidades externas, tamaño y recursos externos                                                                                                                                                                                     |
+| `MotorPlantillasTest`                                                   | La compilación y el llenado de las diecinueve plantillas, las tildes en el PDF y el límite de filas                                                                                                                                                                                       |
+| `LibroExcelTest`                                                        | La escritura en flujo, la neutralización de fórmulas y el reempaquetado del libro                                                                                                                                                                                                         |
+| `DocumentoServiceTest`                                                  | La autorización de cada documento, las exportaciones, la purga, los límites y las plantillas                                                                                                                                                                                              |
+| `SeguridadOperativaSeguridadTest`, `EventoSeguridadServiceTest`         | Eventos de seguridad sin correos ni claves, enmascarado de IP, umbrales, purga, permisos de administración, estado del sistema, evoluciones pendientes y motivos obligatorios                                                                                                             |
+| `CoberturaCalculadoraTest`, `SegurosServiceTest`                        | El cálculo de cobertura con porcentaje, copago fijo, topes, exclusiones y redondeo, las pólizas, las preautorizaciones, el cobro del copago, la reversión y las liquidaciones                                                                                                             |
+| `CanalesServiceTest`, `CanalesUnidadTest`                               | El consentimiento y la verificación con intentos y reenvíos, la bandeja de salida, el mensaje sin datos clínicos, las preferencias, el silencio, los reintentos con retroceso, el límite por hora, la idempotencia, la baja, el webhook firmado, el rebote y las plantillas con versiones |
+| `CanalesSeguridadTest`, `RespaldosServiceTest`                          | Los permisos por rol de canales, entregas, plantillas y respaldos, los endpoints públicos, el token de respaldos, el estado con semáforo, los vencimientos y las alertas sin duplicados                                                                                                   |
+| `SegurosSeguridadTest`                                                  | Los permisos por rol, el acceso a pólizas ajenas y lo que ve el médico                                                                                                                                                                                                                    |
+| `DocumentosMedicosServiceTest`, `ConsentimientosServiceTest`            | El ciclo de borrador, emisión y anulación, la inmutabilidad, los hashes, las validaciones del descanso, la autorización del diagnóstico, la firma, el representante, el testigo y la revocación                                                                                           |
+| `SecuenciasDocumentosMedicosConcurrenciaTest`                           | Que la numeración correlativa no repite números con emisiones simultáneas                                                                                                                                                                                                                 |
+| `DocumentosMedicosSeguridadTest`                                        | La verificación pública sin datos del paciente, los roles, el acceso a documentos ajenos y la auditoría                                                                                                                                                                                   |
+| `DocumentosSeguridadTest`                                               | El acceso por rol, los intentos de acceso a datos ajenos y el aislamiento entre usuarios                                                                                                                                                                                                  |
+| `CitaRepositoryTest`                                                    | Las consultas JPQL de citas, médicos, horarios y auditoría contra datos reales                                                                                                                                                                                                            |
+| `SecurityIntegrationTest`                                               | Respuestas 401 y 403, rutas públicas, CORS, contenido del token y login con BCrypt                                                                                                                                                                                                        |
+| `CitaServiceImplTest`                                                   | Reserva de citas, conflictos de horario con rollback, permisos, transiciones de estado y disponibilidad                                                                                                                                                                                   |
+| `AuthServiceImplTest`                                                   | Registro de pacientes, duplicados y login                                                                                                                                                                                                                                                 |
+| `MedicoEspecialidadServiceImplTest`                                     | Especialidades, alta de médicos y validación de horarios                                                                                                                                                                                                                                  |
+| `HttpTelemetryFilterTest`, `DtoCredencialesToStringTest`                | Que los spans enmascaran credenciales y no registran cuerpos clínicos ni de autenticación, y que los DTO ocultan sus secretos                                                                                                                                                             |
+| `RecepcionServiceTest`, `AdmisionServiceTest`, `RecepcionSeguridadTest` | Llegadas, numeración y cola de turnos, registro de pacientes y citas de mostrador, y permisos por rol                                                                                                                                                                                     |
+| `CajaServiceTest`, `CajaSeguridadTest`                                  | Apertura y cierre, cobros con IGV, anulación, cuentas por cobrar, reporte y permisos                                                                                                                                                                                                      |
+| `HospitalizacionServiceTest`, `HospitalizacionSeguridadTest`            | Camas, ingresos, traslados con cargo por tramos, triaje, evoluciones por rol, alta y permisos                                                                                                                                                                                             |
+| `ImagenesServiceTest`, `ImagenesSeguridadTest`                          | Catálogo, programación con choque de sala, carga validada por contenido, informes con versiones, acceso por relación, minimización por rol y cobro                                                                                                                                        |
+| `DetectorContenidoTest`, `NombresArchivoTest`                           | Detección por firma de imágenes, PDF, Office, CSV y JRXML, rechazo de ejecutables, SVG, HTML y XML con DOCTYPE, y sanitización de nombres                                                                                                                                                 |
+| `LocalStorageServiceTest`, `S3StorageServiceTest`                       | Guardado, lectura por rangos, borrado, claves con recorrido de directorio y errores del almacén con un cliente S3 simulado                                                                                                                                                                |
+| `ArchivoServiceTest`, `ArchivosSeguridadTest`                           | Validación por propósito, acceso por relación y propietario, rangos, ETag, avatar del perfil y accesos indebidos por HTTP                                                                                                                                                                 |
 
 ## Flujo de trabajo con Git
 
@@ -3170,38 +3317,39 @@ El archivo `postman/Tusalud.postman_collection.json` es la única colección del
 
 Para usarla en Postman, importa el archivo y ejecuta la colección completa con Run collection. Las carpetas están numeradas y se ejecutan en orden, porque cada una reutiliza los tokens e identificadores que capturan las anteriores:
 
-| Carpeta                                                 | Contenido                                                                                                                                                                                                               |
-| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `00 - Autenticación`                                    | Login de los usuarios de prueba, registro de un paciente y errores 400 y 401                                                                                                                                            |
-| `01 - Especialidades`                                   | Alta, consulta, actualización, duplicado, acceso sin permiso y eliminación                                                                                                                                              |
-| `02 - Médicos y Horarios`                               | Listados, alta de médico, bloques de horario, solapamiento y disponibilidad                                                                                                                                             |
-| `03 - Citas (Paciente)`                                 | Reserva en el primer turno libre, conflictos y acceso a citas ajenas                                                                                                                                                    |
-| `04 - Citas (Médico)`                                   | Agenda, confirmación, atención y transiciones inválidas                                                                                                                                                                 |
-| `05 - Cancelación`                                      | Cancelación de una segunda cita y cancelación repetida                                                                                                                                                                  |
-| `06 - Auditoría (Admin)`                                | Reportes por estado y por rango, y accesos no permitidos                                                                                                                                                                |
-| `07 - Seguridad`                                        | Peticiones sin token y con token inválido                                                                                                                                                                               |
-| `08 - Perfil`                                           | Datos personales, contraseña y preferencias                                                                                                                                                                             |
-| `09 - Tarifas, roles y pacientes compartidos`           | Tarifa por especialidad, especialidades del médico, roles y pacientes compartidos                                                                                                                                       |
-| `10 - Pagos con Yape y Plin`                            | Reserva, generación del QR, consulta y confirmación simulada                                                                                                                                                            |
-| `11 - Verificación en dos pasos y renovación del token` | Configuración del autenticador y errores del refresh token                                                                                                                                                              |
-| `12 - Calendario y eventos`                             | Eventos personales, arrastre, privacidad y límites del rango                                                                                                                                                            |
-| `13 - Personal y almacén`                               | Alta de personal, productos, proveedores, ingresos, salidas y alertas                                                                                                                                                   |
-| `14 - Farmacia`                                         | Catálogo, venta libre, anulación y entregas del paciente                                                                                                                                                                |
-| `15 - Laboratorio`                                      | Orden del médico, muestra, resultados fuera de rango, validación y acceso                                                                                                                                               |
-| `16 - Recepción y turnos`                               | Registro de pacientes, turnos, cola, llamado, pantalla y permisos                                                                                                                                                       |
-| `17 - Caja y facturación`                               | Apertura, cobros con IGV, factura, anulación, reporte, cierre y permisos                                                                                                                                                |
-| `18 - Hospitalización y emergencia`                     | Ingreso, evoluciones por rol, traslado, triaje, alta y permisos                                                                                                                                                         |
-| `19 - Seguridad y permisos`                             | Accesos indebidos por relación, por rol y a datos clínicos, y campos que no se exponen                                                                                                                                  |
-| `20 - Reportes y BI`                                    | Los cuatro reportes por rol, validaciones del rango, comparación con el periodo anterior y ausencia de datos de pacientes                                                                                               |
-| `21 - Recursos humanos`                                 | Fichas, turnos con choques y exceso de horas, ausencias con aprobación, Mi espacio y permisos                                                                                                                           |
-| `22 - Imágenes diagnósticas`                            | Catálogo, orden, programación, carga de imágenes, informe con correcciones, accesos indebidos, cobro y cancelación                                                                                                      |
-| `23 - Archivos y almacenamiento`                        | Foto de perfil, descarga con ETag y Range, rechazo de archivos disfrazados, documentos de paciente con acceso por relación y eliminación                                                                                |
-| `24 - Documentos y exportaciones`                       | Documentos de un registro con su regla de acceso, exportaciones asíncronas con consulta hasta terminar, aislamiento entre usuarios, formatos y filtros inválidos, y gestión de plantillas con validación y restauración |
-| `25 - Seguridad operativa y motivos`                    | Eventos de seguridad sin datos sensibles, resumen, estado del sistema, uso del almacenamiento, evoluciones pendientes y validación del motivo en las acciones sensibles                                                 |
-| `26 - Seguros y convenios`                              | Catálogo con convenios y reglas, pólizas, verificación, preautorizaciones, cobro del copago con cuenta por cobrar, cobrar como particular, reversión al anular, cartera, liquidaciones con glosa y permisos por rol     |
-| `27 - Telemedicina`                                     | Citas virtuales, ticket de sala, sala de espera, consentimiento y accesos indebidos                                                                                                                                     |
-| `28 - Codificación CIE-10`                              | Catálogo, diagnósticos de la atención, importación y morbilidad con sus errores                                                                                                                                         |
-| `29 - Documentos médicos y consentimientos`             | Certificados, descansos, informes, referencias y contrarreferencias, ciclo de vida, validaciones, anulación y reemplazo, consentimientos con firma y revocación, verificación pública y accesos indebidos               |
+| Carpeta                                                 | Contenido                                                                                                                                                                                                                                                           |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `00 - Autenticación`                                    | Login de los usuarios de prueba, registro de un paciente y errores 400 y 401                                                                                                                                                                                        |
+| `01 - Especialidades`                                   | Alta, consulta, actualización, duplicado, acceso sin permiso y eliminación                                                                                                                                                                                          |
+| `02 - Médicos y Horarios`                               | Listados, alta de médico, bloques de horario, solapamiento y disponibilidad                                                                                                                                                                                         |
+| `03 - Citas (Paciente)`                                 | Reserva en el primer turno libre, conflictos y acceso a citas ajenas                                                                                                                                                                                                |
+| `04 - Citas (Médico)`                                   | Agenda, confirmación, atención y transiciones inválidas                                                                                                                                                                                                             |
+| `05 - Cancelación`                                      | Cancelación de una segunda cita y cancelación repetida                                                                                                                                                                                                              |
+| `06 - Auditoría (Admin)`                                | Reportes por estado y por rango, y accesos no permitidos                                                                                                                                                                                                            |
+| `07 - Seguridad`                                        | Peticiones sin token y con token inválido                                                                                                                                                                                                                           |
+| `08 - Perfil`                                           | Datos personales, contraseña y preferencias                                                                                                                                                                                                                         |
+| `09 - Tarifas, roles y pacientes compartidos`           | Tarifa por especialidad, especialidades del médico, roles y pacientes compartidos                                                                                                                                                                                   |
+| `10 - Pagos con Yape y Plin`                            | Reserva, generación del QR, consulta y confirmación simulada                                                                                                                                                                                                        |
+| `11 - Verificación en dos pasos y renovación del token` | Configuración del autenticador y errores del refresh token                                                                                                                                                                                                          |
+| `12 - Calendario y eventos`                             | Eventos personales, arrastre, privacidad y límites del rango                                                                                                                                                                                                        |
+| `13 - Personal y almacén`                               | Alta de personal, productos, proveedores, ingresos, salidas y alertas                                                                                                                                                                                               |
+| `14 - Farmacia`                                         | Catálogo, venta libre, anulación y entregas del paciente                                                                                                                                                                                                            |
+| `15 - Laboratorio`                                      | Orden del médico, muestra, resultados fuera de rango, validación y acceso                                                                                                                                                                                           |
+| `16 - Recepción y turnos`                               | Registro de pacientes, turnos, cola, llamado, pantalla y permisos                                                                                                                                                                                                   |
+| `17 - Caja y facturación`                               | Apertura, cobros con IGV, factura, anulación, reporte, cierre y permisos                                                                                                                                                                                            |
+| `18 - Hospitalización y emergencia`                     | Ingreso, evoluciones por rol, traslado, triaje, alta y permisos                                                                                                                                                                                                     |
+| `19 - Seguridad y permisos`                             | Accesos indebidos por relación, por rol y a datos clínicos, y campos que no se exponen                                                                                                                                                                              |
+| `20 - Reportes y BI`                                    | Los cuatro reportes por rol, validaciones del rango, comparación con el periodo anterior y ausencia de datos de pacientes                                                                                                                                           |
+| `21 - Recursos humanos`                                 | Fichas, turnos con choques y exceso de horas, ausencias con aprobación, Mi espacio y permisos                                                                                                                                                                       |
+| `22 - Imágenes diagnósticas`                            | Catálogo, orden, programación, carga de imágenes, informe con correcciones, accesos indebidos, cobro y cancelación                                                                                                                                                  |
+| `23 - Archivos y almacenamiento`                        | Foto de perfil, descarga con ETag y Range, rechazo de archivos disfrazados, documentos de paciente con acceso por relación y eliminación                                                                                                                            |
+| `24 - Documentos y exportaciones`                       | Documentos de un registro con su regla de acceso, exportaciones asíncronas con consulta hasta terminar, aislamiento entre usuarios, formatos y filtros inválidos, y gestión de plantillas con validación y restauración                                             |
+| `25 - Seguridad operativa y motivos`                    | Eventos de seguridad sin datos sensibles, resumen, estado del sistema, uso del almacenamiento, evoluciones pendientes y validación del motivo en las acciones sensibles                                                                                             |
+| `26 - Seguros y convenios`                              | Catálogo con convenios y reglas, pólizas, verificación, preautorizaciones, cobro del copago con cuenta por cobrar, cobrar como particular, reversión al anular, cartera, liquidaciones con glosa y permisos por rol                                                 |
+| `27 - Telemedicina`                                     | Citas virtuales, ticket de sala, sala de espera, consentimiento y accesos indebidos                                                                                                                                                                                 |
+| `28 - Codificación CIE-10`                              | Catálogo, diagnósticos de la atención, importación y morbilidad con sus errores                                                                                                                                                                                     |
+| `29 - Documentos médicos y consentimientos`             | Certificados, descansos, informes, referencias y contrarreferencias, ciclo de vida, validaciones, anulación y reemplazo, consentimientos con firma y revocación, verificación pública y accesos indebidos                                                           |
+| `30 - Canales de notificación y respaldos`              | Activación y verificación de canales con el código leído en Mailpit, preferencias, alertas de seguridad por correo y SMS sin datos clínicos, enlace de baja, webhook firmado, plantillas con versiones, bitácora, reporte de respaldos con token y permisos por rol |
 
 Desde la línea de comandos:
 
@@ -3215,6 +3363,8 @@ Para ejecutarla contra otro servidor sin editar el archivo:
 npx newman run postman/Tusalud.postman_collection.json --env-var baseUrl=https://otro-servidor
 ```
 
+La carpeta 30 lee los correos de Mailpit con la variable `mailpitUrl`, que vale `http://localhost:8025`, y necesita que la API tenga las variables de desarrollo de `compose.dev.yaml`: `RESPALDO_TOKEN` igual a `respaldoToken` y `CANALES_WEBHOOK_SECRETO` igual a `webhookSecret`. Espera unos 14 segundos a que la cola envíe la alerta de seguridad.
+
 Si los datos de prueba no están cargados, la carpeta de autenticación falla porque no encuentra a los usuarios de prueba. Los perfiles `local`, `dev` y `qa` los traen con Flyway. Un stack de producción no los trae.
 
 La colección puede ejecutarse varias veces sobre la misma base. Genera emails, DNI, colegiaturas y nombres únicos en cada corrida y calcula la fecha de la cita buscando el primer turno libre, sin depender de identificadores fijos. Cada ejecución deja en la base un paciente, un médico y una especialidad nuevos, además de una cita atendida y otra cancelada.
@@ -3227,59 +3377,79 @@ El archivo `.env.example` documenta todas las variables con valores para desarro
 cp .env.example .env
 ```
 
-| Variable                           | Uso                                                                                   | Valor por defecto                                     |
-| ---------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `SPRING_PROFILES_ACTIVE`           | Perfil de Spring en tiempo de ejecución                                               | El perfil de Maven                                    |
-| `DB_URL`                           | URL JDBC de PostgreSQL, obligatoria en `prod`                                         | Según el perfil                                       |
-| `DB_USERNAME`                      | Usuario de PostgreSQL, obligatorio en `prod`                                          | `postgres`                                            |
-| `DB_PASSWORD`                      | Clave de PostgreSQL, obligatoria en `prod`                                            | `postgres`                                            |
-| `JWT_SECRET`                       | Clave HMAC en Base64 de al menos 256 bits, obligatoria en `prod`                      | Solo fuera de `prod`                                  |
-| `JWT_EXPIRATION_MS`                | Vigencia del token de acceso en milisegundos                                          | `900000`                                              |
-| `JWT_REFRESH_EXPIRATION_MS`        | Vigencia del refresh token en milisegundos                                            | `604800000`                                           |
-| `MFA_CLAVE_CIFRADO`                | Clave para cifrar los secretos de la verificación en dos pasos, obligatoria en `prod` | Solo fuera de `prod`                                  |
-| `PAGOS_SIMULACION_HABILITADA`      | Habilita la confirmación simulada de pagos con Yape y Plin                            | `true`, y `false` en `prod`                           |
-| `CORS_ALLOWED_ORIGINS`             | Orígenes permitidos, separados por comas                                              | `http://localhost:4200`                               |
-| `SERVER_PORT`                      | Puerto HTTP de la API dentro del contenedor                                           | `8080`                                                |
-| `JDK_JAVA_OPTIONS`                 | Opciones adicionales de la JVM de la API                                              | `-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError` |
-| `OTEL_SERVICE_NAME`                | Nombre del servicio en las trazas                                                     | `tusalud-api`                                         |
-| `APP_PORT`                         | Puerto de la API en el host, solo en desarrollo                                       | `8080`                                                |
-| `WEB_PORT`                         | Puerto del gateway en el host en desarrollo                                           | `4200`                                                |
-| `GATEWAY_PORT`                     | Puerto HTTP del gateway en el host en producción                                      | `80`                                                  |
-| `GATEWAY_TLS_PORT`                 | Puerto HTTPS del gateway en el host                                                   | `443`, y `4443` en desarrollo                         |
-| `GATEWAY_TLS`                      | Activa HTTPS con los certificados de `GATEWAY_CERTS_DIR`                              | `off`                                                 |
-| `GATEWAY_CERTS_DIR`                | Carpeta con `tls.crt` y `tls.key`                                                     | `docker/gateway/certs`                                |
-| `GATEWAY_SERVER_NAME`              | Nombre de servidor del gateway                                                        | `_`                                                   |
-| `GATEWAY_HTTPS_REDIRECT_PORT`      | Puerto, con los dos puntos, al que redirige el HTTP cuando no es el 443               | Vacío                                                 |
-| `GATEWAY_EXPONER_DOCS`             | Expone Swagger UI y OpenAPI por el gateway                                            | `off`, y `on` en desarrollo y qa                      |
-| `GATEWAY_MAX_BODY_DEFAULT`         | Tamaño máximo de una petición en la API                                               | `1m`                                                  |
-| `GATEWAY_MAX_BODY_UPLOAD`          | Tamaño máximo en las rutas de carga de archivos                                       | `25m`                                                 |
-| `RATE_LOGIN`                       | Límite de intentos de inicio de sesión y cambio de contraseña por dirección           | `10r/m`, y `240r/m` en desarrollo                     |
-| `RATE_REFRESH`                     | Límite de renovaciones del token                                                      | `30r/m`                                               |
-| `RATE_MFA`                         | Límite de verificaciones de la verificación en dos pasos                              | `10r/m`                                               |
-| `RATE_REGISTRO`                    | Límite de registros de pacientes                                                      | `5r/m`                                                |
-| `RATE_VERIFICACION`                | Límite de consultas a la verificación pública de documentos                           | `30r/m`                                               |
-| `RATE_GENERAL`                     | Límite del resto de la API                                                            | `600r/m`, y `12000r/m` en desarrollo                  |
-| `RATE_BURST_AUTH`                  | Ráfaga permitida en las rutas de autenticación                                        | `5`, y `60` en desarrollo                             |
-| `RATE_BURST_GENERAL`               | Ráfaga permitida en el resto de la API                                                | `100`, y `1000` en desarrollo                         |
-| `STORAGE_TIPO`                     | Almacén de archivos, `s3` o `local`                                                   | `local`, y `s3` en `prod` y en Compose                |
-| `STORAGE_ENDPOINT`                 | URL interna de la puerta de enlace S3, obligatoria con `s3`                           | `http://storage:8333` en Compose                      |
-| `STORAGE_ENDPOINT_PUBLICO`         | Host público para firmar direcciones prefirmadas, opcional                            | Vacío                                                 |
-| `STORAGE_ACCESS_KEY`               | Clave de acceso S3, sin valor por defecto en producción                               | Solo en `compose.dev.yaml` y `compose.qa.yaml`        |
-| `STORAGE_SECRET_KEY`               | Clave secreta S3, sin valor por defecto en producción                                 | Solo en `compose.dev.yaml` y `compose.qa.yaml`        |
-| `STORAGE_REGION`                   | Región que firman las peticiones S3                                                   | `us-east-1`                                           |
-| `STORAGE_DIRECTORIO_LOCAL`         | Directorio del almacén con `STORAGE_TIPO=local`                                       | Una carpeta temporal                                  |
-| `TURN_SECRET`                      | Secreto compartido para las credenciales TURN, obligatorio en producción              | Solo en desarrollo y QA                               |
-| `TURN_HOST`                        | Host público del servidor TURN que reciben los navegadores                            | `localhost`                                           |
-| `TURN_PORT`                        | Puerto de coturn                                                                      | `3478`                                                |
-| `TURN_EXTERNAL_IP`                 | Dirección pública del servidor TURN en producción                                     | Vacío                                                 |
-| `TURN_RELAY_MIN`, `TURN_RELAY_MAX` | Rango de puertos UDP de relé                                                          | `49160` a `49200`                                     |
-| `TELEMEDICINA_VENTANA_ANTES_MIN`   | Minutos antes de la hora en que se habilita la sala                                   | `10`, `43200` en desarrollo                           |
-| `STORAGE_ADMIN_PORT`               | Puerto de la interfaz de SeaweedFS en `127.0.0.1`, solo en desarrollo                 | `9333`                                                |
-| `POSTGRES_PORT`                    | Puerto de PostgreSQL en el host                                                       | `5432`                                                |
-| `JAEGER_UI_PORT`                   | Puerto de la interfaz de Jaeger en el host                                            | `16686`                                               |
-| `OTEL_GRPC_PORT`                   | Puerto OTLP gRPC del Collector en el host                                             | `4317`                                                |
-| `OTEL_HTTP_PORT`                   | Puerto OTLP HTTP del Collector en el host                                             | `4318`                                                |
-| `OTEL_HEALTH_PORT`                 | Puerto del healthcheck del Collector en el host                                       | `13133`                                               |
-| `PGADMIN_PORT`                     | Puerto de pgAdmin en el host                                                          | `5050`                                                |
-| `PGADMIN_EMAIL`                    | Usuario de pgAdmin                                                                    | `admin@tusalud.com`                                   |
-| `PGADMIN_PASSWORD`                 | Clave de pgAdmin                                                                      | `admin`                                               |
+| Variable                                                                           | Uso                                                                                   | Valor por defecto                                     |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `SPRING_PROFILES_ACTIVE`                                                           | Perfil de Spring en tiempo de ejecución                                               | El perfil de Maven                                    |
+| `DB_URL`                                                                           | URL JDBC de PostgreSQL, obligatoria en `prod`                                         | Según el perfil                                       |
+| `DB_USERNAME`                                                                      | Usuario de PostgreSQL, obligatorio en `prod`                                          | `postgres`                                            |
+| `DB_PASSWORD`                                                                      | Clave de PostgreSQL, obligatoria en `prod`                                            | `postgres`                                            |
+| `JWT_SECRET`                                                                       | Clave HMAC en Base64 de al menos 256 bits, obligatoria en `prod`                      | Solo fuera de `prod`                                  |
+| `JWT_EXPIRATION_MS`                                                                | Vigencia del token de acceso en milisegundos                                          | `900000`                                              |
+| `JWT_REFRESH_EXPIRATION_MS`                                                        | Vigencia del refresh token en milisegundos                                            | `604800000`                                           |
+| `MFA_CLAVE_CIFRADO`                                                                | Clave para cifrar los secretos de la verificación en dos pasos, obligatoria en `prod` | Solo fuera de `prod`                                  |
+| `PAGOS_SIMULACION_HABILITADA`                                                      | Habilita la confirmación simulada de pagos con Yape y Plin                            | `true`, y `false` en `prod`                           |
+| `CORS_ALLOWED_ORIGINS`                                                             | Orígenes permitidos, separados por comas                                              | `http://localhost:4200`                               |
+| `SERVER_PORT`                                                                      | Puerto HTTP de la API dentro del contenedor                                           | `8080`                                                |
+| `JDK_JAVA_OPTIONS`                                                                 | Opciones adicionales de la JVM de la API                                              | `-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError` |
+| `OTEL_SERVICE_NAME`                                                                | Nombre del servicio en las trazas                                                     | `tusalud-api`                                         |
+| `APP_PORT`                                                                         | Puerto de la API en el host, solo en desarrollo                                       | `8080`                                                |
+| `WEB_PORT`                                                                         | Puerto del gateway en el host en desarrollo                                           | `4200`                                                |
+| `GATEWAY_PORT`                                                                     | Puerto HTTP del gateway en el host en producción                                      | `80`                                                  |
+| `GATEWAY_TLS_PORT`                                                                 | Puerto HTTPS del gateway en el host                                                   | `443`, y `4443` en desarrollo                         |
+| `GATEWAY_TLS`                                                                      | Activa HTTPS con los certificados de `GATEWAY_CERTS_DIR`                              | `off`                                                 |
+| `GATEWAY_CERTS_DIR`                                                                | Carpeta con `tls.crt` y `tls.key`                                                     | `docker/gateway/certs`                                |
+| `GATEWAY_SERVER_NAME`                                                              | Nombre de servidor del gateway                                                        | `_`                                                   |
+| `GATEWAY_HTTPS_REDIRECT_PORT`                                                      | Puerto, con los dos puntos, al que redirige el HTTP cuando no es el 443               | Vacío                                                 |
+| `GATEWAY_EXPONER_DOCS`                                                             | Expone Swagger UI y OpenAPI por el gateway                                            | `off`, y `on` en desarrollo y qa                      |
+| `GATEWAY_MAX_BODY_DEFAULT`                                                         | Tamaño máximo de una petición en la API                                               | `1m`                                                  |
+| `GATEWAY_MAX_BODY_UPLOAD`                                                          | Tamaño máximo en las rutas de carga de archivos                                       | `25m`                                                 |
+| `RATE_LOGIN`                                                                       | Límite de intentos de inicio de sesión y cambio de contraseña por dirección           | `10r/m`, y `240r/m` en desarrollo                     |
+| `RATE_REFRESH`                                                                     | Límite de renovaciones del token                                                      | `30r/m`                                               |
+| `RATE_MFA`                                                                         | Límite de verificaciones de la verificación en dos pasos                              | `10r/m`                                               |
+| `RATE_REGISTRO`                                                                    | Límite de registros de pacientes                                                      | `5r/m`                                                |
+| `RATE_VERIFICACION`                                                                | Límite de consultas a la verificación pública de documentos                           | `30r/m`                                               |
+| `RATE_GENERAL`                                                                     | Límite del resto de la API                                                            | `600r/m`, y `12000r/m` en desarrollo                  |
+| `RATE_BURST_AUTH`                                                                  | Ráfaga permitida en las rutas de autenticación                                        | `5`, y `60` en desarrollo                             |
+| `RATE_BURST_GENERAL`                                                               | Ráfaga permitida en el resto de la API                                                | `100`, y `1000` en desarrollo                         |
+| `STORAGE_TIPO`                                                                     | Almacén de archivos, `s3` o `local`                                                   | `local`, y `s3` en `prod` y en Compose                |
+| `STORAGE_ENDPOINT`                                                                 | URL interna de la puerta de enlace S3, obligatoria con `s3`                           | `http://storage:8333` en Compose                      |
+| `STORAGE_ENDPOINT_PUBLICO`                                                         | Host público para firmar direcciones prefirmadas, opcional                            | Vacío                                                 |
+| `STORAGE_ACCESS_KEY`                                                               | Clave de acceso S3, sin valor por defecto en producción                               | Solo en `compose.dev.yaml` y `compose.qa.yaml`        |
+| `STORAGE_SECRET_KEY`                                                               | Clave secreta S3, sin valor por defecto en producción                                 | Solo en `compose.dev.yaml` y `compose.qa.yaml`        |
+| `STORAGE_REGION`                                                                   | Región que firman las peticiones S3                                                   | `us-east-1`                                           |
+| `STORAGE_DIRECTORIO_LOCAL`                                                         | Directorio del almacén con `STORAGE_TIPO=local`                                       | Una carpeta temporal                                  |
+| `TURN_SECRET`                                                                      | Secreto compartido para las credenciales TURN, obligatorio en producción              | Solo en desarrollo y QA                               |
+| `TURN_HOST`                                                                        | Host público del servidor TURN que reciben los navegadores                            | `localhost`                                           |
+| `TURN_PORT`                                                                        | Puerto de coturn                                                                      | `3478`                                                |
+| `TURN_EXTERNAL_IP`                                                                 | Dirección pública del servidor TURN en producción                                     | Vacío                                                 |
+| `TURN_RELAY_MIN`, `TURN_RELAY_MAX`                                                 | Rango de puertos UDP de relé                                                          | `49160` a `49200`                                     |
+| `TELEMEDICINA_VENTANA_ANTES_MIN`                                                   | Minutos antes de la hora en que se habilita la sala                                   | `10`, `43200` en desarrollo                           |
+| `STORAGE_ADMIN_PORT`                                                               | Puerto de la interfaz de SeaweedFS en `127.0.0.1`, solo en desarrollo                 | `9333`                                                |
+| `CANALES_URL_BASE`                                                                 | URL pública de la aplicación que llevan los mensajes, obligatoria en `prod`           | `http://localhost:4200` en desarrollo                 |
+| `CANALES_SECRETO`                                                                  | Secreto para firmar los enlaces de baja y los códigos, obligatorio en `prod`          | Solo en desarrollo y QA                               |
+| `CANALES_WEBHOOK_SECRETO`                                                          | Secreto de la firma del webhook de entrega, sin él se rechaza todo                    | Vacío, y un valor de desarrollo en `compose.dev.yaml` |
+| `CANALES_LIMITE_POR_HORA`                                                          | Máximo de avisos por hora y destinatario en cada canal                                | `10`                                                  |
+| `CANALES_CENTRO`                                                                   | Nombre del centro que firman los mensajes                                             | `TuSalud`                                             |
+| `CANALES_CORREO_PROVEEDOR`                                                         | Proveedor del correo, `smtp` o `simulado`                                             | `simulado`, y `smtp` en desarrollo con Mailpit        |
+| `CANALES_CORREO_REMITENTE`                                                         | Dirección del remitente                                                               | `no-responder@tusalud.local`                          |
+| `SMTP_HOST`, `SMTP_PORT`                                                           | Servidor SMTP que usa la API con `smtp`                                               | `mailpit` y `1025` en desarrollo                      |
+| `SMTP_USUARIO`, `SMTP_CLAVE`                                                       | Credenciales del servidor SMTP                                                        | Vacío                                                 |
+| `CANALES_SMS_PROVEEDOR`                                                            | Proveedor de SMS, `http` o `simulado`                                                 | `simulado`                                            |
+| `CANALES_SMS_URL`, `_AUTENTICACION`, `_USUARIO`, `_SECRETO`, `_FORMATO`, `_CUERPO` | Configuración del proveedor HTTP de SMS                                               | Vacío                                                 |
+| `CANALES_WHATSAPP_PROVEEDOR`                                                       | Proveedor de WhatsApp, `http` o `simulado`                                            | `simulado`                                            |
+| `CANALES_WHATSAPP_URL`, `_SECRETO`, `_CUERPO`                                      | Configuración del proveedor HTTP de WhatsApp                                          | Vacío                                                 |
+| `MAILPIT_UI_PORT`                                                                  | Puerto de Mailpit en el loopback, solo en desarrollo                                  | `8025`                                                |
+| `RESPALDO_TOKEN`                                                                   | Secreto con el que el contenedor de respaldos reporta a la API, obligatorio en `prod` | Solo en desarrollo y QA                               |
+| `RESPALDO_PASSPHRASE`                                                              | Clave con la que se cifran los respaldos, sin ella el contenedor no arranca           | Solo en desarrollo y QA                               |
+| `BACKUP_CRON`, `TEST_CRON`                                                         | Horario del respaldo y de la prueba de restauración                                   | `0 2 * * *` y `30 3 * * 0`                            |
+| `RETENCION_DIARIOS`, `RETENCION_SEMANALES`, `RETENCION_MENSUALES`                  | Cuántos respaldos se conservan de cada categoría                                      | `7`, `4` y `6`                                        |
+| `RESPALDO_REMOTO_ENDPOINT`, `_BUCKET`, `_ACCESS_KEY`, `_SECRET_KEY`                | Segundo destino S3 opcional para los respaldos                                        | Vacío                                                 |
+| `RESPALDOS_MAX_HORAS`, `RESPALDOS_MAX_DIAS_SIN_PRUEBA`                             | Antigüedad máxima de un respaldo y de una prueba antes de alertar                     | `26` y `8`                                            |
+| `POSTGRES_PORT`                                                                    | Puerto de PostgreSQL en el host                                                       | `5432`                                                |
+| `JAEGER_UI_PORT`                                                                   | Puerto de la interfaz de Jaeger en el host                                            | `16686`                                               |
+| `OTEL_GRPC_PORT`                                                                   | Puerto OTLP gRPC del Collector en el host                                             | `4317`                                                |
+| `OTEL_HTTP_PORT`                                                                   | Puerto OTLP HTTP del Collector en el host                                             | `4318`                                                |
+| `OTEL_HEALTH_PORT`                                                                 | Puerto del healthcheck del Collector en el host                                       | `13133`                                               |
+| `PGADMIN_PORT`                                                                     | Puerto de pgAdmin en el host                                                          | `5050`                                                |
+| `PGADMIN_EMAIL`                                                                    | Usuario de pgAdmin                                                                    | `admin@tusalud.com`                                   |
+| `PGADMIN_PASSWORD`                                                                 | Clave de pgAdmin                                                                      | `admin`                                               |
