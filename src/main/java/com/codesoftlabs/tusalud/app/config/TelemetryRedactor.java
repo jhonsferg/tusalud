@@ -63,6 +63,7 @@ public final class TelemetryRedactor {
             + "|documentos(/.*)?"
             + "|exportaciones(/.*)?"
             + "|plantillas(/.*)?"
+            + "|teleconsultas(/.*)?"
             + "|hospitalizacion(/.*)?"
             + "|farmacia(/.*)?"
             + "|seguros(/.*)?"

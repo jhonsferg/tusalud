@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "6b0d7c1e-3f5a-4e1b-9a7c-2d4e8f9a1c01",
     "name": "TuSalud API",
-    "description": "Colección única de pruebas de la API de TuSalud, el sistema de gestión clínica integral: cubre desde la atención ambulatoria hasta los reportes, los documentos y la seguridad operativa. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 26, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
+    "description": "Colección única de pruebas de la API de TuSalud, el sistema de gestión clínica integral: cubre desde la atención ambulatoria hasta los reportes, los documentos y la seguridad operativa. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 27, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -25674,6 +25674,1188 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "27 - Telemedicina",
+      "item": [
+        {
+          "name": "Login del médico de la teleconsulta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"teleMedicoToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.salazar@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médicos para reservar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const garcia = pm.response.json().find(m => /Salazar/.test(m.apellido));",
+                  "pm.test(\"Existe un médico con especialidad\", () => pm.expect(garcia.especialidades).to.not.be.empty);",
+                  "pm.collectionVariables.set(\"teleMedicoId\", garcia.id);",
+                  "pm.collectionVariables.set(\"teleEspecialidadId\", garcia.especialidades[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reservar una cita virtual",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let fecha;",
+                  "do {",
+                  "    fecha = new Date();",
+                  "    fecha.setDate(fecha.getDate() + 2 + Math.floor(Math.random() * 24));",
+                  "} while (fecha.getDay() === 0 || fecha.getDay() === 6);",
+                  "const dos = (n) => String(n).padStart(2, \"0\");",
+                  "const hora = 8 + Math.floor(Math.random() * 4);",
+                  "const minutos = Math.random() < 0.5 ? \"00\" : \"30\";",
+                  "pm.collectionVariables.set(\"teleFechaHora\", fecha.getFullYear() + \"-\" + dos(fecha.getMonth() + 1) + \"-\" + dos(fecha.getDate()) + \"T\" + dos(hora) + \":\" + minutos + \":00\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"La cita es virtual\", () => pm.expect(j.modalidad).to.eql(\"VIRTUAL\"));",
+                  "pm.test(\"El monto es un número\", () => pm.expect(Number(j.monto)).to.be.above(0));",
+                  "pm.collectionVariables.set(\"teleCitaId\", j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": \"{{teleMedicoId}}\",\n  \"especialidadId\": \"{{teleEspecialidadId}}\",\n  \"fechaHora\": \"{{teleFechaHora}}\",\n  \"motivo\": \"Teleconsulta de control\",\n  \"modalidad\": \"VIRTUAL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mis teleconsultas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const t = pm.response.json().find(x => x.citaId === pm.collectionVariables.get(\"teleCitaId\"));",
+                  "pm.test(\"Existe la teleconsulta de la cita\", () => pm.expect(t).to.exist);",
+                  "pm.test(\"Está programada y es del paciente\", () => {",
+                  "    pm.expect(t.estado).to.eql(\"PROGRAMADA\");",
+                  "    pm.expect(t.rol).to.eql(\"PACIENTE\");",
+                  "    pm.expect(t.consentimientoPendiente).to.be.true;",
+                  "});",
+                  "pm.collectionVariables.set(\"teleconsultaId\", t.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/mias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "teleconsultas", "mias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Teleconsultas del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Incluye la teleconsulta\", () => pm.expect(pm.response.json().some(t => t.id === pm.collectionVariables.get(\"teleconsultaId\"))).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/medico",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "teleconsultas", "medico"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teleMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Detalle de la teleconsulta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"No expone la sala ni datos del otro participante\", () => {",
+                  "    pm.expect(j).to.not.have.property(\"sala\");",
+                  "    pm.expect(JSON.stringify(j)).to.not.match(/dni|email/i);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "teleconsultas", "{{teleconsultaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sin token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "teleconsultas", "{{teleconsultaId}}"]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Id que no es UUID (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/no-es-uuid",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "teleconsultas", "no-es-uuid"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente no accede (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "teleconsultas", "{{teleconsultaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{paciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro médico no accede (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "teleconsultas", "{{teleconsultaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medico2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador no accede (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "teleconsultas", "{{teleconsultaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ticket sin consentimiento (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}/ticket",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "teleconsultas",
+                "{{teleconsultaId}}",
+                "ticket"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Consentimiento vigente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Trae versión y texto y aún no está aceptado\", () => {",
+                  "    pm.expect(j.version).to.be.a(\"string\");",
+                  "    pm.expect(j.texto).to.include(\"graba\");",
+                  "    pm.expect(j.aceptado).to.be.false;",
+                  "});",
+                  "pm.collectionVariables.set(\"teleVersionConsentimiento\", j.version);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/consentimiento",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "teleconsultas", "consentimiento"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Versión de consentimiento inválida (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/consentimiento",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "teleconsultas", "consentimiento"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"version\": \"9.9\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no acepta consentimientos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/consentimiento",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "teleconsultas", "consentimiento"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teleMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"version\": \"1.0\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Aceptar el consentimiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Queda aceptado\", () => pm.expect(pm.response.json().aceptado).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/consentimiento",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "teleconsultas", "consentimiento"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"version\": \"{{teleVersionConsentimiento}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ticket del paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Ticket de 30 segundos hacia el canal de señalización\", () => {",
+                  "    pm.expect(j.ticket).to.have.length.above(30);",
+                  "    pm.expect(j.expiraEnSegundos).to.eql(30);",
+                  "    pm.expect(j.ruta).to.eql(\"/ws/teleconsulta\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}/ticket",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "teleconsultas",
+                "{{teleconsultaId}}",
+                "ticket"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ticket del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}/ticket",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "teleconsultas",
+                "{{teleconsultaId}}",
+                "ticket"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teleMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro médico no obtiene ticket (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}/ticket",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "teleconsultas",
+                "{{teleconsultaId}}",
+                "ticket"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{medico2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Servidores ICE con credenciales temporales",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "const turn = j.iceServers.find(s => s.username);",
+                  "pm.test(\"Incluye STUN y TURN con credencial que caduca\", () => {",
+                  "    pm.expect(j.iceServers.length).to.be.at.least(2);",
+                  "    pm.expect(turn.username).to.match(/^\\d+:/);",
+                  "    pm.expect(turn.credential).to.be.a(\"string\");",
+                  "    pm.expect(Number(turn.username.split(\":\")[0])).to.be.above(Math.floor(Date.now() / 1000));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}/ice",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "teleconsultas",
+                "{{teleconsultaId}}",
+                "ice"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no abre la sala (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}/abrir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "teleconsultas",
+                "{{teleconsultaId}}",
+                "abrir"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico abre la sala",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Sala abierta\", () => pm.expect(pm.response.json().estado).to.eql(\"SALA_ABIERTA\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}/abrir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "teleconsultas",
+                "{{teleconsultaId}}",
+                "abrir"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teleMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no ve el resumen del paciente (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}/resumen-paciente",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "teleconsultas",
+                "{{teleconsultaId}}",
+                "resumen-paciente"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico ve el resumen mínimo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Trae nombre y motivo\", () => {",
+                  "    const j = pm.response.json();",
+                  "    pm.expect(j.pacienteNombre).to.be.a(\"string\");",
+                  "    pm.expect(j.motivo).to.include(\"Teleconsulta\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}/resumen-paciente",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "teleconsultas",
+                "{{teleconsultaId}}",
+                "resumen-paciente"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teleMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no finaliza (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}/finalizar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "teleconsultas",
+                "{{teleconsultaId}}",
+                "finalizar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico finaliza la teleconsulta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Finalizada\", () => pm.expect(pm.response.json().estado).to.eql(\"FINALIZADA\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}/finalizar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "teleconsultas",
+                "{{teleconsultaId}}",
+                "finalizar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teleMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finalizar otra vez (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}/finalizar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "teleconsultas",
+                "{{teleconsultaId}}",
+                "finalizar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{teleMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sin ingreso tras finalizar (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/teleconsultas/{{teleconsultaId}}/ticket",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "teleconsultas",
+                "{{teleconsultaId}}",
+                "ticket"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{nuevoPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -26307,6 +27489,34 @@
     },
     {
       "key": "aseguradoraDemoId",
+      "value": ""
+    },
+    {
+      "key": "teleMedicoId",
+      "value": ""
+    },
+    {
+      "key": "teleEspecialidadId",
+      "value": ""
+    },
+    {
+      "key": "teleFechaHora",
+      "value": ""
+    },
+    {
+      "key": "teleCitaId",
+      "value": ""
+    },
+    {
+      "key": "teleconsultaId",
+      "value": ""
+    },
+    {
+      "key": "teleVersionConsentimiento",
+      "value": ""
+    },
+    {
+      "key": "teleMedicoToken",
       "value": ""
     }
   ]

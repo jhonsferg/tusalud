@@ -14,6 +14,7 @@ import com.codesoftlabs.tusalud.app.entities.Paciente;
 import com.codesoftlabs.tusalud.app.entities.Pago;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoCita;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoPago;
+import com.codesoftlabs.tusalud.app.entities.enums.ModalidadCita;
 import com.codesoftlabs.tusalud.app.entities.enums.RolNombre;
 import com.codesoftlabs.tusalud.app.entities.enums.TipoNotificacion;
 import com.codesoftlabs.tusalud.app.exceptions.BusinessLogicException;
@@ -31,6 +32,8 @@ import com.codesoftlabs.tusalud.app.security.TextoSeguro;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
 import com.codesoftlabs.tusalud.app.services.interfaces.CitaService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
+import com.codesoftlabs.tusalud.app.services.interfaces.TeleconsultaService;
+import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -78,6 +81,7 @@ public class CitaServiceImpl implements CitaService {
     private final EventoCalendarioRepository eventoRepository;
     private final NotificacionService notificacionService;
     private final CitaResponseMapper citaMapper;
+    private final TeleconsultaService teleconsultaService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -106,16 +110,25 @@ public class CitaServiceImpl implements CitaService {
 
         validarDisponibilidad(medico, paciente, fechaHora, NINGUNA_CITA);
 
+        ModalidadCita modalidad = request.modalidad() == null ? ModalidadCita.PRESENCIAL : request.modalidad();
+        BigDecimal monto = modalidad == ModalidadCita.VIRTUAL && especialidad.getPrecioVirtual() != null
+                ? especialidad.getPrecioVirtual()
+                : especialidad.getPrecioConsulta();
+
         Cita cita = Cita.builder()
                 .fechaHora(fechaHora)
                 .motivo(request.motivo().trim())
                 .estado(EstadoCita.PENDIENTE)
-                .monto(especialidad.getPrecioConsulta())
+                .monto(monto)
+                .modalidad(modalidad)
                 .especialidad(especialidad)
                 .medico(medico)
                 .paciente(paciente)
                 .build();
         cita = citaRepository.save(cita);
+        if (modalidad == ModalidadCita.VIRTUAL) {
+            teleconsultaService.crearParaCita(cita);
+        }
 
         String fecha = fechaHora.format(FORMATO_FECHA);
         notificacionService.crear(

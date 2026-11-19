@@ -1,6 +1,7 @@
 package com.codesoftlabs.tusalud.app.entities;
 
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoCita;
+import com.codesoftlabs.tusalud.app.entities.enums.ModalidadCita;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -49,6 +50,11 @@ public class Cita {
 
     @Column(nullable = false, length = 500)
     private String motivo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 12)
+    @Builder.Default
+    private ModalidadCita modalidad = ModalidadCita.PRESENCIAL;
 
     @Column(name = "motivo_cancelacion", length = 300)
     private String motivoCancelacion;

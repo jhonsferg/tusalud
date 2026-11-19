@@ -1,5 +1,6 @@
 package com.codesoftlabs.tusalud.app.dto.request;
 
+import com.codesoftlabs.tusalud.app.entities.enums.ModalidadCita;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
@@ -25,4 +26,12 @@ public record CitaCreateRequest(
 
         @Schema(example = "1", description = "Especialidad de la consulta; debe pertenecer al médico")
         @NotNull(message = "La especialidad es obligatoria")
-        UUID especialidadId) {}
+        UUID especialidadId,
+
+        @Schema(example = "PRESENCIAL", description = "PRESENCIAL por defecto o VIRTUAL para una teleconsulta")
+        ModalidadCita modalidad) {
+
+    public CitaCreateRequest(UUID medicoId, LocalDateTime fechaHora, String motivo, UUID especialidadId) {
+        this(medicoId, fechaHora, motivo, especialidadId, null);
+    }
+}

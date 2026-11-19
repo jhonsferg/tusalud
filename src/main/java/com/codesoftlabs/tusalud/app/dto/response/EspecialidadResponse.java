@@ -15,13 +15,15 @@ public record EspecialidadResponse(
         @Schema(example = "Diagnóstico y tratamiento de enfermedades del corazón")
         String descripcion,
 
-        @Schema(example = "150.00") BigDecimal precioConsulta) {
+        @Schema(example = "150.00") BigDecimal precioConsulta,
+        @Schema(example = "120.00") BigDecimal precioVirtual) {
 
     public static EspecialidadResponse from(Especialidad especialidad) {
         return new EspecialidadResponse(
                 especialidad.getId(),
                 especialidad.getNombre(),
                 especialidad.getDescripcion(),
-                especialidad.getPrecioConsulta());
+                especialidad.getPrecioConsulta(),
+                especialidad.getPrecioVirtual());
     }
 }

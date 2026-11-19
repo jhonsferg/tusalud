@@ -10,6 +10,8 @@ services:
       PAGOS_SIMULACION_HABILITADA: ${PAGOS_SIMULACION_HABILITADA:-true}
       STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:-tusalud-dev-access}
       STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-tusalud-dev-secret-0123456789}
+      TURN_SECRET: ${TURN_SECRET:-secreto-turn-solo-desarrollo}
+      TELEMEDICINA_VENTANA_ANTES_MIN: ${TELEMEDICINA_VENTANA_ANTES_MIN:-43200}
       OTEL_RESOURCE_ATTRIBUTES: service.namespace=tusalud,deployment.environment.name=dev
     ports:
       - "${APP_PORT:-8080}:8080"
@@ -20,6 +22,25 @@ services:
       STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:-tusalud-dev-secret-0123456789}
     ports:
       - "127.0.0.1:${STORAGE_ADMIN_PORT:-9333}:9333"
+
+  turn:
+    command:
+      - "--log-file=stdout"
+      - "--realm=tusalud"
+      - "--use-auth-secret"
+      - "--static-auth-secret=${TURN_SECRET:-secreto-turn-solo-desarrollo}"
+      - "--listening-port=3478"
+      - "--min-port=49160"
+      - "--max-port=49200"
+      - "--fingerprint"
+      - "--no-cli"
+      - "--no-tls"
+      - "--no-dtls"
+      - "--no-multicast-peers"
+      - "--no-tcp-relay"
+    ports: !override
+      - "${TURN_PORT:-3478}:3478/udp"
+      - "${TURN_PORT:-3478}:3478/tcp"
 
   web:
     build:

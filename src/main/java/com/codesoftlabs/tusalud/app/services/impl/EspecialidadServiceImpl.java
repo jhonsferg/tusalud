@@ -45,6 +45,7 @@ public class EspecialidadServiceImpl implements EspecialidadService {
                 .nombre(nombre)
                 .descripcion(limpiar(request.descripcion()))
                 .precioConsulta(request.precioConsulta())
+                .precioVirtual(request.precioVirtual())
                 .build();
         especialidad = especialidadRepository.save(especialidad);
         log.info("Especialidad creada: {} (id {})", nombre, especialidad.getId());
@@ -62,6 +63,7 @@ public class EspecialidadServiceImpl implements EspecialidadService {
         especialidad.setNombre(nombre);
         especialidad.setDescripcion(limpiar(request.descripcion()));
         especialidad.setPrecioConsulta(request.precioConsulta());
+        especialidad.setPrecioVirtual(request.precioVirtual());
         log.info("Especialidad actualizada: id {}", id);
         return EspecialidadResponse.from(especialidad);
     }

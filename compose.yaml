@@ -72,6 +72,12 @@ services:
       JWT_REFRESH_EXPIRATION_MS: ${JWT_REFRESH_EXPIRATION_MS:-604800000}
       MFA_CLAVE_CIFRADO: ${MFA_CLAVE_CIFRADO:-}
       PAGOS_SIMULACION_HABILITADA: ${PAGOS_SIMULACION_HABILITADA:-false}
+      TURN_HOST: ${TURN_HOST:-localhost}
+      TURN_PORT: ${TURN_PORT:-3478}
+      TURN_SECRET: ${TURN_SECRET:-}
+      TURN_HABILITADO: ${TURN_HABILITADO:-true}
+      TELEMEDICINA_VENTANA_ANTES_MIN: ${TELEMEDICINA_VENTANA_ANTES_MIN:-10}
+      TELEMEDICINA_VENTANA_DESPUES_MIN: ${TELEMEDICINA_VENTANA_DESPUES_MIN:-30}
       STORAGE_TIPO: s3
       STORAGE_ENDPOINT: http://storage:8333
       STORAGE_REGION: ${STORAGE_REGION:-us-east-1}
@@ -134,6 +140,34 @@ services:
     restart: unless-stopped
     expose:
       - "8080"
+
+  turn:
+    image: coturn/coturn:4.7.0-alpine
+    container_name: tusalud-turn
+    restart: unless-stopped
+    command:
+      - "--log-file=stdout"
+      - "--realm=tusalud"
+      - "--use-auth-secret"
+      - "--static-auth-secret=${TURN_SECRET:-}"
+      - "--listening-port=3478"
+      - "--min-port=${TURN_RELAY_MIN:-49160}"
+      - "--max-port=${TURN_RELAY_MAX:-49200}"
+      - "--fingerprint"
+      - "--no-cli"
+      - "--no-tls"
+      - "--no-dtls"
+      - "--no-multicast-peers"
+      - "--no-tcp-relay"
+      - "--denied-peer-ip=0.0.0.0-0.255.255.255"
+      - "--denied-peer-ip=127.0.0.0-127.255.255.255"
+      - "--denied-peer-ip=169.254.0.0-169.254.255.255"
+      - "--denied-peer-ip=100.64.0.0-100.127.255.255"
+      - "--external-ip=${TURN_EXTERNAL_IP:-}"
+    ports:
+      - "${TURN_PORT:-3478}:3478/udp"
+      - "${TURN_PORT:-3478}:3478/tcp"
+      - "${TURN_RELAY_MIN:-49160}-${TURN_RELAY_MAX:-49200}:${TURN_RELAY_MIN:-49160}-${TURN_RELAY_MAX:-49200}/udp"
 
   gateway:
     build:

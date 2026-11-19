@@ -5,6 +5,7 @@ import com.codesoftlabs.tusalud.app.entities.Medico;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoCita;
 import com.codesoftlabs.tusalud.app.entities.enums.EstadoPago;
+import com.codesoftlabs.tusalud.app.entities.enums.ModalidadCita;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -62,7 +63,9 @@ public record CitaResponse(
         boolean conflicto,
 
         @Schema(example = "Viaje imprevisto", description = "Motivo de la cancelación, solo en citas canceladas")
-        String motivoCancelacion) {
+        String motivoCancelacion,
+
+        @Schema(example = "PRESENCIAL") ModalidadCita modalidad) {
 
     private static final int DURACION_POR_DEFECTO = 30;
 
@@ -94,6 +97,7 @@ public record CitaResponse(
                 pagado,
                 duracionMinutos,
                 false,
-                cita.getEstado() == EstadoCita.CANCELADA ? cita.getMotivoCancelacion() : null);
+                cita.getEstado() == EstadoCita.CANCELADA ? cita.getMotivoCancelacion() : null,
+                cita.getModalidad());
     }
 }

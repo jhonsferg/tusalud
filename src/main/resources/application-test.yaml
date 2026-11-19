@@ -16,6 +16,9 @@ spring:
       path: /h2-console
 
 app:
+  telemedicina:
+    turn:
+      secreto: ${TURN_SECRET:secreto-turn-solo-desarrollo}
   documentos:
     sincronico: true
   jwt:

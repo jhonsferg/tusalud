@@ -38,4 +38,7 @@ public class Especialidad {
 
     @Column(name = "precio_consulta", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioConsulta;
+
+    @Column(name = "precio_virtual", precision = 10, scale = 2)
+    private BigDecimal precioVirtual;
 }

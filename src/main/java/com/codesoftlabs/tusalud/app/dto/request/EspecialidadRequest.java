@@ -23,4 +23,14 @@ public record EspecialidadRequest(
         @NotNull(message = "El precio de la consulta es obligatorio")
         @DecimalMin(value = "0.0", inclusive = false, message = "El precio debe ser mayor a 0")
         @Digits(integer = 8, fraction = 2, message = "El precio admite como máximo 8 enteros y 2 decimales")
-        BigDecimal precioConsulta) {}
+        BigDecimal precioConsulta,
+
+        @Schema(example = "120.00", description = "Precio de la teleconsulta; si falta se cobra el de la consulta")
+        @DecimalMin(value = "0.0", inclusive = false, message = "El precio virtual debe ser mayor a 0")
+        @Digits(integer = 8, fraction = 2, message = "El precio virtual admite como máximo 8 enteros y 2 decimales")
+        BigDecimal precioVirtual) {
+
+    public EspecialidadRequest(String nombre, String descripcion, BigDecimal precioConsulta) {
+        this(nombre, descripcion, precioConsulta, null);
+    }
+}

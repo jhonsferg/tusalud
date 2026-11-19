@@ -16,6 +16,9 @@ spring:
     show-sql: false
 
 app:
+  telemedicina:
+    turn:
+      secreto: ${TURN_SECRET:secreto-turn-solo-desarrollo}
   jwt:
     secret: ${JWT_SECRET:7M+c4b4GZSekiWHhQKtFdWMk3BbcEwa1YQ0PqmCFie75dy5ko50rildSWFTsI18NTxineFm3/IIKY1lyrZn89g==}
 

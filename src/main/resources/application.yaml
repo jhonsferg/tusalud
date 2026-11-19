@@ -58,6 +58,19 @@ app:
   pagos:
     simulacion-habilitada: ${PAGOS_SIMULACION_HABILITADA:true}
     expiracion-qr-minutos: 5
+  telemedicina:
+    ventana-antes-min: ${TELEMEDICINA_VENTANA_ANTES_MIN:10}
+    ventana-despues-min: ${TELEMEDICINA_VENTANA_DESPUES_MIN:30}
+    ticket-ttl-seg: 30
+    version-consentimiento: "1.0"
+    max-mensajes-por-ventana: 120
+    inactividad-seg: 90
+    turn:
+      habilitado: ${TURN_HABILITADO:true}
+      host: ${TURN_HOST:localhost}
+      puerto: ${TURN_PORT:3478}
+      secreto: ${TURN_SECRET:}
+      ttl-seg: 3600
   documentos:
     retencion-exportaciones: ${DOCUMENTOS_RETENCION:7d}
     maximo-concurrentes: 3
