@@ -126,6 +126,55 @@ public enum TipoDocumento {
             Set.of(FormatoDocumento.XLSX),
             false,
             EnumSet.of(RolNombre.ROLE_RRHH, RolNombre.ROLE_ADMIN)),
+    CERTIFICADO_MEDICO(
+            "certificado-medico",
+            "certificado-medico",
+            false,
+            Set.of(FormatoDocumento.PDF),
+            true,
+            EnumSet.of(RolNombre.ROLE_MEDICO, RolNombre.ROLE_PACIENTE)),
+    DESCANSO_MEDICO(
+            "descanso-medico",
+            "descanso-medico",
+            false,
+            Set.of(FormatoDocumento.PDF),
+            true,
+            EnumSet.of(RolNombre.ROLE_MEDICO, RolNombre.ROLE_PACIENTE)),
+    INFORME_MEDICO(
+            "informe-medico",
+            "informe-medico",
+            false,
+            Set.of(FormatoDocumento.PDF),
+            true,
+            EnumSet.of(RolNombre.ROLE_MEDICO, RolNombre.ROLE_PACIENTE)),
+    REFERENCIA_MEDICA(
+            "referencia-medica",
+            "referencia-medica",
+            false,
+            Set.of(FormatoDocumento.PDF),
+            true,
+            EnumSet.of(RolNombre.ROLE_MEDICO, RolNombre.ROLE_PACIENTE)),
+    CONTRARREFERENCIA_MEDICA(
+            "contrarreferencia-medica",
+            "contrarreferencia-medica",
+            false,
+            Set.of(FormatoDocumento.PDF),
+            true,
+            EnumSet.of(RolNombre.ROLE_MEDICO, RolNombre.ROLE_PACIENTE)),
+    EPICRISIS(
+            "epicrisis",
+            "epicrisis",
+            false,
+            Set.of(FormatoDocumento.PDF),
+            true,
+            EnumSet.of(RolNombre.ROLE_MEDICO, RolNombre.ROLE_PACIENTE)),
+    CONSENTIMIENTO(
+            "consentimiento",
+            "consentimiento",
+            false,
+            Set.of(FormatoDocumento.PDF),
+            true,
+            EnumSet.of(RolNombre.ROLE_MEDICO, RolNombre.ROLE_PACIENTE)),
     MIS_CITAS("mis-citas", null, false, Set.of(FormatoDocumento.XLSX), false, EnumSet.of(RolNombre.ROLE_MEDICO));
 
     private final String codigo;
@@ -172,6 +221,19 @@ public enum TipoDocumento {
 
     public Set<RolNombre> roles() {
         return roles;
+    }
+
+    public boolean autonomo() {
+        return switch (this) {
+            case CERTIFICADO_MEDICO,
+                    DESCANSO_MEDICO,
+                    INFORME_MEDICO,
+                    REFERENCIA_MEDICA,
+                    CONTRARREFERENCIA_MEDICA,
+                    EPICRISIS,
+                    CONSENTIMIENTO -> true;
+            default -> false;
+        };
     }
 
     public boolean esReporte() {

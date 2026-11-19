@@ -15,7 +15,9 @@ public enum PropositoArchivo {
                     TipoContenido.XLSX,
                     TipoContenido.CSV)),
     REPORTE(25 * 1024 * 1024, Set.of(TipoContenido.PDF, TipoContenido.XLSX, TipoContenido.DOCX, TipoContenido.CSV)),
-    PLANTILLA(2 * 1024 * 1024, Set.of(TipoContenido.JRXML, TipoContenido.XLSX, TipoContenido.DOCX));
+    PLANTILLA(2 * 1024 * 1024, Set.of(TipoContenido.JRXML, TipoContenido.XLSX, TipoContenido.DOCX)),
+    FIRMA_CONSENTIMIENTO(512 * 1024, Set.of(TipoContenido.PNG)),
+    DOCUMENTO_CLINICO(10 * 1024 * 1024, Set.of(TipoContenido.PDF));
 
     private final long tamanoMaximo;
     private final Set<TipoContenido> tiposPermitidos;
@@ -40,6 +42,7 @@ public enum PropositoArchivo {
             case DOCUMENTO_PACIENTE -> buckets.documentos();
             case REPORTE -> buckets.reportes();
             case PLANTILLA -> buckets.plantillas();
+            case FIRMA_CONSENTIMIENTO, DOCUMENTO_CLINICO -> buckets.documentos();
         };
     }
 }

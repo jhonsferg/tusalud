@@ -96,6 +96,9 @@ public class DocumentoServiceImpl implements DocumentoService {
 
     @Override
     public void exigirPermiso(UsuarioPrincipal actor, TipoDocumento tipo, FormatoDocumento formato) {
+        if (tipo.autonomo()) {
+            throw new DatosInvalidosException("Este documento se emite desde su módulo");
+        }
         boolean permitido =
                 tipo.roles().stream().anyMatch(rol -> actor.getRoles().contains(rol.name()));
         if (!permitido) {

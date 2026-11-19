@@ -250,7 +250,7 @@ class DocumentosSeguridadTest {
         }
         mockMvc.perform(get("/api/v1/plantillas").header(HttpHeaders.AUTHORIZATION, tokenAdmin))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(12)));
+                .andExpect(jsonPath("$.length()", is(19)));
         mockMvc.perform(get("/api/v1/plantillas/receta/descargar").header(HttpHeaders.AUTHORIZATION, tokenAdmin))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("jasperReport")));

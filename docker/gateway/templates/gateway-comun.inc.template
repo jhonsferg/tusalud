@@ -139,6 +139,12 @@ location ~ ^/api/v1/auth/mfa/(verificar|activar|desactivar|codigos-recuperacion/
     include /etc/nginx/conf.d/proxy-api.inc;
 }
 
+location ~ ^/api/v1/verificacion/ {
+    limit_req zone=verificacion burst=${RATE_BURST_AUTH} nodelay;
+    include /etc/nginx/conf.d/cabeceras.inc;
+    include /etc/nginx/conf.d/proxy-api.inc;
+}
+
 location = /api/v1/perfil/password {
     limit_req zone=login burst=${RATE_BURST_AUTH} nodelay;
     include /etc/nginx/conf.d/cabeceras.inc;

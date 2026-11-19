@@ -23,6 +23,7 @@
         <springdoc.version>3.1.1</springdoc.version>
         <aws-sdk.version>2.59.3</aws-sdk.version>
         <jasperreports.version>7.1.1</jasperreports.version>
+        <zxing.version>3.5.3</zxing.version>
         <poi.version>5.5.1</poi.version>
         <spotless.version>3.10.4</spotless.version>
         <palantir-java-format.version>2.102.0</palantir-java-format.version>
@@ -107,6 +108,11 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>${zxing.version}</version>
         </dependency>
         <dependency>
             <groupId>net.sf.jasperreports</groupId>

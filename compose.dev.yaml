@@ -57,6 +57,7 @@ services:
       RATE_REFRESH: 240r/m
       RATE_MFA: 240r/m
       RATE_REGISTRO: 240r/m
+      RATE_VERIFICACION: 240r/m
       RATE_GENERAL: 12000r/m
       RATE_BURST_AUTH: "60"
       RATE_BURST_GENERAL: "1000"

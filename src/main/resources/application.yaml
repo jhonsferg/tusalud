@@ -71,6 +71,11 @@ app:
       puerto: ${TURN_PORT:3478}
       secreto: ${TURN_SECRET:}
       ttl-seg: 3600
+  documentos-medicos:
+    url-verificacion: ${DOCUMENTOS_URL_VERIFICACION:http://localhost:4600/verificar/}
+    descanso-max-dias: ${DESCANSO_MAX_DIAS:30}
+    descanso-retroactivo-dias: ${DESCANSO_RETROACTIVO_DIAS:3}
+    verificacion-por-minuto: ${VERIFICACION_POR_MINUTO:20}
   documentos:
     retencion-exportaciones: ${DOCUMENTOS_RETENCION:7d}
     maximo-concurrentes: 3

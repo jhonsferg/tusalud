@@ -6,6 +6,7 @@ limit_req_zone ${RATE_KEY} zone=login:10m rate=${RATE_LOGIN};
 limit_req_zone ${RATE_KEY} zone=refresh:10m rate=${RATE_REFRESH};
 limit_req_zone ${RATE_KEY} zone=mfa:10m rate=${RATE_MFA};
 limit_req_zone ${RATE_KEY} zone=registro:10m rate=${RATE_REGISTRO};
+limit_req_zone ${RATE_KEY} zone=verificacion:10m rate=${RATE_VERIFICACION};
 limit_req_zone ${RATE_KEY} zone=general:20m rate=${RATE_GENERAL};
 limit_req_status 429;
 limit_req_log_level warn;
