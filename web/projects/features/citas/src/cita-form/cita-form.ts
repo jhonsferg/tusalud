@@ -15,6 +15,7 @@ import { Router, RouterLink } from '@angular/router';
 import { startWith } from 'rxjs';
 import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';
+import { SelectButton } from 'primeng/selectbutton';
 import { Textarea } from 'primeng/textarea';
 
 import {
@@ -25,6 +26,7 @@ import {
   combineDateAndTime,
   EspecialidadesStore,
   MedicosStore,
+  ModalidadCita,
   NotificationService,
   optionalIdAttribute,
   parseIsoDate,
@@ -52,6 +54,7 @@ const MOTIVO_MAX = 500;
     RouterLink,
     Button,
     Select,
+    SelectButton,
     Calendario,
     Textarea,
     FormField,
@@ -83,10 +86,26 @@ export class CitaForm {
     fecha: [null as Date | null, [Validators.required]],
     hora: [null as string | null, [Validators.required]],
     motivo: ['', [Validators.required, AppValidators.notBlank, Validators.maxLength(MOTIVO_MAX)]],
+    modalidad: ['PRESENCIAL' as ModalidadCita],
   });
+
+  protected readonly modalidades = [
+    { label: 'Presencial', value: 'PRESENCIAL' },
+    { label: 'Teleconsulta', value: 'VIRTUAL' },
+  ];
 
   private readonly valores = toSignal(this.form.valueChanges.pipe(startWith(this.form.value)), {
     initialValue: this.form.value,
+  });
+
+  protected readonly precioReserva = computed(() => {
+    const especialidad = this.especialidadElegida();
+    if (!especialidad) {
+      return 0;
+    }
+    return this.valores().modalidad === 'VIRTUAL' && especialidad.precioVirtual
+      ? especialidad.precioVirtual
+      : especialidad.precioConsulta;
   });
 
   protected readonly opcionesEspecialidad = computed(() =>
@@ -274,6 +293,7 @@ export class CitaForm {
         especialidadId: valor.especialidadId!,
         fechaHora,
         motivo: valor.motivo!.trim(),
+        modalidad: valor.modalidad ?? 'PRESENCIAL',
       })
       .subscribe({
         next: (cita) => {

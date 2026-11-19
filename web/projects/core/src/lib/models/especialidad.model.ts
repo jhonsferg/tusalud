@@ -3,10 +3,12 @@ export interface EspecialidadResponse {
   nombre: string;
   descripcion?: string | null;
   precioConsulta: number;
+  precioVirtual?: number | null;
 }
 
 export interface EspecialidadRequest {
   nombre: string;
   descripcion?: string | null;
   precioConsulta: number;
+  precioVirtual?: number | null;
 }

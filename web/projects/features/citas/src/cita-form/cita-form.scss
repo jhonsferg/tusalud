@@ -108,3 +108,15 @@ form {
 .req {
   color: var(--p-red-500);
 }
+
+.modalidad {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+
+  .etiqueta-modalidad {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+}

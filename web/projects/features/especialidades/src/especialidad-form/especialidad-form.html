@@ -28,6 +28,25 @@
       </app-form-field>
 
       <app-form-field
+        label="Precio de teleconsulta"
+        [control]="form.controls.precioVirtual"
+        inputId="esp-precio-virtual"
+        hint="Opcional. Si lo dejas vacío, la teleconsulta cuesta lo mismo que la consulta presencial."
+      >
+        <p-inputnumber
+          inputId="esp-precio-virtual"
+          formControlName="precioVirtual"
+          mode="currency"
+          currency="PEN"
+          locale="es-PE"
+          [min]="0"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          [fluid]="true"
+        />
+      </app-form-field>
+
+      <app-form-field
         label="Precio de consulta"
         [control]="form.controls.precioConsulta"
         inputId="esp-precio"

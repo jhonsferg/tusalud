@@ -56,6 +56,7 @@ export class EspecialidadForm {
     nombre: ['', [Validators.required, AppValidators.notBlank, Validators.maxLength(80)]],
     descripcion: ['', [Validators.maxLength(255)]],
     precioConsulta: [null as number | null, [Validators.required, Validators.min(0.01)]],
+    precioVirtual: [null as number | null, [Validators.min(0.01)]],
   });
 
   constructor() {
@@ -72,6 +73,7 @@ export class EspecialidadForm {
           nombre: actual.nombre,
           descripcion: actual.descripcion ?? '',
           precioConsulta: actual.precioConsulta,
+          precioVirtual: actual.precioVirtual ?? null,
         });
       }
     });
@@ -82,11 +84,12 @@ export class EspecialidadForm {
       this.form.markAllAsTouched();
       return;
     }
-    const { nombre, descripcion, precioConsulta } = this.form.getRawValue();
+    const { nombre, descripcion, precioConsulta, precioVirtual } = this.form.getRawValue();
     const request = {
       nombre: nombre.trim(),
       descripcion: descripcion.trim() || null,
       precioConsulta: precioConsulta!,
+      precioVirtual: precioVirtual ?? null,
     };
     const id = this.id();
     this.submitting.set(true);

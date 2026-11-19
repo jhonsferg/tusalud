@@ -24,6 +24,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         roles: ['ROLE_MEDICO'],
       },
       {
+        label: 'Teleconsultas',
+        icon: 'pi-video',
+        link: '/teleconsultas',
+        roles: ['ROLE_MEDICO'],
+      },
+      {
         label: 'Calendario',
         icon: 'pi-calendar-plus',
         link: '/calendario',

@@ -51,6 +51,11 @@ export const routes: Routes = [
           import('@tusalud/features/laboratorio').then((m) => m.LABORATORIO_ROUTES),
       },
       {
+        path: 'teleconsultas',
+        loadChildren: () =>
+          import('@tusalud/features/telemedicina').then((m) => m.TELECONSULTAS_ROUTES),
+      },
+      {
         path: 'imagenes',
         loadChildren: () => import('@tusalud/features/imagenes').then((m) => m.IMAGENES_ROUTES),
       },

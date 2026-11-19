@@ -18,6 +18,7 @@ import { PAGOS_ROUTES } from '@tusalud/features/pagos';
 import { PERFIL_ROUTES } from '@tusalud/features/perfil';
 import { COLA_ROUTES, RECEPCION_ROUTES } from '@tusalud/features/recepcion';
 import { REPORTES_ROUTES } from '@tusalud/features/reportes';
+import { TELECONSULTAS_ROUTES } from '@tusalud/features/telemedicina';
 import { MI_ESPACIO_ROUTES, RRHH_ROUTES } from '@tusalud/features/rrhh';
 import {
   SEGUROS_FINANZAS_ROUTES,
@@ -41,6 +42,7 @@ const DOMINIOS: Record<string, Routes> = {
   HOSPITALIZACION_ROUTES,
   MIS_INGRESOS_ROUTES,
   IMAGENES_ROUTES,
+  TELECONSULTAS_ROUTES,
   ESTUDIOS_ROUTES,
   LABORATORIO_ROUTES,
   RESULTADOS_ROUTES,

@@ -3,6 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 
 import { ArchivosApiService } from './archivos-api.service';
+import { TeleconsultaApiService } from './teleconsulta-api.service';
 import { AuditoriaApiService } from './auditoria-api.service';
 import { AuthApiService } from './auth-api.service';
 import { CitasApiService } from './citas-api.service';
@@ -1047,5 +1048,37 @@ describe('servicios de la API', () => {
     });
     api.resumen().subscribe();
     expectRequest({ method: 'GET', url: '/api/v1/seguros/resumen' });
+  });
+
+  it('TeleconsultaApiService cubre consentimiento, ticket, ICE y control de la sala', () => {
+    const api = TestBed.inject(TeleconsultaApiService);
+    api.mias().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/teleconsultas/mias' });
+    api.delMedico('2026-11-20').subscribe();
+    expectRequest({
+      method: 'GET',
+      url: '/api/v1/teleconsultas/medico',
+      params: { desde: '2026-11-20' },
+    });
+    api.obtener(u(1)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/teleconsultas/${u(1)}` });
+    api.consentimiento().subscribe();
+    expectRequest({ method: 'GET', url: '/api/v1/teleconsultas/consentimiento' });
+    api.aceptarConsentimiento('1.0').subscribe();
+    expectRequest({
+      method: 'POST',
+      url: '/api/v1/teleconsultas/consentimiento',
+      body: { version: '1.0' },
+    });
+    api.abrir(u(1)).subscribe();
+    expectRequest({ method: 'POST', url: `/api/v1/teleconsultas/${u(1)}/abrir`, body: {} });
+    api.ticket(u(1)).subscribe();
+    expectRequest({ method: 'POST', url: `/api/v1/teleconsultas/${u(1)}/ticket`, body: {} });
+    api.ice(u(1)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/teleconsultas/${u(1)}/ice` });
+    api.finalizar(u(1)).subscribe();
+    expectRequest({ method: 'POST', url: `/api/v1/teleconsultas/${u(1)}/finalizar`, body: {} });
+    api.resumenPaciente(u(1)).subscribe();
+    expectRequest({ method: 'GET', url: `/api/v1/teleconsultas/${u(1)}/resumen-paciente` });
   });
 });

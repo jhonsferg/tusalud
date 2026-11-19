@@ -15,6 +15,7 @@ import {
   OrdenImagenResponse,
   OrdenResponse,
 } from '@tusalud/core';
+import { ProximaTeleconsulta } from '@tusalud/features/telemedicina';
 import { PageHeader } from '@tusalud/ui/page-header';
 import {
   AccionRapida,
@@ -47,6 +48,7 @@ const ETIQUETA_CITA: Readonly<Record<string, string>> = {
 @Component({
   selector: 'app-inicio-paciente',
   imports: [
+    ProximaTeleconsulta,
     DatePipe,
     RouterLink,
     Button,
@@ -59,6 +61,7 @@ const ETIQUETA_CITA: Readonly<Record<string, string>> = {
   ],
   template: `
     <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-heart" />
+    <app-proxima-teleconsulta />
 
     <div class="tablero">
       <div class="c8">

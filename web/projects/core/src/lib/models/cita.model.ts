@@ -1,3 +1,4 @@
+import { ModalidadCita } from './teleconsulta.model';
 export type EstadoCita = 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA' | 'ATENDIDA';
 
 export const ESTADOS_CITA: readonly EstadoCita[] = [
@@ -11,6 +12,7 @@ export const ESTADOS_CITA_ACTIVOS: readonly EstadoCita[] = ['PENDIENTE', 'CONFIR
 
 export interface CitaResponse {
   id: string;
+  modalidad?: ModalidadCita;
   fechaHora: string;
   motivo: string;
   estado: EstadoCita;
@@ -37,6 +39,7 @@ export interface CitaCreateRequest {
   especialidadId: string;
   fechaHora: string;
   motivo: string;
+  modalidad?: ModalidadCita;
 }
 
 export interface CitasPorEstadoResponse {

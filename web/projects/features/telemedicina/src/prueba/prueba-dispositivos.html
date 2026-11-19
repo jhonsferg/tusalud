@@ -1,0 +1,150 @@
+<app-page-header
+  title="Preparar la teleconsulta"
+  subtitle="Revisa tu cámara, tu micrófono y tu conexión antes de entrar"
+  icon="pi-video"
+  backLink="/teleconsultas"
+  backLabel="Volver a teleconsultas"
+/>
+
+@if (teleconsulta(); as t) {
+  <section class="panel resumen" aria-label="Datos de la teleconsulta">
+    <div>
+      <strong>{{ esMedico() ? t.pacienteNombre : t.medicoNombre }}</strong>
+      <small class="text-muted block">{{ t.especialidad }}</small>
+    </div>
+    <div>
+      <strong>{{ t.fechaHora | date: "EEEE d 'de' MMMM, HH:mm" }}</strong>
+      <small class="text-muted block"
+        >Puedes ingresar desde las {{ t.ventanaDesde | date: 'HH:mm' }} hasta las
+        {{ t.ventanaHasta | date: 'HH:mm' }}</small
+      >
+    </div>
+  </section>
+
+  <app-security-notice
+    texto="La teleconsulta no se graba. El audio y el video van directamente entre tú y tu médico y el chat de la sala no se conserva."
+  />
+
+  @if (requiereConsentimiento()) {
+    <section class="panel bloque" aria-labelledby="tele-consent">
+      <h2 id="tele-consent">Consentimiento de telemedicina</h2>
+      @if (store.consentimiento.value(); as c) {
+        <p class="texto-consentimiento">{{ c.texto }}</p>
+        <label class="acepto">
+          <p-checkbox
+            inputId="tele-acepto"
+            [binary]="true"
+            [ngModel]="acepta()"
+            (ngModelChange)="acepta.set($event)"
+          />
+          <span>He leído y acepto el consentimiento de telemedicina, versión {{ c.version }}.</span>
+        </label>
+        <p-button
+          label="Aceptar y continuar"
+          icon="pi pi-check"
+          [disabled]="!acepta()"
+          [loading]="guardando()"
+          (onClick)="aceptar()"
+        />
+      }
+    </section>
+  } @else {
+    <section class="panel bloque" aria-labelledby="tele-dispositivos">
+      <h2 id="tele-dispositivos">Cámara y micrófono</h2>
+      @if (errorMedios(); as mensaje) {
+        <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+      }
+      <div class="prueba">
+        <div class="vista">
+          <video #vista autoplay playsinline muted aria-label="Vista previa de tu cámara"></video>
+          @if (!dispositivosListos()) {
+            <p class="text-muted">Aún no probamos tu cámara.</p>
+          }
+        </div>
+        <div class="controles">
+          <p-button
+            [label]="dispositivosListos() ? 'Probar de nuevo' : 'Probar cámara y micrófono'"
+            icon="pi pi-camera"
+            [loading]="probando()"
+            [outlined]="dispositivosListos()"
+            (onClick)="probar()"
+          />
+          @if (dispositivosListos()) {
+            <label class="campo"
+              >Cámara
+              <p-select
+                [options]="camaras()"
+                optionLabel="label"
+                optionValue="value"
+                [ngModel]="camaraElegida()"
+                (ngModelChange)="cambiarCamara($event)"
+                appendTo="body"
+                styleClass="w-full"
+                ariaLabel="Elegir cámara"
+              />
+            </label>
+            <label class="campo"
+              >Micrófono
+              <p-select
+                [options]="microfonos()"
+                optionLabel="label"
+                optionValue="value"
+                [ngModel]="microfonoElegido()"
+                (ngModelChange)="cambiarMicrofono($event)"
+                appendTo="body"
+                styleClass="w-full"
+                ariaLabel="Elegir micrófono"
+              />
+            </label>
+            <div
+              class="medidor"
+              role="meter"
+              aria-label="Volumen del micrófono"
+              [attr.aria-valuenow]="nivelAudio()"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              <span [style.width.%]="nivelAudio()"></span>
+            </div>
+            <small class="text-muted">Habla para ver moverse la barra de volumen.</small>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="panel bloque" aria-labelledby="tele-red">
+      <h2 id="tele-red">Conexión</h2>
+      <p-button
+        label="Probar conexión"
+        icon="pi pi-wifi"
+        [outlined]="true"
+        [loading]="probandoRed()"
+        (onClick)="probarRed()"
+      />
+      @if (latencia(); as ms) {
+        <p class="resultado-red" [class.mala]="redBuena() === false">
+          @if (redBuena()) {
+            Conexión adecuada, respuesta en {{ ms }} ms.
+          } @else {
+            Conexión lenta o inestable, respuesta en {{ ms }} ms. Acércate al router o desactiva el
+            video si se corta.
+          }
+        </p>
+      }
+    </section>
+
+    <div class="entrar">
+      @if (!t.puedeIngresar) {
+        <p-message severity="info"
+          >La sala se habilita desde las {{ t.ventanaDesde | date: 'HH:mm' }}.</p-message
+        >
+      }
+      <p-button
+        [label]="esMedico() ? 'Entrar a la sala' : 'Ingresar a la sala de espera'"
+        icon="pi pi-video"
+        [disabled]="!puedeEntrar()"
+        (onClick)="entrar()"
+      />
+    </div>
+  }
+}

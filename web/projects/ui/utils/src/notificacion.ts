@@ -32,6 +32,9 @@ export const ICONO_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   EXPORTACION_LISTA: 'pi-file-export',
   PREAUTORIZACION_SOLICITADA: 'pi-verified',
   PREAUTORIZACION_RESUELTA: 'pi-verified',
+  TELECONSULTA_PROXIMA: 'pi-video',
+  TELECONSULTA_SALA_ABIERTA: 'pi-video',
+  TELECONSULTA_PACIENTE_EN_SALA: 'pi-user',
   SISTEMA: 'pi-info-circle',
 };
 
@@ -67,5 +70,8 @@ export const COLOR_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   EXPORTACION_LISTA: '#0891b2',
   PREAUTORIZACION_SOLICITADA: '#0d9488',
   PREAUTORIZACION_RESUELTA: '#0d9488',
+  TELECONSULTA_PROXIMA: '#0891b2',
+  TELECONSULTA_SALA_ABIERTA: '#0891b2',
+  TELECONSULTA_PACIENTE_EN_SALA: '#0d9488',
   SISTEMA: '#64748b',
 };

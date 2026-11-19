@@ -13,6 +13,7 @@ import {
   RecepcionApiService,
   TurnoResponse,
 } from '@tusalud/core';
+import { ProximaTeleconsulta } from '@tusalud/features/telemedicina';
 import { PageHeader } from '@tusalud/ui/page-header';
 import {
   AccionRapida,
@@ -52,9 +53,19 @@ function hora(fecha: string): string {
 
 @Component({
   selector: 'app-inicio-medico',
-  imports: [RouterLink, PageHeader, SectionCard, StatCard, Timeline, QuickActions, TaskList],
+  imports: [
+    RouterLink,
+    ProximaTeleconsulta,
+    PageHeader,
+    SectionCard,
+    StatCard,
+    Timeline,
+    QuickActions,
+    TaskList,
+  ],
   template: `
     <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-heart" />
+    <app-proxima-teleconsulta />
 
     <div class="fila-stats stats">
       <app-stat-card

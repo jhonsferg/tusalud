@@ -102,6 +102,24 @@
       </div>
     </div>
 
+    <div class="modalidad" role="group" aria-label="Modalidad de la cita">
+      <span class="etiqueta-modalidad">Modalidad</span>
+      <p-selectbutton
+        [options]="modalidades"
+        optionLabel="label"
+        optionValue="value"
+        formControlName="modalidad"
+        [allowEmpty]="false"
+        ariaLabel="Modalidad de la cita"
+      />
+      @if (form.controls.modalidad.value === 'VIRTUAL') {
+        <small class="text-muted"
+          >Te conectarás por video desde tu navegador, sin instalar nada. La sala se habilita 10
+          minutos antes de la hora y no se graba.</small
+        >
+      }
+    </div>
+
     <app-form-field
       label="Motivo de la consulta"
       [control]="form.controls.motivo"
@@ -158,7 +176,7 @@
         <div class="total">
           <dt>Total a pagar</dt>
           <dd>
-            {{ especialidadElegida()?.precioConsulta ?? 0 | currency: 'PEN' : 'symbol-narrow' }}
+            {{ precioReserva() | currency: 'PEN' : 'symbol-narrow' }}
           </dd>
         </div>
       </dl>

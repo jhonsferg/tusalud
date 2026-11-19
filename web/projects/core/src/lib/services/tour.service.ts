@@ -320,6 +320,13 @@ export const PASOS_TOUR_PREDETERMINADOS: readonly TourStep[] = [
     roles: ['ROLE_PACIENTE'],
   },
   {
+    target: 'nav:/teleconsultas',
+    icon: 'pi-video',
+    title: 'Teleconsultas',
+    text: 'Atiende o recibe consultas por video. Antes de entrar probarás tu cámara y tu micrófono, y la sala se habilita 10 minutos antes de la hora.',
+    roles: ['ROLE_PACIENTE', 'ROLE_MEDICO'],
+  },
+  {
     target: 'nav:/calendario',
     icon: 'pi-calendar-plus',
     title: 'Calendario',

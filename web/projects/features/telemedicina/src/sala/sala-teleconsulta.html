@@ -1,0 +1,244 @@
+<section class="sala" [attr.data-conexion]="conexion()" aria-label="Sala de teleconsulta">
+  <header class="barra">
+    <div>
+      <h1>Teleconsulta con {{ contraparte() }}</h1>
+      @if (teleconsulta(); as t) {
+        <small class="text-muted"
+          >{{ t.especialidad }} · {{ t.fechaHora | date: 'd MMM, HH:mm' }}</small
+        >
+      }
+    </div>
+    <div class="estado" role="status" aria-live="polite">
+      @switch (conexion()) {
+        @case ('preparando') {
+          <span class="punto"></span> Preparando la cámara
+        }
+        @case ('conectando') {
+          <span class="punto"></span> Conectando con la sala
+        }
+        @case ('esperando') {
+          <span class="punto espera"></span>
+          {{
+            contraparteEnSala()
+              ? admitido()
+                ? 'Iniciando la llamada'
+                : 'En sala de espera'
+              : 'Esperando a ' + contraparte()
+          }}
+        }
+        @case ('negociando') {
+          <span class="punto espera"></span> Estableciendo la llamada
+        }
+        @case ('conectado') {
+          <span class="punto ok"></span> {{ etiquetaCalidad() }}
+        }
+        @case ('reconectando') {
+          <span class="punto aviso"></span> Reconectando
+        }
+        @case ('finalizada') {
+          <span class="punto"></span> Teleconsulta finalizada
+        }
+        @default {
+          <span class="punto error"></span> Sin conexión
+        }
+      }
+    </div>
+  </header>
+
+  <app-security-notice
+    texto="La teleconsulta no se graba. El audio y el video van directamente entre ambos y el chat no se conserva."
+  />
+
+  @if (error(); as mensaje) {
+    <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    <div class="acciones-error">
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="reintentar()" />
+      <a routerLink="/teleconsultas">Volver a teleconsultas</a>
+    </div>
+  } @else if (conexion() === 'finalizada') {
+    <div class="panel fin">
+      <i class="pi pi-check-circle" aria-hidden="true"></i>
+      <h2>La teleconsulta terminó</h2>
+      <p class="text-muted">
+        @if (esMedico()) {
+          Registra la atención de esta consulta para completar la historia clínica.
+        } @else {
+          Gracias por conectarte. Tu médico registrará la atención en tu historia clínica.
+        }
+      </p>
+      <div class="acciones-error">
+        @if (esMedico() && teleconsulta(); as t) {
+          <p-button
+            label="Registrar la atención"
+            icon="pi pi-file-edit"
+            [routerLink]="['/citas', t.citaId]"
+          />
+        }
+        <p-button
+          label="Volver a teleconsultas"
+          severity="secondary"
+          [outlined]="true"
+          routerLink="/teleconsultas"
+        />
+      </div>
+    </div>
+  } @else {
+    @if (aviso(); as mensaje) {
+      <p-message severity="warn" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+
+    <div class="escenario">
+      <div class="video-area">
+        <video
+          #remoto
+          id="tele-video-remoto"
+          class="remoto"
+          autoplay
+          playsinline
+          [attr.aria-label]="'Video de ' + contraparte()"
+        ></video>
+        @if (!enLlamada()) {
+          <div class="espera">
+            @if (esMedico() && pacienteEnSala() && !admitido()) {
+              <i class="pi pi-user" aria-hidden="true"></i>
+              <h2>{{ contraparte() }} está en la sala de espera</h2>
+              <p-button label="Admitir al paciente" icon="pi pi-check" (onClick)="admitir()" />
+            } @else if (!esMedico() && medicoEnSala() && !admitido()) {
+              <i class="pi pi-clock" aria-hidden="true"></i>
+              <h2>Estás en la sala de espera</h2>
+              <p class="text-muted">El médico te admitirá en un momento.</p>
+            } @else if (!contraparteEnSala()) {
+              <i class="pi pi-hourglass" aria-hidden="true"></i>
+              <h2>Esperando a {{ contraparte() }}</h2>
+              <p class="text-muted">Mantén esta ventana abierta. Te avisaremos cuando llegue.</p>
+            } @else {
+              <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+              <h2>Estableciendo la llamada</h2>
+            }
+          </div>
+        }
+        <video
+          #local
+          id="tele-video-local"
+          class="local"
+          autoplay
+          playsinline
+          muted
+          aria-label="Tu cámara"
+          [class.apagada]="!camara()"
+        ></video>
+        <div class="controles" role="toolbar" aria-label="Controles de la llamada">
+          <p-button
+            [icon]="microfono() ? 'pi pi-microphone' : 'pi pi-microphone-slash'"
+            [rounded]="true"
+            [severity]="microfono() ? 'secondary' : 'danger'"
+            [ariaLabel]="microfono() ? 'Silenciar el micrófono' : 'Activar el micrófono'"
+            (onClick)="alternarMicrofono()"
+          />
+          <p-button
+            [icon]="camara() ? 'pi pi-video' : 'pi pi-eye-slash'"
+            [rounded]="true"
+            [severity]="camara() ? 'secondary' : 'danger'"
+            [ariaLabel]="camara() ? 'Apagar la cámara' : 'Encender la cámara'"
+            (onClick)="alternarCamara()"
+          />
+          @if (esMedico() && enLlamada()) {
+            <p-button
+              icon="pi pi-desktop"
+              [rounded]="true"
+              [severity]="pantalla() ? 'success' : 'secondary'"
+              [ariaLabel]="pantalla() ? 'Dejar de compartir la pantalla' : 'Compartir la pantalla'"
+              (onClick)="alternarPantalla()"
+            />
+          }
+          @if (esMedico()) {
+            <p-button
+              label="Finalizar"
+              icon="pi pi-phone"
+              severity="danger"
+              [loading]="finalizando()"
+              ariaLabel="Finalizar la teleconsulta para ambos"
+              (onClick)="finalizar()"
+            />
+          } @else {
+            <p-button
+              label="Salir"
+              icon="pi pi-sign-out"
+              severity="danger"
+              [outlined]="true"
+              ariaLabel="Salir de la sala"
+              (onClick)="salir()"
+            />
+          }
+        </div>
+      </div>
+
+      <aside class="lateral">
+        @if (esMedico() && resumen(); as r) {
+          <section class="panel resumen" aria-label="Resumen del paciente">
+            <h2>Paciente</h2>
+            <app-security-notice variante="auditado" />
+            <dl>
+              <div>
+                <dt>Nombre</dt>
+                <dd>{{ r.pacienteNombre }}</dd>
+              </div>
+              @if (r.edad !== null && r.edad !== undefined) {
+                <div>
+                  <dt>Edad</dt>
+                  <dd>{{ r.edad }} años</dd>
+                </div>
+              }
+              <div>
+                <dt>Grupo sanguíneo</dt>
+                <dd>{{ r.grupoSanguineo || 'Sin registrar' }}</dd>
+              </div>
+              <div>
+                <dt>Alergias</dt>
+                <dd>{{ r.alergias || 'Sin alergias registradas' }}</dd>
+              </div>
+              <div>
+                <dt>Motivo</dt>
+                <dd>{{ r.motivo }}</dd>
+              </div>
+            </dl>
+          </section>
+        }
+
+        <section class="panel chat" aria-label="Chat de la sala">
+          <h2>Chat</h2>
+          <ul id="tele-chat" aria-live="polite">
+            @for (m of mensajes(); track $index) {
+              <li [class.propio]="m.propio">
+                <span>{{ m.texto }}</span>
+                <small>{{ m.hora | date: 'HH:mm' }}</small>
+              </li>
+            } @empty {
+              <li class="vacio text-muted">Los mensajes no se conservan al terminar.</li>
+            }
+          </ul>
+          <form (submit)="$event.preventDefault(); enviarChat()">
+            <input
+              pInputText
+              id="tele-chat-texto"
+              name="mensaje"
+              autocomplete="off"
+              maxlength="500"
+              placeholder="Escribe un mensaje"
+              aria-label="Mensaje"
+              [disabled]="!admitido()"
+              [ngModel]="texto()"
+              (ngModelChange)="texto.set($event)"
+            />
+            <p-button
+              type="submit"
+              icon="pi pi-send"
+              ariaLabel="Enviar mensaje"
+              [disabled]="!admitido() || !texto().trim()"
+            />
+          </form>
+        </section>
+      </aside>
+    </div>
+  }
+</section>

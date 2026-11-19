@@ -30,6 +30,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         corta: 'Reservar',
       },
       {
+        label: 'Teleconsultas',
+        icon: 'pi-video',
+        link: '/teleconsultas',
+        roles: ['ROLE_PACIENTE'],
+      },
+      {
         label: 'Calendario',
         icon: 'pi-calendar',
         link: '/calendario',

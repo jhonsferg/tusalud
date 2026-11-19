@@ -1,0 +1,78 @@
+<app-page-header
+  title="Teleconsultas"
+  [subtitle]="
+    esMedico() ? 'Tus consultas por video, desde hoy' : 'Tus consultas por video con el médico'
+  "
+  icon="pi-video"
+/>
+
+@if (store.lista.error(); as problema) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar las teleconsultas"
+      [message]="problema.message"
+    />
+  </div>
+} @else if (store.lista.hasValue()) {
+  <section class="panel bloque" aria-labelledby="tele-proximas">
+    <h2 id="tele-proximas">Próximas</h2>
+    @for (t of proximas(); track t.id) {
+      <article class="tele" [attr.data-estado]="t.estado">
+        <div class="cuando">
+          <strong>{{ t.fechaHora | date: 'd MMM' }}</strong>
+          <span>{{ t.fechaHora | date: 'HH:mm' }}</span>
+        </div>
+        <div class="datos">
+          <strong>{{ esMedico() ? t.pacienteNombre : t.medicoNombre }}</strong>
+          <small class="text-muted">{{ t.especialidad }} · {{ t.motivo }}</small>
+          <p-tag [value]="etiqueta[t.estado]" [severity]="severidad[t.estado]" />
+        </div>
+        <div class="accion">
+          @if (t.puedeIngresar) {
+            <p-button
+              [label]="esMedico() ? 'Abrir sala' : 'Ingresar'"
+              icon="pi pi-video"
+              [ariaLabel]="
+                esMedico()
+                  ? 'Abrir la sala con ' + t.pacienteNombre
+                  : 'Ingresar a la teleconsulta con ' + t.medicoNombre
+              "
+              (onClick)="ingresar(t)"
+            />
+          } @else {
+            <small class="text-muted"
+              >Se habilita el {{ t.ventanaDesde | date: "d MMM 'a las' HH:mm" }}</small
+            >
+          }
+        </div>
+      </article>
+    } @empty {
+      <app-empty-state
+        icon="pi-video"
+        title="Sin teleconsultas próximas"
+        message="Cuando reserves una cita virtual, aparecerá aquí con su botón de ingreso."
+      />
+    }
+  </section>
+
+  @if (historial().length > 0) {
+    <section class="panel bloque" aria-labelledby="tele-historial">
+      <h2 id="tele-historial">Historial</h2>
+      @for (t of historial(); track t.id) {
+        <article class="tele">
+          <div class="cuando">
+            <strong>{{ t.fechaHora | date: 'd MMM' }}</strong>
+            <span>{{ t.fechaHora | date: 'HH:mm' }}</span>
+          </div>
+          <div class="datos">
+            <strong>{{ esMedico() ? t.pacienteNombre : t.medicoNombre }}</strong>
+            <small class="text-muted">{{ t.especialidad }}</small>
+            <p-tag [value]="etiqueta[t.estado]" [severity]="severidad[t.estado]" />
+          </div>
+        </article>
+      }
+    </section>
+  }
+}
