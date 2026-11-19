@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.codesoftlabs.tusalud.app.Cie10Pruebas;
 import com.codesoftlabs.tusalud.app.dto.request.AtencionRequest;
 import com.codesoftlabs.tusalud.app.dto.request.RecetaItemRequest;
 import com.codesoftlabs.tusalud.app.dto.response.AtencionResponse;
@@ -92,7 +93,8 @@ class DocumentosSeguridadTest {
                         "120/80",
                         null,
                         72,
-                        List.of(new RecetaItemRequest("Losartán 50 mg", "1 tableta", "Cada 24 horas", "30 días"))),
+                        List.of(new RecetaItemRequest("Losartán 50 mg", "1 tableta", "Cada 24 horas", "30 días")),
+                        Cie10Pruebas.principal()),
                 UsuarioPrincipal.from(medico.getUsuario()));
         tokenMedico = token(UsuarioPrincipal.from(medico.getUsuario()));
         tokenMedicoAjeno = token(UsuarioPrincipal.from(
@@ -248,7 +250,7 @@ class DocumentosSeguridadTest {
         }
         mockMvc.perform(get("/api/v1/plantillas").header(HttpHeaders.AUTHORIZATION, tokenAdmin))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(11)));
+                .andExpect(jsonPath("$.length()", is(12)));
         mockMvc.perform(get("/api/v1/plantillas/receta/descargar").header(HttpHeaders.AUTHORIZATION, tokenAdmin))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("jasperReport")));

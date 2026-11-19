@@ -1,5 +1,6 @@
 package com.codesoftlabs.tusalud.app.dto.request;
 
+import com.codesoftlabs.tusalud.app.entities.enums.SexoPaciente;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -43,7 +44,9 @@ public record RegisterRequest(
         @Schema(type = "string", example = "1992-04-15")
         @NotNull(message = "La fecha de nacimiento es obligatoria")
         @Past(message = "La fecha de nacimiento debe ser una fecha pasada")
-        LocalDate fechaNacimiento) {
+        LocalDate fechaNacimiento,
+
+        @Schema(example = "F") SexoPaciente sexo) {
     @Override
     public String toString() {
         return "RegisterRequest[REDACTADO]";

@@ -39,7 +39,12 @@ public record IngresoHospResponse(
         Long esperaMinutos,
 
         @Schema(description = "Motivo de la cancelación, solo en ingresos cancelados y para personal clínico")
-        String motivoCancelacion) {
+        String motivoCancelacion,
+
+        @Schema(example = "I50.0") String cie10IngresoCodigo,
+        String cie10IngresoDescripcion,
+        @Schema(example = "I50.9") String cie10AltaCodigo,
+        String cie10AltaDescripcion) {
 
     public IngresoHospResponse sinDatosClinicos() {
         return new IngresoHospResponse(
@@ -64,6 +69,10 @@ public record IngresoHospResponse(
                 cargoCama,
                 triaje == null ? null : triaje.soloPrioridad(),
                 esperaMinutos,
+                null,
+                null,
+                null,
+                null,
                 null);
     }
 
@@ -102,7 +111,11 @@ public record IngresoHospResponse(
                 cargo,
                 TriajeResponse.from(ingreso),
                 espera,
-                ingreso.getEstado() == EstadoIngresoHosp.CANCELADO ? ingreso.getMotivoCancelacion() : null);
+                ingreso.getEstado() == EstadoIngresoHosp.CANCELADO ? ingreso.getMotivoCancelacion() : null,
+                ingreso.getCie10IngresoCodigo(),
+                ingreso.getCie10IngresoDescripcion(),
+                ingreso.getCie10AltaCodigo(),
+                ingreso.getCie10AltaDescripcion());
     }
 
     public static long dias(LocalDateTime desde, LocalDateTime hasta) {

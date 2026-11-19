@@ -40,7 +40,8 @@ public class PlantillaDocumentoServiceImpl implements PlantillaDocumentoService 
             Map.entry("reporte-ejecutivo", "Reporte ejecutivo"),
             Map.entry("reporte-financiero", "Reporte financiero"),
             Map.entry("reporte-operativo", "Reporte operativo"),
-            Map.entry("reporte-calidad", "Reporte de calidad"));
+            Map.entry("reporte-calidad", "Reporte de calidad"),
+            Map.entry("reporte-morbilidad", "Reporte de morbilidad"));
     private static final String REFERENCIA = "PLANTILLA_";
     private static final int MOTIVO_MAXIMO = 200;
 

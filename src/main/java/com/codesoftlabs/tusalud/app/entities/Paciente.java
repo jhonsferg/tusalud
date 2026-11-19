@@ -1,8 +1,11 @@
 package com.codesoftlabs.tusalud.app.entities;
 
+import com.codesoftlabs.tusalud.app.entities.enums.SexoPaciente;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -47,6 +50,10 @@ public class Paciente {
 
     @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 1)
+    private SexoPaciente sexo;
 
     @Column(name = "grupo_sanguineo", length = 3)
     private String grupoSanguineo;

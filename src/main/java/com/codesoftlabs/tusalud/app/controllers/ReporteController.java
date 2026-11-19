@@ -3,6 +3,7 @@ package com.codesoftlabs.tusalud.app.controllers;
 import com.codesoftlabs.tusalud.app.dto.response.ReporteCalidadResponse;
 import com.codesoftlabs.tusalud.app.dto.response.ReporteEjecutivoResponse;
 import com.codesoftlabs.tusalud.app.dto.response.ReporteFinancieroResponse;
+import com.codesoftlabs.tusalud.app.dto.response.ReporteMorbilidadResponse;
 import com.codesoftlabs.tusalud.app.dto.response.ReporteOperativoResponse;
 import com.codesoftlabs.tusalud.app.entities.enums.AgrupacionReporte;
 import com.codesoftlabs.tusalud.app.services.interfaces.ReporteService;
@@ -78,5 +79,18 @@ public class ReporteController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
             @RequestParam(required = false) AgrupacionReporte agrupacion) {
         return ResponseEntity.ok(reporteService.calidad(desde, hasta, agrupacion));
+    }
+
+    @GetMapping("/morbilidad")
+    @PreAuthorize("hasAnyRole('CALIDAD', 'OPERACIONES', 'GERENCIA', 'ADMIN')")
+    @Operation(
+            summary = "Reporte de morbilidad",
+            description =
+                    "Diagnósticos principales CIE-10 más frecuentes por periodo, capítulo, especialidad, grupo etario y sexo. Solo agregados: las celdas con menos de 5 casos se ocultan en los cortes por edad y sexo.")
+    public ResponseEntity<ReporteMorbilidadResponse> morbilidad(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
+            @RequestParam(required = false) AgrupacionReporte agrupacion) {
+        return ResponseEntity.ok(reporteService.morbilidad(desde, hasta, agrupacion));
     }
 }

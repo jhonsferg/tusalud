@@ -3,6 +3,7 @@ package com.codesoftlabs.tusalud.app.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.codesoftlabs.tusalud.app.Cie10Pruebas;
 import com.codesoftlabs.tusalud.app.documentos.DocumentoGenerado;
 import com.codesoftlabs.tusalud.app.documentos.FormatoDocumento;
 import com.codesoftlabs.tusalud.app.documentos.TipoDocumento;
@@ -181,7 +182,8 @@ class DocumentoServiceTest {
                         "120/80",
                         new BigDecimal("36.5"),
                         72,
-                        List.of(new RecetaItemRequest("Losartán 50 mg", "1 tableta", "Cada 24 horas", "30 días"))),
+                        List.of(new RecetaItemRequest("Losartán 50 mg", "1 tableta", "Cada 24 horas", "30 días")),
+                        Cie10Pruebas.principal()),
                 medicoPrincipal);
         citaAtendida = cita;
     }
@@ -264,7 +266,7 @@ class DocumentoServiceTest {
         assertThat(contenido)
                 .contains("Receta médica")
                 .contains("Losartán 50 mg")
-                .contains("Hipertensión leve");
+                .contains("I10 Hipertensión esencial (primaria)");
         assertThat(texto(directo(pacientePrincipal, TipoDocumento.RECETA, atencion.id())))
                 .contains("Losartán 50 mg");
         assertThat(texto(directo(farmacia, TipoDocumento.RECETA, atencion.id())))
@@ -301,13 +303,13 @@ class DocumentoServiceTest {
         long antes = auditoriaRepository.count();
 
         String paraMedico = texto(directo(medicoPrincipal, TipoDocumento.RESUMEN_HISTORIA, paciente.getId()));
-        assertThat(paraMedico).contains("Resumen de historia clínica").contains("Hipertensión leve");
+        assertThat(paraMedico).contains("Resumen de historia clínica").contains("I10");
         assertThat(auditoriaRepository.count()).isGreaterThan(antes);
         assertThat(auditoriaRepository.findAll())
                 .anyMatch(registro -> AuditoriaClinicaService.DOCUMENTO_GENERADO.equals(registro.getAccion()));
 
         assertThat(texto(directo(pacientePrincipal, TipoDocumento.RESUMEN_HISTORIA, paciente.getId())))
-                .contains("Hipertensión leve");
+                .contains("I10");
         assertThatThrownBy(() -> directo(pacientePrincipal, TipoDocumento.RESUMEN_HISTORIA, otroPaciente.getId()))
                 .isInstanceOf(ForbiddenOperationException.class);
         assertThatThrownBy(() -> directo(otroMedico, TipoDocumento.RESUMEN_HISTORIA, paciente.getId()))

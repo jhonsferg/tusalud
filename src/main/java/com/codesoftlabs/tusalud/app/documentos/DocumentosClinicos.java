@@ -160,7 +160,7 @@ public class DocumentosClinicos {
                 .par("Colegiatura", atencion.getMedico().getColegiatura())
                 .par("Especialidad", atencion.getCita().getEspecialidad().getNombre())
                 .par("Fecha", Formato.fechaHora(atencion.getFecha()))
-                .par("Diagnóstico", Formato.texto(atencion.getDiagnostico()));
+                .par("Diagnóstico", diagnosticoCodificado(atencion));
         atencion.getReceta()
                 .forEach(item -> ficha.fila(
                         item.getMedicamento(),
@@ -302,7 +302,7 @@ public class DocumentosClinicos {
                 Formato.fecha(atencion.fecha().toLocalDate()),
                 atencion.medicoNombre(),
                 atencion.especialidad(),
-                Formato.texto(atencion.diagnostico()),
+                diagnosticoCodificado(atencion),
                 Formato.texto(atencion.tratamiento())));
         if (historia.atenciones().size() > ATENCIONES_RESUMEN) {
             ficha.nota(
@@ -312,6 +312,24 @@ public class DocumentosClinicos {
         }
         return new DocumentoPreparado(
                 ficha, datos.pacienteId(), datos.pacienteId().toString(), "historia-" + datos.dni());
+    }
+
+    private static String diagnosticoCodificado(Atencion atencion) {
+        if (atencion.getDiagnosticos().isEmpty()) {
+            return Formato.texto(atencion.getDiagnostico());
+        }
+        return atencion.getDiagnosticos().stream()
+                .map(d -> d.getCodigo() + " " + d.getDescripcion())
+                .collect(java.util.stream.Collectors.joining("; "));
+    }
+
+    private static String diagnosticoCodificado(AtencionResponse atencion) {
+        if (atencion.diagnosticos() == null || atencion.diagnosticos().isEmpty()) {
+            return Formato.texto(atencion.diagnostico());
+        }
+        return atencion.diagnosticos().stream()
+                .map(d -> d.codigo() + " " + d.descripcion())
+                .collect(java.util.stream.Collectors.joining("; "));
     }
 
     private static String referencia(OrdenLabResponse.ResultadoResponse resultado) {

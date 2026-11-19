@@ -117,6 +117,7 @@ public class AdmisionServiceImpl implements AdmisionService {
         Paciente paciente = pacienteRepository.save(Paciente.builder()
                 .dni(dni)
                 .fechaNacimiento(request.fechaNacimiento())
+                .sexo(request.sexo())
                 .historialClinicoNumero(String.format("HC-%06d", pacienteRepository.nextCorrelativo()))
                 .usuario(usuario)
                 .build());

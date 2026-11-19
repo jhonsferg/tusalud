@@ -51,7 +51,7 @@ class AuthServiceImplTest {
 
     private RegisterRequest registro(String email, String dni) {
         return new RegisterRequest(
-                "Carlos", "Mendoza", email, "Paciente123!", "987654321", dni, LocalDate.of(1992, 4, 15));
+                "Carlos", "Mendoza", email, "Paciente123!", "987654321", dni, LocalDate.of(1992, 4, 15), null);
     }
 
     @Test

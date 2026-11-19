@@ -1,5 +1,6 @@
 package com.codesoftlabs.tusalud.app.dto.request;
 
+import com.codesoftlabs.tusalud.app.entities.enums.SexoPaciente;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
@@ -28,4 +29,7 @@ public record PerfilUpdateRequest(
 
         @Schema(example = "Consultorio 101", description = "Solo se aplica a médicos")
         @Size(max = 50, message = "El consultorio no debe superar 50 caracteres")
-        String consultorio) {}
+        String consultorio,
+
+        @Schema(example = "M", description = "Solo se aplica a pacientes")
+        SexoPaciente sexo) {}

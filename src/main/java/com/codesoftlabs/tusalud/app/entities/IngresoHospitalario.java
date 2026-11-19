@@ -91,6 +91,18 @@ public class IngresoHospitalario {
     @Column(name = "indicaciones_alta", length = 500)
     private String indicacionesAlta;
 
+    @Column(name = "cie10_ingreso_codigo", length = 8)
+    private String cie10IngresoCodigo;
+
+    @Column(name = "cie10_ingreso_descripcion", length = 300)
+    private String cie10IngresoDescripcion;
+
+    @Column(name = "cie10_alta_codigo", length = 8)
+    private String cie10AltaCodigo;
+
+    @Column(name = "cie10_alta_descripcion", length = 300)
+    private String cie10AltaDescripcion;
+
     @Column(name = "cargo_acumulado", nullable = false, precision = 12, scale = 2)
     @Builder.Default
     private BigDecimal cargoAcumulado = BigDecimal.ZERO;

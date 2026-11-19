@@ -60,6 +60,7 @@ public class ReporteServiceImpl implements ReporteService {
     private final ReporteRepository repositorio;
     private final com.codesoftlabs.tusalud.app.services.seguros.SegurosReporteService segurosReporte;
     private final MedicoRepository medicoRepository;
+    private final MorbilidadCalculadora morbilidadCalculadora;
 
     private record Rango(LocalDate desde, LocalDate hasta, AgrupacionReporte agrupacion) {
 
@@ -767,6 +768,12 @@ public class ReporteServiceImpl implements ReporteService {
             claves.put(cubeta(r.desde().plusDays(i), r.agrupacion()), Boolean.TRUE);
         }
         return new ArrayList<>(claves.keySet());
+    }
+
+    @Override
+    public com.codesoftlabs.tusalud.app.dto.response.ReporteMorbilidadResponse morbilidad(
+            LocalDate desde, LocalDate hasta, AgrupacionReporte agrupacion) {
+        return morbilidadCalculadora.calcular(rango(desde, hasta, agrupacion).periodo());
     }
 
     private static Rango rango(LocalDate desde, LocalDate hasta, AgrupacionReporte agrupacion) {

@@ -15,6 +15,7 @@ import com.codesoftlabs.tusalud.app.dto.response.HospResumenResponse;
 import com.codesoftlabs.tusalud.app.dto.response.IngresoHospResponse;
 import com.codesoftlabs.tusalud.app.dto.response.MapaCamasResponse;
 import com.codesoftlabs.tusalud.app.entities.Cama;
+import com.codesoftlabs.tusalud.app.entities.Cie10Catalogo;
 import com.codesoftlabs.tusalud.app.entities.EvolucionHospitalaria;
 import com.codesoftlabs.tusalud.app.entities.IngresoHospitalario;
 import com.codesoftlabs.tusalud.app.entities.Medico;
@@ -39,6 +40,7 @@ import com.codesoftlabs.tusalud.app.repositories.PacienteRepository;
 import com.codesoftlabs.tusalud.app.repositories.UsuarioRepository;
 import com.codesoftlabs.tusalud.app.security.TextoSeguro;
 import com.codesoftlabs.tusalud.app.security.UsuarioPrincipal;
+import com.codesoftlabs.tusalud.app.services.interfaces.Cie10Service;
 import com.codesoftlabs.tusalud.app.services.interfaces.HospitalizacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.NotificacionService;
 import com.codesoftlabs.tusalud.app.services.interfaces.RelacionAsistencialService;
@@ -89,6 +91,7 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
     private final UsuarioRepository usuarioRepository;
     private final NotificacionService notificacionService;
     private final RelacionAsistencialService relacionAsistencial;
+    private final Cie10Service cie10Service;
     private final com.codesoftlabs.tusalud.app.services.seguros.PreautorizacionService preautorizacionService;
 
     @Override
@@ -158,6 +161,11 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
                 paciente, com.codesoftlabs.tusalud.app.entities.enums.CategoriaServicio.HOSPITALIZACION, null, false);
         Medico medico = resolverMedico(actor, request.medicoId());
         LocalDateTime ahora = LocalDateTime.now();
+        Cie10Catalogo cieIngreso = resolverCie10(request.cie10Ingreso());
+        String textoIngreso = vacioANulo(request.diagnosticoIngreso());
+        if (textoIngreso == null && cieIngreso != null) {
+            textoIngreso = cieIngreso.getDescripcion();
+        }
 
         IngresoHospitalario nuevo = IngresoHospitalario.builder()
                 .codigo("PEND-" + System.nanoTime())
@@ -167,7 +175,9 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
                 .cama(cama)
                 .medico(medico)
                 .motivo(request.motivo().trim())
-                .diagnosticoIngreso(vacioANulo(request.diagnosticoIngreso()))
+                .diagnosticoIngreso(textoIngreso)
+                .cie10IngresoCodigo(cieIngreso == null ? null : cieIngreso.getCodigo())
+                .cie10IngresoDescripcion(cieIngreso == null ? null : cieIngreso.getDescripcion())
                 .fechaIngreso(ahora)
                 .desdeEnCama(ahora)
                 .build();
@@ -245,6 +255,10 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
         return IngresoHospResponse.from(ingresoRepository.save(ingreso), ahora);
     }
 
+    private Cie10Catalogo resolverCie10(String codigo) {
+        return codigo == null || codigo.isBlank() ? null : cie10Service.exigirActivo(codigo);
+    }
+
     @Override
     public IngresoHospResponse darAlta(UsuarioPrincipal actor, UUID id, AltaHospRequest request) {
         IngresoHospitalario ingreso = buscarIngresoActivo(id);
@@ -259,6 +273,9 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
         ingreso.setEstado(EstadoIngresoHosp.ALTA);
         ingreso.setFechaAlta(ahora);
         ingreso.setDiagnosticoAlta(request.diagnosticoAlta().trim());
+        Cie10Catalogo cieAlta = resolverCie10(request.cie10Alta());
+        ingreso.setCie10AltaCodigo(cieAlta == null ? null : cieAlta.getCodigo());
+        ingreso.setCie10AltaDescripcion(cieAlta == null ? null : cieAlta.getDescripcion());
         ingreso.setIndicacionesAlta(request.indicacionesAlta().trim());
         ingreso.setDesdeEnCama(null);
         IngresoHospitalario guardado = ingresoRepository.save(ingreso);

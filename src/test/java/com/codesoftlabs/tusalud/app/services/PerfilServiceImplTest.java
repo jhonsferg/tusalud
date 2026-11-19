@@ -88,7 +88,7 @@ class PerfilServiceImplTest {
 
         PerfilResponse perfil = perfilService.actualizar(
                 fixture.principal(paciente.getUsuario()),
-                new PerfilUpdateRequest("  Ana ", "Ríos", "912345678", LocalDate.of(1990, 1, 2), "ignorado"));
+                new PerfilUpdateRequest("  Ana ", "Ríos", "912345678", LocalDate.of(1990, 1, 2), "ignorado", null));
 
         assertThat(perfil.nombre()).isEqualTo("Ana");
         assertThat(perfil.apellido()).isEqualTo("Ríos");
@@ -103,7 +103,7 @@ class PerfilServiceImplTest {
 
         PerfilResponse perfil = perfilService.actualizar(
                 fixture.principal(medico.getUsuario()),
-                new PerfilUpdateRequest("Luis", "García", " ", null, "Consultorio 999"));
+                new PerfilUpdateRequest("Luis", "García", " ", null, "Consultorio 999", null));
 
         assertThat(perfil.consultorio()).isEqualTo("Consultorio 999");
         assertThat(perfil.telefono()).isNull();

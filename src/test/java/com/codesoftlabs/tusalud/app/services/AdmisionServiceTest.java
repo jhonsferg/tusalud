@@ -73,7 +73,8 @@ class AdmisionServiceTest {
     }
 
     private PacienteMostradorRequest registro(String dni, String email) {
-        return new PacienteMostradorRequest("Lucía", "Paredes", dni, LocalDate.of(1992, 4, 15), "987654321", email);
+        return new PacienteMostradorRequest(
+                "Lucía", "Paredes", dni, LocalDate.of(1992, 4, 15), "987654321", email, null);
     }
 
     private LocalDateTime proximoLunes(int hora, int minuto) {

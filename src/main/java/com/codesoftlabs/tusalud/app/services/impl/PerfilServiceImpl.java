@@ -66,6 +66,9 @@ public class PerfilServiceImpl implements PerfilService {
         usuario.setTelefono(vacioANulo(request.telefono()));
 
         pacienteRepository.findByUsuarioEmail(usuario.getEmail()).ifPresent(paciente -> {
+            if (request.sexo() != null) {
+                paciente.setSexo(request.sexo());
+            }
             if (request.fechaNacimiento() != null) {
                 paciente.setFechaNacimiento(request.fechaNacimiento());
             }

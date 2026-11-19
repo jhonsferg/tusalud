@@ -97,7 +97,7 @@ class HospitalizacionServiceTest {
         fixture.cita(medico, destino, LocalDateTime.now().plusDays(2), EstadoCita.CONFIRMADA);
         return hospitalizacionService.crearIngreso(
                 medicoPrincipal,
-                new IngresoHospCreateRequest(destino.getId(), cama.id(), "Motivo de prueba", null, null));
+                new IngresoHospCreateRequest(destino.getId(), cama.id(), "Motivo de prueba", null, null, null));
     }
 
     private static TriajeRequest triaje(int nivel) {
@@ -223,7 +223,7 @@ class HospitalizacionServiceTest {
         assertThat(trasladado.cargoCama()).isEqualByComparingTo("600.00");
 
         IngresoHospResponse alta = hospitalizacionService.darAlta(
-                medicoPrincipal, ingreso.id(), new AltaHospRequest("Recuperado", "Control en 7 días"));
+                medicoPrincipal, ingreso.id(), new AltaHospRequest("Recuperado", "Control en 7 días", null));
         assertThat(alta.cargoCama()).isEqualByComparingTo("600.00");
         assertThat(alta.diasEstancia()).isEqualTo(3);
     }
@@ -234,7 +234,7 @@ class HospitalizacionServiceTest {
         IngresoHospResponse ingreso = ingresar(paciente, cama);
 
         IngresoHospResponse alta = hospitalizacionService.darAlta(
-                medicoPrincipal, ingreso.id(), new AltaHospRequest("Neumonía resuelta", "Reposo por una semana"));
+                medicoPrincipal, ingreso.id(), new AltaHospRequest("Neumonía resuelta", "Reposo por una semana", null));
 
         assertThat(alta.estado()).isEqualTo(EstadoIngresoHosp.ALTA);
         assertThat(alta.fechaAlta()).isNotNull();
@@ -244,8 +244,8 @@ class HospitalizacionServiceTest {
                 .extracting(CamaResponse::id)
                 .contains(cama.id());
         assertThat(notificaciones(pacientePrincipal)).anyMatch(n -> n.tipo() == TipoNotificacion.ALTA_HOSPITALARIA);
-        assertThatThrownBy(() ->
-                        hospitalizacionService.darAlta(medicoPrincipal, ingreso.id(), new AltaHospRequest("X", "Y")))
+        assertThatThrownBy(() -> hospitalizacionService.darAlta(
+                        medicoPrincipal, ingreso.id(), new AltaHospRequest("X", "Y", null)))
                 .isInstanceOf(ConflictException.class);
         assertThat(ingresar(paciente, cama(AreaCama.HOSPITALIZACION, "120.00")).id())
                 .isNotNull();
@@ -304,7 +304,8 @@ class HospitalizacionServiceTest {
     @Test
     void noSeRegistranEvolucionesEnUnIngresoCerrado() {
         IngresoHospResponse ingreso = ingresar(paciente, cama(AreaCama.HOSPITALIZACION, "100.00"));
-        hospitalizacionService.darAlta(medicoPrincipal, ingreso.id(), new AltaHospRequest("Resuelto", "Alta médica"));
+        hospitalizacionService.darAlta(
+                medicoPrincipal, ingreso.id(), new AltaHospRequest("Resuelto", "Alta médica", null));
 
         assertThatThrownBy(() -> hospitalizacionService.registrarEvolucion(
                         medicoPrincipal, ingreso.id(), evolucion(TipoEvolucion.MEDICA, "Tarde")))
@@ -505,7 +506,7 @@ class HospitalizacionServiceTest {
 
         assertThatThrownBy(() -> hospitalizacionService.crearIngreso(
                         fixture.principal(ajeno.getUsuario()),
-                        new IngresoHospCreateRequest(paciente.getId(), cama.id(), "Sin relación", null, null)))
+                        new IngresoHospCreateRequest(paciente.getId(), cama.id(), "Sin relación", null, null, null)))
                 .isInstanceOf(ForbiddenOperationException.class);
         assertThat(hospitalizacionService.listarCamas(null, EstadoCama.OCUPADA))
                 .extracting(CamaResponse::id)
@@ -526,7 +527,7 @@ class HospitalizacionServiceTest {
                         principalAjeno, ingreso.id(), evolucion(TipoEvolucion.MEDICA, "No es mi paciente")))
                 .isInstanceOf(ForbiddenOperationException.class);
         assertThatThrownBy(() -> hospitalizacionService.darAlta(
-                        principalAjeno, ingreso.id(), new AltaHospRequest("Alta ajena", "Indicaciones")))
+                        principalAjeno, ingreso.id(), new AltaHospRequest("Alta ajena", "Indicaciones", null)))
                 .isInstanceOf(ForbiddenOperationException.class);
         assertThat(hospitalizacionService.listarIngresos(principalAjeno, EstadoIngresoHosp.ACTIVO, null))
                 .extracting(IngresoHospResponse::id)
@@ -543,7 +544,7 @@ class HospitalizacionServiceTest {
                 medicoPrincipal, ingreso.id(), evolucion(TipoEvolucion.MEDICA, "Reservado"));
 
         assertThatThrownBy(() -> hospitalizacionService.darAlta(
-                        admin, ingreso.id(), new AltaHospRequest("Administrador", "No corresponde")))
+                        admin, ingreso.id(), new AltaHospRequest("Administrador", "No corresponde", null)))
                 .isInstanceOf(ForbiddenOperationException.class);
         assertThatThrownBy(() -> hospitalizacionService.listarEvoluciones(recepcion, ingreso.id()))
                 .isInstanceOf(ForbiddenOperationException.class);
@@ -602,5 +603,56 @@ class HospitalizacionServiceTest {
                 .isInstanceOf(ForbiddenOperationException.class);
         assertThatThrownBy(() -> hospitalizacionService.obtenerIngreso(principalOtro, emergencia.id()))
                 .isInstanceOf(ForbiddenOperationException.class);
+    }
+
+    @Test
+    void elIngresoYElAltaGuardanElDiagnosticoCie10YLaVistaSinDatosClinicosLoOculta() {
+        CamaResponse cama = cama(AreaCama.HOSPITALIZACION, "100.00");
+        fixture.cita(medico, paciente, LocalDateTime.now().plusDays(2), EstadoCita.CONFIRMADA);
+        IngresoHospResponse ingreso = hospitalizacionService.crearIngreso(
+                medicoPrincipal,
+                new IngresoHospCreateRequest(paciente.getId(), cama.id(), "Disnea progresiva", null, null, "i50.0"));
+        assertThat(ingreso.cie10IngresoCodigo()).isEqualTo("I50.0");
+        assertThat(ingreso.cie10IngresoDescripcion()).isEqualTo("Insuficiencia cardíaca congestiva");
+        assertThat(ingreso.diagnosticoIngreso()).isEqualTo("Insuficiencia cardíaca congestiva");
+
+        IngresoHospResponse alta = hospitalizacionService.darAlta(
+                medicoPrincipal, ingreso.id(), new AltaHospRequest("Compensado", "Control en 7 días", "I10"));
+        assertThat(alta.cie10AltaCodigo()).isEqualTo("I10");
+        assertThat(alta.cie10IngresoCodigo()).isEqualTo("I50.0");
+
+        IngresoHospResponse vistaAdministrativa = alta.sinDatosClinicos();
+        assertThat(vistaAdministrativa.cie10IngresoCodigo()).isNull();
+        assertThat(vistaAdministrativa.cie10IngresoDescripcion()).isNull();
+        assertThat(vistaAdministrativa.cie10AltaCodigo()).isNull();
+        assertThat(vistaAdministrativa.cie10AltaDescripcion()).isNull();
+    }
+
+    @Test
+    void elTextoLibreDelDiagnosticoDeIngresoTienePrioridadSobreLaDescripcionDelCodigo() {
+        CamaResponse cama = cama(AreaCama.HOSPITALIZACION, "100.00");
+        fixture.cita(medico, paciente, LocalDateTime.now().plusDays(2), EstadoCita.CONFIRMADA);
+        IngresoHospResponse ingreso = hospitalizacionService.crearIngreso(
+                medicoPrincipal,
+                new IngresoHospCreateRequest(
+                        paciente.getId(), cama.id(), "Disnea", "Descompensación aguda", null, "I50.0"));
+        assertThat(ingreso.diagnosticoIngreso()).isEqualTo("Descompensación aguda");
+        assertThat(ingreso.cie10IngresoCodigo()).isEqualTo("I50.0");
+    }
+
+    @Test
+    void rechazaUnCodigoCie10InexistenteOInactivoEnElIngresoYElAlta() {
+        CamaResponse cama = cama(AreaCama.HOSPITALIZACION, "100.00");
+        fixture.cita(medico, paciente, LocalDateTime.now().plusDays(2), EstadoCita.CONFIRMADA);
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> hospitalizacionService.crearIngreso(
+                        medicoPrincipal,
+                        new IngresoHospCreateRequest(paciente.getId(), cama.id(), "Motivo", null, null, "Z99.9")))
+                .isInstanceOf(com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException.class);
+        IngresoHospResponse ingreso = hospitalizacionService.crearIngreso(
+                medicoPrincipal, new IngresoHospCreateRequest(paciente.getId(), cama.id(), "Motivo", null, null, null));
+        assertThat(ingreso.cie10IngresoCodigo()).isNull();
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> hospitalizacionService.darAlta(
+                        medicoPrincipal, ingreso.id(), new AltaHospRequest("Alta", "Control", "K29.7")))
+                .isInstanceOf(com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException.class);
     }
 }

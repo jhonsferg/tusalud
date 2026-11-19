@@ -181,15 +181,19 @@ class AccesoDatosClinicosSeguridadTest {
 
     @Test
     void laAtencionDeUnaCitaSoloLaVenSuMedicoYSuPaciente() throws Exception {
-        mockMvc.perform(post("/api/v1/citas/" + cita.getId() + "/atencion")
-                        .header(HttpHeaders.AUTHORIZATION, tokenAjeno)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"diagnostico\":\"Intruso\"}"))
+        mockMvc.perform(
+                        post("/api/v1/citas/" + cita.getId() + "/atencion")
+                                .header(HttpHeaders.AUTHORIZATION, tokenAjeno)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"diagnostico\":\"Intruso\",\"diagnosticos\":[{\"codigo\":\"I10\",\"tipo\":\"DEFINITIVO\",\"principal\":true}]}"))
                 .andExpect(status().isForbidden());
-        mockMvc.perform(post("/api/v1/citas/" + cita.getId() + "/atencion")
-                        .header(HttpHeaders.AUTHORIZATION, tokenMedico)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"diagnostico\":\"Faringitis\"}"))
+        mockMvc.perform(
+                        post("/api/v1/citas/" + cita.getId() + "/atencion")
+                                .header(HttpHeaders.AUTHORIZATION, tokenMedico)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"diagnostico\":\"Faringitis\",\"diagnosticos\":[{\"codigo\":\"I10\",\"tipo\":\"DEFINITIVO\",\"principal\":true}]}"))
                 .andExpect(status().isCreated());
 
         for (String token : new String[] {tokenMedico, tokenPaciente}) {
@@ -203,10 +207,12 @@ class AccesoDatosClinicosSeguridadTest {
             mockMvc.perform(get("/api/v1/citas/" + cita.getId() + "/atencion").header(HttpHeaders.AUTHORIZATION, token))
                     .andExpect(status().isForbidden());
         }
-        mockMvc.perform(put("/api/v1/citas/" + cita.getId() + "/atencion")
-                        .header(HttpHeaders.AUTHORIZATION, tokenAjeno)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"diagnostico\":\"Falsificado\"}"))
+        mockMvc.perform(
+                        put("/api/v1/citas/" + cita.getId() + "/atencion")
+                                .header(HttpHeaders.AUTHORIZATION, tokenAjeno)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"diagnostico\":\"Falsificado\",\"diagnosticos\":[{\"codigo\":\"I10\",\"tipo\":\"DEFINITIVO\",\"principal\":true}]}"))
                 .andExpect(status().isForbidden());
     }
 

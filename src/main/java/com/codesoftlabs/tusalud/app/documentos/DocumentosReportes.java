@@ -5,6 +5,7 @@ import com.codesoftlabs.tusalud.app.dto.response.PeriodoReporte;
 import com.codesoftlabs.tusalud.app.dto.response.ReporteCalidadResponse;
 import com.codesoftlabs.tusalud.app.dto.response.ReporteEjecutivoResponse;
 import com.codesoftlabs.tusalud.app.dto.response.ReporteFinancieroResponse;
+import com.codesoftlabs.tusalud.app.dto.response.ReporteMorbilidadResponse;
 import com.codesoftlabs.tusalud.app.dto.response.ReporteOperativoResponse;
 import com.codesoftlabs.tusalud.app.entities.enums.AgrupacionReporte;
 import com.codesoftlabs.tusalud.app.services.interfaces.ReporteService;
@@ -33,6 +34,7 @@ public class DocumentosReportes {
             case REPORTE_FINANCIERO -> financiero(reporteService.financiero(desde, hasta, agrupacion), conGraficos);
             case REPORTE_OPERATIVO -> operativo(reporteService.operativo(desde, hasta, agrupacion), conGraficos);
             case REPORTE_CALIDAD -> calidad(reporteService.calidad(desde, hasta, agrupacion), conGraficos);
+            case REPORTE_MORBILIDAD -> morbilidad(reporteService.morbilidad(desde, hasta, agrupacion), conGraficos);
             default -> throw new IllegalArgumentException("El documento no es un reporte: " + tipo);
         };
     }
@@ -337,6 +339,98 @@ public class DocumentosReportes {
                 List.of(resumen, camas, esperas, emergencias, demanda, agenda, inventario),
                 "Reporte operativo",
                 nombre("operativo", r.periodo()));
+    }
+
+    private ReporteArmado morbilidad(ReporteMorbilidadResponse r, boolean graficos) {
+        FichaDocumento ficha = base(TipoDocumento.REPORTE_MORBILIDAD, "Reporte de morbilidad", r.periodo(), null);
+        HojaExcel resumen = HojaExcel.de("Resumen", "Concepto", "Valor");
+        ficha.seccion("Resumen").cabecera("Concepto", "Valor");
+        agregarResumen(ficha, resumen, "Casos con diagnóstico principal", r.casos(), String.valueOf(r.casos()));
+        agregarResumen(
+                ficha,
+                resumen,
+                "Diagnósticos distintos",
+                r.diagnosticosDistintos(),
+                String.valueOf(r.diagnosticosDistintos()));
+
+        ficha.seccion("Diagnósticos principales más frecuentes")
+                .cabecera("Código", "Diagnóstico", "Casos", "Porcentaje");
+        HojaExcel top = HojaExcel.de("Diagnósticos", "Código", "Diagnóstico", "Capítulo", "Casos", "Porcentaje");
+        List<String> etiquetas = new ArrayList<>();
+        List<Number> casos = new ArrayList<>();
+        for (ReporteMorbilidadResponse.Diagnostico d : r.top()) {
+            ficha.fila(d.codigo(), d.descripcion(), String.valueOf(d.casos()), Formato.porcentaje(d.porcentaje()));
+            top.fila(d.codigo(), d.descripcion(), d.capitulo(), d.casos(), d.porcentaje());
+            etiquetas.add(d.codigo());
+            casos.add(d.casos());
+        }
+
+        ficha.seccion("Casos por capítulo").cabecera("Capítulo", "Casos", "Porcentaje");
+        HojaExcel capitulos = HojaExcel.de("Capítulos", "Capítulo", "Casos", "Porcentaje");
+        for (ReporteMorbilidadResponse.Capitulo c : r.porCapitulo()) {
+            ficha.fila(c.capitulo(), String.valueOf(c.casos()), Formato.porcentaje(c.porcentaje()));
+            capitulos.fila(c.capitulo(), c.casos(), c.porcentaje());
+        }
+
+        ficha.seccion("Principales diagnósticos por especialidad").cabecera("Especialidad", "Diagnóstico", "Casos");
+        HojaExcel especialidades = HojaExcel.de("Especialidades", "Especialidad", "Código", "Diagnóstico", "Casos");
+        for (ReporteMorbilidadResponse.PorEspecialidad e : r.porEspecialidad()) {
+            for (ReporteMorbilidadResponse.DiagnosticoCorto d : e.top()) {
+                ficha.fila(e.especialidad(), d.codigo() + " " + d.descripcion(), String.valueOf(d.casos()));
+                especialidades.fila(e.especialidad(), d.codigo(), d.descripcion(), d.casos());
+            }
+        }
+
+        ficha.seccion("Casos por grupo de edad y sexo, se ocultan las celdas con menos de " + r.umbralSupresion()
+                        + " casos")
+                .cabecera("Grupo de edad", "Masculino", "Femenino", "Sin dato de sexo", "Total");
+        HojaExcel grupos =
+                HojaExcel.de("Edad y sexo", "Grupo de edad", "Masculino", "Femenino", "Sin dato de sexo", "Total");
+        for (ReporteMorbilidadResponse.GrupoEtario g : r.porGrupoEtario()) {
+            ficha.fila(
+                    g.grupo(),
+                    oculto(g.masculino(), g),
+                    oculto(g.femenino(), g),
+                    oculto(g.sinDato(), g),
+                    oculto(g.total(), g));
+            grupos.fila(
+                    g.grupo(),
+                    valorOculto(g.masculino(), g),
+                    valorOculto(g.femenino(), g),
+                    valorOculto(g.sinDato(), g),
+                    valorOculto(g.total(), g));
+        }
+
+        ficha.seccion("Serie por " + unidad(r.periodo().agrupacion())).cabecera("Fecha", "Casos");
+        HojaExcel serie = HojaExcel.de("Serie", "Fecha", "Casos");
+        List<String> fechas = new ArrayList<>();
+        List<Number> serieCasos = new ArrayList<>();
+        for (ReporteMorbilidadResponse.Punto p : r.serie()) {
+            ficha.fila(Formato.fecha(p.fecha()), String.valueOf(p.casos()));
+            serie.fila(p.fecha(), p.casos());
+            fechas.add(corta(p.fecha()));
+            serieCasos.add(p.casos());
+        }
+        if (graficos && !etiquetas.isEmpty()) {
+            ficha.grafico(1, GraficosPdf.barras("Casos por diagnóstico", etiquetas, casos));
+        }
+        if (graficos && !fechas.isEmpty()) {
+            ficha.grafico(
+                    2, GraficosPdf.lineas("Casos por " + unidad(r.periodo().agrupacion()), fechas, serieCasos));
+        }
+        return new ReporteArmado(
+                ficha,
+                List.of(resumen, top, capitulos, especialidades, grupos, serie),
+                "Reporte de morbilidad",
+                nombre("morbilidad", r.periodo()));
+    }
+
+    private static String oculto(Long valor, ReporteMorbilidadResponse.GrupoEtario grupo) {
+        return valor == null ? "Oculto" : String.valueOf(valor);
+    }
+
+    private static Object valorOculto(Long valor, ReporteMorbilidadResponse.GrupoEtario grupo) {
+        return valor == null ? "Oculto" : valor;
     }
 
     private ReporteArmado calidad(ReporteCalidadResponse r, boolean graficos) {

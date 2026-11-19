@@ -378,6 +378,8 @@ public class ArchivoServiceImpl implements ArchivoService {
             case "REPORTE_FINANCIERO" -> tieneAlgunRol(actor, RolNombre.ROLE_FINANZAS, RolNombre.ROLE_GERENCIA);
             case "REPORTE_OPERATIVO" -> tieneAlgunRol(actor, RolNombre.ROLE_OPERACIONES, RolNombre.ROLE_GERENCIA);
             case "REPORTE_CALIDAD" -> tieneAlgunRol(actor, RolNombre.ROLE_CALIDAD, RolNombre.ROLE_GERENCIA);
+            case "REPORTE_MORBILIDAD" ->
+                tieneAlgunRol(actor, RolNombre.ROLE_CALIDAD, RolNombre.ROLE_OPERACIONES, RolNombre.ROLE_GERENCIA);
             default -> false;
         };
         if (!permitido) {

@@ -1,5 +1,6 @@
 package com.codesoftlabs.tusalud.app.dto.request;
 
+import com.codesoftlabs.tusalud.app.entities.enums.SexoPaciente;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -37,4 +38,6 @@ public record PacienteMostradorRequest(
         @Schema(example = "lucia.paredes@correo.com")
         @Email(message = "El email no tiene un formato válido")
         @Size(max = 150, message = "El email no debe superar 150 caracteres")
-        String email) {}
+        String email,
+
+        @Schema(example = "F") SexoPaciente sexo) {}

@@ -3,6 +3,7 @@ package com.codesoftlabs.tusalud.app.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.codesoftlabs.tusalud.app.Cie10Pruebas;
 import com.codesoftlabs.tusalud.app.dto.request.AtencionRequest;
 import com.codesoftlabs.tusalud.app.dto.request.RecetaItemRequest;
 import com.codesoftlabs.tusalud.app.dto.response.AtencionResponse;
@@ -89,7 +90,8 @@ class AtencionServiceImplTest {
                 72,
                 List.of(
                         new RecetaItemRequest("Losartán 50 mg", "1 tableta", "Cada 24 horas", "30 días"),
-                        new RecetaItemRequest("Aspirina 100 mg", "1 tableta", "Cada 24 horas", null)));
+                        new RecetaItemRequest("Aspirina 100 mg", "1 tableta", "Cada 24 horas", null)),
+                Cie10Pruebas.principal());
     }
 
     @Test

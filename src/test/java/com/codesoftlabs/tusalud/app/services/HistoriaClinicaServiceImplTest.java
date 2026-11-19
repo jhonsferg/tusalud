@@ -3,6 +3,7 @@ package com.codesoftlabs.tusalud.app.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.codesoftlabs.tusalud.app.Cie10Pruebas;
 import com.codesoftlabs.tusalud.app.dto.request.AtencionRequest;
 import com.codesoftlabs.tusalud.app.dto.request.DatosMedicosRequest;
 import com.codesoftlabs.tusalud.app.dto.request.RecetaItemRequest;
@@ -67,7 +68,8 @@ class HistoriaClinicaServiceImplTest {
                 null,
                 null,
                 null,
-                List.of(new RecetaItemRequest("Paracetamol 500 mg", "1 tableta", "Cada 8 horas", "3 días")));
+                List.of(new RecetaItemRequest("Paracetamol 500 mg", "1 tableta", "Cada 8 horas", "3 días")),
+                Cie10Pruebas.principal());
     }
 
     private static void pausar() {

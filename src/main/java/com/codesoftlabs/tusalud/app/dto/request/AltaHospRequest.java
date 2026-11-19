@@ -10,4 +10,7 @@ public record AltaHospRequest(
         String diagnosticoAlta,
 
         @Schema(example = "Control en 7 días, dieta hiposódica") @NotBlank @Size(max = 500)
-        String indicacionesAlta) {}
+        String indicacionesAlta,
+
+        @Schema(example = "I50.9", description = "Código CIE-10 del diagnóstico de alta") @Size(max = 8)
+        String cie10Alta) {}

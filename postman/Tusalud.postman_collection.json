@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "6b0d7c1e-3f5a-4e1b-9a7c-2d4e8f9a1c01",
     "name": "TuSalud API",
-    "description": "Colección única de pruebas de la API de TuSalud, el sistema de gestión clínica integral: cubre desde la atención ambulatoria hasta los reportes, los documentos y la seguridad operativa. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 27, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
+    "description": "Colección única de pruebas de la API de TuSalud, el sistema de gestión clínica integral: cubre desde la atención ambulatoria hasta los reportes, los documentos y la seguridad operativa. No necesita un environment: la URL base, los tokens y los identificadores viven como variables de la colección.\n\nEjecuta las carpetas en orden, de la 00 a la 28, con el Collection Runner o con newman. Los datos de prueba se generan únicos en cada ejecución, así que la colección puede correrse varias veces sobre la misma base. Para apuntar a otro servidor, cambia la variable baseUrl.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -21781,8 +21781,8 @@
                 "exec": [
                   "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
                   "const lista = pm.response.json();",
-                  "pm.test('Están las once plantillas del sistema', () => {",
-                  "    pm.expect(lista).to.have.length(11);",
+                  "pm.test('Están las doce plantillas del sistema', () => {",
+                  "    pm.expect(lista).to.have.length(12);",
                   "    ['comprobante', 'receta', 'resultados-laboratorio', 'informe-imagen', 'constancia', 'resumen-historia', 'reporte-ejecutivo', 'reporte-financiero', 'reporte-operativo', 'reporte-calidad'].forEach(c => pm.expect(lista.map(p => p.codigo)).to.include(c));",
                   "});"
                 ]
@@ -26856,6 +26856,1990 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "28 - Codificación CIE-10",
+      "item": [
+        {
+          "name": "Login del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"cieMedicoToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login del paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"ciePacienteToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login del administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"cieAdminToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de recepción",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"cieRecepcionToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recepcion@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de gerencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"cieGerenciaToken\", pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"gerencia@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por código",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"El código exacto va primero\", () => pm.expect(j[0].codigo).to.eql(\"I10\"));",
+                  "pm.test(\"Trae descripción y capítulo\", () => { pm.expect(j[0].descripcion).to.be.a(\"string\"); pm.expect(j[0].capitulo).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cie10?q=I10&limite=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cie10"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "I10"
+                },
+                {
+                  "key": "limite",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por texto sin tildes ni mayúsculas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Encuentra la hipertensión esencial\", () => pm.expect(pm.response.json().map(d => d.codigo)).to.include(\"I10\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cie10?q=HIPERTENSION",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cie10"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "HIPERTENSION"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar por texto con tildes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Encuentra la hipertensión esencial\", () => pm.expect(pm.response.json().map(d => d.codigo)).to.include(\"I10\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cie10?q=hipertensi%C3%B3n%20esencial",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cie10"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "hipertensi%C3%B3n%20esencial"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar sin texto devuelve una lista vacía o corta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200 o 400\", () => pm.expect([200, 400]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cie10?q=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cie10"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": ""
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar sin sesión es 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cie10?q=I10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cie10"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "I10"
+                }
+              ]
+            },
+            "description": ""
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no consulta el catálogo clínico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cie10?q=I10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cie10"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "I10"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener un código",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es el código pedido\", () => pm.expect(pm.response.json().codigo).to.eql(\"I10\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cie10/I10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cie10", "I10"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un código inexistente es 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cie10/Z99.99",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cie10", "Z99.99"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Diagnósticos frecuentes del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es una lista\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cie10/mis-frecuentes?limite=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cie10", "mis-frecuentes"],
+              "query": [
+                {
+                  "key": "limite",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no usa los frecuentes del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cie10/mis-frecuentes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cie10", "mis-frecuentes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ciePacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Médicos para reservar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const garcia = pm.response.json().find(m => /García/.test(m.apellido));",
+                  "pm.test(\"Existe el médico con especialidad\", () => pm.expect(garcia.especialidades).to.not.be.empty);",
+                  "pm.collectionVariables.set(\"cieMedicoId\", garcia.id);",
+                  "pm.collectionVariables.set(\"cieEspecialidadId\", garcia.especialidades[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ciePacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reservar una cita presencial",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let fecha;",
+                  "do {",
+                  "    fecha = new Date();",
+                  "    fecha.setDate(fecha.getDate() + 26 + Math.floor(Math.random() * 35));",
+                  "} while (fecha.getDay() === 0 || fecha.getDay() === 6);",
+                  "const dos = (n) => String(n).padStart(2, \"0\");",
+                  "const hora = 8 + Math.floor(Math.random() * 4);",
+                  "const minutos = Math.random() < 0.5 ? \"00\" : \"30\";",
+                  "pm.collectionVariables.set(\"cieFechaHora\", fecha.getFullYear() + \"-\" + dos(fecha.getMonth() + 1) + \"-\" + dos(fecha.getDate()) + \"T\" + dos(hora) + \":\" + minutos + \":00\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"cieCitaId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ciePacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": \"{{cieMedicoId}}\",\n  \"especialidadId\": \"{{cieEspecialidadId}}\",\n  \"fechaHora\": \"{{cieFechaHora}}\",\n  \"motivo\": \"Control con codificación CIE-10\",\n  \"modalidad\": \"PRESENCIAL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirmar la cita",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cieCitaId}}/confirmar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cieCitaId}}", "confirmar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar la atención sin diagnósticos es 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cieCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cieCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnosticos\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dos diagnósticos principales es 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cieCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cieCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnosticos\": [\n    {\n      \"codigo\": \"I10\",\n      \"tipo\": \"DEFINITIVO\",\n      \"principal\": true\n    },\n    {\n      \"codigo\": \"E11.9\",\n      \"tipo\": \"DEFINITIVO\",\n      \"principal\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ningún diagnóstico principal es 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cieCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cieCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnosticos\": [\n    {\n      \"codigo\": \"I10\",\n      \"tipo\": \"DEFINITIVO\",\n      \"principal\": false\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un código repetido es 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cieCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cieCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnosticos\": [\n    {\n      \"codigo\": \"I10\",\n      \"tipo\": \"DEFINITIVO\",\n      \"principal\": true\n    },\n    {\n      \"codigo\": \"I10\",\n      \"tipo\": \"REPETIDO\",\n      \"principal\": false\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un código que no existe en el catálogo es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400 o 404\", () => pm.expect([400, 404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cieCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cieCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnosticos\": [\n    {\n      \"codigo\": \"Z99.99\",\n      \"tipo\": \"DEFINITIVO\",\n      \"principal\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un paciente no registra atenciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cieCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cieCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ciePacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnosticos\": [\n    {\n      \"codigo\": \"I10\",\n      \"tipo\": \"DEFINITIVO\",\n      \"principal\": true,\n      \"observacion\": \"Control mensual\"\n    },\n    {\n      \"codigo\": \"E11.9\",\n      \"tipo\": \"PRESUNTIVO\",\n      \"principal\": false\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar la atención con diagnósticos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Guarda los dos diagnósticos\", () => pm.expect(j.diagnosticos).to.have.length(2));",
+                  "pm.test(\"Solo uno es principal\", () => pm.expect(j.diagnosticos.filter(d => d.principal)).to.have.length(1));",
+                  "pm.test(\"El principal es I10 con su descripción\", () => { const p = j.diagnosticos.find(d => d.principal); pm.expect(p.codigo).to.eql(\"I10\"); pm.expect(p.descripcion).to.include(\"Hipertensión\"); });",
+                  "pm.test(\"Las advertencias son una lista\", () => pm.expect(j.advertencias || []).to.be.an(\"array\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cieCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cieCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnostico\": \"Hipertensión en control\",\n  \"diagnosticos\": [\n    {\n      \"codigo\": \"I10\",\n      \"tipo\": \"DEFINITIVO\",\n      \"principal\": true,\n      \"observacion\": \"Control mensual\"\n    },\n    {\n      \"codigo\": \"E11.9\",\n      \"tipo\": \"PRESUNTIVO\",\n      \"principal\": false\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Editar la atención cambia el principal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Quedan tres diagnósticos\", () => pm.expect(j.diagnosticos).to.have.length(3));",
+                  "pm.test(\"El principal ahora es E11.9\", () => pm.expect(j.diagnosticos.find(d => d.principal).codigo).to.eql(\"E11.9\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cieCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cieCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnostico\": \"Hipertensión en control\",\n  \"diagnosticos\": [\n    {\n      \"codigo\": \"I10\",\n      \"tipo\": \"DEFINITIVO\",\n      \"principal\": false\n    },\n    {\n      \"codigo\": \"E11.9\",\n      \"tipo\": \"DEFINITIVO\",\n      \"principal\": true\n    },\n    {\n      \"codigo\": \"J00\",\n      \"tipo\": \"PRESUNTIVO\",\n      \"principal\": false\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente ve sus diagnósticos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Ve los tres códigos\", () => pm.expect(j.diagnosticos.map(d => d.codigo).sort()).to.eql([\"E11.9\", \"I10\", \"J00\"]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cieCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cieCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ciePacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no ve los diagnósticos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cieCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cieCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador no ve los diagnósticos de un paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{cieCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{cieCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El historial del paciente trae los códigos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const atencion = pm.response.json().atenciones.find(a => a.citaId === pm.collectionVariables.get(\"cieCitaId\"));",
+                  "pm.test(\"La atención aparece con diagnósticos codificados\", () => pm.expect(atencion.diagnosticos.length).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/historia-clinica",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "historia-clinica"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ciePacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador ve el resumen del catálogo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Hay códigos activos\", () => pm.expect(j.totalActivos).to.be.above(0));",
+                  "pm.test(\"Hay una versión vigente\", () => pm.expect(j.versionVigente).to.be.an(\"object\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/cie10/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "cie10", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no ve el resumen del catálogo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/cie10/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "cie10", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no administra el catálogo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/cie10/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "cie10", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Descargar la plantilla CSV",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es un CSV con la cabecera\", () => pm.expect(pm.response.text()).to.include(\"codigo,descripcion,capitulo,grupo,sexo,edad_minima,edad_maxima\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/cie10/plantilla.csv",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "cie10", "plantilla.csv"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Vista previa de una importación sin modificar el catálogo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"No se aplicó\", () => pm.expect(j.aplicada).to.eql(false));",
+                  "pm.test(\"Cuenta dos filas válidas\", () => { pm.expect(j.filas).to.eql(2); pm.expect(j.validas).to.eql(2); pm.expect(j.totalErrores).to.eql(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/cie10/importaciones/vista-previa",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "cie10",
+                "importaciones",
+                "vista-previa"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/cie10-prueba.csv"
+                },
+                {
+                  "key": "desactivarAusentes",
+                  "type": "text",
+                  "value": "false"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una vista previa con errores los informa por fila",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Detecta el error\", () => { pm.expect(j.totalErrores).to.eql(1); pm.expect(j.errores[0].fila).to.be.above(0); pm.expect(j.errores[0].mensaje).to.be.a(\"string\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/cie10/importaciones/vista-previa",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "cie10",
+                "importaciones",
+                "vista-previa"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/cie10-con-errores.csv"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Importar con errores y sin omitirlos es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400 o 422\", () => pm.expect([400, 422]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/cie10/importaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "cie10", "importaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/cie10-con-errores.csv"
+                },
+                {
+                  "key": "etiqueta",
+                  "type": "text",
+                  "value": "Postman con errores"
+                },
+                {
+                  "key": "omitirErrores",
+                  "type": "text",
+                  "value": "false"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Importar el catálogo de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Se aplicó\", () => pm.expect(j.aplicada).to.eql(true));",
+                  "pm.test(\"Las cifras cuadran\", () => pm.expect(j.altas + j.cambios + j.sinCambios).to.eql(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/cie10/importaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "cie10", "importaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/cie10-prueba.csv"
+                },
+                {
+                  "key": "etiqueta",
+                  "type": "text",
+                  "value": "Postman {{$timestamp}}"
+                },
+                {
+                  "key": "desactivarAusentes",
+                  "type": "text",
+                  "value": "false"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Importar el mismo archivo no cambia nada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Es idempotente\", () => { pm.expect(j.altas).to.eql(0); pm.expect(j.cambios).to.eql(0); pm.expect(j.sinCambios).to.eql(2); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/cie10/importaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "cie10", "importaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/cie10-prueba.csv"
+                },
+                {
+                  "key": "etiqueta",
+                  "type": "text",
+                  "value": "Postman repetido {{$timestamp}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El código importado se puede buscar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Aparece Y98.1\", () => pm.expect(pm.response.json().map(d => d.codigo)).to.include(\"Y98.1\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cie10?q=Y98.1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "cie10"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Y98.1"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no importa el catálogo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/cie10/importaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "cie10", "importaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "archivo",
+                  "type": "file",
+                  "src": "postman/fixtures/cie10-prueba.csv"
+                },
+                {
+                  "key": "etiqueta",
+                  "type": "text",
+                  "value": "No permitido"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Morbilidad de gerencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Trae el umbral de supresión\", () => pm.expect(j.umbralSupresion).to.eql(5));",
+                  "pm.test(\"Hay casos y un top ordenado\", () => { pm.expect(j.casos).to.be.above(0); const casos = j.top.map(d => d.casos); pm.expect(casos).to.eql([...casos].sort((a, b) => b - a)); });",
+                  "pm.test(\"Es solo agregado: sin datos de pacientes\", () => { const texto = JSON.stringify(j).toLowerCase(); pm.expect(texto).to.not.include(\"pacienteid\"); pm.expect(texto).to.not.include(\"dni\"); pm.expect(texto).to.not.include(\"juan\"); });",
+                  "pm.test(\"Ninguna celda visible tiene entre 1 y 4 casos\", () => j.porGrupoEtario.forEach(g => [g.masculino, g.femenino, g.sinDato].forEach(v => pm.expect(v === null || v === undefined || v === 0 || v >= 5).to.eql(true))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/morbilidad?agrupacion=MES",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "morbilidad"],
+              "query": [
+                {
+                  "key": "agrupacion",
+                  "value": "MES"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Morbilidad con un rango invertido es 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/morbilidad?desde=2026-12-31&hasta=2026-01-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "morbilidad"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "2026-12-31"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-01-01"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no ve la morbilidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/morbilidad",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "morbilidad"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cieRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no ve la morbilidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/morbilidad",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "morbilidad"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{ciePacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Morbilidad sin sesión es 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/reportes/morbilidad",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "reportes", "morbilidad"]
+            },
+            "description": ""
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -27517,6 +29501,42 @@
     },
     {
       "key": "teleMedicoToken",
+      "value": ""
+    },
+    {
+      "key": "cieMedicoToken",
+      "value": ""
+    },
+    {
+      "key": "ciePacienteToken",
+      "value": ""
+    },
+    {
+      "key": "cieAdminToken",
+      "value": ""
+    },
+    {
+      "key": "cieRecepcionToken",
+      "value": ""
+    },
+    {
+      "key": "cieGerenciaToken",
+      "value": ""
+    },
+    {
+      "key": "cieMedicoId",
+      "value": ""
+    },
+    {
+      "key": "cieEspecialidadId",
+      "value": ""
+    },
+    {
+      "key": "cieFechaHora",
+      "value": ""
+    },
+    {
+      "key": "cieCitaId",
       "value": ""
     }
   ]

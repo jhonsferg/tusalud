@@ -4,6 +4,7 @@ import com.codesoftlabs.tusalud.app.entities.Especialidad;
 import com.codesoftlabs.tusalud.app.entities.Medico;
 import com.codesoftlabs.tusalud.app.entities.Paciente;
 import com.codesoftlabs.tusalud.app.entities.Usuario;
+import com.codesoftlabs.tusalud.app.entities.enums.SexoPaciente;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,6 +29,7 @@ public record PerfilResponse(
 
         @Schema(example = "12345678") String dni,
         @Schema(type = "string", example = "1992-04-15") LocalDate fechaNacimiento,
+        @Schema(example = "M") SexoPaciente sexo,
         @Schema(example = "HC-000001") String historialClinicoNumero,
 
         @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
@@ -56,6 +58,7 @@ public record PerfilResponse(
                 usuario.getCreatedAt(),
                 paciente == null ? null : paciente.getDni(),
                 paciente == null ? null : paciente.getFechaNacimiento(),
+                paciente == null ? null : paciente.getSexo(),
                 paciente == null ? null : paciente.getHistorialClinicoNumero(),
                 medico == null ? null : medico.getId(),
                 medico == null ? null : medico.getColegiatura(),

@@ -14,7 +14,8 @@ public enum TipoEventoSeguridad {
     CUENTA_DESACTIVADA(SeveridadSeguridad.AVISO, "Cuenta desactivada"),
     ACCESO_DENEGADO(SeveridadSeguridad.INFO, "Acceso denegado"),
     ACCESO_DENEGADO_REPETIDO(SeveridadSeguridad.ALTA, "Accesos denegados repetidos"),
-    DESCARGA_MASIVA(SeveridadSeguridad.ALTA, "Descarga masiva de archivos");
+    DESCARGA_MASIVA(SeveridadSeguridad.ALTA, "Descarga masiva de archivos"),
+    CATALOGO_CIE10_IMPORTADO(SeveridadSeguridad.INFO, "Catálogo CIE-10 importado");
 
     private final SeveridadSeguridad severidad;
     private final String etiqueta;

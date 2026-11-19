@@ -83,6 +83,14 @@ public enum TipoDocumento {
             Set.of(FormatoDocumento.PDF, FormatoDocumento.XLSX),
             false,
             EnumSet.of(RolNombre.ROLE_CALIDAD, RolNombre.ROLE_GERENCIA, RolNombre.ROLE_ADMIN)),
+    REPORTE_MORBILIDAD(
+            "reporte-morbilidad",
+            "reporte-morbilidad",
+            false,
+            Set.of(FormatoDocumento.PDF, FormatoDocumento.XLSX),
+            false,
+            EnumSet.of(
+                    RolNombre.ROLE_CALIDAD, RolNombre.ROLE_OPERACIONES, RolNombre.ROLE_GERENCIA, RolNombre.ROLE_ADMIN)),
     LISTADO_COMPROBANTES(
             "listado-comprobantes",
             null,

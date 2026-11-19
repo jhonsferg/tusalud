@@ -6,7 +6,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
@@ -14,8 +14,9 @@ import java.util.List;
 
 @Schema(description = "Registro de la atención médica de una cita")
 public record AtencionRequest(
-        @Schema(example = "Hipertensión arterial leve")
-        @NotBlank(message = "El diagnóstico es obligatorio")
+        @Schema(
+                example = "Hipertensión arterial leve",
+                description = "Descripción clínica libre; si falta se usa la del diagnóstico principal")
         @Size(max = 1000, message = "El diagnóstico no debe superar 1000 caracteres")
         String diagnostico,
 
@@ -55,4 +56,9 @@ public record AtencionRequest(
         @Max(value = 250, message = "La frecuencia cardíaca no es válida")
         Integer frecuenciaCardiaca,
 
-        @Valid List<RecetaItemRequest> receta) {}
+        @Valid List<RecetaItemRequest> receta,
+
+        @NotEmpty(message = "Registre al menos un diagnóstico CIE-10 principal")
+        @Size(max = 10, message = "Una atención admite hasta 10 diagnósticos")
+        @Valid
+        List<DiagnosticoRequest> diagnosticos) {}

@@ -21,4 +21,7 @@ public record IngresoHospCreateRequest(
         String diagnosticoIngreso,
 
         @Schema(example = "1", description = "Solo lo usa el administrador; un médico ingresa a su nombre")
-        UUID medicoId) {}
+        UUID medicoId,
+
+        @Schema(example = "I50.0", description = "Código CIE-10 del diagnóstico de ingreso") @Size(max = 8)
+        String cie10Ingreso) {}
