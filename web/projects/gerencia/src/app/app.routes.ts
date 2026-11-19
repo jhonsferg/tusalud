@@ -51,6 +51,11 @@ export const routes: Routes = [
           import('@tusalud/features/seguros').then((m) => m.SEGUROS_GERENCIA_ROUTES),
       },
       {
+        path: 'registro-ventas',
+        loadChildren: () =>
+          import('@tusalud/features/facturacion').then((m) => m.REGISTRO_VENTAS_ROUTES),
+      },
+      {
         path: 'calendario',
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },

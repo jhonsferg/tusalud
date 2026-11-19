@@ -27,3 +27,5 @@ export * from './documentos-medicos.model';
 export * from './seguridad-operativa.model';
 export * from './seguros.model';
 export * from './teleconsulta.model';
+export * from './facturacion.model';
+export * from './proteccion-datos.model';

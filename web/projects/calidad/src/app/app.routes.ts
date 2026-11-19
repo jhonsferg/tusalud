@@ -40,6 +40,31 @@ export const routes: Routes = [
         redirectTo: 'mi-espacio/ausencias',
       },
       {
+        path: 'privacidad/solicitudes',
+        loadChildren: () =>
+          import('@tusalud/features/privacidad').then((m) => m.SOLICITUDES_ARCO_ROUTES),
+      },
+      {
+        path: 'privacidad/registro',
+        loadChildren: () =>
+          import('@tusalud/features/privacidad').then((m) => m.REGISTRO_TRATAMIENTOS_ROUTES),
+      },
+      {
+        path: 'privacidad/retencion',
+        loadChildren: () =>
+          import('@tusalud/features/privacidad').then((m) => m.RETENCION_DATOS_ROUTES),
+      },
+      {
+        path: 'privacidad/incidentes',
+        loadChildren: () =>
+          import('@tusalud/features/privacidad').then((m) => m.INCIDENTES_DATOS_ROUTES),
+      },
+      {
+        path: 'privacidad/politica',
+        loadChildren: () =>
+          import('@tusalud/features/privacidad').then((m) => m.POLITICA_ADMIN_ROUTES),
+      },
+      {
         path: 'calendario',
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },

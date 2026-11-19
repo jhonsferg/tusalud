@@ -21,6 +21,13 @@ import {
   VERIFICACION_PUBLICA_ROUTES,
 } from '@tusalud/features/documentos-medicos';
 import { ESPECIALIDADES_ROUTES } from '@tusalud/features/especialidades';
+import {
+  COMPROBANTES_ELECTRONICOS_ROUTES,
+  CONFIGURACION_FISCAL_ROUTES,
+  MIS_COMPROBANTES_ROUTES,
+  REGISTRO_VENTAS_ROUTES,
+  RESUMENES_SUNAT_ROUTES,
+} from '@tusalud/features/facturacion';
 import { FARMACIA_ROUTES, MEDICAMENTOS_ROUTES } from '@tusalud/features/farmacia';
 import { HISTORIA_CLINICA_ROUTES, PACIENTES_ROUTES } from '@tusalud/features/historia-clinica';
 import { HOSPITALIZACION_ROUTES, MIS_INGRESOS_ROUTES } from '@tusalud/features/hospitalizacion';
@@ -31,6 +38,15 @@ import { NOTIFICACIONES_ROUTES } from '@tusalud/features/notificaciones';
 import { PAGOS_ROUTES } from '@tusalud/features/pagos';
 import { PERFIL_ROUTES } from '@tusalud/features/perfil';
 import { COLA_ROUTES, RECEPCION_ROUTES } from '@tusalud/features/recepcion';
+import {
+  INCIDENTES_DATOS_ROUTES,
+  MI_PRIVACIDAD_ROUTES,
+  POLITICA_ADMIN_ROUTES,
+  POLITICA_PUBLICA_ROUTES,
+  REGISTRO_TRATAMIENTOS_ROUTES,
+  RETENCION_DATOS_ROUTES,
+  SOLICITUDES_ARCO_ROUTES,
+} from '@tusalud/features/privacidad';
 import { REPORTES_ROUTES } from '@tusalud/features/reportes';
 import { RESPALDOS_ROUTES } from '@tusalud/features/respaldos';
 import { TELECONSULTAS_ROUTES } from '@tusalud/features/telemedicina';
@@ -85,6 +101,18 @@ const DOMINIOS: Record<string, Routes> = {
   ENTREGAS_ROUTES,
   PLANTILLAS_MENSAJE_ROUTES,
   RESPALDOS_ROUTES,
+  COMPROBANTES_ELECTRONICOS_ROUTES,
+  RESUMENES_SUNAT_ROUTES,
+  CONFIGURACION_FISCAL_ROUTES,
+  REGISTRO_VENTAS_ROUTES,
+  MIS_COMPROBANTES_ROUTES,
+  MI_PRIVACIDAD_ROUTES,
+  SOLICITUDES_ARCO_ROUTES,
+  REGISTRO_TRATAMIENTOS_ROUTES,
+  RETENCION_DATOS_ROUTES,
+  INCIDENTES_DATOS_ROUTES,
+  POLITICA_ADMIN_ROUTES,
+  POLITICA_PUBLICA_ROUTES,
 };
 
 function aplanar(rutas: Routes): Route[] {

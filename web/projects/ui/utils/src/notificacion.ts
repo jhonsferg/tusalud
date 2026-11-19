@@ -40,6 +40,10 @@ export const ICONO_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   CONSENTIMIENTO_FIRMADO: 'pi-verified',
   RESPALDO_FALLIDO: 'pi-database',
   RESPALDO_VENCIDO: 'pi-database',
+  COMPROBANTE_RECHAZADO: 'pi-times-circle',
+  ARCO_RECIBIDA: 'pi-inbox',
+  ARCO_RESUELTA: 'pi-shield',
+  INCIDENTE_DATOS: 'pi-exclamation-triangle',
   SISTEMA: 'pi-info-circle',
 };
 
@@ -83,5 +87,9 @@ export const COLOR_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   CONSENTIMIENTO_FIRMADO: '#15803d',
   RESPALDO_FALLIDO: '#dc2626',
   RESPALDO_VENCIDO: '#d97706',
+  COMPROBANTE_RECHAZADO: '#dc2626',
+  ARCO_RECIBIDA: '#2563eb',
+  ARCO_RESUELTA: '#16a34a',
+  INCIDENTE_DATOS: '#dc2626',
   SISTEMA: '#64748b',
 };

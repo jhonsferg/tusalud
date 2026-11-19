@@ -383,6 +383,70 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Facturación electrónica',
+    items: [
+      {
+        label: 'Comprobantes electrónicos',
+        icon: 'pi-verified',
+        link: '/comprobantes-electronicos',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Resúmenes y bajas',
+        icon: 'pi-list-check',
+        link: '/resumenes-sunat',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Registro de ventas',
+        icon: 'pi-book',
+        link: '/registro-ventas',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Configuración fiscal',
+        icon: 'pi-cog',
+        link: '/configuracion-fiscal',
+        roles: ['ROLE_ADMIN'],
+      },
+    ],
+  },
+  {
+    title: 'Protección de datos',
+    items: [
+      {
+        label: 'Solicitudes ARCO',
+        icon: 'pi-inbox',
+        link: '/privacidad/solicitudes',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Registro de tratamientos',
+        icon: 'pi-database',
+        link: '/privacidad/registro',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Retención de datos',
+        icon: 'pi-clock',
+        link: '/privacidad/retencion',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Incidentes de datos',
+        icon: 'pi-exclamation-triangle',
+        link: '/privacidad/incidentes',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Política de privacidad',
+        icon: 'pi-book',
+        link: '/privacidad/politica',
+        roles: ['ROLE_ADMIN'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

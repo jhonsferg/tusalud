@@ -96,6 +96,16 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'mis-comprobantes',
+        loadChildren: () =>
+          import('@tusalud/features/facturacion').then((m) => m.MIS_COMPROBANTES_ROUTES),
+      },
+      {
+        path: 'privacidad',
+        loadChildren: () =>
+          import('@tusalud/features/privacidad').then((m) => m.MI_PRIVACIDAD_ROUTES),
+      },
+      {
         path: 'calendario',
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },

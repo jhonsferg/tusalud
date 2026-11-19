@@ -31,6 +31,11 @@ export const routes: Routes = [
         loadChildren: () => import('@tusalud/features/caja').then((m) => m.CAJA_ROUTES),
       },
       {
+        path: 'comprobantes-electronicos',
+        loadChildren: () =>
+          import('@tusalud/features/facturacion').then((m) => m.COMPROBANTES_ELECTRONICOS_ROUTES),
+      },
+      {
         path: 'calendario',
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },

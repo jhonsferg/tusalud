@@ -37,6 +37,41 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Protección de datos',
+    items: [
+      {
+        label: 'Solicitudes ARCO',
+        icon: 'pi-inbox',
+        link: '/privacidad/solicitudes',
+        roles: ['ROLE_CALIDAD'],
+      },
+      {
+        label: 'Registro de tratamientos',
+        icon: 'pi-database',
+        link: '/privacidad/registro',
+        roles: ['ROLE_CALIDAD'],
+      },
+      {
+        label: 'Retención de datos',
+        icon: 'pi-clock',
+        link: '/privacidad/retencion',
+        roles: ['ROLE_CALIDAD'],
+      },
+      {
+        label: 'Incidentes de datos',
+        icon: 'pi-exclamation-triangle',
+        link: '/privacidad/incidentes',
+        roles: ['ROLE_CALIDAD'],
+      },
+      {
+        label: 'Política de privacidad',
+        icon: 'pi-book',
+        link: '/privacidad/politica',
+        roles: ['ROLE_CALIDAD'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

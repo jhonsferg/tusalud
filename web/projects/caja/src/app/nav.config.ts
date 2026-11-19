@@ -56,6 +56,17 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Facturación electrónica',
+    items: [
+      {
+        label: 'Comprobantes electrónicos',
+        icon: 'pi-verified',
+        link: '/comprobantes-electronicos',
+        roles: ['ROLE_CAJA'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

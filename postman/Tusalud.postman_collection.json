@@ -8713,7 +8713,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"origen\": \"SERVICIO\",\n  \"tipoComprobante\": \"FACTURA\",\n  \"clienteTipoDoc\": \"RUC\",\n  \"clienteDoc\": \"20123456789\",\n  \"clienteNombre\": \"Empresa Postman SAC\",\n  \"metodoPago\": \"TRANSFERENCIA\",\n  \"items\": [\n    {\n      \"descripcion\": \"Chequeo corporativo\",\n      \"cantidad\": 1,\n      \"precioUnitario\": 300\n    }\n  ]\n}",
+              "raw": "{\n  \"origen\": \"SERVICIO\",\n  \"tipoComprobante\": \"FACTURA\",\n  \"clienteTipoDoc\": \"RUC\",\n  \"clienteDoc\": \"20100070970\",\n  \"clienteNombre\": \"Empresa Postman SAC\",\n  \"metodoPago\": \"TRANSFERENCIA\",\n  \"items\": [\n    {\n      \"descripcion\": \"Chequeo corporativo\",\n      \"cantidad\": 1,\n      \"precioUnitario\": 300\n    }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -21781,8 +21781,8 @@
                 "exec": [
                   "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
                   "const lista = pm.response.json();",
-                  "pm.test('Están las diecinueve plantillas del sistema', () => {",
-                  "    pm.expect(lista).to.have.length(19);",
+                  "pm.test('Están las veinte plantillas del sistema', () => {",
+                  "    pm.expect(lista).to.have.length(20);",
                   "    ['comprobante', 'receta', 'resultados-laboratorio', 'informe-imagen', 'constancia', 'resumen-historia', 'reporte-ejecutivo', 'reporte-financiero', 'reporte-operativo', 'reporte-calidad'].forEach(c => pm.expect(lista.map(p => p.codigo)).to.include(c));",
                   "});"
                 ]
@@ -35800,7 +35800,7 @@
                   "const j = pm.response.json();",
                   "pm.test('Variables permitidas y una plantilla por aviso y canal', () => {",
                   "  pm.expect(j.variables).to.eql(['centro', 'enlace', 'nombre']);",
-                  "  pm.expect(j.plantillas.length).to.eql(54);",
+                  "  pm.expect(j.plantillas.length).to.eql(60);",
                   "  const seg = j.plantillas.filter(p => p.categoria === 'Seguridad');",
                   "  pm.expect(seg.length).to.be.at.least(15);",
                   "});",
@@ -36554,6 +36554,4657 @@
                   "type": "string"
                 }
               ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "31 - Facturación electrónica y protección de datos",
+      "item": [
+        {
+          "name": "Login del administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('fpAdmin', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de finanzas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('fpFinanzas', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"finanzas@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de caja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('fpCaja', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"caja@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de gerencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('fpGerencia', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"gerencia@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de calidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('fpCalidad', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"calidad@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de recepción",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('fpRecepcion', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recepcion@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('fpMedico', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de otro paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('fpOtroPaciente', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar un paciente nuevo para la prueba",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.collectionVariables.set('fpEmail', 'fiscal.' + ts + '@correo.com');",
+                  "pm.collectionVariables.set('fpDni', String(Math.floor(10000000 + Math.random() * 90000000)));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "register"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Fiscal\",\n  \"apellido\": \"Prueba\",\n  \"email\": \"{{fpEmail}}\",\n  \"password\": \"Paciente123!\",\n  \"telefono\": \"987654321\",\n  \"dni\": \"{{fpDni}}\",\n  \"fechaNacimiento\": \"1990-05-12\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login del paciente nuevo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('fpPaciente', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{fpEmail}}\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción localiza al paciente nuevo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json(); const lista = Array.isArray(j) ? j : (j.contenido || []);",
+                  "pm.test('Aparece el paciente', () => pm.expect(lista.length).to.be.above(0));",
+                  "pm.collectionVariables.set('fpPacienteId', lista[0].pacienteId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpRecepcion}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recepcion/pacientes?q={{fpDni}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recepcion", "pacientes"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{fpDni}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sin token no hay estado fiscal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "estado"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sin token no hay solicitudes de privacidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/solicitudes/mias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "solicitudes", "mias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La política vigente es pública",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200 o 404', () => pm.expect([200,404]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/politica",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "politica"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La caja no ve la configuración fiscal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/configuracion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "configuracion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no ve la bandeja de comprobantes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "documentos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no ve la bandeja de comprobantes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpMedico}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "documentos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no ve el registro de ventas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpRecepcion}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/registro-ventas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "registro-ventas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas consulta la configuración fiscal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Hay emisor habilitado en simulación', () => { pm.expect(j.habilitada).to.eql(true); pm.expect(j.proveedor).to.eql('SIMULACION'); pm.expect(j.ruc).to.have.length(11); });",
+                  "pm.test('No expone credenciales', () => { pm.expect(JSON.stringify(j)).to.not.match(/clave|password|secreto/i); });",
+                  "pm.collectionVariables.set('fpConfig', JSON.stringify(j));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/configuracion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "configuracion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un RUC de emisor inválido se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/configuracion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "configuracion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"habilitada\": true,\n  \"ruc\": \"20123456789\",\n  \"razonSocial\": \"Clínica TuSalud S.A.C.\",\n  \"nombreComercial\": null,\n  \"direccion\": \"Av. Salud 123\",\n  \"ubigeo\": \"150122\",\n  \"departamento\": \"Lima\",\n  \"provincia\": \"Lima\",\n  \"distrito\": \"Miraflores\",\n  \"codigoLocal\": \"0000\",\n  \"proveedor\": \"SIMULACION\",\n  \"modo\": \"BETA\",\n  \"urlServicio\": null,\n  \"afectacionServicios\": \"GRAVADO\",\n  \"boletasPorResumen\": false,\n  \"diasLimiteBaja\": 7\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas guarda la configuración fiscal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Quedó habilitada', () => pm.expect(pm.response.json().habilitada).to.eql(true));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/configuracion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "configuracion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"habilitada\": true,\n  \"ruc\": \"20601234565\",\n  \"razonSocial\": \"Clínica TuSalud S.A.C.\",\n  \"nombreComercial\": \"TuSalud\",\n  \"direccion\": \"Av. Salud 123, Miraflores\",\n  \"ubigeo\": \"150122\",\n  \"departamento\": \"Lima\",\n  \"provincia\": \"Lima\",\n  \"distrito\": \"Miraflores\",\n  \"codigoLocal\": \"0000\",\n  \"proveedor\": \"SIMULACION\",\n  \"modo\": \"BETA\",\n  \"urlServicio\": null,\n  \"afectacionServicios\": \"GRAVADO\",\n  \"boletasPorResumen\": false,\n  \"diasLimiteBaja\": 7\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas lista las series",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const series = pm.response.json().map(s => s.serie);",
+                  "pm.test('Están las series de notas', () => pm.expect(series).to.include.members(['FC01', 'BC01', 'FD01']));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/series",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "series"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una serie duplicada se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/series",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "series"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"NOTA_CREDITO\",\n  \"serie\": \"FC01\",\n  \"correlativoInicial\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una serie con prefijo incorrecto se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/series",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "series"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"FACTURA\",\n  \"serie\": \"B777\",\n  \"correlativoInicial\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas ve los motivos de las notas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye anulación y devolución', () => { const c = pm.response.json().map(m => m.codigo); pm.expect(c).to.include.members(['01', '06']); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/motivos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "motivos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La caja abre su caja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201 o 400 o 409', () => pm.expect([201,400,409]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/caja/aperturas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "caja", "aperturas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"montoApertura\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La caja cobra una boleta al paciente nuevo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json(); pm.test('Total 118', () => pm.expect(j.total).to.eql(118));",
+                  "pm.collectionVariables.set('fpBoletaId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/caja/cobros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "caja", "cobros"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origen\": \"SERVICIO\",\n  \"pacienteId\": \"{{fpPacienteId}}\",\n  \"tipoComprobante\": \"BOLETA\",\n  \"clienteTipoDoc\": \"DNI\",\n  \"clienteDoc\": \"{{fpDni}}\",\n  \"clienteNombre\": \"Fiscal Prueba\",\n  \"metodoPago\": \"EFECTIVO\",\n  \"items\": [\n    {\n      \"descripcion\": \"Curación simple\",\n      \"cantidad\": 2,\n      \"precioUnitario\": 59\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La caja cobra una factura a una empresa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('fpFacturaId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/caja/cobros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "caja", "cobros"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origen\": \"SERVICIO\",\n  \"tipoComprobante\": \"FACTURA\",\n  \"clienteTipoDoc\": \"RUC\",\n  \"clienteDoc\": \"20100070970\",\n  \"clienteNombre\": \"Distribuidora Andina SAC\",\n  \"metodoPago\": \"TRANSFERENCIA\",\n  \"items\": [\n    {\n      \"descripcion\": \"Chequeo ocupacional\",\n      \"cantidad\": 1,\n      \"precioUnitario\": 236\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La caja cobra otra factura para la baja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('fpFactura2Id', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/caja/cobros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "caja", "cobros"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origen\": \"SERVICIO\",\n  \"tipoComprobante\": \"FACTURA\",\n  \"clienteTipoDoc\": \"RUC\",\n  \"clienteDoc\": \"20100070970\",\n  \"clienteNombre\": \"Distribuidora Andina SAC\",\n  \"metodoPago\": \"TRANSFERENCIA\",\n  \"items\": [\n    {\n      \"descripcion\": \"Examen de aptitud\",\n      \"cantidad\": 1,\n      \"precioUnitario\": 118\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El cobro genera su comprobante electrónico pendiente o ya enviado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Está firmado y numerado como el cobro', () => { pm.expect(j.tipo).to.eql('BOLETA'); pm.expect(j.digestValue).to.be.a('string').and.not.empty; pm.expect(j.serie).to.match(/^B/); });",
+                  "pm.collectionVariables.set('fpBoletaCpeId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/por-comprobante/{{fpBoletaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "por-comprobante",
+                "{{fpBoletaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas procesa los envíos pendientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve el conteo', () => pm.expect(pm.response.json().procesados).to.be.a('number'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/cola/procesar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "cola", "procesar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La boleta quedó aceptada con su constancia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Aceptada por el SUNAT simulado', () => { pm.expect(j.estado).to.eql('ACEPTADO'); pm.expect(j.cdrCodigo).to.eql('0'); pm.expect(j.intercambios.length).to.be.above(0); });",
+                  "pm.test('Los totales cuadran', () => pm.expect(Math.abs(j.opGravada + j.igv - j.total)).to.be.below(0.011));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/{{fpBoletaCpeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "{{fpBoletaCpeId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La factura tiene su comprobante electrónico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Es una factura aceptada, con observación por no tener dirección', () => { pm.expect(j.tipo).to.eql('FACTURA'); pm.expect(['ACEPTADO', 'ACEPTADO_OBSERVACIONES']).to.include(j.estado); });",
+                  "pm.collectionVariables.set('fpFacturaCpeId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/por-comprobante/{{fpFacturaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "por-comprobante",
+                "{{fpFacturaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Se completa la dirección y la factura queda sin observaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200 o 409', () => pm.expect([200,409]).to.include(pm.response.code));",
+                  "pm.test('Si estaba aceptada se corrige con una nota', () => { if (pm.response.code === 409) { pm.expect(pm.response.json().message).to.match(/nota de crédito/i); } });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/{{fpFacturaCpeId}}/cliente",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "{{fpFacturaCpeId}}",
+                "cliente"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipoDoc\": \"RUC\",\n  \"documento\": \"20100070970\",\n  \"nombre\": \"Distribuidora Andina SAC\",\n  \"direccion\": \"Jr. Comercio 45\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas descarga el XML firmado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un XML UBL firmado', () => { const t = pm.response.text(); pm.expect(t).to.include('Invoice'); pm.expect(t).to.include('Signature'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/{{fpBoletaCpeId}}/xml",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "{{fpBoletaCpeId}}",
+                "xml"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas descarga la constancia de recepción",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/{{fpBoletaCpeId}}/cdr",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "{{fpBoletaCpeId}}",
+                "cdr"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La caja no descarga el XML firmado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/{{fpBoletaCpeId}}/xml",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "{{fpBoletaCpeId}}",
+                "xml"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La caja no descarga la constancia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/{{fpBoletaCpeId}}/cdr",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "{{fpBoletaCpeId}}",
+                "cdr"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente titular descarga su PDF con QR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('pdf'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/{{fpBoletaCpeId}}/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "{{fpBoletaCpeId}}",
+                "pdf"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente no descarga el PDF ajeno",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpOtroPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/{{fpBoletaCpeId}}/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "{{fpBoletaCpeId}}",
+                "pdf"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente ve su comprobante electrónico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Aparece la boleta', () => pm.expect(pm.response.json().map(c => c.id)).to.include(pm.collectionVariables.get('fpBoletaCpeId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/mis-comprobantes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "mis-comprobantes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente no ve comprobantes ajenos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('No aparece la boleta', () => pm.expect(pm.response.json().map(c => c.id)).to.not.include(pm.collectionVariables.get('fpBoletaCpeId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpOtroPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/mis-comprobantes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "mis-comprobantes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La caja no emite notas de crédito",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/notas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "notas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentoId\": \"{{fpFacturaCpeId}}\",\n  \"tipo\": \"NOTA_CREDITO\",\n  \"motivoCodigo\": \"01\",\n  \"descripcion\": \"Anulación de la operación\",\n  \"items\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas emite la nota de crédito total",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Serie y estado de la nota', () => { pm.expect(j.tipo).to.eql('NOTA_CREDITO'); pm.expect(j.serie).to.eql('FC01'); pm.expect(['ACEPTADO', 'ACEPTADO_OBSERVACIONES']).to.include(j.estado); pm.expect(j.documentoReferenciaId).to.eql(pm.collectionVariables.get('fpFacturaCpeId')); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/notas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "notas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentoId\": \"{{fpFacturaCpeId}}\",\n  \"tipo\": \"NOTA_CREDITO\",\n  \"motivoCodigo\": \"01\",\n  \"descripcion\": \"Anulación de la operación\",\n  \"items\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otra nota que supera el importe se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/notas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "notas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentoId\": \"{{fpFacturaCpeId}}\",\n  \"tipo\": \"NOTA_CREDITO\",\n  \"motivoCodigo\": \"09\",\n  \"descripcion\": \"Disminución en el valor\",\n  \"items\": [\n    {\n      \"descripcion\": \"Descuento\",\n      \"cantidad\": 1,\n      \"precioUnitario\": 10\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El comprobante acreditado muestra el importe de las notas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Acreditado completo', () => pm.expect(pm.response.json().acreditado).to.eql(pm.response.json().total));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/{{fpFacturaCpeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "{{fpFacturaCpeId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Se envía y se da de baja la segunda factura",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/cola/procesar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "cola", "procesar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La segunda factura tiene su comprobante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('fpFactura2CpeId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/por-comprobante/{{fpFactura2Id}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "por-comprobante",
+                "{{fpFactura2Id}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La caja no da de baja comprobantes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/{{fpFactura2CpeId}}/baja",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "{{fpFactura2CpeId}}",
+                "baja"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Error en la emisión\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas comunica la baja de la segunda factura",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Baja en trámite', () => pm.expect(pm.response.json().motivoBaja).to.eql('Error en la emisión'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/{{fpFactura2CpeId}}/baja",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "{{fpFactura2CpeId}}",
+                "baja"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Error en la emisión\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No se repite la baja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/documentos/{{fpFactura2CpeId}}/baja",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "facturacion",
+                "documentos",
+                "{{fpFactura2CpeId}}",
+                "baja"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Error en la emisión\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La comunicación de baja queda registrada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Hay una comunicación de baja', () => pm.expect(pm.response.json().some(r => r.identificador.startsWith('RA-'))).to.eql(true));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/resumenes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "resumenes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Se cobra una boleta que luego se anula antes de enviarla",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('fpBoleta3Id', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/caja/cobros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "caja", "cobros"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origen\": \"SERVICIO\",\n  \"tipoComprobante\": \"BOLETA\",\n  \"clienteTipoDoc\": \"SIN_DOC\",\n  \"clienteNombre\": \"Cliente de mostrador\",\n  \"metodoPago\": \"EFECTIVO\",\n  \"items\": [\n    {\n      \"descripcion\": \"Curación\",\n      \"cantidad\": 1,\n      \"precioUnitario\": 40\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Anular el cobro anula el comprobante electrónico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.expect([200]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/caja/comprobantes/{{fpBoleta3Id}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "caja",
+                "comprobantes",
+                "{{fpBoleta3Id}}",
+                "anular"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Cliente se arrepintió\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas ve el registro de ventas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Tiene filas y totales numéricos', () => { pm.expect(j.filas).to.be.an('array'); pm.expect(j.total).to.be.a('number'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/registro-ventas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "registro-ventas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia ve el registro de ventas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpGerencia}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/registro-ventas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "registro-ventas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas exporta el registro de ventas a Excel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un libro de Excel', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('spreadsheetml'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/registro-ventas/excel",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "registro-ventas", "excel"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La caja no ve el registro de ventas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/registro-ventas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "registro-ventas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia no emite notas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpGerencia}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/notas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "notas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentoId\": \"{{fpFacturaCpeId}}\",\n  \"tipo\": \"NOTA_CREDITO\",\n  \"motivoCodigo\": \"01\",\n  \"descripcion\": \"Anulación de la operación\",\n  \"items\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La caja ve la bandeja y el estado fiscal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae el conteo por estado', () => pm.expect(pm.response.json().conteo).to.be.an('object'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/facturacion/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "facturacion", "estado"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La caja cierra su caja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200 o 400', () => pm.expect([200,400]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCaja}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/caja/cierre",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "caja", "cierre"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"montoContado\": 100,\n  \"observaciones\": \"Cierre de la prueba fiscal\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente nuevo no ha aceptado la política vigente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/politica/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "politica", "estado"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no crea versiones de la política",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/politicas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "gestion", "politicas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"x\",\n  \"contenido\": \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\n  \"vigenteDesde\": \"2026-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad crea un borrador de la política",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('fpHoy', new Date().toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Es un borrador con huella', () => { const j = pm.response.json(); pm.expect(j.publicada).to.eql(false); pm.expect(j.hash).to.have.length(64); });",
+                  "pm.collectionVariables.set('fpPoliticaId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/politicas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "gestion", "politicas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Política de privacidad de prueba\",\n  \"contenido\": \"Esta política describe el tratamiento de datos personales de la clínica, sus finalidades, los plazos de conservación y los derechos de acceso, rectificación, cancelación y oposición del titular.\",\n  \"vigenteDesde\": \"{{fpHoy}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad publica la política",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/politicas/{{fpPoliticaId}}/publicar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "gestion",
+                "politicas",
+                "{{fpPoliticaId}}",
+                "publicar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una política publicada no se modifica",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/politicas/{{fpPoliticaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "gestion",
+                "politicas",
+                "{{fpPoliticaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Otro título\",\n  \"contenido\": \"Esta política describe el tratamiento de datos personales de la clínica, sus finalidades, los plazos de conservación y los derechos del titular.\",\n  \"vigenteDesde\": \"2026-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La política vigente es pública y trae su huella",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae el texto y la versión', () => { const j = pm.response.json(); pm.expect(j.version).to.be.a('number'); pm.expect(j.contenido).to.be.a('string'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/politica",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "politica"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente aún debe aceptar la nueva versión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Pendiente', () => pm.expect(pm.response.json().aceptada).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/politica/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "politica", "estado"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente acepta la política",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Aceptada', () => pm.expect(pm.response.json().aceptada).to.eql(true));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/politica/aceptar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "politica", "aceptar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente ve sus consentimientos por finalidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json(); const opcional = j.find(f => !f.obligatoria); const obligatoria = j.find(f => f.obligatoria);",
+                  "pm.test('Hay finalidades obligatorias y opcionales', () => { pm.expect(opcional).to.not.be.undefined; pm.expect(obligatoria).to.not.be.undefined; });",
+                  "pm.collectionVariables.set('fpFinalidadId', opcional.finalidadId);",
+                  "pm.collectionVariables.set('fpFinalidadObligatoriaId', obligatoria.finalidadId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/consentimientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "consentimientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente otorga un consentimiento opcional",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Otorgado', () => pm.expect(pm.response.json().estado).to.eql('OTORGADO'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/consentimientos/{{fpFinalidadId}}/otorgar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "consentimientos",
+                "{{fpFinalidadId}}",
+                "otorgar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente revoca el consentimiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Revocado', () => pm.expect(pm.response.json().estado).to.eql('REVOCADO'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/consentimientos/{{fpFinalidadId}}/revocar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "consentimientos",
+                "{{fpFinalidadId}}",
+                "revocar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Ya no deseo recibirlas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una finalidad obligatoria no se revoca",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/consentimientos/{{fpFinalidadObligatoriaId}}/revocar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "consentimientos",
+                "{{fpFinalidadObligatoriaId}}",
+                "revocar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El historial conserva el rastro de cada cambio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Dos registros y el último es la revocación', () => { pm.expect(j.length).to.be.at.least(2); pm.expect(j[0].accion).to.eql('REVOCAR'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/consentimientos/historial",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "consentimientos",
+                "historial"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no gestiona consentimientos de tratamiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpMedico}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/consentimientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "consentimientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente ve qué se puede cancelar y qué se conserva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Trae categorías con su motivo y base legal', () => { pm.expect(j.categorias.length).to.be.above(0); j.categorias.forEach(c => { pm.expect(['BLOQUEADO', 'CANCELABLE']).to.include(c.estado); pm.expect(c.motivo).to.be.a('string'); pm.expect(c.baseLegal).to.be.a('string'); }); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/cancelacion/previa",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "cancelacion", "previa"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente solicita el acceso a sus datos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Recibida con su plazo', () => { pm.expect(j.estado).to.eql('RECIBIDA'); pm.expect(j.codigo).to.match(/^ARCO-/); pm.expect(j.venceEn).to.be.a('string'); });",
+                  "pm.collectionVariables.set('fpArcoId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/solicitudes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "solicitudes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"ACCESO\",\n  \"descripcion\": \"Quiero una copia de mis datos personales\",\n  \"campo\": null,\n  \"valorPropuesto\": null,\n  \"finalidadId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No se acepta una segunda solicitud de acceso abierta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/solicitudes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "solicitudes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"ACCESO\",\n  \"descripcion\": \"Otra solicitud de acceso\",\n  \"campo\": null,\n  \"valorPropuesto\": null,\n  \"finalidadId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente no ve la solicitud ajena",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpOtroPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/solicitudes/{{fpArcoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "solicitudes", "{{fpArcoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no ve la solicitud",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpMedico}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/solicitudes/{{fpArcoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "solicitudes", "{{fpArcoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La exportación no está lista antes de atender",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/solicitudes/{{fpArcoId}}/exportacion",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "solicitudes",
+                "{{fpArcoId}}",
+                "exportacion"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no resuelve su propia solicitud",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/solicitudes/{{fpArcoId}}/resolver",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "gestion",
+                "solicitudes",
+                "{{fpArcoId}}",
+                "resolver"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"ATENDER\",\n  \"resolucion\": \"Me la apruebo a mí mismo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia no ve la bandeja de privacidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpGerencia}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/solicitudes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "gestion", "solicitudes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad ve la bandeja con la solicitud",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Está la solicitud', () => pm.expect(pm.response.json().map(s => s.id)).to.include(pm.collectionVariables.get('fpArcoId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/solicitudes?estado=RECIBIDA",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "gestion", "solicitudes"],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "RECIBIDA"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad asume la solicitud",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('En revisión', () => pm.expect(pm.response.json().estado).to.eql('EN_REVISION'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/solicitudes/{{fpArcoId}}/tomar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "gestion",
+                "solicitudes",
+                "{{fpArcoId}}",
+                "tomar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad atiende el acceso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Atendida con exportación', () => { const j = pm.response.json(); pm.expect(j.estado).to.eql('ATENDIDA'); pm.expect(j.tieneExportacion).to.eql(true); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/solicitudes/{{fpArcoId}}/resolver",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "gestion",
+                "solicitudes",
+                "{{fpArcoId}}",
+                "resolver"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"ATENDER\",\n  \"resolucion\": \"Se adjunta la copia de sus datos personales\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El titular descarga la exportación de sus datos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Contiene solo sus datos', () => { pm.expect(j.perfil.correo).to.eql(pm.collectionVariables.get('fpEmail')); pm.expect(j.paciente.dni).to.eql(pm.collectionVariables.get('fpDni')); });",
+                  "pm.test('La respuesta no se almacena en caché', () => pm.expect(pm.response.headers.get('Cache-Control')).to.include('no-store'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/solicitudes/{{fpArcoId}}/exportacion",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "solicitudes",
+                "{{fpArcoId}}",
+                "exportacion"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente no descarga la exportación ajena",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpOtroPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/solicitudes/{{fpArcoId}}/exportacion",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "solicitudes",
+                "{{fpArcoId}}",
+                "exportacion"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El detalle muestra la línea de tiempo del titular",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Eventos de recepción y resolución', () => { const a = pm.response.json().eventos.map(e => e.accion); pm.expect(a).to.include.members(['RECIBIDA', 'ASIGNADA', 'ATENDIDA']); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/solicitudes/{{fpArcoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "solicitudes", "{{fpArcoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un valor inválido en la rectificación se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/solicitudes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "solicitudes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"RECTIFICACION\",\n  \"descripcion\": \"Mi teléfono está mal registrado\",\n  \"campo\": \"TELEFONO\",\n  \"valorPropuesto\": \"abc\",\n  \"finalidadId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente solicita rectificar su teléfono",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('fpArcoRectId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/solicitudes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "solicitudes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"RECTIFICACION\",\n  \"descripcion\": \"Mi teléfono está mal registrado\",\n  \"campo\": \"TELEFONO\",\n  \"valorPropuesto\": \"+51 999 111 222\",\n  \"finalidadId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad aplica la rectificación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Atendida', () => pm.expect(pm.response.json().estado).to.eql('ATENDIDA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/solicitudes/{{fpArcoRectId}}/resolver",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "gestion",
+                "solicitudes",
+                "{{fpArcoRectId}}",
+                "resolver"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"ATENDER\",\n  \"resolucion\": \"Dato corregido en el sistema\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente solicita la cancelación de sus datos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('fpArcoCancelId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/solicitudes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "solicitudes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"CANCELACION\",\n  \"descripcion\": \"Deseo que eliminen mis datos personales\",\n  \"campo\": null,\n  \"valorPropuesto\": null,\n  \"finalidadId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La cancelación conserva lo que la ley obliga",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Atendida en parte porque hay datos bloqueados', () => pm.expect(['PARCIAL', 'ATENDIDA']).to.include(pm.response.json().estado));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/solicitudes/{{fpArcoCancelId}}/resolver",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "gestion",
+                "solicitudes",
+                "{{fpArcoCancelId}}",
+                "resolver"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"ATENDER\",\n  \"resolucion\": \"Se canceló lo que la ley permite\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El titular ve qué se hizo con sus datos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae el resultado por categoría', () => pm.expect(pm.response.json().resultado).to.be.an('array').that.is.not.empty);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/solicitudes/{{fpArcoCancelId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "solicitudes",
+                "{{fpArcoCancelId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La oposición a una finalidad obligatoria se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/solicitudes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "solicitudes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"OPOSICION\",\n  \"descripcion\": \"Me opongo al tratamiento de mis datos\",\n  \"campo\": null,\n  \"valorPropuesto\": null,\n  \"finalidadId\": \"{{fpFinalidadObligatoriaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente consulta quién accedió a sus datos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/accesos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "accesos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otro paciente no ve accesos ajenos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Solo los suyos', () => pm.response.json().forEach(a => pm.expect(a.realizadoPor).to.be.a('string')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpOtroPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/accesos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "accesos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no ve las políticas de retención",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpPaciente}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/retencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "gestion", "retencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad ve las políticas de retención",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('La historia clínica solo se marca', () => { const h = pm.response.json().find(p => p.tipoDato === 'HISTORIA_CLINICA'); pm.expect(h.accion).to.eql('MARCAR'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/retencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "gestion", "retencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad ejecuta la retención",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve el resultado por política', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/retencion/ejecutar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "gestion",
+                "retencion",
+                "ejecutar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La retención deja su historial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Hay ejecuciones', () => pm.expect(pm.response.json().length).to.be.above(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/retencion/historial",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "gestion",
+                "retencion",
+                "historial"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad registra un incidente grave",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Calcula el plazo para la autoridad', () => { pm.expect(j.codigo).to.match(/^INC-/); pm.expect(j.estado).to.eql('ABIERTO'); pm.expect(j.notificarAutoridadAntesDe).to.be.a('string'); pm.expect(j.vencido).to.eql(false); });",
+                  "pm.collectionVariables.set('fpIncidenteId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/incidentes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "gestion", "incidentes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"ACCESO_NO_AUTORIZADO\",\n  \"severidad\": \"ALTA\",\n  \"descripcion\": \"Un usuario consultó historias sin relación asistencial\",\n  \"datosAfectados\": \"Historias clínicas\",\n  \"titularesAfectados\": 3,\n  \"detectadoEn\": null,\n  \"contencion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un incidente grave no se cierra sin notificar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/incidentes/{{fpIncidenteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "gestion",
+                "incidentes",
+                "{{fpIncidenteId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"CERRADO\",\n  \"contencion\": \"Accesos revocados\",\n  \"causaRaiz\": \"Rol mal asignado\",\n  \"autoridadNotificada\": false,\n  \"titularesNotificados\": false,\n  \"responsableId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Se registra la notificación y se cierra",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Cerrado con notificaciones', () => { const j = pm.response.json(); pm.expect(j.estado).to.eql('CERRADO'); pm.expect(j.autoridadNotificadaEn).to.be.a('string'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/incidentes/{{fpIncidenteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "privacidad",
+                "gestion",
+                "incidentes",
+                "{{fpIncidenteId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"CERRADO\",\n  \"contencion\": \"Accesos revocados\",\n  \"causaRaiz\": \"Rol mal asignado\",\n  \"autoridadNotificada\": true,\n  \"titularesNotificados\": true,\n  \"responsableId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas no ve los incidentes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpFinanzas}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/incidentes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "gestion", "incidentes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El registro de tratamientos lo ve calidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae bancos, finalidades y encargados', () => { const j = pm.response.json(); pm.expect(j.bancos).to.be.an('array'); pm.expect(j.finalidades.length).to.be.above(0); pm.expect(j.encargados).to.be.an('array'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/registro",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "gestion", "registro"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad registra un banco de datos",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('fpSufijo', String(Date.now()).slice(-9));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('fpBancoId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/bancos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "gestion", "bancos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"PM-{{fpSufijo}}\",\n  \"nombre\": \"Banco de prueba\",\n  \"descripcion\": \"Banco creado por la prueba\",\n  \"finalidadPrincipal\": \"Pruebas\",\n  \"categoriasDatos\": \"Identificación\",\n  \"contieneSensibles\": false,\n  \"responsable\": \"Clínica TuSalud\",\n  \"ubicacion\": \"Servidor propio\",\n  \"medidasSeguridad\": \"Control de acceso\",\n  \"transferenciaTransfronteriza\": false,\n  \"numeroInscripcion\": null,\n  \"fechaInscripcion\": null,\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un código de banco duplicado se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/bancos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "gestion", "bancos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"PM-{{fpSufijo}}\",\n  \"nombre\": \"Duplicado\",\n  \"descripcion\": \"x\",\n  \"finalidadPrincipal\": \"x\",\n  \"categoriasDatos\": \"x\",\n  \"contieneSensibles\": false,\n  \"responsable\": \"x\",\n  \"ubicacion\": \"x\",\n  \"medidasSeguridad\": \"x\",\n  \"transferenciaTransfronteriza\": false,\n  \"numeroInscripcion\": null,\n  \"fechaInscripcion\": null,\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un encargado con RUC inválido se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/encargados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "gestion", "encargados"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razonSocial\": \"Proveedor de prueba\",\n  \"ruc\": \"20123456789\",\n  \"servicio\": \"Mensajería\",\n  \"categoriasDatos\": \"Teléfonos\",\n  \"pais\": \"Perú\",\n  \"transfronterizo\": false,\n  \"contratoVigenteHasta\": null,\n  \"contacto\": null,\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El estado de cumplimiento lo ve calidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae indicadores numéricos', () => { const j = pm.response.json(); pm.expect(j.solicitudesAbiertas).to.be.a('number'); pm.expect(j.incidentesVencidos).to.be.a('number'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{fpCalidad}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/privacidad/gestion/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "privacidad", "gestion", "estado"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
             }
           },
           "response": []

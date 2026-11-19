@@ -11,6 +11,11 @@ export const routes: Routes = [
     loadChildren: () => import('./auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
   {
+    path: 'privacidad',
+    loadChildren: () =>
+      import('@tusalud/features/privacidad').then((m) => m.POLITICA_PUBLICA_ROUTES),
+  },
+  {
     path: 'verificar',
     loadChildren: () =>
       import('@tusalud/features/documentos-medicos').then((m) => m.VERIFICACION_PUBLICA_ROUTES),

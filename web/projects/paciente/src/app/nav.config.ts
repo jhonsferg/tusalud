@@ -134,6 +134,23 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Mi privacidad y pagos',
+    items: [
+      {
+        label: 'Mis comprobantes',
+        icon: 'pi-receipt',
+        link: '/mis-comprobantes',
+        roles: ['ROLE_PACIENTE'],
+      },
+      {
+        label: 'Mi privacidad',
+        icon: 'pi-shield',
+        link: '/privacidad',
+        roles: ['ROLE_PACIENTE'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

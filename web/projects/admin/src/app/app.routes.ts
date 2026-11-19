@@ -82,6 +82,51 @@ export const routes: Routes = [
         loadChildren: () => import('@tusalud/features/seguros').then((m) => m.SEGUROS_ADMIN_ROUTES),
       },
       {
+        path: 'comprobantes-electronicos',
+        loadChildren: () =>
+          import('@tusalud/features/facturacion').then((m) => m.COMPROBANTES_ELECTRONICOS_ROUTES),
+      },
+      {
+        path: 'resumenes-sunat',
+        loadChildren: () =>
+          import('@tusalud/features/facturacion').then((m) => m.RESUMENES_SUNAT_ROUTES),
+      },
+      {
+        path: 'configuracion-fiscal',
+        loadChildren: () =>
+          import('@tusalud/features/facturacion').then((m) => m.CONFIGURACION_FISCAL_ROUTES),
+      },
+      {
+        path: 'registro-ventas',
+        loadChildren: () =>
+          import('@tusalud/features/facturacion').then((m) => m.REGISTRO_VENTAS_ROUTES),
+      },
+      {
+        path: 'privacidad/solicitudes',
+        loadChildren: () =>
+          import('@tusalud/features/privacidad').then((m) => m.SOLICITUDES_ARCO_ROUTES),
+      },
+      {
+        path: 'privacidad/registro',
+        loadChildren: () =>
+          import('@tusalud/features/privacidad').then((m) => m.REGISTRO_TRATAMIENTOS_ROUTES),
+      },
+      {
+        path: 'privacidad/retencion',
+        loadChildren: () =>
+          import('@tusalud/features/privacidad').then((m) => m.RETENCION_DATOS_ROUTES),
+      },
+      {
+        path: 'privacidad/incidentes',
+        loadChildren: () =>
+          import('@tusalud/features/privacidad').then((m) => m.INCIDENTES_DATOS_ROUTES),
+      },
+      {
+        path: 'privacidad/politica',
+        loadChildren: () =>
+          import('@tusalud/features/privacidad').then((m) => m.POLITICA_ADMIN_ROUTES),
+      },
+      {
         path: 'calendario',
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },

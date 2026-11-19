@@ -60,6 +60,35 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Facturación electrónica',
+    items: [
+      {
+        label: 'Comprobantes electrónicos',
+        icon: 'pi-verified',
+        link: '/comprobantes-electronicos',
+        roles: ['ROLE_FINANZAS'],
+      },
+      {
+        label: 'Resúmenes y bajas',
+        icon: 'pi-list-check',
+        link: '/resumenes-sunat',
+        roles: ['ROLE_FINANZAS'],
+      },
+      {
+        label: 'Registro de ventas',
+        icon: 'pi-book',
+        link: '/registro-ventas',
+        roles: ['ROLE_FINANZAS'],
+      },
+      {
+        label: 'Configuración fiscal',
+        icon: 'pi-cog',
+        link: '/configuracion-fiscal',
+        roles: ['ROLE_FINANZAS'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

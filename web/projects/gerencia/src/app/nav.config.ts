@@ -90,6 +90,17 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Ventas',
+    items: [
+      {
+        label: 'Registro de ventas',
+        icon: 'pi-book',
+        link: '/registro-ventas',
+        roles: ['ROLE_GERENCIA'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {
