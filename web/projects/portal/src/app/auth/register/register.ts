@@ -6,6 +6,7 @@ import { DatePicker } from 'primeng/datepicker';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
 import { Password } from 'primeng/password';
+import { Select } from 'primeng/select';
 
 import {
   ApiError,
@@ -22,6 +23,7 @@ import { FormField } from '@tusalud/ui/form-field';
 @Component({
   selector: 'app-register',
   imports: [
+    Select,
     ReactiveFormsModule,
     RouterLink,
     Button,
@@ -39,6 +41,10 @@ export class Register {
   private readonly auth = inject(AuthService);
   private readonly navegador = inject(NAVEGADOR_EXTERNO);
 
+  protected readonly sexos = [
+    { value: 'F', label: 'Femenino' },
+    { value: 'M', label: 'Masculino' },
+  ];
   protected readonly submitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
   protected readonly ayer = (() => {
@@ -53,6 +59,7 @@ export class Register {
     dni: ['', [Validators.required, AppValidators.dni]],
     telefono: ['', [AppValidators.telefono]],
     fechaNacimiento: [null as Date | null, [Validators.required]],
+    sexo: [null as string | null],
     email: ['', [Validators.required, Validators.email, Validators.maxLength(120)]],
     password: [
       '',
@@ -75,6 +82,7 @@ export class Register {
         dni: valor.dni!,
         telefono: valor.telefono || null,
         fechaNacimiento: toIsoDate(valor.fechaNacimiento!),
+        sexo: valor.sexo || null,
         email: valor.email!,
         password: valor.password!,
       })

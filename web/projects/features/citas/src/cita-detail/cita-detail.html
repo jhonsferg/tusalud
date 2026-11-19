@@ -119,7 +119,10 @@
             <p-skeleton height="8rem" />
           } @else if (clinica.atencion.value(); as atencion) {
             <h4>Diagnóstico</h4>
-            <p class="texto">{{ atencion.diagnostico }}</p>
+            <app-lista-diagnosticos
+              [diagnosticos]="atencion.diagnosticos"
+              [descripcion]="atencion.diagnostico"
+            />
             @if (atencion.tratamiento) {
               <h4>Tratamiento</h4>
               <p class="texto">{{ atencion.tratamiento }}</p>

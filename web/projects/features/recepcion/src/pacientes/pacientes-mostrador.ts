@@ -8,6 +8,7 @@ import { DatePicker } from 'primeng/datepicker';
 import { Dialog } from 'primeng/dialog';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
+import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { Subject, debounceTime, switchMap, of } from 'rxjs';
 
@@ -24,6 +25,7 @@ import { PageHeader } from '@tusalud/ui/page-header';
 @Component({
   selector: 'app-pacientes-mostrador',
   imports: [
+    Select,
     FormsModule,
     ReactiveFormsModule,
     Button,
@@ -45,6 +47,10 @@ export class PacientesMostrador {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder).nonNullable;
 
+  protected readonly sexos = [
+    { value: 'F', label: 'Femenino' },
+    { value: 'M', label: 'Masculino' },
+  ];
   protected readonly termino = signal('');
   protected readonly resultados = signal<PacienteMostradorResponse[]>([]);
   protected readonly buscando = signal(false);
@@ -62,6 +68,7 @@ export class PacientesMostrador {
     apellido: ['', [Validators.required, Validators.maxLength(80)]],
     dni: ['', [Validators.required, Validators.pattern(/^\d{8}$/)]],
     fechaNacimiento: [null as Date | null, [Validators.required]],
+    sexo: [null as string | null],
     telefono: ['', [Validators.pattern(/^$|^\d{9}$/)]],
     email: ['', [Validators.email]],
   });
@@ -102,6 +109,7 @@ export class PacientesMostrador {
       apellido: '',
       dni: '',
       fechaNacimiento: null,
+      sexo: null,
       telefono: '',
       email: '',
     });
@@ -123,6 +131,7 @@ export class PacientesMostrador {
         apellido: valor.apellido.trim(),
         dni: valor.dni,
         fechaNacimiento: toIsoDate(valor.fechaNacimiento!),
+        sexo: valor.sexo || null,
         telefono: valor.telefono || null,
         email: valor.email.trim() || null,
       })

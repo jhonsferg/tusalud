@@ -28,6 +28,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         link: '/reportes/operativo',
         roles: ['ROLE_OPERACIONES'],
       },
+      {
+        label: 'Morbilidad',
+        icon: 'pi-heart',
+        link: '/reportes/morbilidad',
+        roles: ['ROLE_OPERACIONES'],
+      },
     ],
   },
   {

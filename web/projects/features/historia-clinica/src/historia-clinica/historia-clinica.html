@@ -199,7 +199,10 @@
             </header>
 
             <h4>Diagnóstico</h4>
-            <p>{{ atencion.diagnostico }}</p>
+            <app-lista-diagnosticos
+              [diagnosticos]="atencion.diagnosticos"
+              [descripcion]="atencion.diagnostico"
+            />
             @if (atencion.tratamiento) {
               <h4>Tratamiento</h4>
               <p>{{ atencion.tratamiento }}</p>

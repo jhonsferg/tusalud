@@ -1,3 +1,4 @@
+import { SelectorCie10 } from '@tusalud/ui/selector-cie10';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { MotivoService } from '@tusalud/ui/dialogo-motivo';
@@ -26,6 +27,7 @@ import {
   HospitalizacionStore,
   NotificationService,
   optionalIdAttribute,
+  Cie10Response,
 } from '@tusalud/core';
 import { COLOR_TRIAJE } from '@tusalud/ui/utils';
 import { EmptyState } from '@tusalud/ui/empty-state';
@@ -47,6 +49,7 @@ import { SecurityNotice } from '@tusalud/ui/tablero';
     Select,
     Tag,
     Textarea,
+    SelectorCie10,
     EmptyState,
     PageHeader,
   ],
@@ -91,6 +94,7 @@ export class IngresoDetalle {
 
   protected readonly altaVisible = signal(false);
   protected readonly diagnosticoAlta = signal('');
+  protected readonly cie10Alta = signal<Cie10Response | null>(null);
   protected readonly indicaciones = signal('');
   protected readonly errorAlta = signal<string | null>(null);
 
@@ -176,6 +180,7 @@ export class IngresoDetalle {
 
   protected abrirAlta(): void {
     this.diagnosticoAlta.set('');
+    this.cie10Alta.set(null);
     this.indicaciones.set('');
     this.errorAlta.set(null);
     this.altaVisible.set(true);
@@ -190,6 +195,7 @@ export class IngresoDetalle {
     this.store
       .alta(ingreso.id, {
         diagnosticoAlta: this.diagnosticoAlta().trim(),
+        cie10Alta: this.cie10Alta()?.codigo ?? null,
         indicacionesAlta: this.indicaciones().trim(),
       })
       .subscribe({

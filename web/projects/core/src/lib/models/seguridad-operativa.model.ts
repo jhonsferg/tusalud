@@ -14,7 +14,8 @@ export type TipoEventoSeguridad =
   | 'CUENTA_DESACTIVADA'
   | 'ACCESO_DENEGADO'
   | 'ACCESO_DENEGADO_REPETIDO'
-  | 'DESCARGA_MASIVA';
+  | 'DESCARGA_MASIVA'
+  | 'CATALOGO_CIE10_IMPORTADO';
 
 export const TIPOS_EVENTO_SEGURIDAD: readonly { value: TipoEventoSeguridad; label: string }[] = [
   { value: 'LOGIN_FALLIDO', label: 'Inicio de sesión fallido' },
@@ -31,6 +32,7 @@ export const TIPOS_EVENTO_SEGURIDAD: readonly { value: TipoEventoSeguridad; labe
   { value: 'ACCESO_DENEGADO', label: 'Acceso denegado' },
   { value: 'ACCESO_DENEGADO_REPETIDO', label: 'Accesos denegados repetidos' },
   { value: 'DESCARGA_MASIVA', label: 'Descarga masiva de archivos' },
+  { value: 'CATALOGO_CIE10_IMPORTADO', label: 'Catálogo CIE-10 importado' },
 ];
 
 export const SEVERIDADES_SEGURIDAD: readonly { value: SeveridadSeguridad; label: string }[] = [

@@ -127,6 +127,20 @@
         />
       </label>
     </div>
+    <label>
+      Sexo
+      <p-select
+        inputId="pac-sexo"
+        formControlName="sexo"
+        [options]="sexos"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Sin indicar"
+        [showClear]="true"
+        [fluid]="true"
+        appendTo="body"
+      />
+    </label>
     <div class="dos">
       <label
         >Teléfono

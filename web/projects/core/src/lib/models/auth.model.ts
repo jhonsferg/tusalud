@@ -99,6 +99,7 @@ export interface RegisterRequest {
   telefono?: string | null;
   dni: string;
   fechaNacimiento: string;
+  sexo?: string | null;
 }
 
 export interface AuthResponse {

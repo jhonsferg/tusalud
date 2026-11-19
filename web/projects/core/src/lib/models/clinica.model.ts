@@ -1,3 +1,5 @@
+import { DiagnosticoRequest, DiagnosticoResponse, SexoPaciente } from './cie10.model';
+
 export interface RecetaItem {
   medicamento: string;
   dosis?: string | null;
@@ -6,7 +8,8 @@ export interface RecetaItem {
 }
 
 export interface AtencionRequest {
-  diagnostico: string;
+  diagnostico?: string | null;
+  diagnosticos: DiagnosticoRequest[];
   tratamiento?: string | null;
   indicaciones?: string | null;
   observaciones?: string | null;
@@ -36,6 +39,8 @@ export interface AtencionResponse {
   temperaturaC?: number | null;
   frecuenciaCardiaca?: number | null;
   receta: RecetaItem[];
+  diagnosticos?: DiagnosticoResponse[];
+  advertencias?: string[];
 }
 
 export interface PacienteClinicoResponse {
@@ -45,6 +50,7 @@ export interface PacienteClinicoResponse {
   historialClinicoNumero: string;
   fechaNacimiento?: string | null;
   edad?: number | null;
+  sexo?: SexoPaciente | null;
   grupoSanguineo?: string | null;
   alergias?: string | null;
   antecedentes?: string | null;

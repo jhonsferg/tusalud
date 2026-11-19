@@ -140,6 +140,12 @@ export class InicioCalidad implements OnInit {
       enlace: '/reportes/calidad',
       detalle: 'Satisfacción, tiempos y anulaciones',
     },
+    {
+      label: 'Morbilidad',
+      icono: 'pi-heart',
+      enlace: '/reportes/morbilidad',
+      detalle: 'Diagnósticos más frecuentes',
+    },
   ];
 
   protected readonly satisfaccion = computed<ItemBarra[]>(() =>

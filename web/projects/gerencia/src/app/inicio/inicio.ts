@@ -195,6 +195,12 @@ export class InicioGerencia implements OnInit {
       detalle: 'Ingresos y caja',
     },
     {
+      label: 'Morbilidad',
+      icono: 'pi-heart',
+      enlace: '/reportes/morbilidad',
+      detalle: 'Diagnósticos más frecuentes',
+    },
+    {
       label: 'Operativo',
       icono: 'pi-sitemap',
       enlace: '/reportes/operativo',

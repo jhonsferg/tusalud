@@ -1,0 +1,71 @@
+<div class="selector" (focusin)="abrir()" (focusout)="cerrarConRetraso()">
+  <label class="etiqueta" [for]="inputId()">{{ etiqueta() }}</label>
+  <div class="campo">
+    <i class="pi pi-search" aria-hidden="true"></i>
+    <input
+      pInputText
+      type="text"
+      role="combobox"
+      class="w-full"
+      autocomplete="off"
+      autocorrect="off"
+      spellcheck="false"
+      placeholder="Escribe al menos 2 caracteres, por ejemplo I10 o hipertensión"
+      [id]="inputId()"
+      [disabled]="deshabilitado()"
+      [attr.aria-expanded]="mostrarLista()"
+      [attr.aria-controls]="idLista"
+      [attr.aria-autocomplete]="'list'"
+      [attr.aria-activedescendant]="activo() >= 0 && mostrarLista() ? idOpcion(activo()) : null"
+      [ngModel]="texto()"
+      (ngModelChange)="escribir($event)"
+      (keydown)="teclado($event)"
+    />
+    @if (buscando()) {
+      <i class="pi pi-spin pi-spinner cargando" aria-hidden="true"></i>
+    }
+  </div>
+
+  <div class="sr-only" aria-live="polite" role="status">{{ anuncio() }}</div>
+
+  @if (mostrarLista()) {
+    <ul
+      class="lista"
+      role="listbox"
+      [id]="idLista"
+      [attr.aria-label]="'Resultados de ' + etiqueta()"
+    >
+      @if (modoFrecuentes() && lista().length > 0) {
+        <li class="titulo" role="presentation">Tus diagnósticos frecuentes</li>
+      }
+      @for (item of lista(); track item.codigo; let i = $index) {
+        <li
+          role="option"
+          class="opcion"
+          [id]="idOpcion(i)"
+          [class.activa]="i === activo()"
+          [attr.aria-selected]="i === activo()"
+          (mousedown)="$event.preventDefault()"
+          (click)="elegir(item)"
+          (mouseenter)="activo.set(i)"
+        >
+          <span class="codigo">{{ item.codigo }}</span>
+          <span class="texto">
+            <span class="descripcion">{{ item.descripcion }}</span>
+            @if (restriccion(item); as texto) {
+              <small class="restriccion">{{ texto }}</small>
+            }
+          </span>
+        </li>
+      } @empty {
+        @if (fallo()) {
+          <li class="vacio" role="presentation">
+            No se pudo consultar el catálogo. Inténtalo de nuevo.
+          </li>
+        } @else if (!buscando()) {
+          <li class="vacio" role="presentation">Sin coincidencias en el catálogo.</li>
+        }
+      }
+    </ul>
+  }
+</div>

@@ -8,6 +8,7 @@ import {
   ReporteCalidadResponse,
   ReporteEjecutivoResponse,
   ReporteFinancieroResponse,
+  ReporteMorbilidadResponse,
   ReporteOperativoResponse,
 } from '../../models';
 import { toHttpParams } from '../../utils/http-params';
@@ -37,6 +38,12 @@ export class ReportesApiService {
 
   calidad(filtro: FiltroReporte): Observable<ReporteCalidadResponse> {
     return this.http.get<ReporteCalidadResponse>(`${this.baseUrl}/calidad`, {
+      params: toHttpParams({ ...filtro }),
+    });
+  }
+
+  morbilidad(filtro: FiltroReporte): Observable<ReporteMorbilidadResponse> {
+    return this.http.get<ReporteMorbilidadResponse>(`${this.baseUrl}/morbilidad`, {
       params: toHttpParams({ ...filtro }),
     });
   }

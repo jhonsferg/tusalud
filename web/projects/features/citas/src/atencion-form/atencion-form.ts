@@ -22,14 +22,19 @@ import {
   applyServerErrors,
   AppValidators,
   AtencionRequest,
+  Cie10Response,
   CitasStore,
   ClinicaStore,
+  DiagnosticoResponse,
+  TIPOS_DIAGNOSTICO,
+  TipoDiagnostico,
   NotificationService,
   optionalIdAttribute,
 } from '@tusalud/core';
 import { EmptyState } from '@tusalud/ui/empty-state';
 import { FormField } from '@tusalud/ui/form-field';
 import { PageHeader } from '@tusalud/ui/page-header';
+import { SelectorCie10 } from '@tusalud/ui/selector-cie10';
 
 @Component({
   selector: 'app-atencion-form',
@@ -45,6 +50,7 @@ import { PageHeader } from '@tusalud/ui/page-header';
     EmptyState,
     FormField,
     PageHeader,
+    SelectorCie10,
   ],
   templateUrl: './atencion-form.html',
   styleUrl: './atencion-form.scss',
@@ -60,10 +66,13 @@ export class AtencionForm {
   private readonly fb = inject(FormBuilder);
 
   protected readonly guardando = signal(false);
+  protected readonly tiposDiagnostico = TIPOS_DIAGNOSTICO;
+  protected readonly errorDiagnosticos = signal<string | null>(null);
   protected readonly editando = computed(() => this.clinica.atencion.hasValue());
 
   protected readonly form = this.fb.group({
-    diagnostico: ['', [Validators.required, AppValidators.notBlank, Validators.maxLength(1000)]],
+    diagnostico: ['', [Validators.maxLength(1000)]],
+    diagnosticos: this.fb.array([]),
     tratamiento: ['', [Validators.maxLength(2000)]],
     indicaciones: ['', [Validators.maxLength(2000)]],
     observaciones: ['', [Validators.maxLength(2000)]],
@@ -74,6 +83,14 @@ export class AtencionForm {
     frecuenciaCardiaca: [null as number | null, [Validators.min(20), Validators.max(250)]],
     receta: this.fb.array([]),
   });
+
+  protected get diagnosticos(): FormArray {
+    return this.form.controls.diagnosticos;
+  }
+
+  protected get codigosElegidos(): string[] {
+    return (this.diagnosticos.getRawValue() as { codigo: string }[]).map((d) => d.codigo);
+  }
 
   protected get receta(): FormArray {
     return this.form.controls.receta;
@@ -94,9 +111,11 @@ export class AtencionForm {
       const atencion = this.clinica.atencion.value();
       if (atencion) {
         this.receta.clear();
+        this.diagnosticos.clear();
+        (atencion.diagnosticos ?? []).forEach((d) => this.agregarDiagnosticoDe(d));
         atencion.receta.forEach((item) => this.agregarMedicamento(item));
         this.form.patchValue({
-          diagnostico: atencion.diagnostico,
+          diagnostico: atencion.diagnosticos?.length ? '' : atencion.diagnostico,
           tratamiento: atencion.tratamiento ?? '',
           indicaciones: atencion.indicaciones ?? '',
           observaciones: atencion.observaciones ?? '',
@@ -109,6 +128,60 @@ export class AtencionForm {
         this.form.markAsPristine();
       }
     });
+  }
+
+  protected agregarDiagnostico(item: Cie10Response): void {
+    const primero = this.diagnosticos.length === 0;
+    this.errorDiagnosticos.set(null);
+    this.diagnosticos.push(
+      this.fb.group({
+        codigo: [item.codigo],
+        descripcion: [item.descripcion],
+        tipo: ['DEFINITIVO' as TipoDiagnostico],
+        principal: [primero],
+        observacion: ['', [Validators.maxLength(200)]],
+      }),
+    );
+    this.form.markAsDirty();
+  }
+
+  private agregarDiagnosticoDe(d: DiagnosticoResponse): void {
+    this.diagnosticos.push(
+      this.fb.group({
+        codigo: [d.codigo],
+        descripcion: [d.descripcion],
+        tipo: [d.tipo],
+        principal: [d.principal],
+        observacion: [d.observacion ?? '', [Validators.maxLength(200)]],
+      }),
+    );
+  }
+
+  protected quitarDiagnostico(indice: number): void {
+    const eraPrincipal = this.diagnosticos.at(indice).value.principal === true;
+    this.diagnosticos.removeAt(indice);
+    if (eraPrincipal && this.diagnosticos.length > 0) {
+      this.diagnosticos.at(0).patchValue({ principal: true });
+    }
+    this.form.markAsDirty();
+  }
+
+  protected hacerPrincipal(indice: number): void {
+    this.diagnosticos.controls.forEach((control, i) =>
+      control.patchValue({ principal: i === indice }),
+    );
+    this.form.markAsDirty();
+  }
+
+  protected moverDiagnostico(indice: number, delta: number): void {
+    const destino = indice + delta;
+    if (destino < 0 || destino >= this.diagnosticos.length) {
+      return;
+    }
+    const control = this.diagnosticos.at(indice);
+    this.diagnosticos.removeAt(indice);
+    this.diagnosticos.insert(destino, control);
+    this.form.markAsDirty();
   }
 
   protected agregarMedicamento(
@@ -143,9 +216,28 @@ export class AtencionForm {
     if (id === undefined || this.form.invalid) {
       return;
     }
+    if (this.diagnosticos.length === 0) {
+      this.errorDiagnosticos.set(
+        'Agrega al menos un diagnóstico CIE-10 y marca uno como principal.',
+      );
+      return;
+    }
     const valor = this.form.getRawValue();
     const solicitud: AtencionRequest = {
-      diagnostico: valor.diagnostico!.trim(),
+      diagnostico: valor.diagnostico?.trim() || null,
+      diagnosticos: (
+        valor.diagnosticos as {
+          codigo: string;
+          tipo: TipoDiagnostico;
+          principal: boolean;
+          observacion: string;
+        }[]
+      ).map((d) => ({
+        codigo: d.codigo,
+        tipo: d.tipo,
+        principal: d.principal,
+        observacion: d.observacion?.trim() || null,
+      })),
       tratamiento: valor.tratamiento?.trim() || null,
       indicaciones: valor.indicaciones?.trim() || null,
       observaciones: valor.observaciones?.trim() || null,
@@ -173,9 +265,10 @@ export class AtencionForm {
       ? this.clinica.actualizarAtencion(id, solicitud)
       : this.clinica.registrarAtencion(id, solicitud);
     operacion.subscribe({
-      next: () => {
+      next: (guardada) => {
         this.guardando.set(false);
         this.notifications.success('La atención médica fue guardada.');
+        (guardada.advertencias ?? []).forEach((aviso) => this.notifications.warning(aviso));
         this.citas.loadOne(id);
         void this.router.navigate(['/citas', id]);
       },

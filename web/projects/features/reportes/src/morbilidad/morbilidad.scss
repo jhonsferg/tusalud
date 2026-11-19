@@ -1,0 +1,100 @@
+.aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin: 0 0 1.1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: var(--app-primary-soft, var(--p-content-hover-background));
+  color: var(--p-text-color);
+  font-size: 0.9rem;
+
+  i {
+    margin-top: 0.15rem;
+    color: var(--app-primary-text, var(--p-primary-color));
+  }
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.graficos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+
+  @media (max-width: 1000px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tablas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin: 1.25rem 0;
+
+  @media (max-width: 1000px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+h3 {
+  margin-bottom: 0.9rem;
+  font-size: 1rem;
+}
+
+.grafico {
+  position: relative;
+  min-height: 280px;
+}
+
+.codigo {
+  color: var(--app-primary-text, var(--p-primary-color));
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-weight: 700;
+}
+
+.nota {
+  margin: 0.75rem 0 0;
+  font-size: 0.82rem;
+}
+
+.especialidades {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr));
+  gap: 1rem;
+
+  article {
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--p-content-border-color);
+    border-radius: 12px;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.6rem;
+  }
+
+  ol {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: grid;
+    grid-template-columns: 3.4rem minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+}

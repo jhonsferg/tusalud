@@ -1,3 +1,4 @@
+import { SelectorCie10 } from '@tusalud/ui/selector-cie10';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -23,6 +24,7 @@ import {
   HospitalizacionStore,
   NotificationService,
   PacienteMostradorResponse,
+  Cie10Response,
 } from '@tusalud/core';
 import { colorCama } from '@tusalud/ui/utils';
 import { EmptyState } from '@tusalud/ui/empty-state';
@@ -35,6 +37,7 @@ const REFRESCO_MS = 20_000;
 @Component({
   selector: 'app-hosp-panel',
   imports: [
+    SelectorCie10,
     FormsModule,
     RouterLink,
     Button,
@@ -67,6 +70,7 @@ export class HospPanel implements OnInit {
   protected readonly paciente = signal<PacienteMostradorResponse | null>(null);
   protected readonly motivo = signal('');
   protected readonly diagnostico = signal('');
+  protected readonly cie10 = signal<Cie10Response | null>(null);
   protected readonly guardando = signal(false);
   protected readonly error = signal<string | null>(null);
 
@@ -91,6 +95,7 @@ export class HospPanel implements OnInit {
       this.paciente.set(null);
       this.motivo.set('');
       this.diagnostico.set('');
+      this.cie10.set(null);
       this.error.set(null);
     }
   }
@@ -109,6 +114,7 @@ export class HospPanel implements OnInit {
         camaId: cama.id,
         motivo: this.motivo().trim(),
         diagnosticoIngreso: this.diagnostico().trim() || null,
+        cie10Ingreso: this.cie10()?.codigo ?? null,
       })
       .subscribe({
         next: (ingreso) => {

@@ -8,6 +8,7 @@ export * from './perfil.model';
 export * from './notificacion.model';
 export * from './seguridad.model';
 export * from './pagos.model';
+export * from './cie10.model';
 export * from './clinica.model';
 export * from './admin.model';
 export * from './calendario.model';

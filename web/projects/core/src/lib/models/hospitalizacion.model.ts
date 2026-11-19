@@ -87,6 +87,10 @@ export interface IngresoHospResponse {
   medicoNombre?: string | null;
   motivo?: string | null;
   diagnosticoIngreso?: string | null;
+  cie10IngresoCodigo?: string | null;
+  cie10IngresoDescripcion?: string | null;
+  cie10AltaCodigo?: string | null;
+  cie10AltaDescripcion?: string | null;
   fechaIngreso: string;
   fechaAlta?: string | null;
   diagnosticoAlta?: string | null;
@@ -104,11 +108,13 @@ export interface IngresoHospRequest {
   motivo: string;
   diagnosticoIngreso?: string | null;
   medicoId?: string | null;
+  cie10Ingreso?: string | null;
 }
 
 export interface AltaRequest {
   diagnosticoAlta: string;
   indicacionesAlta: string;
+  cie10Alta?: string | null;
 }
 
 export interface EmergenciaRequest {

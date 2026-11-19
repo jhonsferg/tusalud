@@ -91,11 +91,81 @@
     <section class="panel">
       <h3>Evaluación</h3>
       <div class="texto">
+        <div class="diagnosticos">
+          <app-selector-cie10
+            inputId="at-cie10"
+            [excluir]="codigosElegidos"
+            (elegido)="agregarDiagnostico($event)"
+          />
+          @if (errorDiagnosticos(); as mensaje) {
+            <small class="error" role="alert">{{ mensaje }}</small>
+          }
+          @if (diagnosticos.length > 0) {
+            <ul class="dx-lista" formArrayName="diagnosticos" aria-label="Diagnósticos elegidos">
+              @for (d of diagnosticos.controls; track d; let i = $index) {
+                <li [formGroupName]="i" class="dx-fila" [class.principal]="d.value.principal">
+                  <div class="dx-titulo">
+                    <span class="dx-codigo">{{ d.value.codigo }}</span>
+                    <span class="dx-desc">{{ d.value.descripcion }}</span>
+                  </div>
+                  <div class="dx-campos">
+                    <label class="dx-principal">
+                      <input
+                        type="radio"
+                        name="dx-principal"
+                        [checked]="d.value.principal"
+                        (change)="hacerPrincipal(i)"
+                      />
+                      Principal
+                    </label>
+                    <select
+                      formControlName="tipo"
+                      [attr.aria-label]="'Tipo del diagnóstico ' + d.value.codigo"
+                    >
+                      @for (t of tiposDiagnostico; track t.value) {
+                        <option [value]="t.value">{{ t.label }}</option>
+                      }
+                    </select>
+                    <input
+                      pInputText
+                      formControlName="observacion"
+                      maxlength="200"
+                      placeholder="Observación opcional"
+                      [attr.aria-label]="'Observación del diagnóstico ' + d.value.codigo"
+                    />
+                    <p-button
+                      icon="pi pi-arrow-up"
+                      [text]="true"
+                      severity="secondary"
+                      [disabled]="i === 0"
+                      [ariaLabel]="'Subir el diagnóstico ' + d.value.codigo"
+                      (onClick)="moverDiagnostico(i, -1)"
+                    />
+                    <p-button
+                      icon="pi pi-arrow-down"
+                      [text]="true"
+                      severity="secondary"
+                      [disabled]="i === diagnosticos.length - 1"
+                      [ariaLabel]="'Bajar el diagnóstico ' + d.value.codigo"
+                      (onClick)="moverDiagnostico(i, 1)"
+                    />
+                    <p-button
+                      icon="pi pi-trash"
+                      [text]="true"
+                      severity="danger"
+                      [ariaLabel]="'Quitar el diagnóstico ' + d.value.codigo"
+                      (onClick)="quitarDiagnostico(i)"
+                    />
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+        </div>
         <app-form-field
-          label="Diagnóstico"
+          label="Descripción clínica del diagnóstico (opcional)"
           [control]="form.controls.diagnostico"
           inputId="at-diagnostico"
-          [required]="true"
         >
           <textarea
             pTextarea

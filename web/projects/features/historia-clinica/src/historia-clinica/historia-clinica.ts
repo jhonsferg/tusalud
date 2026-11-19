@@ -25,6 +25,7 @@ import { PageHeader } from '@tusalud/ui/page-header';
 import { SecurityNotice } from '@tusalud/ui/tablero';
 
 const GRUPOS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+import { ListaDiagnosticos } from '@tusalud/ui/selector-cie10';
 
 @Component({
   selector: 'app-historia-clinica',
@@ -42,6 +43,7 @@ const GRUPOS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
     EmptyState,
     FormField,
     PageHeader,
+    ListaDiagnosticos,
   ],
   templateUrl: './historia-clinica.html',
   styleUrl: './historia-clinica.scss',

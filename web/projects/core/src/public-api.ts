@@ -21,6 +21,7 @@ export * from './lib/services/api/caja-api.service';
 export * from './lib/services/api/seguros-api.service';
 export * from './lib/services/api/calendario-api.service';
 export * from './lib/services/api/citas-api.service';
+export * from './lib/services/api/cie10-api.service';
 export * from './lib/services/api/clinica-api.service';
 export * from './lib/services/api/especialidades-api.service';
 export * from './lib/services/api/farmacia-api.service';

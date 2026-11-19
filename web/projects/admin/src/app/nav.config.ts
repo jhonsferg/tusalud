@@ -218,6 +218,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         roles: ['ROLE_ADMIN'],
       },
       {
+        label: 'Catálogo CIE-10',
+        icon: 'pi-book',
+        link: '/cie10',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
         label: 'Cupones',
         icon: 'pi-ticket',
         link: '/admin/cupones',
@@ -278,6 +284,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         label: 'Calidad',
         icon: 'pi-verified',
         link: '/reportes/calidad',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Morbilidad',
+        icon: 'pi-heart',
+        link: '/reportes/morbilidad',
         roles: ['ROLE_ADMIN'],
       },
     ],

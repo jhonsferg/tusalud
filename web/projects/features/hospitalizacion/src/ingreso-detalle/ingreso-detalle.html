@@ -21,15 +21,29 @@
       @if (i.motivo) {
         <p><strong>Motivo:</strong> {{ i.motivo }}</p>
       }
-      @if (i.diagnosticoIngreso) {
-        <p><strong>Diagnóstico de ingreso:</strong> {{ i.diagnosticoIngreso }}</p>
+      @if (i.cie10IngresoCodigo || i.diagnosticoIngreso) {
+        <p>
+          <strong>Diagnóstico de ingreso:</strong>
+          @if (i.cie10IngresoCodigo) {
+            <span class="cie">{{ i.cie10IngresoCodigo }}</span>
+            {{ i.cie10IngresoDescripcion }}
+          }
+          @if (i.diagnosticoIngreso) {
+            {{ i.diagnosticoIngreso }}
+          }
+        </p>
       }
       @if (i.estado === 'CANCELADO' && i.motivoCancelacion) {
         <p><strong>Motivo de la cancelación:</strong> {{ i.motivoCancelacion }}</p>
       }
       @if (i.estado === 'ALTA') {
         <p class="alta">
-          <strong>Alta {{ i.fechaAlta | date: 'd MMM y, HH:mm' }}:</strong> {{ i.diagnosticoAlta }}
+          <strong>Alta {{ i.fechaAlta | date: 'd MMM y, HH:mm' }}:</strong>
+          @if (i.cie10AltaCodigo) {
+            <span class="cie">{{ i.cie10AltaCodigo }}</span>
+            {{ i.cie10AltaDescripcion }}
+          }
+          {{ i.diagnosticoAlta }}
         </p>
         @if (i.indicacionesAlta) {
           <p><strong>Indicaciones:</strong> {{ i.indicacionesAlta }}</p>
@@ -247,6 +261,23 @@
         [ngModel]="diagnosticoAlta()"
         (ngModelChange)="diagnosticoAlta.set($event)"
     /></label>
+    <app-selector-cie10
+      inputId="alta-cie10"
+      etiqueta="Diagnóstico CIE-10 de alta (opcional)"
+      (elegido)="cie10Alta.set($event)"
+    />
+    @if (cie10Alta(); as c) {
+      <p class="elegido">
+        <span class="cie">{{ c.codigo }}</span> {{ c.descripcion }}
+        <p-button
+          icon="pi pi-times"
+          [text]="true"
+          severity="secondary"
+          ariaLabel="Quitar el diagnóstico CIE-10 de alta"
+          (onClick)="cie10Alta.set(null)"
+        />
+      </p>
+    }
     <label>
       Indicaciones
       <textarea

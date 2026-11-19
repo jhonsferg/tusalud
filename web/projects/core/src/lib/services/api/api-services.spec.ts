@@ -285,7 +285,11 @@ describe('servicios de la API', () => {
 
   it('ClinicaApiService cubre atención, historia clínica y valoraciones', () => {
     const api = TestBed.inject(ClinicaApiService);
-    const atencion = { diagnostico: 'Hipertensión leve', receta: [{ medicamento: 'Enalapril' }] };
+    const atencion = {
+      diagnostico: 'Hipertensión leve',
+      diagnosticos: [{ codigo: 'I10', tipo: 'DEFINITIVO' as const, principal: true }],
+      receta: [{ medicamento: 'Enalapril' }],
+    };
     api.obtenerAtencion(u(7)).subscribe();
     expectRequest({ method: 'GET', url: `/api/v1/citas/${u(7)}/atencion` });
     api.registrarAtencion(u(7), atencion).subscribe();

@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import {
   AsyncState,
   AuthService,
+  Cie10ApiService,
+  Cie10FrecuenteResponse,
   CitaResponse,
   ImagenesApiService,
   LaboratorioApiService,
@@ -132,6 +134,27 @@ function hora(fecha: string): string {
 
       <div class="c12">
         <app-section-card
+          titulo="Mis diagnósticos frecuentes"
+          icono="pi-book"
+          subtitulo="Códigos CIE-10 que más registras"
+          [cargando]="frecuentes.loading() && !frecuentes.hasValue()"
+          [vacio]="listaFrecuentes().length === 0 && frecuentes.hasValue()"
+          textoVacio="Aún no registras diagnósticos codificados."
+        >
+          <ul class="frecuentes" aria-label="Diagnósticos más frecuentes">
+            @for (d of listaFrecuentes(); track d.codigo) {
+              <li>
+                <span class="cod">{{ d.codigo }}</span>
+                <span>{{ d.descripcion }}</span>
+                <strong>{{ d.casos }}</strong>
+              </li>
+            }
+          </ul>
+        </app-section-card>
+      </div>
+
+      <div class="c12">
+        <app-section-card
           titulo="Pendientes clínicos"
           icono="pi-exclamation-circle"
           [vacio]="pendientes().length === 0 && ordenes.hasValue()"
@@ -150,6 +173,27 @@ function hora(fecha: string): string {
     .stats {
       margin-bottom: var(--sp-4);
     }
+
+    .frecuentes {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .frecuentes li {
+      display: grid;
+      grid-template-columns: 3.6rem minmax(0, 1fr) auto;
+      gap: 0.6rem;
+    }
+
+    .cod {
+      color: var(--app-primary-text, var(--p-primary-color));
+      font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+      font-weight: 700;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -159,11 +203,14 @@ export class InicioMedico implements OnInit {
   private readonly recepcionApi = inject(RecepcionApiService);
   private readonly laboratorioApi = inject(LaboratorioApiService);
   private readonly imagenesApi = inject(ImagenesApiService);
+  private readonly cie10Api = inject(Cie10ApiService);
 
   protected readonly agenda = new AsyncState<CitaResponse[]>();
   protected readonly cola = new AsyncState<TurnoResponse[]>();
   protected readonly ordenes = new AsyncState<OrdenResponse[]>();
   protected readonly estudios = new AsyncState<OrdenImagenResponse[]>();
+  protected readonly frecuentes = new AsyncState<Cie10FrecuenteResponse[]>();
+  protected readonly listaFrecuentes = computed(() => this.frecuentes.value() ?? []);
 
   protected readonly saludo = computed(() => saludoDelDia(this.auth.user()?.nombreCompleto ?? ''));
   protected readonly fecha = computed(() => {
@@ -309,5 +356,6 @@ export class InicioMedico implements OnInit {
     this.cola.load(this.recepcionApi.cola());
     this.ordenes.load(this.laboratorioApi.listarOrdenes({ estado: 'COMPLETADA' }));
     this.estudios.load(this.imagenesApi.listarOrdenes({ estado: 'INFORMADA' }));
+    this.frecuentes.load(this.cie10Api.frecuentes(5));
   }
 }

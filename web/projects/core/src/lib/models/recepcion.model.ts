@@ -88,6 +88,7 @@ export interface PacienteMostradorRequest {
   apellido: string;
   dni: string;
   fechaNacimiento: string;
+  sexo?: string | null;
   telefono?: string | null;
   email?: string | null;
 }

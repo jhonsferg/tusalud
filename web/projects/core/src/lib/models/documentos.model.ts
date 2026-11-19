@@ -12,6 +12,7 @@ export type TipoExportacion =
   | 'reporte-financiero'
   | 'reporte-operativo'
   | 'reporte-calidad'
+  | 'reporte-morbilidad'
   | 'listado-comprobantes'
   | 'kardex'
   | 'stock'
@@ -28,6 +29,7 @@ export const ETIQUETA_TIPO_EXPORTACION: Readonly<Record<string, string>> = {
   'reporte-financiero': 'Reporte financiero',
   'reporte-operativo': 'Reporte operativo',
   'reporte-calidad': 'Reporte de calidad',
+  'reporte-morbilidad': 'Reporte de morbilidad',
   'listado-comprobantes': 'Listado de comprobantes',
   kardex: 'Kardex del almacén',
   stock: 'Stock del almacén',

@@ -50,6 +50,13 @@ export const PASOS_TOUR_PREDETERMINADOS: readonly TourStep[] = [
     roles: ['ROLE_ADMIN'],
   },
   {
+    target: 'nav:/cie10',
+    icon: 'pi-book',
+    title: 'Catálogo CIE-10',
+    text: 'Consulta los diagnósticos que usan los médicos e importa el catálogo oficial desde un CSV, con vista previa, versiones y auditoría.',
+    roles: ['ROLE_ADMIN'],
+  },
+  {
     target: 'nav:/admin/usuarios',
     icon: 'pi-id-card',
     title: 'Usuarios y roles',
@@ -223,6 +230,13 @@ export const PASOS_TOUR_PREDETERMINADOS: readonly TourStep[] = [
     title: 'Reporte operativo',
     text: 'Ocupación de camas, esperas, demanda por hora, uso de la agenda e inventario crítico.',
     roles: ['ROLE_OPERACIONES', 'ROLE_GERENCIA', 'ROLE_ADMIN'],
+  },
+  {
+    target: 'nav:/reportes/morbilidad',
+    icon: 'pi-heart',
+    title: 'Reporte de morbilidad',
+    text: 'Los diagnósticos principales más frecuentes por capítulo, especialidad, edad y sexo. Solo muestra datos agregados y oculta las celdas con menos de cinco casos.',
+    roles: ['ROLE_CALIDAD', 'ROLE_OPERACIONES', 'ROLE_GERENCIA', 'ROLE_ADMIN'],
   },
   {
     target: 'nav:/reportes/calidad',

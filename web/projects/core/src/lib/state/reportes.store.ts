@@ -5,6 +5,7 @@ import {
   ReporteCalidadResponse,
   ReporteEjecutivoResponse,
   ReporteFinancieroResponse,
+  ReporteMorbilidadResponse,
   ReporteOperativoResponse,
 } from '../models';
 import { ReportesApiService } from '../services/api/reportes-api.service';
@@ -19,6 +20,7 @@ export class ReportesStore {
   readonly financiero = new AsyncState<ReporteFinancieroResponse>();
   readonly operativo = new AsyncState<ReporteOperativoResponse>();
   readonly calidad = new AsyncState<ReporteCalidadResponse>();
+  readonly morbilidad = new AsyncState<ReporteMorbilidadResponse>();
 
   constructor() {
     resetOnLogout(() => this.reset());
@@ -40,10 +42,15 @@ export class ReportesStore {
     this.calidad.load(this.api.calidad(filtro));
   }
 
+  cargarMorbilidad(filtro: FiltroReporte): void {
+    this.morbilidad.load(this.api.morbilidad(filtro));
+  }
+
   reset(): void {
     this.ejecutivo.reset();
     this.financiero.reset();
     this.operativo.reset();
     this.calidad.reset();
+    this.morbilidad.reset();
   }
 }

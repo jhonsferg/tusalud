@@ -125,6 +125,20 @@
                     <input pInputText id="per-dni" [value]="perfil.dni" readonly class="w-full" />
                   </div>
 
+                  <app-form-field label="Sexo" [control]="datos.controls.sexo" inputId="per-sexo">
+                    <p-select
+                      inputId="per-sexo"
+                      formControlName="sexo"
+                      [options]="sexos"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="Prefiero no indicarlo"
+                      [showClear]="true"
+                      [fluid]="true"
+                      appendTo="body"
+                    />
+                  </app-form-field>
+
                   <app-form-field
                     label="Fecha de nacimiento"
                     [control]="datos.controls.fechaNacimiento"

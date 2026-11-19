@@ -18,6 +18,7 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Caja y facturación](#caja-y-facturación)
   - [Seguros y convenios](#seguros-y-convenios)
   - [Telemedicina](#telemedicina)
+  - [Codificación clínica CIE-10](#codificación-clínica-cie-10)
   - [Recursos humanos](#recursos-humanos)
   - [Gerencia, reportes y BI](#gerencia-reportes-y-bi)
   - [Documentos y archivos](#documentos-y-archivos)
@@ -43,6 +44,7 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Contexto de caja y seguros](#contexto-de-caja-y-seguros)
   - [Contexto de recursos humanos](#contexto-de-recursos-humanos)
   - [Contexto de documentos y archivos](#contexto-de-documentos-y-archivos)
+  - [Contexto de codificación clínica](#contexto-de-codificación-clínica)
   - [Reglas de integridad](#reglas-de-integridad)
 - [Seguridad](#seguridad)
   - [Modelo de amenazas resumido](#modelo-de-amenazas-resumido)
@@ -113,6 +115,7 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Seguridad operativa y motivos](#seguridad-operativa-y-motivos)
   - [Seguros y convenios](#seguros-y-convenios-1)
   - [Telemedicina](#telemedicina-1)
+  - [Codificación clínica CIE-10](#codificación-clínica-cie-10-1)
 - [Manejo de errores](#manejo-de-errores)
 - [Perfiles y configuración](#perfiles-y-configuración)
   - [Selección del perfil](#selección-del-perfil)
@@ -178,15 +181,15 @@ Las cifras salen del código y de las corridas de prueba más recientes.
 | ------------------------------------ | ----- |
 | Roles                                | 15    |
 | Aplicaciones web, incluido el portal | 16    |
-| Controladores REST                   | 46    |
-| Endpoints                            | 277   |
-| Entidades JPA                        | 65    |
-| Migraciones de esquema               | 21    |
-| Migraciones de datos de demostración | 14    |
-| Pruebas del backend                  | 688   |
-| Pruebas unitarias del frontend       | 378   |
-| Pruebas de extremo a extremo         | 167   |
-| Carpetas de la colección de Postman  | 28    |
+| Controladores REST                   | 48    |
+| Endpoints                            | 285   |
+| Entidades JPA                        | 68    |
+| Migraciones de esquema               | 22    |
+| Migraciones de datos de demostración | 15    |
+| Pruebas del backend                  | 724   |
+| Pruebas unitarias del frontend       | 394   |
+| Pruebas de extremo a extremo         | 172   |
+| Carpetas de la colección de Postman  | 29    |
 
 ### Cómo leer este documento
 
@@ -209,8 +212,9 @@ TuSalud se organiza por áreas operativas de la clínica. Cada área agrupa mód
 | Farmacia y almacén           | Dispensación, venta libre, inventario por lotes con FEFO              | Farmacia, almacén                        | Operativo                          |
 | Caja y facturación           | Caja, cobros, comprobantes, pagos en línea, cupones                   | Caja, paciente, administrador            | Operativo con billeteras simuladas |
 | Seguros y convenios          | Aseguradoras, convenios, pólizas, preautorizaciones, liquidaciones    | Recepción, caja, finanzas, médico        | Operativo con verificador simulado |
+| Codificación clínica         | Catálogo CIE-10, diagnósticos de la atención, reporte de morbilidad   | Médico, administrador, gerencia, calidad | Operativo con catálogo de muestra  |
 | Recursos humanos             | Fichas laborales, turnos, ausencias, vacaciones, Mi espacio           | Recursos humanos, todo el personal       | Operativo                          |
-| Gerencia, reportes y BI      | Reportes ejecutivo, financiero, operativo y de calidad                | Gerencia, finanzas, operaciones, calidad | Operativo                          |
+| Gerencia, reportes y BI      | Reportes ejecutivo, financiero, operativo, de calidad y de morbilidad | Gerencia, finanzas, operaciones, calidad | Operativo                          |
 | Documentos y archivos        | Almacén de objetos, PDF con Jasper, Excel con POI, plantillas         | Todos los roles según el documento       | Operativo                          |
 | Seguridad y auditoría        | Autenticación, MFA, sesiones, eventos de seguridad, auditoría clínica | Administrador y todos los usuarios       | Operativo                          |
 | Notificaciones y calendario  | Avisos en tiempo real, calendario personal y bloqueos de agenda       | Todos los roles                          | Operativo                          |
@@ -287,6 +291,15 @@ TuSalud se organiza por áreas operativas de la clínica. Cada área agrupa mód
 - **Endpoints principales.** `/api/v1/teleconsultas` y el canal de señalización `/ws/teleconsulta`.
 - **Pantallas.** Paciente: Teleconsultas y la tarjeta de próxima teleconsulta en su inicio. Médico: Teleconsultas con apertura de sala, resumen mínimo del paciente y acceso a registrar la atención. Ambos: preparación de cámara y micrófono, sala de video y chat. Reserva de cita con elección de modalidad.
 - **Estado.** Operativo. La conexión directa se verificó entre dos navegadores en la misma red; atravesar redes reales con NAT depende del servidor TURN y no se probó.
+
+### Codificación clínica CIE-10
+
+- **Propósito.** Convierte el diagnóstico de texto libre en un diagnóstico codificado con la Clasificación Internacional de Enfermedades, para que la historia clínica hable un idioma común y los reportes de morbilidad se calculen sobre datos limpios.
+- **Actores.** El médico codifica cada atención. El administrador mantiene el catálogo. Gerencia, calidad y operaciones consultan la morbilidad. El paciente ve los códigos de sus propias atenciones.
+- **Reglas clave.** Toda atención nueva lleva al menos un diagnóstico y exactamente uno es el principal. No se repite un código en la misma atención y solo se aceptan códigos activos del catálogo. Si el código no corresponde al sexo o a la edad del paciente, el sistema guarda la atención y avisa al médico, porque el criterio clínico manda. Recepción y caja no ven diagnósticos, el administrador no ve los de los pacientes y la constancia de atención sale sin diagnóstico por privacidad. La morbilidad solo muestra agregados y oculta las celdas con menos de cinco casos en los cortes por edad y sexo.
+- **Endpoints principales.** `/api/v1/cie10`, `/api/v1/admin/cie10` y `/api/v1/reportes/morbilidad`.
+- **Pantallas.** Médico: selector de diagnósticos en la atención y diagnósticos frecuentes en su inicio. Médico: código opcional en el ingreso y en el alta de hospitalización. Administrador: Catálogo CIE-10 con búsqueda, importación y versiones. Gerencia, calidad, operaciones y administrador: Morbilidad. Paciente: códigos en su historia clínica.
+- **Estado.** Operativo. El catálogo que se instala trae una muestra de 263 códigos frecuentes con descripciones abreviadas, marcada como tal. El catálogo oficial se carga desde un CSV, como se explica en el detalle del módulo.
 
 ### Recursos humanos
 
@@ -639,12 +652,26 @@ erDiagram
     Archivo ||--o| PlantillaDocumento : contenido
 ```
 
+### Contexto de codificación clínica
+
+```mermaid
+erDiagram
+    Cie10Version ||--o{ Cie10Catalogo : versiona
+    Atencion ||--o{ AtencionDiagnostico : codifica
+    Cie10Catalogo ||--o{ AtencionDiagnostico : describe
+    Paciente }o--o| Sexo : declara
+    IngresoHospitalario }o--o| Cie10Catalogo : ingreso
+    IngresoHospitalario }o--o| Cie10Catalogo : alta
+    Usuario ||--o{ Cie10Version : importa
+```
+
 ### Reglas de integridad
 
 - La tabla `citas` tiene índices por médico y fecha y por paciente y fecha, y el campo `version` aplica bloqueo optimista para que dos operaciones concurrentes no sobrescriban la misma cita.
 - El correo, el DNI, la colegiatura y el número de historia clínica son únicos. Los códigos de negocio, como los comprobantes, los turnos y los ingresos, son correlativos y legibles, y no se usan como identificador.
 - Las líneas de comprobantes, órdenes y resultados guardan su posición, porque un UUID no conserva el orden de creación.
 - Los datos que deben sobrevivir a cambios del catálogo se copian al momento de usarlos: el precio de la consulta en la cita y el nombre, la unidad y el rango de un parámetro en el resultado de laboratorio.
+- El diagnóstico codificado copia el código y la descripción en `atencion_diagnosticos`, de modo que una actualización del catálogo no reescribe una historia clínica ya firmada. La unicidad de un solo principal por atención se valida en el servicio y no con un índice parcial, para que la misma regla funcione en PostgreSQL y en H2.
 - Los archivos no se guardan en la base de datos: la tabla `archivos` guarda los metadatos, el bucket, la clave, el tamaño, el hash y el propietario, y los bytes viven en el almacén de objetos.
 
 ## Seguridad
@@ -797,7 +824,7 @@ Una integración nueva debe incluir una prueba de contrato contra la interfaz, m
 ### Convenciones
 
 - **Nombres.** Los paquetes, clases, métodos y rutas están en español para el dominio. Los endpoints cuelgan de `/api/v1/` con el nombre del módulo en minúsculas. Las clases siguen el sufijo de su capa, como `Controller`, `Service` y `Repository`, y los DTO terminan en `Request` o `Response`.
-- **Migraciones.** Se numeran de forma correlativa sin huecos. El esquema usa el rango V1 a V20 y la siguiente es la V21. Los datos de demostración usan el rango V100 a V113 y la siguiente es la V114. Una migración ya fusionada no se edita: cada cambio posterior es una migración nueva. Durante el desarrollo temprano, antes de contar con datos reales, las migraciones se reescribieron en sitio, por ejemplo al pasar a UUID, y por eso las bases anteriores se recrean con `docker compose down -v`.
+- **Migraciones.** Se numeran de forma correlativa sin huecos. El esquema usa el rango V1 a V22 y la siguiente es la V23. Los datos de demostración usan el rango V100 a V114 y la siguiente es la V115. Una migración ya fusionada no se edita: cada cambio posterior es una migración nueva. Durante el desarrollo temprano, antes de contar con datos reales, las migraciones se reescribieron en sitio, por ejemplo al pasar a UUID, y por eso las bases anteriores se recrean con `docker compose down -v`.
 - **Pruebas.** Las pruebas del backend terminan en `Test` y las de seguridad por módulo en `SeguridadTest`. Cada módulo cubre servicio, seguridad y casos borde. Los e2e usan datos propios y no dependen del estado ni de la hora.
 - **Mensajes.** Los errores de negocio y de validación se escriben en español, claros para el usuario y sin datos sensibles.
 - **Estilo.** El código Java se formatea con Spotless y el resto con Prettier, y los hooks de Git lo verifican. El código no lleva comentarios.
@@ -822,28 +849,29 @@ La hoja de ruta muestra cómo evolucionó el sistema y hacia dónde va. Cada ít
 
 ### Lo ya hecho, por fases
 
-| Fase | Contenido                                                                                                                                                            | Estado                                                        |
-| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| 1    | Reserva de citas, agenda de médicos, especialidades con tarifa, atención, historia clínica, recetas, pagos con tarjeta y cupones, notificaciones, auditoría y perfil | Hecho                                                         |
-| 2    | Pagos con Yape y Plin simulados, verificación en dos pasos, renovación de sesión, calendario y planificador, pacientes compartidos, reprogramación y valoraciones    | Hecho                                                         |
-| 3    | Roles de personal con almacén, farmacia y laboratorio clínico                                                                                                        | Hecho                                                         |
-| 4    | Recepción y turnos, caja y facturación, hospitalización y emergencias                                                                                                | Hecho                                                         |
-| 5    | Identificadores UUID, auditoría clínica y relación asistencial, minimización de datos por rol y telemetría enmascarada                                               | Hecho                                                         |
-| 6    | Frontend dividido en un portal y una aplicación por actor, con las librerías `core`, `ui` y `features`                                                               | Hecho                                                         |
-| 7    | Cargos directivos: reportes y BI, recursos humanos, turnos y ausencias                                                                                               | Hecho                                                         |
-| 8    | Imágenes diagnósticas con visor e informes                                                                                                                           | Hecho                                                         |
-| 9    | Almacén de objetos con SeaweedFS y gateway nginx como único punto de entrada                                                                                         | Hecho                                                         |
-| 10   | Documentos y reportes en PDF con Jasper y en Excel con POI, exportaciones asíncronas y plantillas                                                                    | Hecho                                                         |
-| 11   | Rediseño de la interfaz con sistema de diseño, inicio por rol, bloqueo por inactividad y modo privacidad                                                             | Hecho                                                         |
-| 12   | Seguridad operativa: eventos de seguridad, estado del sistema, evoluciones pendientes y motivos obligatorios                                                         | Hecho                                                         |
-| 13   | Seguros y convenios con copago, preautorizaciones, cartera y liquidaciones                                                                                           | Hecho                                                         |
-| 15   | 14                                                                                                                                                                   | Reescritura de la documentación como sistema clínico integral | Hecho |
+| Fase | Contenido                                                                                                                                                            | Estado |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| 1    | Reserva de citas, agenda de médicos, especialidades con tarifa, atención, historia clínica, recetas, pagos con tarjeta y cupones, notificaciones, auditoría y perfil | Hecho  |
+| 2    | Pagos con Yape y Plin simulados, verificación en dos pasos, renovación de sesión, calendario y planificador, pacientes compartidos, reprogramación y valoraciones    | Hecho  |
+| 3    | Roles de personal con almacén, farmacia y laboratorio clínico                                                                                                        | Hecho  |
+| 4    | Recepción y turnos, caja y facturación, hospitalización y emergencias                                                                                                | Hecho  |
+| 5    | Identificadores UUID, auditoría clínica y relación asistencial, minimización de datos por rol y telemetría enmascarada                                               | Hecho  |
+| 6    | Frontend dividido en un portal y una aplicación por actor, con las librerías `core`, `ui` y `features`                                                               | Hecho  |
+| 7    | Cargos directivos: reportes y BI, recursos humanos, turnos y ausencias                                                                                               | Hecho  |
+| 8    | Imágenes diagnósticas con visor e informes                                                                                                                           | Hecho  |
+| 9    | Almacén de objetos con SeaweedFS y gateway nginx como único punto de entrada                                                                                         | Hecho  |
+| 10   | Documentos y reportes en PDF con Jasper y en Excel con POI, exportaciones asíncronas y plantillas                                                                    | Hecho  |
+| 11   | Rediseño de la interfaz con sistema de diseño, inicio por rol, bloqueo por inactividad y modo privacidad                                                             | Hecho  |
+| 12   | Seguridad operativa: eventos de seguridad, estado del sistema, evoluciones pendientes y motivos obligatorios                                                         | Hecho  |
+| 13   | Seguros y convenios con copago, preautorizaciones, cartera y liquidaciones                                                                                           | Hecho  |
+| 14   | Telemedicina con videoconsulta de uno a uno por WebRTC, consentimiento, sala de espera y modalidad virtual en las citas                                              | Hecho  |
+| 15   | Reescritura de la documentación como sistema clínico integral                                                                                                        | Hecho  |
+| 16   | Codificación clínica con CIE-10, diagnósticos por atención y reporte de morbilidad                                                                                   | Hecho  |
 
 ### Planificado, en orden de prioridad
 
 | Ítem                                                                                                                                                 | Estado      |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| Telemedicina con videoconsulta de uno a uno entre médico y paciente, con señalización en el backend y sala vinculada a la cita                       | Planificado |
 | Flujos propios por especialidad como aplicaciones nuevas: odontología con odontograma y presupuesto, y pediatría con curvas de crecimiento y vacunas | Planificado |
 | Antivirus para las subidas de archivos                                                                                                               | Planificado |
 | Copias de seguridad de la base de datos y del almacén de objetos, y réplica del almacén                                                              | Planificado |
@@ -1054,6 +1082,8 @@ La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y
 | `/reportes/financiero`                                                    | Finanzas, gerencia, admin                                                                     | Ingresos, anulaciones y cajas                                                                             |
 | `/reportes/operativo`                                                     | Operaciones, gerencia, admin                                                                  | Ocupación, esperas, demanda e inventario                                                                  |
 | `/reportes/calidad`                                                       | Calidad, gerencia, admin                                                                      | Valoraciones, cancelaciones y entregas                                                                    |
+| `/reportes/morbilidad`                                                    | Calidad, operaciones, gerencia, admin                                                         | Diagnósticos principales más frecuentes, solo agregados                                                   |
+| `/cie10`                                                                  | Admin                                                                                         | Catálogo CIE-10, importación por CSV y versiones                                                          |
 | `/rrhh`                                                                   | Recursos humanos, gerencia, admin                                                             | Resumen de la plantilla                                                                                   |
 | `/rrhh/empleados`                                                         | Recursos humanos, gerencia, admin                                                             | Fichas laborales                                                                                          |
 | `/rrhh/turnos`                                                            | Recursos humanos, admin                                                                       | Turnos semanales del personal                                                                             |
@@ -1140,6 +1170,11 @@ La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y
 | `GET`                                                                     | `/api/v1/reportes/financiero`                                                                 | Finanzas, gerencia, admin                                                                                 | 200       |
 | `GET`                                                                     | `/api/v1/reportes/operativo`                                                                  | Operaciones, gerencia, admin                                                                              | 200       |
 | `GET`                                                                     | `/api/v1/reportes/calidad`                                                                    | Calidad, gerencia, admin                                                                                  | 200       |
+| `GET`                                                                     | `/api/v1/reportes/morbilidad`                                                                 | Calidad, operaciones, gerencia, admin                                                                     | 200       |
+| `GET`                                                                     | `/api/v1/cie10`, `/cie10/{codigo}`                                                            | Médico, admin, calidad, operaciones, gerencia                                                             | 200       |
+| `GET`                                                                     | `/api/v1/cie10/mis-frecuentes`                                                                | Médico                                                                                                    | 200       |
+| `GET`                                                                     | `/api/v1/admin/cie10/resumen`, `/admin/cie10/plantilla.csv`                                   | Admin                                                                                                     | 200       |
+| `POST`                                                                    | `/api/v1/admin/cie10/importaciones/vista-previa`, `/admin/cie10/importaciones`                | Admin                                                                                                     | 200       |
 | `GET`                                                                     | `/api/v1/rrhh/resumen`, `/rrhh/empleados`, `/rrhh/empleados/{id}`                             | Recursos humanos, gerencia, admin                                                                         | 200       |
 | `POST`                                                                    | `/api/v1/rrhh/empleados`                                                                      | Recursos humanos                                                                                          | 201       |
 | `PUT`                                                                     | `/api/v1/rrhh/empleados/{id}`                                                                 | Recursos humanos                                                                                          | 200       |
@@ -1164,7 +1199,7 @@ La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y
 | `POST`                                                                    | `/api/v1/citas/{id}/pago`                                                                     | Paciente dueño                                                                                            | 201       |
 | `POST`                                                                    | `/api/v1/citas/{id}/atencion`                                                                 | Médico de la cita                                                                                         | 201       |
 | `PUT`                                                                     | `/api/v1/citas/{id}/atencion`                                                                 | Médico de la cita                                                                                         | 200       |
-| `GET`                                                                     | `/api/v1/citas/{id}/atencion`                                                                 | Paciente dueño, médico o admin                                                                            | 200       |
+| `GET`                                                                     | `/api/v1/citas/{id}/atencion`                                                                 | Paciente dueño o médico de la cita                                                                        | 200       |
 | `POST`                                                                    | `/api/v1/citas/{id}/valoracion`                                                               | Paciente dueño                                                                                            | 201       |
 | `GET`                                                                     | `/api/v1/citas/{id}/valoracion`                                                               | Paciente dueño, médico o admin                                                                            | 200       |
 | `GET`                                                                     | `/api/v1/medicos/{id}/valoraciones`                                                           | Autenticado                                                                                               | 200       |
@@ -2290,6 +2325,32 @@ La clínica atiende a pacientes con seguro público, EPS, seguros privados y con
 
 En la web no hay aplicaciones nuevas. Finanzas y administración usan `/seguros/aseguradoras`, `/seguros/cartera` y `/seguros/liquidaciones`, y finanzas y recepción `/seguros/preautorizaciones`. Recepción usa `/seguros/polizas`, el médico `/preautorizaciones`, el paciente `/mis-seguros` y gerencia ve la cartera y las liquidaciones. Todo vive en el entry point `@tusalud/features/seguros`, y la pantalla de cobro de caja muestra el desglose con la opción de cobrar como particular.
 
+### Codificación clínica CIE-10
+
+El módulo reemplaza el diagnóstico de texto libre por diagnósticos codificados con la CIE-10, sin perder el texto libre que ya existía.
+
+**Catálogo.** La tabla `catalogo_cie10` guarda el código, la descripción, el texto de búsqueda normalizado, el capítulo, el grupo, el sexo y el rango de edad a los que aplica, si está activo y si es una muestra. La migración V22 la crea junto con `cie10_versiones` y `atencion_diagnosticos`, y la V114 de demostración carga 263 códigos frecuentes marcados como muestra. Las descripciones de la muestra son abreviadas y están escritas a mano, no son el catálogo oficial. La página de administración lo avisa mientras solo exista la muestra.
+
+**Búsqueda.** `GET /api/v1/cie10?q=` busca por código o por texto sin distinguir tildes ni mayúsculas, y la misma consulta funciona en PostgreSQL y en H2. Los resultados salen ordenados por código exacto, prefijo de código, inicio del texto y el resto. Con varias palabras, la base filtra por la más larga y el servicio aplica las demás. `GET /api/v1/cie10/{codigo}` devuelve un código y `GET /api/v1/cie10/mis-frecuentes` los que el médico más registra.
+
+**Importación del catálogo oficial.** El administrador descarga la plantilla en `GET /api/v1/admin/cie10/plantilla.csv`, la completa con el catálogo oficial publicado por el MINSA o por la OPS, y la sube en `/cie10`. Las columnas son `codigo`, `descripcion`, `capitulo`, `grupo`, `sexo`, `edad_minima` y `edad_maxima`, con coma, punto y coma o tabulador como separador. `POST /api/v1/admin/cie10/importaciones/vista-previa` valida el archivo y cuenta altas, cambios, filas sin cambios y errores por fila sin tocar el catálogo. `POST /api/v1/admin/cie10/importaciones` lo aplica de forma idempotente por código, exige una etiqueta para la versión nueva, puede desactivar los códigos que no vengan en el archivo y puede omitir las filas con errores. Cada importación queda como una versión y como un evento de seguridad de tipo `CATALOGO_CIE10_IMPORTADO`. Importar el mismo archivo dos veces no cambia nada. Un código desactivado sigue visible en las atenciones antiguas pero ya no se puede elegir.
+
+**Diagnósticos de la atención.** `POST` y `PUT /api/v1/citas/{id}/atencion` reciben la lista `diagnosticos` con el código, el tipo, si es el principal y una observación opcional. El tipo es `PRESUNTIVO`, `DEFINITIVO` o `REPETIDO`. Se admiten hasta 10 diagnósticos, uno solo es el principal, no se repiten códigos y todos deben estar activos. Al editar, el sistema reconcilia en sitio los diagnósticos existentes para no violar la unicidad. El campo de texto libre sigue existiendo como descripción clínica opcional.
+
+**Avisos por sexo y edad.** Si un código restringido a un sexo o a una edad no coincide con el paciente, la respuesta incluye `advertencias` y la web las muestra como avisos. No bloquean el guardado. Para esto el paciente tiene el campo `sexo`, opcional, que se puede indicar al registrarse, en el perfil y en el mostrador de recepción.
+
+**Hospitalización.** El ingreso y el alta admiten un código CIE-10 opcional, además del texto, y la ficha del ingreso muestra ambos.
+
+**Morbilidad.** `GET /api/v1/reportes/morbilidad` calcula, sobre el diagnóstico principal de las atenciones del periodo, los diagnósticos más frecuentes, los casos por capítulo, los principales por especialidad, la distribución por grupo de edad y sexo, la serie en el tiempo y la tendencia de los cinco primeros. Solo devuelve agregados. En el corte por edad y sexo, toda celda con menos de cinco casos se oculta, y si una celda de una fila queda oculta también se oculta el total de la fila, para que no se pueda deducir por resta. Se exporta a PDF y a Excel con el tipo `reporte-morbilidad`.
+
+**Seguridad.** Buscar en el catálogo y ver la morbilidad no exponen datos de pacientes. Ver los diagnósticos de una atención exige ser el médico de la cita o el paciente dueño. Recepción, caja, farmacia, almacén y el administrador reciben 403. La telemetría no registra los cuerpos de las rutas de atención. La constancia de atención no incluye el diagnóstico. La importación es solo del administrador y queda en la auditoría.
+
+**Pantallas.** El componente `@tusalud/ui/selector-cie10` es un combobox accesible con búsqueda diferida, navegación por teclado, anuncios para lectores de pantalla y sugerencias de frecuentes. Lo usan la atención, el alta y el ingreso de hospitalización. `ListaDiagnosticos`, del mismo paquete, muestra los diagnósticos en la historia clínica y en el detalle de la cita.
+
+**Pruebas.** El backend tiene pruebas de servicio para la normalización, la búsqueda y la importación, de la atención con sus reglas, de la morbilidad con la supresión de celdas y de seguridad por rol. El frontend prueba el selector, la lista y el catálogo. Los e2e cubren el flujo del médico, la minimización por rol, la importación por el administrador y la exportación de morbilidad. La carpeta 28 de Postman recorre todos los casos felices y los 400, 401, 403 y 404.
+
+**Límites conocidos.** El catálogo incluido es una muestra y el oficial lo carga el administrador. No hay CIE-10 en las órdenes de laboratorio ni de imágenes, ni sugerencias de diagnóstico, ni codificación de procedimientos con CPT o CIE-9-MC. Las atenciones anteriores a la migración se codificaron en la demostración por coincidencia de texto y las demás conservan solo el texto libre.
+
 ## Manejo de errores
 
 `GlobalExceptionHandler` traduce cada excepción a una respuesta con el mismo formato. Los errores 401 y 403 que produce Spring Security antes de llegar a un controlador usan ese mismo formato.
@@ -2814,7 +2875,7 @@ Las 378 pruebas unitarias corren con Vitest, repartidas entre los proyectos, y c
 npm test
 ```
 
-Las 167 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal los flujos de almacén, farmacia y laboratorio, los de recepción, caja y hospitalización, el recorrido completo de un estudio de imagen con carga de imágenes e informe, los reportes gerenciales, los turnos, las ausencias y Mi espacio, y la subida y descarga de archivos, el aislamiento del almacén, las cabeceras de seguridad, el límite de tasa y los tamaños del gateway, y la seguridad operativa con los eventos de seguridad, el estado del sistema, las evoluciones pendientes y los motivos obligatorios, y la telemedicina con dos navegadores que se conectan por video, chatean y finalizan. Requieren el stack levantado con datos de prueba y atraviesan el portal y las aplicaciones por sus rutas base. El helper `ir` de `e2e/support.ts` construye la dirección real de cada pantalla a partir de la aplicación en la que está el usuario y de su prefijo oculto.
+Las 172 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal los flujos de almacén, farmacia y laboratorio, los de recepción, caja y hospitalización, el recorrido completo de un estudio de imagen con carga de imágenes e informe, los reportes gerenciales, los turnos, las ausencias y Mi espacio, y la subida y descarga de archivos, el aislamiento del almacén, las cabeceras de seguridad, el límite de tasa y los tamaños del gateway, y la seguridad operativa con los eventos de seguridad, el estado del sistema, las evoluciones pendientes y los motivos obligatorios, la telemedicina con dos navegadores que se conectan por video, chatean y finalizan, y la codificación CIE-10 con la atención codificada por el médico, la minimización por rol, la importación del catálogo y la exportación de morbilidad. Requieren el stack levantado con datos de prueba y atraviesan el portal y las aplicaciones por sus rutas base. El helper `ir` de `e2e/support.ts` construye la dirección real de cada pantalla a partir de la aplicación en la que está el usuario y de su prefijo oculto.
 
 Las ocho pruebas de documentos exportan un reporte a PDF y a Excel desde la web, descargan un comprobante y un listado, bajan los resultados de laboratorio, comprueban que un paciente o un médico sin relación no obtiene la receta ajena, que el token en la dirección no autentica y que una exportación es solo de quien la pidió, y suben, rechazan y restauran una plantilla. Cada una limpia lo que crea para poder repetirse.
 
@@ -2947,7 +3008,7 @@ En los perfiles `local`, `dev` y `qa` los datos se cargan con las migraciones de
 
 ### Datos de demostración
 
-`V100__datos_demostracion.sql` amplía esos datos en los perfiles `local`, `dev` y `qa`, y los scripts V101 a V113 hacen lo mismo con cada módulo. V113 agrega cuatro aseguradoras con su convenio, seis pólizas de pacientes demo, una suspendida, una vencida y una por vencer, preautorizaciones, cuentas por cobrar y liquidaciones en varios estados.
+`V100__datos_demostracion.sql` amplía esos datos en los perfiles `local`, `dev` y `qa`, y los scripts V101 a V114 hacen lo mismo con cada módulo. V114 carga la muestra del catálogo CIE-10 y codifica las atenciones de demostración. V113 agrega cuatro aseguradoras con su convenio, seis pólizas de pacientes demo, una suspendida, una vencida y una por vencer, preautorizaciones, cuentas por cobrar y liquidaciones en varios estados.
 
 - Cinco médicos más, de Medicina General, Dermatología, Traumatología, Ginecología y Oftalmología, cada uno con sus horarios.
 - Ocho pacientes más con nombres, DNI y fechas de nacimiento ficticios.

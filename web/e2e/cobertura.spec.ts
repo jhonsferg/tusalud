@@ -98,6 +98,8 @@ test.describe('ciclo de vida de una cita', () => {
     });
     await medico.getByRole('button', { name: 'Registrar atención' }).click();
     await expect(medico).toHaveURL(/\/atencion$/);
+    await medico.locator('#at-cie10').fill('hipertensión');
+    await medico.getByRole('option').filter({ hasText: 'I10' }).first().click();
     await medico.locator('#at-diagnostico').fill('Control sin hallazgos');
     await medico.getByRole('button', { name: 'Guardar atención' }).click();
     await expect(medico.getByText('La atención médica fue guardada.')).toBeVisible();

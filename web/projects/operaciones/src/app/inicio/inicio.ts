@@ -186,6 +186,12 @@ export class InicioOperaciones implements OnInit {
       enlace: '/reportes/operativo',
       detalle: 'Demanda, esperas y agenda',
     },
+    {
+      label: 'Morbilidad',
+      icono: 'pi-heart',
+      enlace: '/reportes/morbilidad',
+      detalle: 'Diagnósticos más frecuentes',
+    },
   ];
 
   protected readonly serie = computed<PuntoBarra[]>(() =>

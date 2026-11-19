@@ -37,8 +37,14 @@
           @if (i.motivo) {
             <p><strong>Motivo:</strong> {{ i.motivo }}</p>
           }
-          @if (i.diagnosticoAlta) {
-            <p><strong>Diagnóstico de alta:</strong> {{ i.diagnosticoAlta }}</p>
+          @if (i.diagnosticoAlta || i.cie10AltaCodigo) {
+            <p>
+              <strong>Diagnóstico de alta:</strong>
+              @if (i.cie10AltaCodigo) {
+                {{ i.cie10AltaCodigo }} {{ i.cie10AltaDescripcion }}
+              }
+              {{ i.diagnosticoAlta }}
+            </p>
           }
           @if (i.indicacionesAlta) {
             <p><strong>Indicaciones:</strong> {{ i.indicacionesAlta }}</p>

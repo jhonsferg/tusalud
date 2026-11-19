@@ -1,0 +1,224 @@
+<app-page-header
+  title="Morbilidad"
+  subtitle="Diagnósticos principales CIE-10 del periodo"
+  icon="pi-heart"
+>
+  <app-boton-exportar
+    tipo="reporte-morbilidad"
+    formato="PDF"
+    [parametros]="parametros()"
+    [deshabilitado]="!filtro()"
+  />
+  <app-boton-exportar
+    tipo="reporte-morbilidad"
+    formato="XLSX"
+    [parametros]="parametros()"
+    [deshabilitado]="!filtro()"
+  />
+</app-page-header>
+
+<app-filtros-reporte (cambio)="cargar($event)" />
+
+@if (store.morbilidad.error(); as problema) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar el reporte"
+      [message]="problema.message"
+    />
+  </div>
+} @else if (store.morbilidad.value(); as r) {
+  <p class="aviso" role="note">
+    <i class="pi pi-shield" aria-hidden="true"></i>
+    <span>
+      Solo datos agregados, sin información de pacientes. En los cortes por edad y sexo se ocultan
+      las celdas con menos de {{ r.umbralSupresion }} casos para evitar identificar a una persona.
+    </span>
+  </p>
+
+  @if (r.casos === 0) {
+    <div class="panel">
+      <app-empty-state
+        icon="pi-heart"
+        title="Sin atenciones codificadas"
+        message="No hay atenciones con diagnóstico principal CIE-10 en el periodo elegido."
+      />
+    </div>
+  } @else {
+    <div class="kpis">
+      <app-kpi etiqueta="Casos con diagnóstico principal" [valor]="r.casos" icono="pi-file-edit" />
+      <app-kpi
+        etiqueta="Diagnósticos distintos"
+        [valor]="r.diagnosticosDistintos"
+        icono="pi-list"
+      />
+      @if (r.top[0]; as primero) {
+        <app-kpi
+          etiqueta="Más frecuente"
+          [valor]="primero.codigo + ' · ' + primero.casos + ' casos'"
+          icono="pi-chart-bar"
+        />
+      }
+      @if (r.porCapitulo[0]; as capitulo) {
+        <app-kpi
+          etiqueta="Capítulo más frecuente"
+          [valor]="(capitulo.porcentaje | number: '1.0-1') + ' % de los casos'"
+          icono="pi-sitemap"
+        />
+      }
+    </div>
+
+    <div class="graficos">
+      <section class="panel">
+        <h3>Diagnósticos más frecuentes</h3>
+        <div
+          class="grafico"
+          role="img"
+          aria-label="Gráfico de barras con los diagnósticos más frecuentes. Los mismos datos están en la tabla de abajo."
+        >
+          <p-chart type="bar" [data]="graficoTop()" [options]="opcionesTop" height="360px" />
+        </div>
+      </section>
+      <section class="panel">
+        <h3>
+          Casos por
+          {{
+            r.periodo.agrupacion === 'DIA'
+              ? 'día'
+              : r.periodo.agrupacion === 'SEMANA'
+                ? 'semana'
+                : 'mes'
+          }}
+        </h3>
+        <div
+          class="grafico"
+          role="img"
+          aria-label="Gráfico de líneas con los casos a lo largo del periodo"
+        >
+          <p-chart type="line" [data]="graficoSerie()" [options]="opcionesLinea" height="360px" />
+        </div>
+      </section>
+    </div>
+
+    <section class="panel">
+      <h3>Detalle de los diagnósticos principales</h3>
+      <p-table [value]="r.top" [rowHover]="true" responsiveLayout="scroll">
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="codigo">Código <p-sortIcon field="codigo" /></th>
+            <th pSortableColumn="descripcion">Diagnóstico <p-sortIcon field="descripcion" /></th>
+            <th pSortableColumn="capitulo">Capítulo <p-sortIcon field="capitulo" /></th>
+            <th pSortableColumn="casos" class="text-right">Casos <p-sortIcon field="casos" /></th>
+            <th class="text-right">Porcentaje</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-d>
+          <tr>
+            <td class="codigo">{{ d.codigo }}</td>
+            <td>{{ d.descripcion }}</td>
+            <td class="text-muted">{{ d.capitulo }}</td>
+            <td class="text-right">
+              <strong>{{ d.casos }}</strong>
+            </td>
+            <td class="text-right">{{ d.porcentaje | number: '1.1-1' }} %</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </section>
+
+    <div class="tablas">
+      <section class="panel">
+        <h3>Casos por capítulo</h3>
+        <p-table [value]="r.porCapitulo" [rowHover]="true" responsiveLayout="scroll">
+          <ng-template #header>
+            <tr>
+              <th>Capítulo</th>
+              <th class="text-right">Casos</th>
+              <th class="text-right">Porcentaje</th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-c>
+            <tr>
+              <td>{{ c.capitulo }}</td>
+              <td class="text-right">{{ c.casos }}</td>
+              <td class="text-right">{{ c.porcentaje | number: '1.1-1' }} %</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </section>
+
+      <section class="panel">
+        <h3>Casos por grupo de edad y sexo</h3>
+        <p-table [value]="r.porGrupoEtario" responsiveLayout="scroll">
+          <ng-template #header>
+            <tr>
+              <th>Grupo de edad</th>
+              <th class="text-right">Masculino</th>
+              <th class="text-right">Femenino</th>
+              <th class="text-right">Sin dato</th>
+              <th class="text-right">Total</th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-g>
+            <tr>
+              <td>{{ g.grupo }}</td>
+              <td class="text-right">{{ g.masculino ?? 'Oculto' }}</td>
+              <td class="text-right">{{ g.femenino ?? 'Oculto' }}</td>
+              <td class="text-right">{{ g.sinDato ?? 'Oculto' }}</td>
+              <td class="text-right">
+                <strong>{{ g.total ?? 'Oculto' }}</strong>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+        <p class="nota text-muted">
+          Oculto significa menos de {{ r.umbralSupresion }} casos en esa celda.
+        </p>
+      </section>
+    </div>
+
+    <section class="panel">
+      <h3>Principales diagnósticos por especialidad</h3>
+      <div class="especialidades">
+        @for (e of r.porEspecialidad; track e.especialidad) {
+          <article>
+            <header>
+              <strong>{{ e.especialidad }}</strong>
+              <span class="text-muted">{{ e.casos }} casos</span>
+            </header>
+            <ol>
+              @for (d of e.top; track d.codigo) {
+                <li>
+                  <span class="codigo">{{ d.codigo }}</span>
+                  <span>{{ d.descripcion }}</span>
+                  <strong>{{ d.casos }}</strong>
+                </li>
+              }
+            </ol>
+          </article>
+        }
+      </div>
+    </section>
+
+    @if (r.tendencia.length > 0) {
+      <section class="panel">
+        <h3>Tendencia de los cinco diagnósticos más frecuentes</h3>
+        <div
+          class="grafico"
+          role="img"
+          aria-label="Gráfico de líneas con la evolución de los cinco diagnósticos más frecuentes"
+        >
+          <p-chart
+            type="line"
+            [data]="graficoTendencia()"
+            [options]="opcionesLinea"
+            height="320px"
+          />
+        </div>
+      </section>
+    }
+  }
+} @else if (store.morbilidad.loading()) {
+  <div class="panel"><p>Preparando el reporte…</p></div>
+}

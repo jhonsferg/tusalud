@@ -6,6 +6,7 @@ const EJECUTIVO = roleGuard('ROLE_GERENCIA', 'ROLE_ADMIN');
 const FINANCIERO = roleGuard('ROLE_FINANZAS', 'ROLE_GERENCIA', 'ROLE_ADMIN');
 const OPERATIVO = roleGuard('ROLE_OPERACIONES', 'ROLE_GERENCIA', 'ROLE_ADMIN');
 const CALIDAD = roleGuard('ROLE_CALIDAD', 'ROLE_GERENCIA', 'ROLE_ADMIN');
+const MORBILIDAD = roleGuard('ROLE_CALIDAD', 'ROLE_OPERACIONES', 'ROLE_GERENCIA', 'ROLE_ADMIN');
 
 export const REPORTES_ROUTES: Routes = [
   {
@@ -31,5 +32,11 @@ export const REPORTES_ROUTES: Routes = [
     title: 'Reporte de calidad',
     canMatch: [CALIDAD],
     loadComponent: () => import('./calidad/calidad').then((m) => m.ReporteCalidad),
+  },
+  {
+    path: 'morbilidad',
+    title: 'Morbilidad',
+    canMatch: [MORBILIDAD],
+    loadComponent: () => import('./morbilidad/morbilidad').then((m) => m.ReporteMorbilidad),
   },
 ];

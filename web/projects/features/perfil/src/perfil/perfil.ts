@@ -154,6 +154,10 @@ function reducirImagen(archivo: File): Promise<File> {
 export class Perfil implements OnInit {
   readonly tab = input<string>();
 
+  protected readonly sexos = [
+    { value: 'F', label: 'Femenino' },
+    { value: 'M', label: 'Masculino' },
+  ];
   protected readonly store = inject(PerfilStore);
   protected readonly theme = inject(ThemeService);
   private readonly notifications = inject(NotificationService);
@@ -200,6 +204,7 @@ export class Perfil implements OnInit {
     apellido: ['', [Validators.required, AppValidators.notBlank, Validators.maxLength(100)]],
     telefono: ['', [AppValidators.telefono]],
     fechaNacimiento: [null as Date | null],
+    sexo: [null as string | null],
     consultorio: ['', [Validators.maxLength(50)]],
   });
 
@@ -268,6 +273,7 @@ export class Perfil implements OnInit {
       apellido: perfil.apellido,
       telefono: perfil.telefono ?? '',
       fechaNacimiento: perfil.fechaNacimiento ? parseIsoDate(perfil.fechaNacimiento) : null,
+      sexo: perfil.sexo ?? null,
       consultorio: perfil.consultorio ?? '',
     });
   }
@@ -284,6 +290,7 @@ export class Perfil implements OnInit {
         nombre: valor.nombre!.trim(),
         apellido: valor.apellido!.trim(),
         telefono: valor.telefono || null,
+        sexo: this.esPaciente() ? valor.sexo || null : null,
         fechaNacimiento:
           this.esPaciente() && valor.fechaNacimiento ? toIsoDate(valor.fechaNacimiento) : null,
         consultorio: this.esMedico() ? valor.consultorio?.trim() || null : null,

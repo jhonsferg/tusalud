@@ -31,6 +31,7 @@ import { BotonDocumento } from '@tusalud/ui/boton-documento';
 import { PageHeader } from '@tusalud/ui/page-header';
 import { PagoDialog } from '@tusalud/ui/pago-dialog';
 import { ValoracionDialog } from '@tusalud/ui/valoracion-dialog';
+import { ListaDiagnosticos } from '@tusalud/ui/selector-cie10';
 
 @Component({
   selector: 'app-cita-detail',
@@ -49,6 +50,7 @@ import { ValoracionDialog } from '@tusalud/ui/valoracion-dialog';
     PageHeader,
     PagoDialog,
     ValoracionDialog,
+    ListaDiagnosticos,
   ],
   templateUrl: './cita-detail.html',
   styleUrl: './cita-detail.scss',

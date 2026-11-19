@@ -86,6 +86,19 @@
       />
     </app-form-field>
 
+    <app-form-field class="full" label="Sexo" [control]="form.controls.sexo" inputId="reg-sexo">
+      <p-select
+        inputId="reg-sexo"
+        formControlName="sexo"
+        [options]="sexos"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Prefiero no indicarlo"
+        [showClear]="true"
+        [fluid]="true"
+      />
+    </app-form-field>
+
     <app-form-field
       class="full"
       label="Email"

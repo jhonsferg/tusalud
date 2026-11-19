@@ -9,6 +9,7 @@ export interface PerfilResponse {
   createdAt: string;
   dni?: string | null;
   fechaNacimiento?: string | null;
+  sexo?: string | null;
   historialClinicoNumero?: string | null;
   medicoId?: string | null;
   colegiatura?: string | null;
@@ -24,6 +25,7 @@ export interface PerfilUpdateRequest {
   apellido: string;
   telefono?: string | null;
   fechaNacimiento?: string | null;
+  sexo?: string | null;
   consultorio?: string | null;
 }
 

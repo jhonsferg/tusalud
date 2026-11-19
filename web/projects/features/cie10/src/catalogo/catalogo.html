@@ -1,0 +1,278 @@
+<app-page-header
+  title="Catálogo CIE-10"
+  subtitle="Diagnósticos codificados que usan los médicos y los reportes de morbilidad"
+  icon="pi-book"
+>
+  <p-button
+    label="Descargar plantilla CSV"
+    icon="pi pi-download"
+    [outlined]="true"
+    (onClick)="descargarPlantilla()"
+  />
+</app-page-header>
+
+@if (errorResumen(); as mensaje) {
+  <div class="panel">
+    <app-empty-state
+      tone="error"
+      icon="pi-exclamation-triangle"
+      title="No pudimos cargar el catálogo"
+      [message]="mensaje"
+    >
+      <p-button label="Reintentar" icon="pi pi-refresh" (onClick)="cargarResumen()" />
+    </app-empty-state>
+  </div>
+} @else if (resumen(); as r) {
+  @if (r.soloMuestra) {
+    <p-message severity="warn" styleClass="w-full aviso-muestra">
+      El catálogo actual es una muestra curada de diagnósticos frecuentes. Para codificar toda la
+      práctica clínica, obtén el catálogo oficial de la fuente del MINSA o de la OPS y cárgalo desde
+      un archivo CSV con las columnas de la plantilla.
+    </p-message>
+  }
+
+  <div class="kpis">
+    <app-kpi etiqueta="Diagnósticos activos" [valor]="r.totalActivos" icono="pi-book" />
+    <app-kpi
+      etiqueta="Versión vigente"
+      [valor]="r.versionVigente?.etiqueta ?? 'Sin versión'"
+      icono="pi-tag"
+    />
+    <app-kpi
+      etiqueta="Origen"
+      [valor]="r.soloMuestra ? 'Muestra' : 'Importación'"
+      icono="pi-database"
+      [tono]="r.soloMuestra ? 'alerta' : 'exito'"
+    />
+  </div>
+
+  <section class="panel">
+    <h3>Buscar en el catálogo</h3>
+    <label class="campo" for="cie-buscar">Código o nombre del diagnóstico</label>
+    <input
+      pInputText
+      id="cie-buscar"
+      type="search"
+      class="w-full"
+      autocomplete="off"
+      placeholder="Por ejemplo I10 o diabetes"
+      [ngModel]="consulta()"
+      (ngModelChange)="buscar($event)"
+    />
+    @if (buscando()) {
+      <p class="text-muted">Buscando…</p>
+    } @else if (buscado()) {
+      <p-table [value]="resultados()" [rowHover]="true" responsiveLayout="scroll">
+        <ng-template #header>
+          <tr>
+            <th>Código</th>
+            <th>Descripción</th>
+            <th>Capítulo</th>
+            <th>Aplica a</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-c>
+          <tr>
+            <td class="codigo">{{ c.codigo }}</td>
+            <td>{{ c.descripcion }}</td>
+            <td class="text-muted">{{ c.capitulo }}</td>
+            <td class="text-muted">{{ restriccion(c) || 'Todos' }}</td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="4">Sin coincidencias.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    }
+  </section>
+
+  <section class="panel">
+    <h3>Importar el catálogo desde un CSV</h3>
+    <p class="text-muted">
+      Las columnas son codigo, descripcion, capitulo, grupo, sexo, edad_minima y edad_maxima. La
+      importación es idempotente por código: crea los nuevos, actualiza los que cambian y deja una
+      versión nueva en el historial. Antes de aplicarla puedes ver la vista previa.
+    </p>
+
+    <div class="importacion">
+      <div class="campo-archivo">
+        <label for="cie-archivo">Archivo CSV</label>
+        <input
+          id="cie-archivo"
+          type="file"
+          accept=".csv,text/csv"
+          (change)="elegirArchivo($event)"
+        />
+        @if (errorArchivo(); as mensaje) {
+          <small class="error" role="alert">{{ mensaje }}</small>
+        }
+      </div>
+      <label class="check">
+        <input
+          type="checkbox"
+          [ngModel]="desactivarAusentes()"
+          (ngModelChange)="desactivarAusentes.set($event)"
+        />
+        Desactivar los códigos que no estén en el archivo
+      </label>
+      <p-button
+        label="Vista previa"
+        icon="pi pi-eye"
+        [outlined]="true"
+        [disabled]="!archivo()"
+        [loading]="analizando()"
+        (onClick)="previsualizar()"
+      />
+    </div>
+
+    @if (errorImportacion(); as mensaje) {
+      <p-message severity="error" styleClass="w-full">{{ mensaje }}</p-message>
+    }
+
+    @if (vista(); as v) {
+      <div class="resultado" aria-live="polite">
+        <h4>Vista previa</h4>
+        <ul class="cifras">
+          <li>
+            <strong>{{ v.filas }}</strong> filas
+          </li>
+          <li>
+            <strong>{{ v.validas }}</strong> válidas
+          </li>
+          <li>
+            <strong>{{ v.altas }}</strong> altas
+          </li>
+          <li>
+            <strong>{{ v.cambios }}</strong> cambios
+          </li>
+          <li>
+            <strong>{{ v.sinCambios }}</strong> sin cambios
+          </li>
+          @if (desactivarAusentes()) {
+            <li>
+              <strong>{{ v.desactivados }}</strong> se desactivarán
+            </li>
+          }
+          <li [class.con-error]="v.totalErrores > 0">
+            <strong>{{ v.totalErrores }}</strong> con errores
+          </li>
+        </ul>
+
+        @if (v.errores.length > 0) {
+          <details open>
+            <summary>Filas con errores</summary>
+            <ul class="errores">
+              @for (e of v.errores; track e.fila + e.mensaje) {
+                <li>Fila {{ e.fila }}: {{ e.mensaje }}</li>
+              }
+            </ul>
+            @if (v.totalErrores > v.errores.length) {
+              <small class="text-muted">
+                Se muestran los primeros {{ v.errores.length }} de {{ v.totalErrores }} errores.
+              </small>
+            }
+          </details>
+        }
+
+        @if (v.muestra.length > 0) {
+          <p-table [value]="v.muestra" responsiveLayout="scroll">
+            <ng-template #header>
+              <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th>Acción</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-f>
+              <tr>
+                <td class="codigo">{{ f.codigo }}</td>
+                <td>{{ f.descripcion }}</td>
+                <td>
+                  <p-tag
+                    [value]="etiquetaAccion(f.accion)"
+                    [severity]="severidadAccion(f.accion)"
+                  />
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        }
+
+        <div class="aplicar">
+          <label class="campo" for="cie-etiqueta">Etiqueta de la versión</label>
+          <input
+            pInputText
+            id="cie-etiqueta"
+            class="w-full"
+            maxlength="60"
+            placeholder="Por ejemplo CIE-10 OPS 2026"
+            autocomplete="off"
+            [ngModel]="etiqueta()"
+            (ngModelChange)="etiqueta.set($event)"
+          />
+          @if (v.totalErrores > 0) {
+            <label class="check">
+              <input
+                type="checkbox"
+                [ngModel]="omitirErrores()"
+                (ngModelChange)="omitirErrores.set($event)"
+              />
+              Importar solo las filas válidas y omitir las que tienen errores
+            </label>
+          }
+          <p-button
+            label="Importar catálogo"
+            icon="pi pi-check"
+            [disabled]="!puedeImportar()"
+            [loading]="importando()"
+            (onClick)="importar()"
+          />
+        </div>
+      </div>
+    }
+
+    @if (importada(); as i) {
+      <p-message severity="success" styleClass="w-full">
+        Importación aplicada: {{ i.altas }} altas, {{ i.cambios }} cambios y {{ i.sinCambios }} sin
+        cambios.
+      </p-message>
+    }
+  </section>
+
+  <section class="panel">
+    <h3>Historial de versiones</h3>
+    <p-table [value]="r.versiones" [rowHover]="true" responsiveLayout="scroll">
+      <ng-template #header>
+        <tr>
+          <th>Versión</th>
+          <th>Origen</th>
+          <th class="text-right">Activos</th>
+          <th class="text-right">Altas</th>
+          <th class="text-right">Cambios</th>
+          <th>Fecha</th>
+          <th>Responsable</th>
+          <th>Estado</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-v>
+        <tr>
+          <td class="font-semibold">{{ v.etiqueta }}</td>
+          <td>{{ v.origen === 'MUESTRA' ? 'Muestra' : 'Importación' }}</td>
+          <td class="text-right">{{ v.total | number }}</td>
+          <td class="text-right">{{ v.altas | number }}</td>
+          <td class="text-right">{{ v.cambios | number }}</td>
+          <td>{{ v.creadaEn | date: 'd MMM y, HH:mm' }}</td>
+          <td>{{ v.creadaPor || 'Sistema' }}</td>
+          <td>
+            <p-tag
+              [value]="v.activa ? 'Vigente' : 'Anterior'"
+              [severity]="v.activa ? 'success' : 'secondary'"
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </section>
+}
