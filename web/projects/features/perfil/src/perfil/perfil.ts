@@ -56,6 +56,7 @@ import { FormField } from '@tusalud/ui/form-field';
 import { PageHeader } from '@tusalud/ui/page-header';
 import { CargaArchivos } from '@tusalud/ui/carga-archivos';
 import { UserAvatar } from '@tusalud/ui/user-avatar';
+import { PreferenciasCanales } from '@tusalud/features/canales';
 import { MfaPanel } from '../mfa-panel/mfa-panel';
 
 const AVATAR_LADO = 256;
@@ -122,6 +123,7 @@ function reducirImagen(archivo: File): Promise<File> {
   selector: 'app-perfil',
   imports: [
     MfaPanel,
+    PreferenciasCanales,
     DatePipe,
     FormsModule,
     ReactiveFormsModule,

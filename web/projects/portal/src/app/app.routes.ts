@@ -16,6 +16,10 @@ export const routes: Routes = [
       import('@tusalud/features/documentos-medicos').then((m) => m.VERIFICACION_PUBLICA_ROUTES),
   },
   {
+    path: 'baja',
+    loadChildren: () => import('@tusalud/features/canales').then((m) => m.BAJA_CANAL_ROUTES),
+  },
+  {
     path: 'acceso-denegado',
     title: 'Acceso denegado',
     loadComponent: () => import('@tusalud/ui/forbidden').then((m) => m.Forbidden),

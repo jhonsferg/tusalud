@@ -36,6 +36,8 @@ export type TipoNotificacion =
   | 'DOCUMENTO_EMITIDO'
   | 'CONSENTIMIENTO_PENDIENTE'
   | 'CONSENTIMIENTO_FIRMADO'
+  | 'RESPALDO_FALLIDO'
+  | 'RESPALDO_VENCIDO'
   | 'SISTEMA';
 
 export interface NotificacionResponse {

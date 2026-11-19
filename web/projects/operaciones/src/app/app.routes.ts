@@ -32,6 +32,16 @@ export const routes: Routes = [
         loadChildren: () => import('@tusalud/features/reportes').then((m) => m.REPORTES_ROUTES),
       },
       {
+        path: 'canales/entregas',
+        canMatch: [roleGuard('ROLE_OPERACIONES')],
+        loadChildren: () => import('@tusalud/features/canales').then((m) => m.ENTREGAS_ROUTES),
+      },
+      {
+        path: 'respaldos',
+        canMatch: [roleGuard('ROLE_OPERACIONES')],
+        loadChildren: () => import('@tusalud/features/respaldos').then((m) => m.RESPALDOS_ROUTES),
+      },
+      {
         path: 'mi-espacio',
         loadChildren: () => import('@tusalud/features/rrhh').then((m) => m.MI_ESPACIO_ROUTES),
       },

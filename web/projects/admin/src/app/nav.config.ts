@@ -255,6 +255,29 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Comunicaciones y respaldos',
+    items: [
+      {
+        label: 'Plantillas de mensajes',
+        icon: 'pi-envelope',
+        link: '/canales/plantillas',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Entregas de avisos',
+        icon: 'pi-send',
+        link: '/canales/entregas',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Respaldos',
+        icon: 'pi-database',
+        link: '/respaldos',
+        roles: ['ROLE_ADMIN'],
+      },
+    ],
+  },
+  {
     title: 'Directorio',
     items: [
       {

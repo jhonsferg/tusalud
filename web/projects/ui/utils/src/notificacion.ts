@@ -38,6 +38,8 @@ export const ICONO_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   DOCUMENTO_EMITIDO: 'pi-file-check',
   CONSENTIMIENTO_PENDIENTE: 'pi-pencil',
   CONSENTIMIENTO_FIRMADO: 'pi-verified',
+  RESPALDO_FALLIDO: 'pi-database',
+  RESPALDO_VENCIDO: 'pi-database',
   SISTEMA: 'pi-info-circle',
 };
 
@@ -79,5 +81,7 @@ export const COLOR_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   DOCUMENTO_EMITIDO: '#1d4ed8',
   CONSENTIMIENTO_PENDIENTE: '#d97706',
   CONSENTIMIENTO_FIRMADO: '#15803d',
+  RESPALDO_FALLIDO: '#dc2626',
+  RESPALDO_VENCIDO: '#d97706',
   SISTEMA: '#64748b',
 };

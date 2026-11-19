@@ -134,6 +134,22 @@ export const routes: Routes = [
         loadChildren: () => import('@tusalud/features/plantillas').then((m) => m.PLANTILLAS_ROUTES),
       },
       {
+        path: 'canales/plantillas',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () =>
+          import('@tusalud/features/canales').then((m) => m.PLANTILLAS_MENSAJE_ROUTES),
+      },
+      {
+        path: 'canales/entregas',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () => import('@tusalud/features/canales').then((m) => m.ENTREGAS_ROUTES),
+      },
+      {
+        path: 'respaldos',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () => import('@tusalud/features/respaldos').then((m) => m.RESPALDOS_ROUTES),
+      },
+      {
         path: 'notificaciones',
         loadChildren: () =>
           import('@tusalud/features/notificaciones').then((m) => m.NOTIFICACIONES_ROUTES),

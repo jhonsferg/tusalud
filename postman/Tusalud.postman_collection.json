@@ -33187,6 +33187,3378 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "30 - Canales de notificación y respaldos",
+      "item": [
+        {
+          "name": "Login del administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('cnAdminToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de operaciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('cnOpsToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"operaciones@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login del médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('cnMedicoToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de recepción",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('cnRecepcionToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recepcion@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar un paciente nuevo para la prueba",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ts = Date.now();",
+                  "pm.collectionVariables.set('cnPacienteEmail', 'canales.' + ts + '@correo.com');",
+                  "pm.collectionVariables.set('cnPacienteDni', String(Math.floor(10000000 + Math.random() * 90000000)));",
+                  "pm.collectionVariables.set('cnTelefono', '+519' + String(Math.floor(1000000 + Math.random() * 8999999)).padStart(7, '1') + '1');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('cnPacienteToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "register"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Canales\",\n  \"apellido\": \"Prueba\",\n  \"email\": \"{{cnPacienteEmail}}\",\n  \"password\": \"Paciente123!\",\n  \"telefono\": \"987654321\",\n  \"dni\": \"{{cnPacienteDni}}\",\n  \"fechaNacimiento\": \"1991-06-10\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Vaciar la bandeja del proveedor simulado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/simulacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "canales", "simulacion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sin token no se ven los canales",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/mis-canales",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "mis-canales"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no consulta la bitácora de entregas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/entregas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "entregas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no consulta la bitácora de entregas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/entregas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "entregas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no consulta la bitácora de entregas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/entregas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "entregas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Operaciones consulta la bitácora de entregas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Devuelve una página sin textos de mensajes', () => {",
+                  "  pm.expect(j.contenido).to.be.an('array');",
+                  "  pm.expect(j.tamano).to.eql(5);",
+                  "  j.contenido.forEach(e => { pm.expect(e).to.not.have.property('texto'); pm.expect(e.destino).to.include('***'); });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/entregas?tamano=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "entregas"],
+              "query": [
+                {
+                  "key": "tamano",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnOpsToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Operaciones no administra plantillas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/plantillas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "canales", "plantillas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnOpsToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no administra plantillas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/plantillas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "canales", "plantillas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no ve la bandeja simulada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/simulacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "canales", "simulacion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Operaciones no reintenta entregas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/entregas/00000000-0000-4000-8000-000000000001/reintentar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "canales",
+                "entregas",
+                "00000000-0000-4000-8000-000000000001",
+                "reintentar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnOpsToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no ve los respaldos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/respaldos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "respaldos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no ve el estado de respaldos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/respaldos/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "respaldos", "estado"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar un respaldo sin token compartido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/respaldos/ejecuciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "respaldos", "ejecuciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"RESPALDO\",\n  \"estado\": \"EXITOSO\",\n  \"alcance\": \"COMPLETO\",\n  \"categoria\": \"DIARIO\",\n  \"iniciadoEn\": \"2026-01-01T02:00:00\",\n  \"finalizadoEn\": \"2026-01-01T02:01:10\",\n  \"bytesTotal\": 2048,\n  \"archivo\": \"postman\",\n  \"checksum\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n  \"migracionesValidadas\": null,\n  \"tablasValidadas\": null,\n  \"objetosAlmacen\": 0,\n  \"copiaRemota\": false,\n  \"detalle\": \"Registro de prueba de Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar un respaldo con un token incorrecto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Respaldo-Token",
+                "value": "token-incorrecto"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/respaldos/ejecuciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "respaldos", "ejecuciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"RESPALDO\",\n  \"estado\": \"EXITOSO\",\n  \"alcance\": \"COMPLETO\",\n  \"categoria\": \"DIARIO\",\n  \"iniciadoEn\": \"2026-01-01T02:00:00\",\n  \"finalizadoEn\": \"2026-01-01T02:01:10\",\n  \"bytesTotal\": 2048,\n  \"archivo\": \"postman\",\n  \"checksum\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n  \"migracionesValidadas\": null,\n  \"tablasValidadas\": null,\n  \"objetosAlmacen\": 0,\n  \"copiaRemota\": false,\n  \"detalle\": \"Registro de prueba de Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un administrador con sesión tampoco registra respaldos sin el token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/respaldos/ejecuciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "respaldos", "ejecuciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"RESPALDO\",\n  \"estado\": \"EXITOSO\",\n  \"alcance\": \"COMPLETO\",\n  \"categoria\": \"DIARIO\",\n  \"iniciadoEn\": \"2026-01-01T02:00:00\",\n  \"finalizadoEn\": \"2026-01-01T02:01:10\",\n  \"bytesTotal\": 2048,\n  \"archivo\": \"postman\",\n  \"checksum\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n  \"migracionesValidadas\": null,\n  \"tablasValidadas\": null,\n  \"objetosAlmacen\": 0,\n  \"copiaRemota\": false,\n  \"detalle\": \"Registro de prueba de Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El webhook rechaza un evento sin firma",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/webhook/SMS",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "webhook", "SMS"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idExterno\": \"sim-x\",\n  \"estado\": \"ENTREGADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La baja rechaza un enlace alterado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('No revela detalles', () => pm.expect(pm.response.json().message).to.include('no es válido'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/baja?t=abc.def",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "baja"],
+              "query": [
+                {
+                  "key": "t",
+                  "value": "abc.def"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un paciente nuevo ve sus tres canales sin activar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Tres canales sin activar y el correo enmascarado', () => {",
+                  "  pm.expect(j.canales.map(c => c.canal)).to.eql(['CORREO', 'SMS', 'WHATSAPP']);",
+                  "  j.canales.forEach(c => pm.expect(c.estado).to.eql('SIN_CONFIGURAR'));",
+                  "  pm.expect(j.canales[0].destinoFijo).to.be.true;",
+                  "  pm.expect(j.canales[0].destinoMascara).to.not.include(pm.collectionVariables.get('cnPacienteEmail'));",
+                  "  pm.expect(j.canales[0].destinoMascara).to.include('***@');",
+                  "});",
+                  "pm.test('Las alertas de seguridad vienen obligatorias y activas', () => {",
+                  "  const s = j.preferencias.find(p => p.tipo === 'SESION_SOSPECHOSA');",
+                  "  pm.expect(s.obligatoria).to.be.true;",
+                  "  pm.expect(Object.values(s.activos).every(v => v === true)).to.be.true;",
+                  "});",
+                  "pm.test('El silencio nocturno viene activo por defecto', () => pm.expect(j.silencio.activo).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/mis-canales",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "mis-canales"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Activar el correo exige el consentimiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/contactos/CORREO/solicitar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "canales",
+                "contactos",
+                "CORREO",
+                "solicitar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"consentimiento\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El correo del canal no puede ser otro distinto al de la cuenta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/contactos/CORREO/solicitar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "canales",
+                "contactos",
+                "CORREO",
+                "solicitar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destino\": \"otro@correo.com\",\n  \"consentimiento\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Activar el correo con consentimiento envía un código",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda pendiente de verificación', () => {",
+                  "  pm.expect(j.estado).to.eql('PENDIENTE_VERIFICACION');",
+                  "  pm.expect(j.consentimientoEn).to.be.a('string');",
+                  "  pm.expect(j.verificadoEn).to.not.exist;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/contactos/CORREO/solicitar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "canales",
+                "contactos",
+                "CORREO",
+                "solicitar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"consentimiento\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No se puede pedir otro código de inmediato",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 429', () => pm.response.to.have.status(429));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/contactos/CORREO/solicitar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "canales",
+                "contactos",
+                "CORREO",
+                "solicitar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"consentimiento\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El código llega a Mailpit",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const fin = Date.now() + 1000;",
+                  "while (Date.now() < fin) {}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Hay un único correo con el código', () => {",
+                  "  pm.expect(j.messages.length).to.eql(1);",
+                  "  const m = j.messages[0];",
+                  "  pm.expect(m.Subject).to.eql('Su código de verificación');",
+                  "  pm.expect(m.From.Address).to.eql('no-responder@tusalud.local');",
+                  "  const codigo = /(\\d{6})/.exec(m.Snippet);",
+                  "  pm.expect(codigo, 'el código está en el extracto').to.not.be.null;",
+                  "  pm.collectionVariables.set('cnCodigo', codigo[1]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{mailpitUrl}}/api/v1/search?query=to:{{cnPacienteEmail}}",
+              "host": ["{{mailpitUrl}}"],
+              "path": ["api", "v1", "search"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "to:{{cnPacienteEmail}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un código incorrecto no activa el canal",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const bueno = pm.collectionVariables.get('cnCodigo');",
+                  "pm.variables.set('cnMalo', bueno === '000000' ? '111111' : '000000');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje claro', () => pm.expect(pm.response.json().message).to.include('no es correcto'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/contactos/CORREO/verificar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "canales",
+                "contactos",
+                "CORREO",
+                "verificar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{cnMalo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un código con formato inválido se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/contactos/CORREO/verificar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "canales",
+                "contactos",
+                "CORREO",
+                "verificar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"12ab\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El código correcto activa el correo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('El correo queda activo y verificado', () => {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.estado).to.eql('ACTIVO');",
+                  "  pm.expect(j.verificadoEn).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/contactos/CORREO/verificar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "canales",
+                "contactos",
+                "CORREO",
+                "verificar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{cnCodigo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un teléfono inválido se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/contactos/SMS/solicitar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "contactos", "SMS", "solicitar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destino\": \"123\",\n  \"consentimiento\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Activar el SMS envía un código al proveedor simulado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('El destino va enmascarado', () => {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.estado).to.eql('PENDIENTE_VERIFICACION');",
+                  "  pm.expect(j.destinoMascara).to.match(/^\\*\\*\\*\\d{3}$/);",
+                  "  pm.expect(j.destinoMascara).to.not.include(pm.collectionVariables.get('cnTelefono'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/contactos/SMS/solicitar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "contactos", "SMS", "solicitar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destino\": \"{{cnTelefono}}\",\n  \"consentimiento\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador ve el código en la bandeja simulada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('El mensaje al teléfono trae el código', () => {",
+                  "  const telefono = pm.collectionVariables.get('cnTelefono');",
+                  "  const m = pm.response.json().find(x => x.destino === telefono && x.canal === 'SMS');",
+                  "  pm.expect(m, 'mensaje al teléfono').to.exist;",
+                  "  const codigo = /(\\d{6})/.exec(m.texto);",
+                  "  pm.expect(codigo).to.not.be.null;",
+                  "  pm.collectionVariables.set('cnCodigoSms', codigo[1]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/simulacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "canales", "simulacion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El código correcto activa el SMS",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('El SMS queda activo', () => pm.expect(pm.response.json().estado).to.eql('ACTIVO'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/contactos/SMS/verificar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "contactos", "SMS", "verificar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{cnCodigoSms}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Las alertas de seguridad no se pueden desactivar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/preferencias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "preferencias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"preferencias\": [\n    {\n      \"tipo\": \"SESION_SOSPECHOSA\",\n      \"canal\": \"CORREO\",\n      \"activo\": false\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un tipo que no se envía por canales externos se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/preferencias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "preferencias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"preferencias\": [\n    {\n      \"tipo\": \"STOCK_BAJO\",\n      \"canal\": \"CORREO\",\n      \"activo\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una ventana de silencio sin duración se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/preferencias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "preferencias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"silencio\": {\n    \"activo\": true,\n    \"desde\": \"08:00\",\n    \"hasta\": \"08:00\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Guardar preferencias y horario de silencio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Las preferencias y el silencio quedan guardados', () => {",
+                  "  pm.expect(j.preferencias.find(p => p.tipo === 'CITA_CREADA').activos.CORREO).to.be.false;",
+                  "  pm.expect(j.preferencias.find(p => p.tipo === 'RECORDATORIO_CITA').activos.SMS).to.be.true;",
+                  "  pm.expect(j.silencio.desde).to.eql('21:30:00');",
+                  "  pm.expect(j.silencio.hasta).to.eql('06:30:00');",
+                  "});",
+                  "pm.test('Los canales activos se reflejan', () => {",
+                  "  const por = Object.fromEntries(j.canales.map(c => [c.canal, c.estado]));",
+                  "  pm.expect(por.CORREO).to.eql('ACTIVO');",
+                  "  pm.expect(por.SMS).to.eql('ACTIVO');",
+                  "  pm.expect(por.WHATSAPP).to.eql('SIN_CONFIGURAR');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/preferencias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "preferencias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"preferencias\": [\n    {\n      \"tipo\": \"CITA_CREADA\",\n      \"canal\": \"CORREO\",\n      \"activo\": false\n    },\n    {\n      \"tipo\": \"RECORDATORIO_CITA\",\n      \"canal\": \"SMS\",\n      \"activo\": true\n    }\n  ],\n  \"silencio\": {\n    \"activo\": true,\n    \"desde\": \"21:30\",\n    \"hasta\": \"06:30\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cambiar la contraseña genera una alerta de seguridad externa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/perfil/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "perfil", "password"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passwordActual\": \"Paciente123!\",\n  \"passwordNueva\": \"Paciente456!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La alerta llega a Mailpit sin datos clínicos ni contraseñas",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const fin = Date.now() + 14000;",
+                  "while (Date.now() < fin) {}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Llegó el correo de seguridad', () => {",
+                  "  pm.expect(j.messages.length).to.eql(1);",
+                  "  pm.expect(j.messages[0].Subject).to.eql('Se cambió su contraseña');",
+                  "  pm.collectionVariables.set('cnMensajeId', j.messages[0].ID);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{mailpitUrl}}/api/v1/search?query=to:{{cnPacienteEmail}} subject:contraseña",
+              "host": ["{{mailpitUrl}}"],
+              "path": ["api", "v1", "search"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "to:{{cnPacienteEmail}} subject:contraseña"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El correo trae el enlace de baja y la versión HTML con la marca",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const m = pm.response.json();",
+                  "pm.test('Texto genérico con el nombre y sin la contraseña', () => {",
+                  "  pm.expect(m.Text).to.include('Hola Canales');",
+                  "  pm.expect(m.Text).to.include('Para dejar de recibir estos correos');",
+                  "  pm.expect(m.Text).to.include('no contiene información clínica');",
+                  "  pm.expect(m.Text).to.not.include('Paciente456');",
+                  "  pm.expect(m.Text).to.not.include('Paciente123');",
+                  "});",
+                  "pm.test('HTML con marca y enlace de baja', () => {",
+                  "  pm.expect(m.HTML).to.include('#0f766e');",
+                  "  pm.expect(m.HTML).to.include('Dejar de recibir estos correos');",
+                  "});",
+                  "const baja = /baja\\?t=([A-Za-z0-9_.\\-]+)/.exec(m.Text);",
+                  "pm.test('Incluye un token de baja', () => pm.expect(baja).to.not.be.null);",
+                  "pm.collectionVariables.set('cnBajaToken', baja[1]);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{mailpitUrl}}/api/v1/message/{{cnMensajeId}}",
+              "host": ["{{mailpitUrl}}"],
+              "path": ["api", "v1", "message", "{{cnMensajeId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El correo declara la baja con un clic en sus cabeceras",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('List-Unsubscribe y baja con un clic', () => {",
+                  "  const claves = Object.keys(pm.response.json()).map(k => k.toLowerCase());",
+                  "  pm.expect(claves).to.include('list-unsubscribe');",
+                  "  pm.expect(claves).to.include('list-unsubscribe-post');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{mailpitUrl}}/api/v1/message/{{cnMensajeId}}/headers",
+              "host": ["{{mailpitUrl}}"],
+              "path": ["api", "v1", "message", "{{cnMensajeId}}", "headers"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La bandeja simulada recibió el aviso por SMS con enlace de baja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('El SMS de seguridad es genérico', () => {",
+                  "  const telefono = pm.collectionVariables.get('cnTelefono');",
+                  "  const m = pm.response.json().find(x => x.destino === telefono && x.texto.indexOf('contraseña') >= 0);",
+                  "  pm.expect(m, 'SMS de seguridad').to.exist;",
+                  "  pm.expect(m.texto).to.include('TuSalud:');",
+                  "  pm.expect(m.texto).to.include('Baja:');",
+                  "  pm.expect(m.texto.length).to.be.below(400);",
+                  "  pm.collectionVariables.set('cnIdExternoSms', m.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/simulacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "canales", "simulacion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La bitácora registra el correo enviado sin guardar su texto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Hay una entrega de cambio de contraseña con el destino enmascarado', () => {",
+                  "  const j = pm.response.json();",
+                  "  const e = j.contenido.find(x => x.tipo === 'CONTRASENA_CAMBIADA' && x.destino.startsWith('c***@'));",
+                  "  pm.expect(e, 'entrega de contraseña').to.exist;",
+                  "  pm.expect(e.urgente).to.be.true;",
+                  "  pm.expect(e.intentos).to.eql(1);",
+                  "  pm.expect(e.plantillaVersion).to.be.a('number');",
+                  "  pm.expect(e).to.not.have.property('texto');",
+                  "  pm.collectionVariables.set('cnEntregaId', e.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/entregas?canal=CORREO&estado=ENVIADO&tamano=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "entregas"],
+              "query": [
+                {
+                  "key": "canal",
+                  "value": "CORREO"
+                },
+                {
+                  "key": "estado",
+                  "value": "ENVIADO"
+                },
+                {
+                  "key": "tamano",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una entrega enviada no se puede reintentar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/entregas/{{cnEntregaId}}/reintentar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "canales",
+                "entregas",
+                "{{cnEntregaId}}",
+                "reintentar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reintentar una entrega que no existe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/entregas/00000000-0000-4000-8000-0000000000ff/reintentar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "canales",
+                "entregas",
+                "00000000-0000-4000-8000-0000000000ff",
+                "reintentar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El resumen por canal y estado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Tres canales y al menos un envío', () => {",
+                  "  pm.expect(j.canales.length).to.eql(3);",
+                  "  pm.expect(j.total).to.be.at.least(1);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/entregas/resumen?dias=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "entregas", "resumen"],
+              "query": [
+                {
+                  "key": "dias",
+                  "value": "7"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnOpsToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El webhook con firma válida marca el SMS como entregado",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const cuerpo = JSON.stringify({ idExterno: pm.collectionVariables.get('cnIdExternoSms'), estado: 'ENTREGADO' });",
+                  "const marca = String(Math.floor(Date.now() / 1000));",
+                  "const firma = CryptoJS.HmacSHA256(marca + '.' + cuerpo, pm.collectionVariables.get('webhookSecret')).toString(CryptoJS.enc.Hex);",
+                  "pm.variables.set('cnWebhookCuerpo', cuerpo);",
+                  "pm.variables.set('cnWebhookMarca', marca);",
+                  "pm.variables.set('cnWebhookFirma', 'sha256=' + firma);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Marca-Tiempo",
+                "value": "{{cnWebhookMarca}}"
+              },
+              {
+                "key": "X-Firma",
+                "value": "{{cnWebhookFirma}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/webhook/SMS",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "webhook", "SMS"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{{cnWebhookCuerpo}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El webhook con una firma incorrecta se rechaza",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const cuerpo = JSON.stringify({ idExterno: pm.collectionVariables.get('cnIdExternoSms'), estado: 'FALLIDO' });",
+                  "pm.variables.set('cnWebhookCuerpo', cuerpo);",
+                  "pm.variables.set('cnWebhookMarca', String(Math.floor(Date.now() / 1000)));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Marca-Tiempo",
+                "value": "{{cnWebhookMarca}}"
+              },
+              {
+                "key": "X-Firma",
+                "value": "sha256=0000"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/webhook/SMS",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "webhook", "SMS"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{{cnWebhookCuerpo}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El webhook con un evento fuera de ventana se rechaza",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const cuerpo = JSON.stringify({ idExterno: pm.collectionVariables.get('cnIdExternoSms'), estado: 'ENTREGADO' });",
+                  "const marca = String(Math.floor(Date.now() / 1000) - 3600);",
+                  "const firma = CryptoJS.HmacSHA256(marca + '.' + cuerpo, pm.collectionVariables.get('webhookSecret')).toString(CryptoJS.enc.Hex);",
+                  "pm.variables.set('cnWebhookCuerpo', cuerpo);",
+                  "pm.variables.set('cnWebhookMarca', marca);",
+                  "pm.variables.set('cnWebhookFirma', 'sha256=' + firma);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Marca-Tiempo",
+                "value": "{{cnWebhookMarca}}"
+              },
+              {
+                "key": "X-Firma",
+                "value": "{{cnWebhookFirma}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/webhook/SMS",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "webhook", "SMS"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{{cnWebhookCuerpo}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La bitácora muestra el SMS como entregado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Hay una entrega entregada con fecha', () => {",
+                  "  const e = pm.response.json().contenido.find(x => x.tipo === 'CONTRASENA_CAMBIADA');",
+                  "  pm.expect(e, 'entrega por SMS').to.exist;",
+                  "  pm.expect(e.entregadoEn).to.be.a('string');",
+                  "  pm.expect(e.destino).to.match(/^\\*\\*\\*\\d{3}$/);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/entregas?canal=SMS&estado=ENTREGADO&tamano=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "entregas"],
+              "query": [
+                {
+                  "key": "canal",
+                  "value": "SMS"
+                },
+                {
+                  "key": "estado",
+                  "value": "ENTREGADO"
+                },
+                {
+                  "key": "tamano",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Darse de baja desde el enlace del correo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Baja del canal de correo', () => {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.canal).to.eql('CORREO');",
+                  "  pm.expect(j.etiqueta).to.eql('Correo electrónico');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/baja?t={{cnBajaToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "baja"],
+              "query": [
+                {
+                  "key": "t",
+                  "value": "{{cnBajaToken}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La baja es idempotente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/baja?t={{cnBajaToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "baja"],
+              "query": [
+                {
+                  "key": "t",
+                  "value": "{{cnBajaToken}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El correo queda dado de baja y el SMS sigue activo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Estados por canal', () => {",
+                  "  const por = Object.fromEntries(pm.response.json().canales.map(c => [c.canal, c.estado]));",
+                  "  pm.expect(por.CORREO).to.eql('BAJA');",
+                  "  pm.expect(por.SMS).to.eql('ACTIVO');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/mis-canales",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "mis-canales"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente da de baja el SMS",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda dado de baja', () => pm.expect(pm.response.json().estado).to.eql('BAJA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/canales/contactos/SMS",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "canales", "contactos", "SMS"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador lista las plantillas de mensajes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Variables permitidas y una plantilla por aviso y canal', () => {",
+                  "  pm.expect(j.variables).to.eql(['centro', 'enlace', 'nombre']);",
+                  "  pm.expect(j.plantillas.length).to.eql(54);",
+                  "  const seg = j.plantillas.filter(p => p.categoria === 'Seguridad');",
+                  "  pm.expect(seg.length).to.be.at.least(15);",
+                  "});",
+                  "pm.test('Los textos predeterminados no mencionan datos clínicos', () => {",
+                  "  j.plantillas.forEach(p => {",
+                  "    pm.expect(p.cuerpo.toLowerCase()).to.not.include('diagn');",
+                  "    pm.expect(p.cuerpo).to.include('{{enlace}}');",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/plantillas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "canales", "plantillas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una variable no permitida se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Nombra la variable', () => pm.expect(pm.response.json().message).to.include('diagnostico'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/plantillas/CITA_CREADA/CORREO",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "canales",
+                "plantillas",
+                "CITA_CREADA",
+                "CORREO"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asunto\": \"Cita\",\n  \"cuerpo\": \"Hola {{nombre}}, su diagnóstico es {{diagnostico}}\",\n  \"motivo\": \"Prueba de validación\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un correo sin asunto se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/plantillas/CITA_CREADA/CORREO",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "canales",
+                "plantillas",
+                "CITA_CREADA",
+                "CORREO"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asunto\": \" \",\n  \"cuerpo\": \"Hola {{nombre}}\",\n  \"motivo\": \"Prueba de validación\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un SMS de más de 320 caracteres se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/plantillas/CITA_CREADA/SMS",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "canales",
+                "plantillas",
+                "CITA_CREADA",
+                "SMS"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuerpo\": \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\n  \"motivo\": \"Prueba de validación\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un tipo sin canales externos no tiene plantilla",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/plantillas/STOCK_BAJO/CORREO",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "canales",
+                "plantillas",
+                "STOCK_BAJO",
+                "CORREO"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asunto\": \"Stock\",\n  \"cuerpo\": \"Hola\",\n  \"motivo\": \"Prueba de validación\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Publicar una versión nueva de una plantilla",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda personalizada con versión creciente', () => {",
+                  "  pm.expect(j.personalizada).to.be.true;",
+                  "  pm.expect(j.version).to.be.at.least(1);",
+                  "  pm.expect(j.actualizadaPor).to.be.a('string');",
+                  "});",
+                  "pm.collectionVariables.set('cnPlantillaVersion', String(j.version));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/plantillas/CITA_CREADA/CORREO",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "canales",
+                "plantillas",
+                "CITA_CREADA",
+                "CORREO"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asunto\": \"Su cita fue registrada en {{centro}}\",\n  \"cuerpo\": \"Hola {{nombre}},\\n\\nSe registró una cita a su nombre.\\n\\nIngrese a {{enlace}}.\",\n  \"motivo\": \"Prueba de Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El historial incluye la versión publicada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('La versión vigente es la primera', () => {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j[0].version).to.eql(Number(pm.collectionVariables.get('cnPlantillaVersion')));",
+                  "  pm.expect(j[0].motivo).to.eql('Prueba de Postman');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/plantillas/CITA_CREADA/CORREO/historial",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "canales",
+                "plantillas",
+                "CITA_CREADA",
+                "CORREO",
+                "historial"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Restaurar la plantilla predeterminada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Vuelve a la versión 0 predeterminada', () => {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.version).to.eql(0);",
+                  "  pm.expect(j.personalizada).to.be.false;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/plantillas/CITA_CREADA/CORREO",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "canales",
+                "plantillas",
+                "CITA_CREADA",
+                "CORREO"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Proveedores de cada canal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Correo por SMTP y mensajería simulada en desarrollo', () => {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.proveedores.CORREO).to.eql('SMTP');",
+                  "  pm.expect(j.proveedores.SMS).to.eql('SIMULADO');",
+                  "  pm.expect(j.workerHabilitado).to.be.true;",
+                  "  pm.expect(j.limitePorHora).to.eql(10);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/canales/proveedores",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "canales", "proveedores"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar un respaldo exitoso con el token compartido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Se registra con su duración', () => {",
+                  "  pm.expect(j.tipo).to.eql('RESPALDO');",
+                  "  pm.expect(j.estado).to.eql('EXITOSO');",
+                  "  pm.expect(j.duracionSeg).to.eql(70);",
+                  "  pm.expect(j.categoria).to.eql('DIARIO');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Respaldo-Token",
+                "value": "{{respaldoToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/respaldos/ejecuciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "respaldos", "ejecuciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"RESPALDO\",\n  \"estado\": \"EXITOSO\",\n  \"alcance\": \"COMPLETO\",\n  \"categoria\": \"DIARIO\",\n  \"iniciadoEn\": \"2026-01-01T02:00:00\",\n  \"finalizadoEn\": \"2026-01-01T02:01:10\",\n  \"bytesTotal\": 2048,\n  \"archivo\": \"postman\",\n  \"checksum\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n  \"migracionesValidadas\": null,\n  \"tablasValidadas\": null,\n  \"objetosAlmacen\": 0,\n  \"copiaRemota\": false,\n  \"detalle\": \"Registro de prueba de Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar una prueba de restauración exitosa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Guarda las validaciones', () => {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.migracionesValidadas).to.eql(24);",
+                  "  pm.expect(j.tablasValidadas).to.eql(80);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Respaldo-Token",
+                "value": "{{respaldoToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/respaldos/ejecuciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "respaldos", "ejecuciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"PRUEBA_RESTAURACION\",\n  \"estado\": \"EXITOSO\",\n  \"alcance\": \"COMPLETO\",\n  \"categoria\": null,\n  \"iniciadoEn\": \"2026-01-01T02:00:00\",\n  \"finalizadoEn\": \"2026-01-01T02:01:10\",\n  \"bytesTotal\": 2048,\n  \"archivo\": \"postman\",\n  \"checksum\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n  \"migracionesValidadas\": 24,\n  \"tablasValidadas\": 80,\n  \"objetosAlmacen\": 0,\n  \"copiaRemota\": false,\n  \"detalle\": \"Registro de prueba de Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una ejecución que termina antes de empezar se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Respaldo-Token",
+                "value": "{{respaldoToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/respaldos/ejecuciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "respaldos", "ejecuciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"RESPALDO\",\n  \"estado\": \"EXITOSO\",\n  \"alcance\": \"COMPLETO\",\n  \"categoria\": \"DIARIO\",\n  \"iniciadoEn\": \"2026-01-01T03:00:00\",\n  \"finalizadoEn\": \"2026-01-01T02:00:00\",\n  \"bytesTotal\": 2048,\n  \"archivo\": \"postman\",\n  \"checksum\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\n  \"migracionesValidadas\": null,\n  \"tablasValidadas\": null,\n  \"objetosAlmacen\": 0,\n  \"copiaRemota\": false,\n  \"detalle\": \"Registro de prueba de Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una ejecución incompleta se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Respaldo-Token",
+                "value": "{{respaldoToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/respaldos/ejecuciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "respaldos", "ejecuciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"RESPALDO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Operaciones consulta el estado de los respaldos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Objetivos y semáforo', () => {",
+                  "  pm.expect(j.rpoObjetivoHoras).to.eql(24);",
+                  "  pm.expect(j.rtoObjetivoMinutos).to.eql(60);",
+                  "  pm.expect(['VERDE', 'AMARILLO', 'ROJO']).to.include(j.semaforo);",
+                  "  pm.expect(j.ultimoRespaldoExitoso).to.not.be.null;",
+                  "  pm.expect(j.ultimaPruebaExitosa).to.not.be.null;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/respaldos/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "respaldos", "estado"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnOpsToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador filtra el historial por tipo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Solo pruebas de restauración, la más reciente primero', () => {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.length).to.be.at.least(1);",
+                  "  j.forEach(e => pm.expect(e.tipo).to.eql('PRUEBA_RESTAURACION'));",
+                  "  pm.expect(j.length).to.be.at.most(5);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/respaldos?tipo=PRUEBA_RESTAURACION&limite=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "respaldos"],
+              "query": [
+                {
+                  "key": "tipo",
+                  "value": "PRUEBA_RESTAURACION"
+                },
+                {
+                  "key": "limite",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cnAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -34073,6 +37445,96 @@
     },
     {
       "key": "dmConsTestigoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "mailpitUrl",
+      "value": "http://localhost:8025",
+      "type": "string"
+    },
+    {
+      "key": "respaldoToken",
+      "value": "token-de-respaldo-solo-desarrollo",
+      "type": "string"
+    },
+    {
+      "key": "webhookSecret",
+      "value": "secreto-webhook-solo-desarrollo",
+      "type": "string"
+    },
+    {
+      "key": "cnAdminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cnOpsToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cnMedicoToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cnRecepcionToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cnPacienteToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cnPacienteEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cnTelefono",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cnCodigo",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cnCodigoSms",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cnBajaToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cnIdExternoSms",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cnEntregaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cnMensajeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cnPacienteDni",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cnPlantillaVersion",
       "value": "",
       "type": "string"
     }

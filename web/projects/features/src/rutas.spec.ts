@@ -5,6 +5,11 @@ import { AGENDA_ROUTES } from '@tusalud/features/agenda';
 import { ALMACEN_ROUTES } from '@tusalud/features/almacen';
 import { CAJA_ROUTES } from '@tusalud/features/caja';
 import { CALENDARIO_ROUTES } from '@tusalud/features/calendario';
+import {
+  BAJA_CANAL_ROUTES,
+  ENTREGAS_ROUTES,
+  PLANTILLAS_MENSAJE_ROUTES,
+} from '@tusalud/features/canales';
 import { CITAS_ROUTES } from '@tusalud/features/citas';
 import {
   CONSENTIMIENTOS_MEDICO_ROUTES,
@@ -27,6 +32,7 @@ import { PAGOS_ROUTES } from '@tusalud/features/pagos';
 import { PERFIL_ROUTES } from '@tusalud/features/perfil';
 import { COLA_ROUTES, RECEPCION_ROUTES } from '@tusalud/features/recepcion';
 import { REPORTES_ROUTES } from '@tusalud/features/reportes';
+import { RESPALDOS_ROUTES } from '@tusalud/features/respaldos';
 import { TELECONSULTAS_ROUTES } from '@tusalud/features/telemedicina';
 import { MI_ESPACIO_ROUTES, RRHH_ROUTES } from '@tusalud/features/rrhh';
 import {
@@ -75,6 +81,10 @@ const DOMINIOS: Record<string, Routes> = {
   ESTABLECIMIENTOS_ADMIN_ROUTES,
   PLANTILLAS_CONSENTIMIENTO_ADMIN_ROUTES,
   VERIFICACION_PUBLICA_ROUTES,
+  BAJA_CANAL_ROUTES,
+  ENTREGAS_ROUTES,
+  PLANTILLAS_MENSAJE_ROUTES,
+  RESPALDOS_ROUTES,
 };
 
 function aplanar(rutas: Routes): Route[] {
