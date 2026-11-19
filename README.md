@@ -19,6 +19,7 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Seguros y convenios](#seguros-y-convenios)
   - [Telemedicina](#telemedicina)
   - [Codificación clínica CIE-10](#codificación-clínica-cie-10)
+  - [Documentos médicos y consentimientos](#documentos-médicos-y-consentimientos)
   - [Recursos humanos](#recursos-humanos)
   - [Gerencia, reportes y BI](#gerencia-reportes-y-bi)
   - [Documentos y archivos](#documentos-y-archivos)
@@ -116,6 +117,7 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Seguros y convenios](#seguros-y-convenios-1)
   - [Telemedicina](#telemedicina-1)
   - [Codificación clínica CIE-10](#codificación-clínica-cie-10-1)
+  - [Documentos médicos y consentimientos](#documentos-médicos-y-consentimientos-1)
 - [Manejo de errores](#manejo-de-errores)
 - [Perfiles y configuración](#perfiles-y-configuración)
   - [Selección del perfil](#selección-del-perfil)
@@ -181,15 +183,15 @@ Las cifras salen del código y de las corridas de prueba más recientes.
 | ------------------------------------ | ----- |
 | Roles                                | 15    |
 | Aplicaciones web, incluido el portal | 16    |
-| Controladores REST                   | 48    |
-| Endpoints                            | 285   |
-| Entidades JPA                        | 68    |
-| Migraciones de esquema               | 22    |
-| Migraciones de datos de demostración | 15    |
-| Pruebas del backend                  | 724   |
-| Pruebas unitarias del frontend       | 394   |
-| Pruebas de extremo a extremo         | 172   |
-| Carpetas de la colección de Postman  | 29    |
+| Controladores REST                   | 52    |
+| Endpoints                            | 311   |
+| Entidades JPA                        | 74    |
+| Migraciones de esquema               | 23    |
+| Migraciones de datos de demostración | 16    |
+| Pruebas del backend                  | 753   |
+| Pruebas unitarias del frontend       | 416   |
+| Pruebas de extremo a extremo         | 176   |
+| Carpetas de la colección de Postman  | 30    |
 
 ### Cómo leer este documento
 
@@ -203,22 +205,23 @@ Las cifras salen del código y de las corridas de prueba más recientes.
 
 TuSalud se organiza por áreas operativas de la clínica. Cada área agrupa módulos que comparten actores y datos. La tabla resume el mapa completo y las fichas de más abajo describen cada área con su propósito, sus actores, sus reglas clave, sus endpoints principales, sus pantallas y su estado. El detalle fino de cada módulo está en la sección Detalle de los módulos y los diagramas de secuencia en Flujos y diagramas de secuencia.
 
-| Área                         | Módulos                                                               | Actores principales                      | Estado                             |
-| ---------------------------- | --------------------------------------------------------------------- | ---------------------------------------- | ---------------------------------- |
-| Atención ambulatoria         | Citas, agenda, atención, historia clínica, recetas, valoraciones      | Paciente, médico                         | Operativo                          |
-| Admisión                     | Recepción, turnos, sala de espera, pacientes y citas de mostrador     | Recepción, médico, paciente              | Operativo                          |
-| Apoyo diagnóstico            | Laboratorio clínico, imágenes diagnósticas                            | Laboratorio, imágenes, médico, paciente  | Operativo                          |
-| Hospitalización y emergencia | Camas, ingresos, triaje, evoluciones, altas                           | Enfermería, médico                       | Operativo                          |
-| Farmacia y almacén           | Dispensación, venta libre, inventario por lotes con FEFO              | Farmacia, almacén                        | Operativo                          |
-| Caja y facturación           | Caja, cobros, comprobantes, pagos en línea, cupones                   | Caja, paciente, administrador            | Operativo con billeteras simuladas |
-| Seguros y convenios          | Aseguradoras, convenios, pólizas, preautorizaciones, liquidaciones    | Recepción, caja, finanzas, médico        | Operativo con verificador simulado |
-| Codificación clínica         | Catálogo CIE-10, diagnósticos de la atención, reporte de morbilidad   | Médico, administrador, gerencia, calidad | Operativo con catálogo de muestra  |
-| Recursos humanos             | Fichas laborales, turnos, ausencias, vacaciones, Mi espacio           | Recursos humanos, todo el personal       | Operativo                          |
-| Gerencia, reportes y BI      | Reportes ejecutivo, financiero, operativo, de calidad y de morbilidad | Gerencia, finanzas, operaciones, calidad | Operativo                          |
-| Documentos y archivos        | Almacén de objetos, PDF con Jasper, Excel con POI, plantillas         | Todos los roles según el documento       | Operativo                          |
-| Seguridad y auditoría        | Autenticación, MFA, sesiones, eventos de seguridad, auditoría clínica | Administrador y todos los usuarios       | Operativo                          |
-| Notificaciones y calendario  | Avisos en tiempo real, calendario personal y bloqueos de agenda       | Todos los roles                          | Operativo                          |
-| Portal del paciente          | Reservar, pagar, resultados, estudios, recetas, seguros, ingresos     | Paciente                                 | Operativo                          |
+| Área                         | Módulos                                                                                                    | Actores principales                         | Estado                             |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ---------------------------------- |
+| Atención ambulatoria         | Citas, agenda, atención, historia clínica, recetas, valoraciones                                           | Paciente, médico                            | Operativo                          |
+| Admisión                     | Recepción, turnos, sala de espera, pacientes y citas de mostrador                                          | Recepción, médico, paciente                 | Operativo                          |
+| Apoyo diagnóstico            | Laboratorio clínico, imágenes diagnósticas                                                                 | Laboratorio, imágenes, médico, paciente     | Operativo                          |
+| Hospitalización y emergencia | Camas, ingresos, triaje, evoluciones, altas                                                                | Enfermería, médico                          | Operativo                          |
+| Farmacia y almacén           | Dispensación, venta libre, inventario por lotes con FEFO                                                   | Farmacia, almacén                           | Operativo                          |
+| Caja y facturación           | Caja, cobros, comprobantes, pagos en línea, cupones                                                        | Caja, paciente, administrador               | Operativo con billeteras simuladas |
+| Seguros y convenios          | Aseguradoras, convenios, pólizas, preautorizaciones, liquidaciones                                         | Recepción, caja, finanzas, médico           | Operativo con verificador simulado |
+| Codificación clínica         | Catálogo CIE-10, diagnósticos de la atención, reporte de morbilidad                                        | Médico, administrador, gerencia, calidad    | Operativo con catálogo de muestra  |
+| Documentos médicos           | Certificados, descansos, informes, referencias, epicrisis, consentimientos con firma, verificación pública | Médico, paciente, administrador, enfermería | Operativo                          |
+| Recursos humanos             | Fichas laborales, turnos, ausencias, vacaciones, Mi espacio                                                | Recursos humanos, todo el personal          | Operativo                          |
+| Gerencia, reportes y BI      | Reportes ejecutivo, financiero, operativo, de calidad y de morbilidad                                      | Gerencia, finanzas, operaciones, calidad    | Operativo                          |
+| Documentos y archivos        | Almacén de objetos, PDF con Jasper, Excel con POI, plantillas                                              | Todos los roles según el documento          | Operativo                          |
+| Seguridad y auditoría        | Autenticación, MFA, sesiones, eventos de seguridad, auditoría clínica                                      | Administrador y todos los usuarios          | Operativo                          |
+| Notificaciones y calendario  | Avisos en tiempo real, calendario personal y bloqueos de agenda                                            | Todos los roles                             | Operativo                          |
+| Portal del paciente          | Reservar, pagar, resultados, estudios, recetas, seguros, ingresos                                          | Paciente                                    | Operativo                          |
 
 ### Atención ambulatoria
 
@@ -300,6 +303,15 @@ TuSalud se organiza por áreas operativas de la clínica. Cada área agrupa mód
 - **Endpoints principales.** `/api/v1/cie10`, `/api/v1/admin/cie10` y `/api/v1/reportes/morbilidad`.
 - **Pantallas.** Médico: selector de diagnósticos en la atención y diagnósticos frecuentes en su inicio. Médico: código opcional en el ingreso y en el alta de hospitalización. Administrador: Catálogo CIE-10 con búsqueda, importación y versiones. Gerencia, calidad, operaciones y administrador: Morbilidad. Paciente: códigos en su historia clínica.
 - **Estado.** Operativo. El catálogo que se instala trae una muestra de 263 códigos frecuentes con descripciones abreviadas, marcada como tal. El catálogo oficial se carga desde un CSV, como se explica en el detalle del módulo.
+
+### Documentos médicos y consentimientos
+
+- **Propósito.** Emite documentos clínicos formales con validez verificable y registra los consentimientos informados por procedimiento con la firma manuscrita del paciente.
+- **Actores.** El médico con relación asistencial emite y anula sus documentos y solicita consentimientos. El paciente descarga sus documentos y firma o revoca sus consentimientos. Enfermería ve solo que existe una epicrisis y el estado de los consentimientos de sus hospitalizados. El administrador gestiona los establecimientos de salud y las plantillas de consentimiento sin ver contenido clínico. Cualquier persona puede verificar un documento con su código.
+- **Reglas clave.** Todo documento nace en borrador, se emite y puede anularse con motivo. Un documento emitido es inmutable: guarda el hash SHA-256 de su contenido y de su PDF, un número correlativo por tipo y año como CM-2026-000001 y un código de verificación aleatorio. Se corrige anulando y emitiendo uno nuevo que referencia al anterior. Los diagnósticos CIE-10 solo se incluyen con la autorización del paciente y el informe la exige. El descanso valida que no se solape con otro vigente, un máximo de días y una retroactividad configurables.
+- **Endpoints principales.** `/api/v1/documentos-medicos`, `/api/v1/consentimientos`, `/api/v1/establecimientos-salud` y `/api/v1/verificacion/{codigo}`.
+- **Pantallas.** Médico: Documentos, Consentimientos y la sección de documentos en la ficha del ingreso. Paciente: Mis documentos y Mis consentimientos con firma en lienzo. Administrador: Establecimientos de salud y Plantillas de consentimiento. Portal: la verificación pública en `/verificar`.
+- **Estado.** Operativo. El catálogo de establecimientos y las seis plantillas de consentimiento son datos de demostración.
 
 ### Recursos humanos
 
@@ -507,7 +519,7 @@ Las dependencias van siempre hacia abajo: una aplicación compone rutas desde `f
 
 ## Modelo de datos
 
-El modelo tiene 63 entidades JPA y 20 migraciones de esquema. Todas las tablas usan un identificador UUID. Las relaciones usan carga perezosa, la propiedad `open-in-view` está desactivada y las entidades nunca se serializan directamente: cada respuesta se construye con un DTO. Los diagramas se agrupan por contexto delimitado. Cada contexto se relaciona con los demás a través de `Usuario`, `Paciente`, `Medico` y `Cita`, que aparecen repetidos como puntos de conexión.
+El modelo tiene 74 entidades JPA y 23 migraciones de esquema. Todas las tablas usan un identificador UUID. Las relaciones usan carga perezosa, la propiedad `open-in-view` está desactivada y las entidades nunca se serializan directamente: cada respuesta se construye con un DTO. Los diagramas se agrupan por contexto delimitado. Cada contexto se relaciona con los demás a través de `Usuario`, `Paciente`, `Medico` y `Cita`, que aparecen repetidos como puntos de conexión.
 
 ### Contexto de identidad y acceso
 
@@ -665,6 +677,20 @@ erDiagram
     Usuario ||--o{ Cie10Version : importa
 ```
 
+```mermaid
+erDiagram
+    Paciente ||--o{ DocumentoMedico : recibe
+    Medico ||--o{ DocumentoMedico : emite
+    DocumentoMedico ||--o| DocumentoMedico : reemplaza
+    DocumentoMedico ||--o| ReferenciaClinica : origina
+    EstablecimientoSalud ||--o{ ReferenciaClinica : destino
+    ConsentimientoPlantilla ||--o{ Consentimiento : base
+    Paciente ||--o{ Consentimiento : firma
+    Medico ||--o{ Consentimiento : solicita
+    Consentimiento }o--o| Archivo : firmaManuscrita
+    SecuenciaDocumentoMedico ||--o{ DocumentoMedico : numera
+```
+
 ### Reglas de integridad
 
 - La tabla `citas` tiene índices por médico y fecha y por paciente y fecha, y el campo `version` aplica bloqueo optimista para que dos operaciones concurrentes no sobrescriban la misma cita.
@@ -672,6 +698,7 @@ erDiagram
 - Las líneas de comprobantes, órdenes y resultados guardan su posición, porque un UUID no conserva el orden de creación.
 - Los datos que deben sobrevivir a cambios del catálogo se copian al momento de usarlos: el precio de la consulta en la cita y el nombre, la unidad y el rango de un parámetro en el resultado de laboratorio.
 - El diagnóstico codificado copia el código y la descripción en `atencion_diagnosticos`, de modo que una actualización del catálogo no reescribe una historia clínica ya firmada. La unicidad de un solo principal por atención se valida en el servicio y no con un índice parcial, para que la misma regla funcione en PostgreSQL y en H2.
+- Un documento médico emitido no se modifica: guarda el hash SHA-256 del contenido canónico y del PDF, y la numeración por tipo y año se asigna con un bloqueo pesimista sobre `secuencias_documentos_medicos`, de modo que dos emisiones simultáneas nunca repiten número. Los índices únicos parciales de número y de código de verificación lo respaldan en la base.
 - Los archivos no se guardan en la base de datos: la tabla `archivos` guarda los metadatos, el bucket, la clave, el tamaño, el hash y el propietario, y los bytes viven en el almacén de objetos.
 
 ## Seguridad
@@ -824,7 +851,7 @@ Una integración nueva debe incluir una prueba de contrato contra la interfaz, m
 ### Convenciones
 
 - **Nombres.** Los paquetes, clases, métodos y rutas están en español para el dominio. Los endpoints cuelgan de `/api/v1/` con el nombre del módulo en minúsculas. Las clases siguen el sufijo de su capa, como `Controller`, `Service` y `Repository`, y los DTO terminan en `Request` o `Response`.
-- **Migraciones.** Se numeran de forma correlativa sin huecos. El esquema usa el rango V1 a V22 y la siguiente es la V23. Los datos de demostración usan el rango V100 a V114 y la siguiente es la V115. Una migración ya fusionada no se edita: cada cambio posterior es una migración nueva. Durante el desarrollo temprano, antes de contar con datos reales, las migraciones se reescribieron en sitio, por ejemplo al pasar a UUID, y por eso las bases anteriores se recrean con `docker compose down -v`.
+- **Migraciones.** Se numeran de forma correlativa sin huecos. El esquema usa el rango V1 a V23 y la siguiente es la V24. Los datos de demostración usan el rango V100 a V115 y la siguiente es la V116. Una migración ya fusionada no se edita: cada cambio posterior es una migración nueva. Durante el desarrollo temprano, antes de contar con datos reales, las migraciones se reescribieron en sitio, por ejemplo al pasar a UUID, y por eso las bases anteriores se recrean con `docker compose down -v`.
 - **Pruebas.** Las pruebas del backend terminan en `Test` y las de seguridad por módulo en `SeguridadTest`. Cada módulo cubre servicio, seguridad y casos borde. Los e2e usan datos propios y no dependen del estado ni de la hora.
 - **Mensajes.** Los errores de negocio y de validación se escriben en español, claros para el usuario y sin datos sensibles.
 - **Estilo.** El código Java se formatea con Spotless y el resto con Prettier, y los hooks de Git lo verifican. El código no lleva comentarios.
@@ -867,6 +894,7 @@ La hoja de ruta muestra cómo evolucionó el sistema y hacia dónde va. Cada ít
 | 14   | Telemedicina con videoconsulta de uno a uno por WebRTC, consentimiento, sala de espera y modalidad virtual en las citas                                              | Hecho  |
 | 15   | Reescritura de la documentación como sistema clínico integral                                                                                                        | Hecho  |
 | 16   | Codificación clínica con CIE-10, diagnósticos por atención y reporte de morbilidad                                                                                   | Hecho  |
+| 17   | Documentos médicos formales y consentimientos informados con firma manuscrita y verificación pública                                                                 | Hecho  |
 
 ### Planificado, en orden de prioridad
 
@@ -1084,6 +1112,10 @@ La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y
 | `/reportes/calidad`                                                       | Calidad, gerencia, admin                                                                      | Valoraciones, cancelaciones y entregas                                                                    |
 | `/reportes/morbilidad`                                                    | Calidad, operaciones, gerencia, admin                                                         | Diagnósticos principales más frecuentes, solo agregados                                                   |
 | `/cie10`                                                                  | Admin                                                                                         | Catálogo CIE-10, importación por CSV y versiones                                                          |
+| `/documentos`, `/consentimientos`                                         | Médico                                                                                        | Documentos médicos y consentimientos informados                                                           |
+| `/mis-documentos`, `/mis-consentimientos`                                 | Paciente                                                                                      | Documentos descargables y consentimientos con firma                                                       |
+| `/establecimientos`, `/consentimientos`                                   | Admin                                                                                         | Catálogo de establecimientos y plantillas de consentimiento                                               |
+| `/verificar`, `/verificar/:codigo`                                        | Público                                                                                       | Verificación de un documento médico                                                                       |
 | `/rrhh`                                                                   | Recursos humanos, gerencia, admin                                                             | Resumen de la plantilla                                                                                   |
 | `/rrhh/empleados`                                                         | Recursos humanos, gerencia, admin                                                             | Fichas laborales                                                                                          |
 | `/rrhh/turnos`                                                            | Recursos humanos, admin                                                                       | Turnos semanales del personal                                                                             |
@@ -1173,6 +1205,21 @@ La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y
 | `GET`                                                                     | `/api/v1/reportes/morbilidad`                                                                 | Calidad, operaciones, gerencia, admin                                                                     | 200       |
 | `GET`                                                                     | `/api/v1/cie10`, `/cie10/{codigo}`                                                            | Médico, admin, calidad, operaciones, gerencia                                                             | 200       |
 | `GET`                                                                     | `/api/v1/cie10/mis-frecuentes`                                                                | Médico                                                                                                    | 200       |
+| `POST`                                                                    | `/api/v1/documentos-medicos`, `/documentos-medicos/epicrisis/borrador`                        | Médico con relación asistencial                                                                           | 201       |
+| `PUT`                                                                     | `/api/v1/documentos-medicos/{id}`                                                             | Médico emisor, solo en borrador                                                                           | 200       |
+| `POST`                                                                    | `/api/v1/documentos-medicos/{id}/emitir`, `/{id}/anular`                                      | Médico emisor                                                                                             | 200       |
+| `PUT`                                                                     | `/api/v1/documentos-medicos/{id}/referencia/estado`                                           | Médico emisor                                                                                             | 200       |
+| `GET`                                                                     | `/api/v1/documentos-medicos/{id}`, `/{id}/pdf`                                                | Médico con relación, paciente propio                                                                      | 200       |
+| `GET`                                                                     | `/api/v1/documentos-medicos/mios`, `/emitidos`, `?pacienteId=`                                | Paciente, médico                                                                                          | 200       |
+| `GET`                                                                     | `/api/v1/documentos-medicos/ingreso/{ingresoId}/resumen`                                      | Médico, enfermería de sus hospitalizados                                                                  | 200       |
+| `GET`                                                                     | `/api/v1/consentimientos/plantillas`                                                          | Médico, admin                                                                                             | 200       |
+| `POST`                                                                    | `/api/v1/consentimientos/plantillas`, `PUT /{id}`                                             | Admin                                                                                                     | 201       |
+| `POST`                                                                    | `/api/v1/consentimientos`                                                                     | Médico                                                                                                    | 201       |
+| `POST`                                                                    | `/api/v1/consentimientos/{id}/firma`, `/{id}/revocar`                                         | Paciente propio, médico                                                                                   | 200       |
+| `GET`                                                                     | `/api/v1/consentimientos/mios`, `/{id}`, `/{id}/pdf`, `?pacienteId=`                          | Paciente, médico                                                                                          | 200       |
+| `GET`                                                                     | `/api/v1/establecimientos-salud`                                                              | Médico, admin                                                                                             | 200       |
+| `POST`                                                                    | `/api/v1/establecimientos-salud`, `PUT /{id}`                                                 | Admin                                                                                                     | 201       |
+| `GET`                                                                     | `/api/v1/verificacion/{codigo}`                                                               | Público, con límite de tasa                                                                               | 200       |
 | `GET`                                                                     | `/api/v1/admin/cie10/resumen`, `/admin/cie10/plantilla.csv`                                   | Admin                                                                                                     | 200       |
 | `POST`                                                                    | `/api/v1/admin/cie10/importaciones/vista-previa`, `/admin/cie10/importaciones`                | Admin                                                                                                     | 200       |
 | `GET`                                                                     | `/api/v1/rrhh/resumen`, `/rrhh/empleados`, `/rrhh/empleados/{id}`                             | Recursos humanos, gerencia, admin                                                                         | 200       |
@@ -2259,7 +2306,7 @@ Los reportes aceptan los mismos `desde`, `hasta` y `agrupacion` que la consulta 
 
 #### Plantillas
 
-Las once plantillas viven en `src/main/resources/reportes` y se usan por defecto. El administrador puede reemplazar cualquiera desde la web o con la API. La versión nueva se guarda en el bucket `plantillas` y manda sobre la del sistema hasta que se restaure.
+Las diecinueve plantillas viven en `src/main/resources/reportes` y se usan por defecto. El administrador puede reemplazar cualquiera desde la web o con la API. La versión nueva se guarda en el bucket `plantillas` y manda sobre la del sistema hasta que se restaure.
 
 - `GET /api/v1/plantillas` lista las plantillas, su versión vigente y si están personalizadas.
 - `GET /api/v1/plantillas/{codigo}/descargar` baja el JRXML vigente.
@@ -2350,6 +2397,26 @@ El módulo reemplaza el diagnóstico de texto libre por diagnósticos codificado
 **Pruebas.** El backend tiene pruebas de servicio para la normalización, la búsqueda y la importación, de la atención con sus reglas, de la morbilidad con la supresión de celdas y de seguridad por rol. El frontend prueba el selector, la lista y el catálogo. Los e2e cubren el flujo del médico, la minimización por rol, la importación por el administrador y la exportación de morbilidad. La carpeta 28 de Postman recorre todos los casos felices y los 400, 401, 403 y 404.
 
 **Límites conocidos.** El catálogo incluido es una muestra y el oficial lo carga el administrador. No hay CIE-10 en las órdenes de laboratorio ni de imágenes, ni sugerencias de diagnóstico, ni codificación de procedimientos con CPT o CIE-9-MC. Las atenciones anteriores a la migración se codificaron en la demostración por coincidencia de texto y las demás conservan solo el texto libre.
+
+### Documentos médicos y consentimientos
+
+El módulo emite documentos clínicos con identidad verificable y registra consentimientos informados con firma manuscrita.
+
+**Ciclo de vida.** Todo documento pasa por BORRADOR, EMITIDO y ANULADO. El borrador se edita y se previsualiza. Al emitir se asigna el número correlativo por tipo y año con su serie, que es CM, DM, IM, RF, CR o EP, se calcula el hash SHA-256 del contenido canónico, se genera el PDF y se guarda su hash junto con un código aleatorio de verificación. El documento registra al médico emisor con su nombre y colegiatura, y la fecha y hora. Después de emitido no se edita. Solo el médico emisor lo anula, con un motivo obligatorio, y el reemplazo se emite como un documento nuevo que referencia al anulado. El paciente recibe una notificación al emitir y cada operación queda en la auditoría clínica.
+
+**Tipos.** El certificado incluye el diagnóstico solo con la autorización del paciente. El descanso lleva tipo, fechas, contingencia e indicación, y rechaza solapes con otro descanso vigente, más días que el máximo y un inicio demasiado retroactivo, que se configuran con `app.documentos-medicos.descanso-max-dias` y `descanso-retroactivo-dias`. El informe exige la autorización del paciente. La referencia apunta a un establecimiento activo del catálogo y recorre ENVIADA, RECIBIDA, ATENDIDA o RECHAZADA, y la contrarreferencia cierra la referencia como atendida. La epicrisis se arma como borrador desde el ingreso con alta y el médico la revisa y la emite.
+
+**Consentimientos.** El médico solicita un consentimiento a partir de una plantilla por procedimiento. Pasa por PENDIENTE_FIRMA, FIRMADO, REVOCADO y VENCIDO. La firma se dibuja en un lienzo, se valida como una imagen PNG con trazos reales y se guarda en el almacén con su hash. Puede firmar el paciente desde su app o el médico en consultorio. Admite representante legal con parentesco y un testigo cuando la plantilla lo exige. El paciente solo firma si su DNI coincide con el registrado. El PDF incrusta la firma y cada cambio de una plantilla sube su versión, de modo que un consentimiento firmado conserva el texto que el paciente aceptó.
+
+**Verificación pública.** `GET /api/v1/verificacion/{codigo}` no pide sesión. Responde solo el resultado, el tipo, la fecha, el médico, el CMP y el establecimiento, y nunca datos del paciente. Un código inexistente o mal formado devuelve la misma forma de respuesta, así que no permite enumerar documentos. La API limita las consultas por dirección con `app.documentos-medicos.verificacion-por-minuto` y el gateway agrega la zona `verificacion`, configurable con `RATE_VERIFICACION`. El código QR del PDF apunta a `/verificar/{codigo}` del portal, cuya base se define en `app.documentos-medicos.url-verificacion`.
+
+**Seguridad.** Los PDF emitidos y las firmas usan propósitos de archivo que el flujo genérico de archivos deniega, por lo que solo se leen por el controlador propio con su autorización. El médico exige relación asistencial. El paciente solo accede a lo propio. Enfermería ve únicamente el resumen del ingreso de sus hospitalizados. Recepción, caja, administración y recursos humanos no ven contenido clínico. Toda lectura de un documento ajeno queda auditada y las rutas de estos módulos se agregan a las que la telemetría no registra con cuerpo.
+
+**Plantillas PDF.** Los siete JRXML nuevos, certificado, descanso, informe, referencia, contrarreferencia, epicrisis y consentimiento, incluyen el código QR, el pie con el código y el hash corto y la marca ANULADO. El administrador puede reemplazarlos como las demás plantillas.
+
+**Pruebas.** El backend prueba el servicio, la numeración concurrente, los consentimientos y la seguridad por rol. El frontend prueba el cliente de la API, las utilidades, el lienzo de firma y las rutas. Los e2e cubren la emisión, la descarga y la verificación pública, la anulación, la firma con el lienzo y la revocación, la referencia con su contrarreferencia y los accesos de terceros. La carpeta 29 de Postman recorre los casos felices y los 400, 401, 403, 404 y 409.
+
+**Límites conocidos.** La firma manuscrita no es una firma digital con certificado, así que no equivale a la firma electrónica de la ley peruana. El estado VENCIDO se calcula al consultar, sin un proceso programado. No hay envío real de correos ni mensajes, y la epicrisis no se arma sin alta.
 
 ## Manejo de errores
 
@@ -3027,33 +3094,36 @@ docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml up -d --b
 ./mvnw test
 ```
 
-Las 688 pruebas usan el perfil `test` con H2 en memoria y no necesitan PostgreSQL ni Docker.
+Las 753 pruebas usan el perfil `test` con H2 en memoria y no necesitan PostgreSQL ni Docker.
 
-| Clase                                                                   | Qué verifica                                                                                                                                                                  |
-| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `VirtualThreadsTest`                                                    | Que Tomcat atiende las peticiones con virtual threads                                                                                                                         |
-| `TusaludApplicationTests`                                               | Que el contexto de Spring arranca                                                                                                                                             |
-| `ValidadorPlantillaTest`                                                | La lista blanca de plantillas: scripts, importaciones, entidades externas, tamaño y recursos externos                                                                         |
-| `MotorPlantillasTest`                                                   | La compilación y el llenado de las once plantillas, las tildes en el PDF y el límite de filas                                                                                 |
-| `LibroExcelTest`                                                        | La escritura en flujo, la neutralización de fórmulas y el reempaquetado del libro                                                                                             |
-| `DocumentoServiceTest`                                                  | La autorización de cada documento, las exportaciones, la purga, los límites y las plantillas                                                                                  |
-| `SeguridadOperativaSeguridadTest`, `EventoSeguridadServiceTest`         | Eventos de seguridad sin correos ni claves, enmascarado de IP, umbrales, purga, permisos de administración, estado del sistema, evoluciones pendientes y motivos obligatorios |
-| `CoberturaCalculadoraTest`, `SegurosServiceTest`                        | El cálculo de cobertura con porcentaje, copago fijo, topes, exclusiones y redondeo, las pólizas, las preautorizaciones, el cobro del copago, la reversión y las liquidaciones |
-| `SegurosSeguridadTest`                                                  | Los permisos por rol, el acceso a pólizas ajenas y lo que ve el médico                                                                                                        |
-| `DocumentosSeguridadTest`                                               | El acceso por rol, los intentos de acceso a datos ajenos y el aislamiento entre usuarios                                                                                      |
-| `CitaRepositoryTest`                                                    | Las consultas JPQL de citas, médicos, horarios y auditoría contra datos reales                                                                                                |
-| `SecurityIntegrationTest`                                               | Respuestas 401 y 403, rutas públicas, CORS, contenido del token y login con BCrypt                                                                                            |
-| `CitaServiceImplTest`                                                   | Reserva de citas, conflictos de horario con rollback, permisos, transiciones de estado y disponibilidad                                                                       |
-| `AuthServiceImplTest`                                                   | Registro de pacientes, duplicados y login                                                                                                                                     |
-| `MedicoEspecialidadServiceImplTest`                                     | Especialidades, alta de médicos y validación de horarios                                                                                                                      |
-| `HttpTelemetryFilterTest`, `DtoCredencialesToStringTest`                | Que los spans enmascaran credenciales y no registran cuerpos clínicos ni de autenticación, y que los DTO ocultan sus secretos                                                 |
-| `RecepcionServiceTest`, `AdmisionServiceTest`, `RecepcionSeguridadTest` | Llegadas, numeración y cola de turnos, registro de pacientes y citas de mostrador, y permisos por rol                                                                         |
-| `CajaServiceTest`, `CajaSeguridadTest`                                  | Apertura y cierre, cobros con IGV, anulación, cuentas por cobrar, reporte y permisos                                                                                          |
-| `HospitalizacionServiceTest`, `HospitalizacionSeguridadTest`            | Camas, ingresos, traslados con cargo por tramos, triaje, evoluciones por rol, alta y permisos                                                                                 |
-| `ImagenesServiceTest`, `ImagenesSeguridadTest`                          | Catálogo, programación con choque de sala, carga validada por contenido, informes con versiones, acceso por relación, minimización por rol y cobro                            |
-| `DetectorContenidoTest`, `NombresArchivoTest`                           | Detección por firma de imágenes, PDF, Office, CSV y JRXML, rechazo de ejecutables, SVG, HTML y XML con DOCTYPE, y sanitización de nombres                                     |
-| `LocalStorageServiceTest`, `S3StorageServiceTest`                       | Guardado, lectura por rangos, borrado, claves con recorrido de directorio y errores del almacén con un cliente S3 simulado                                                    |
-| `ArchivoServiceTest`, `ArchivosSeguridadTest`                           | Validación por propósito, acceso por relación y propietario, rangos, ETag, avatar del perfil y accesos indebidos por HTTP                                                     |
+| Clase                                                                   | Qué verifica                                                                                                                                                                                    |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VirtualThreadsTest`                                                    | Que Tomcat atiende las peticiones con virtual threads                                                                                                                                           |
+| `TusaludApplicationTests`                                               | Que el contexto de Spring arranca                                                                                                                                                               |
+| `ValidadorPlantillaTest`                                                | La lista blanca de plantillas: scripts, importaciones, entidades externas, tamaño y recursos externos                                                                                           |
+| `MotorPlantillasTest`                                                   | La compilación y el llenado de las diecinueve plantillas, las tildes en el PDF y el límite de filas                                                                                             |
+| `LibroExcelTest`                                                        | La escritura en flujo, la neutralización de fórmulas y el reempaquetado del libro                                                                                                               |
+| `DocumentoServiceTest`                                                  | La autorización de cada documento, las exportaciones, la purga, los límites y las plantillas                                                                                                    |
+| `SeguridadOperativaSeguridadTest`, `EventoSeguridadServiceTest`         | Eventos de seguridad sin correos ni claves, enmascarado de IP, umbrales, purga, permisos de administración, estado del sistema, evoluciones pendientes y motivos obligatorios                   |
+| `CoberturaCalculadoraTest`, `SegurosServiceTest`                        | El cálculo de cobertura con porcentaje, copago fijo, topes, exclusiones y redondeo, las pólizas, las preautorizaciones, el cobro del copago, la reversión y las liquidaciones                   |
+| `SegurosSeguridadTest`                                                  | Los permisos por rol, el acceso a pólizas ajenas y lo que ve el médico                                                                                                                          |
+| `DocumentosMedicosServiceTest`, `ConsentimientosServiceTest`            | El ciclo de borrador, emisión y anulación, la inmutabilidad, los hashes, las validaciones del descanso, la autorización del diagnóstico, la firma, el representante, el testigo y la revocación |
+| `SecuenciasDocumentosMedicosConcurrenciaTest`                           | Que la numeración correlativa no repite números con emisiones simultáneas                                                                                                                       |
+| `DocumentosMedicosSeguridadTest`                                        | La verificación pública sin datos del paciente, los roles, el acceso a documentos ajenos y la auditoría                                                                                         |
+| `DocumentosSeguridadTest`                                               | El acceso por rol, los intentos de acceso a datos ajenos y el aislamiento entre usuarios                                                                                                        |
+| `CitaRepositoryTest`                                                    | Las consultas JPQL de citas, médicos, horarios y auditoría contra datos reales                                                                                                                  |
+| `SecurityIntegrationTest`                                               | Respuestas 401 y 403, rutas públicas, CORS, contenido del token y login con BCrypt                                                                                                              |
+| `CitaServiceImplTest`                                                   | Reserva de citas, conflictos de horario con rollback, permisos, transiciones de estado y disponibilidad                                                                                         |
+| `AuthServiceImplTest`                                                   | Registro de pacientes, duplicados y login                                                                                                                                                       |
+| `MedicoEspecialidadServiceImplTest`                                     | Especialidades, alta de médicos y validación de horarios                                                                                                                                        |
+| `HttpTelemetryFilterTest`, `DtoCredencialesToStringTest`                | Que los spans enmascaran credenciales y no registran cuerpos clínicos ni de autenticación, y que los DTO ocultan sus secretos                                                                   |
+| `RecepcionServiceTest`, `AdmisionServiceTest`, `RecepcionSeguridadTest` | Llegadas, numeración y cola de turnos, registro de pacientes y citas de mostrador, y permisos por rol                                                                                           |
+| `CajaServiceTest`, `CajaSeguridadTest`                                  | Apertura y cierre, cobros con IGV, anulación, cuentas por cobrar, reporte y permisos                                                                                                            |
+| `HospitalizacionServiceTest`, `HospitalizacionSeguridadTest`            | Camas, ingresos, traslados con cargo por tramos, triaje, evoluciones por rol, alta y permisos                                                                                                   |
+| `ImagenesServiceTest`, `ImagenesSeguridadTest`                          | Catálogo, programación con choque de sala, carga validada por contenido, informes con versiones, acceso por relación, minimización por rol y cobro                                              |
+| `DetectorContenidoTest`, `NombresArchivoTest`                           | Detección por firma de imágenes, PDF, Office, CSV y JRXML, rechazo de ejecutables, SVG, HTML y XML con DOCTYPE, y sanitización de nombres                                                       |
+| `LocalStorageServiceTest`, `S3StorageServiceTest`                       | Guardado, lectura por rangos, borrado, claves con recorrido de directorio y errores del almacén con un cliente S3 simulado                                                                      |
+| `ArchivoServiceTest`, `ArchivosSeguridadTest`                           | Validación por propósito, acceso por relación y propietario, rangos, ETag, avatar del perfil y accesos indebidos por HTTP                                                                       |
 
 ## Flujo de trabajo con Git
 
@@ -3129,6 +3199,9 @@ Para usarla en Postman, importa el archivo y ejecuta la colección completa con 
 | `24 - Documentos y exportaciones`                       | Documentos de un registro con su regla de acceso, exportaciones asíncronas con consulta hasta terminar, aislamiento entre usuarios, formatos y filtros inválidos, y gestión de plantillas con validación y restauración |
 | `25 - Seguridad operativa y motivos`                    | Eventos de seguridad sin datos sensibles, resumen, estado del sistema, uso del almacenamiento, evoluciones pendientes y validación del motivo en las acciones sensibles                                                 |
 | `26 - Seguros y convenios`                              | Catálogo con convenios y reglas, pólizas, verificación, preautorizaciones, cobro del copago con cuenta por cobrar, cobrar como particular, reversión al anular, cartera, liquidaciones con glosa y permisos por rol     |
+| `27 - Telemedicina`                                     | Citas virtuales, ticket de sala, sala de espera, consentimiento y accesos indebidos                                                                                                                                     |
+| `28 - Codificación CIE-10`                              | Catálogo, diagnósticos de la atención, importación y morbilidad con sus errores                                                                                                                                         |
+| `29 - Documentos médicos y consentimientos`             | Certificados, descansos, informes, referencias y contrarreferencias, ciclo de vida, validaciones, anulación y reemplazo, consentimientos con firma y revocación, verificación pública y accesos indebidos               |
 
 Desde la línea de comandos:
 
@@ -3184,6 +3257,7 @@ cp .env.example .env
 | `RATE_REFRESH`                     | Límite de renovaciones del token                                                      | `30r/m`                                               |
 | `RATE_MFA`                         | Límite de verificaciones de la verificación en dos pasos                              | `10r/m`                                               |
 | `RATE_REGISTRO`                    | Límite de registros de pacientes                                                      | `5r/m`                                                |
+| `RATE_VERIFICACION`                | Límite de consultas a la verificación pública de documentos                           | `30r/m`                                               |
 | `RATE_GENERAL`                     | Límite del resto de la API                                                            | `600r/m`, y `12000r/m` en desarrollo                  |
 | `RATE_BURST_AUTH`                  | Ráfaga permitida en las rutas de autenticación                                        | `5`, y `60` en desarrollo                             |
 | `RATE_BURST_GENERAL`               | Ráfaga permitida en el resto de la API                                                | `100`, y `1000` en desarrollo                         |

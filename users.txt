@@ -171,3 +171,10 @@ TELECONSULTAS
 Para probar una teleconsulta, el paciente juan.perez@correo.com reserva una cita eligiendo la modalidad Teleconsulta con el Dr. García, y ambos entran desde la opción Teleconsultas de su menú: el paciente a /paciente/teleconsultas y el médico a /medico/teleconsultas.
 En desarrollo la sala se habilita 30 días antes de la hora para poder entrar a cualquier cita futura. En producción se habilita 10 minutos antes.
 Hace falta una cámara y un micrófono, o el navegador con dispositivos simulados, y permitir su uso cuando el navegador lo pida.
+
+DOCUMENTOS MEDICOS Y CONSENTIMIENTOS
+------------------------------------
+Sin usuarios nuevos: el médico emite desde Documentos y Consentimientos de /medico/, el paciente descarga y firma desde Mis documentos y Mis consentimientos de /paciente/, y el administrador gestiona los Establecimientos de salud y las Plantillas de consentimiento en /admin/.
+Para probar el flujo completo, el paciente juan.perez@correo.com reserva una cita con el Dr. García y el médico la confirma, lo que crea la relación asistencial. Después el Dr. García emite un certificado o un descanso, el paciente lo descarga y cualquiera lo verifica en /verificar con el código del documento o con el QR del PDF.
+Para firmar un consentimiento, el Dr. García solicita uno a Juan Pérez, cuyo DNI es 12345678, y el paciente lo lee y lo firma dibujando con el mouse o el dedo en Mis consentimientos.
+Datos de ejemplo: 8 establecimientos de salud, uno de ellos inactivo, y 6 plantillas de consentimiento, que son anestesia local, pequeña cirugía, endoscopía, transfusión, procedimiento invasivo y hospitalización.
