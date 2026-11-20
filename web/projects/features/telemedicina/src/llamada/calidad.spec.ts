@@ -19,5 +19,13 @@ describe('calidad de la llamada', () => {
     expect(urlDeSenalizacion('/ws/teleconsulta', 'a b', https)).toBe(
       'wss://clinica.pe/ws/teleconsulta?ticket=a%20b',
     );
+    expect(
+      urlDeSenalizacion(
+        '/ws/teleconsulta',
+        't',
+        https,
+        'https://api.tusalud.codesoftlabs.com/api/v1',
+      ),
+    ).toBe('wss://api.tusalud.codesoftlabs.com/ws/teleconsulta?ticket=t');
   });
 });

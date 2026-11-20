@@ -36,7 +36,8 @@
     "test:features": "ng test features --watch=false",
     "test:apps": "ng test portal --watch=false && ng test paciente --watch=false && ng test medico --watch=false && ng test admin --watch=false && ng test gerencia --watch=false && ng test finanzas --watch=false && ng test operaciones --watch=false && ng test calidad --watch=false && ng test rrhh --watch=false && ng test recepcion --watch=false && ng test caja --watch=false && ng test enfermeria --watch=false && ng test laboratorio --watch=false && ng test imagenes --watch=false && ng test farmacia --watch=false && ng test almacen --watch=false",
     "test:all": "npm run test:core && npm run test:ui && npm run test:features && npm run test:apps",
-    "test": "npm run test:all"
+    "test": "npm run test:all",
+    "build:all:vps": "ng build portal --configuration vps && ng build paciente --configuration vps && ng build medico --configuration vps && ng build admin --configuration vps && ng build gerencia --configuration vps && ng build finanzas --configuration vps && ng build operaciones --configuration vps && ng build calidad --configuration vps && ng build rrhh --configuration vps && ng build recepcion --configuration vps && ng build caja --configuration vps && ng build enfermeria --configuration vps && ng build laboratorio --configuration vps && ng build imagenes --configuration vps && ng build farmacia --configuration vps && ng build almacen --configuration vps"
   },
   "private": true,
   "packageManager": "npm@11.19.0",

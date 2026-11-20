@@ -23,11 +23,12 @@ RUN case "${BUILD_CONFIGURATION}" in production) SUFIJO=prod ;; *) SUFIJO="${BUI
         -size +1k -exec gzip -9 -k -n {} +
 
 FROM ${NGINX_IMAGE} AS runtime
+ARG SECURITY_HEADERS=security-headers.conf
 LABEL org.opencontainers.image.title="tusalud-web" \
       org.opencontainers.image.description="Aplicaciones web de TuSalud" \
       org.opencontainers.image.source="https://github.com/jhonsferg/tusalud" \
       org.opencontainers.image.vendor="CodeSoftLabs"
-COPY nginx/security-headers.conf /etc/nginx/snippets/security-headers.conf
+COPY nginx/${SECURITY_HEADERS} /etc/nginx/snippets/security-headers.conf
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /site /usr/share/nginx/html
 EXPOSE 8080

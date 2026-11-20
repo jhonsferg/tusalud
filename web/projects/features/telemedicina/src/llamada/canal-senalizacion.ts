@@ -65,7 +65,10 @@ export function urlDeSenalizacion(
   ruta: string,
   ticket: string,
   ubicacion: Location = location,
+  apiUrl = '',
 ): string {
-  const protocolo = ubicacion.protocol === 'https:' ? 'wss' : 'ws';
-  return `${protocolo}://${ubicacion.host}${ruta}?ticket=${encodeURIComponent(ticket)}`;
+  const destino =
+    apiUrl.startsWith('http://') || apiUrl.startsWith('https://') ? new URL(apiUrl) : ubicacion;
+  const protocolo = destino.protocol === 'https:' ? 'wss' : 'ws';
+  return `${protocolo}://${destino.host}${ruta}?ticket=${encodeURIComponent(ticket)}`;
 }

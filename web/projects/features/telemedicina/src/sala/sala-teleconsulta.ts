@@ -21,6 +21,7 @@ import { Message } from 'primeng/message';
 import { firstValueFrom } from 'rxjs';
 
 import {
+  API_URL,
   AuthService,
   IceServer,
   NotificationService,
@@ -68,6 +69,7 @@ export class SalaTeleconsulta {
 
   private readonly api = inject(TeleconsultaApiService);
   private readonly auth = inject(AuthService);
+  private readonly apiUrl = inject(API_URL);
   private readonly router = inject(Router);
   private readonly notifications = inject(NotificationService);
   private readonly dispositivos = inject(DispositivosService);
@@ -254,16 +256,19 @@ export class SalaTeleconsulta {
   private async abrirCanal(id: string): Promise<void> {
     this.conexion.set('conectando');
     const ticket = await firstValueFrom(this.api.ticket(id));
-    this.canal = new CanalSenalizacion(urlDeSenalizacion(ticket.ruta, ticket.ticket), {
-      alAbrir: () => {
-        this.reintentos = 0;
-        if (this.conexion() !== 'conectado') {
-          this.conexion.set('esperando');
-        }
+    this.canal = new CanalSenalizacion(
+      urlDeSenalizacion(ticket.ruta, ticket.ticket, location, this.apiUrl),
+      {
+        alAbrir: () => {
+          this.reintentos = 0;
+          if (this.conexion() !== 'conectado') {
+            this.conexion.set('esperando');
+          }
+        },
+        alMensaje: (mensaje) => void this.manejar(mensaje),
+        alCerrar: () => this.alCerrarCanal(id),
       },
-      alMensaje: (mensaje) => void this.manejar(mensaje),
-      alCerrar: () => this.alCerrarCanal(id),
-    });
+    );
     this.canal.abrir();
   }
 
