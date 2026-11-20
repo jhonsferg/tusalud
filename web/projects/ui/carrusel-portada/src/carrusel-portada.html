@@ -1,0 +1,57 @@
+<div
+  class="carrusel"
+  role="region"
+  aria-roledescription="carrusel"
+  aria-label="Imágenes de la clínica"
+>
+  <div class="lamina" aria-live="off">
+    @for (diapositiva of diapositivas; track diapositiva.base; let i = $index) {
+      <img
+        class="diapositiva"
+        [class.activa]="i === indice()"
+        [class.quieta]="reducirMovimiento()"
+        [src]="diapositiva.base + '-1536.webp'"
+        [attr.srcset]="
+          diapositiva.base +
+          '-768.webp 768w, ' +
+          diapositiva.base +
+          '-1536.webp 1536w, ' +
+          diapositiva.base +
+          '-2400.webp 2400w'
+        "
+        sizes="(min-width: 900px) 45vw, 100vw"
+        width="1536"
+        height="1024"
+        [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+        [attr.fetchpriority]="i === 0 ? 'high' : 'auto'"
+        decoding="async"
+        alt=""
+        aria-hidden="true"
+        [style.object-position]="diapositiva.foco"
+      />
+    }
+  </div>
+  <div class="velo" aria-hidden="true"></div>
+  <div class="controles">
+    <button
+      type="button"
+      class="pausa"
+      (click)="alternarPausa()"
+      [attr.aria-label]="pausaManual() ? 'Reanudar la presentación' : 'Pausar la presentación'"
+    >
+      <i [class]="pausaManual() ? 'pi pi-play' : 'pi pi-pause'" aria-hidden="true"></i>
+    </button>
+    <div class="puntos">
+      @for (diapositiva of diapositivas; track diapositiva.base; let i = $index) {
+        <button
+          type="button"
+          class="punto"
+          [class.activo]="i === indice()"
+          (click)="ir(i)"
+          [attr.aria-label]="'Mostrar la imagen ' + (i + 1) + ' de ' + diapositivas.length"
+          [attr.aria-current]="i === indice() ? 'true' : null"
+        ></button>
+      }
+    </div>
+  </div>
+</div>

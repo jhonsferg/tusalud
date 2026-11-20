@@ -19,6 +19,7 @@ import { Calendario, CalEvento } from '@tusalud/ui/calendario';
 import { CitaActions } from '@tusalud/ui/services';
 import { citaAEvento, ETIQUETA_ESTADO } from '@tusalud/ui/utils';
 import { EmptyState } from '@tusalud/ui/empty-state';
+import { EstadoVacio } from '@tusalud/ui/estado-vacio';
 import { EstadoCitaTag } from '@tusalud/ui/estado-cita-tag';
 import { PageHeader } from '@tusalud/ui/page-header';
 
@@ -37,6 +38,7 @@ type Vista = 'proximas' | 'historial' | 'todas';
     TableModule,
     Calendario,
     EmptyState,
+    EstadoVacio,
     EstadoCitaTag,
     PageHeader,
   ],

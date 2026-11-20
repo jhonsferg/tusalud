@@ -120,8 +120,8 @@
       <ng-template #emptymessage>
         <tr>
           <td colspan="5">
-            <app-empty-state
-              icon="pi-calendar"
+            <app-estado-vacio
+              imagen="sin-citas"
               [title]="
                 vista() === 'proximas' ? 'No tienes citas próximas' : 'No hay citas para mostrar'
               "
@@ -132,7 +132,7 @@
                 icon="pi pi-calendar-plus"
                 routerLink="/citas/nueva"
               />
-            </app-empty-state>
+            </app-estado-vacio>
           </td>
         </tr>
       </ng-template>

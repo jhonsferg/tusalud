@@ -1,0 +1,45 @@
+:host {
+  display: block;
+}
+
+.estado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.marco {
+  width: min(24rem, 85vw);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  background: var(--app-surface);
+  border: 1px solid var(--app-borde);
+  border-radius: 16px;
+  box-shadow: var(--sombra-2);
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.35rem;
+}
+
+p {
+  max-width: 28rem;
+  margin: 0 0 1.25rem;
+  color: var(--p-text-muted-color);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}

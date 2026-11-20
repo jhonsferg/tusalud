@@ -1,0 +1,20 @@
+@for (objeto of objetos; track objeto.nombre) {
+  <span [class]="'objeto ' + objeto.clase">
+    <img
+      [src]="'img/comun/objetos/' + objeto.nombre + '-384.webp'"
+      [attr.srcset]="
+        'img/comun/objetos/' +
+        objeto.nombre +
+        '-384.webp 384w, img/comun/objetos/' +
+        objeto.nombre +
+        '-768.webp 768w'
+      "
+      sizes="140px"
+      width="384"
+      height="384"
+      loading="lazy"
+      decoding="async"
+      alt=""
+    />
+  </span>
+}

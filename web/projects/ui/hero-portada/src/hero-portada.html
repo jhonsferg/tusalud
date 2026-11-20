@@ -1,0 +1,41 @@
+<section
+  class="hero"
+  [style.--foco-movil]="focoMovil()"
+  [style.--foco-escritorio]="focoEscritorio()"
+>
+  @if (imagenDisponible()) {
+    <picture>
+      <source
+        media="(max-width: 700px)"
+        srcset="img/portada/full-768.webp 768w, img/portada/full-1536.webp 1536w"
+        sizes="100vw"
+      />
+      <img
+        class="fondo"
+        src="img/portada/hero-1600.webp"
+        srcset="
+          img/portada/hero-800.webp   800w,
+          img/portada/hero-1600.webp 1600w,
+          img/portada/hero-2400.webp 2400w
+        "
+        sizes="(min-width: 1200px) 1100px, 100vw"
+        width="2400"
+        height="800"
+        fetchpriority="high"
+        decoding="async"
+        alt=""
+        (error)="sinImagen()"
+      />
+    </picture>
+  }
+  <div class="velo" aria-hidden="true"></div>
+  <div class="contenido">
+    <div class="textos">
+      <h1>{{ title() }}</h1>
+      @if (subtitle(); as texto) {
+        <p>{{ texto }}</p>
+      }
+    </div>
+    <div class="acciones"><ng-content /></div>
+  </div>
+</section>

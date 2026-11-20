@@ -1,0 +1,87 @@
+:host {
+  position: absolute;
+  inset: 0;
+  display: none;
+  overflow: hidden;
+  pointer-events: none;
+  --px: 0;
+  --py: 0;
+}
+
+.objeto {
+  position: absolute;
+  display: block;
+  width: var(--tam, 6.5rem);
+  opacity: 0.92;
+  mix-blend-mode: multiply;
+  transform: translate3d(
+    calc(var(--px) * var(--prof, 10) * 1px),
+    calc(var(--py) * var(--prof, 10) * 1px),
+    0
+  );
+  transition: transform 0.6s ease-out;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    animation: flotar var(--dur, 11s) ease-in-out infinite;
+    animation-delay: var(--ret, 0s);
+  }
+}
+
+.escudo {
+  --tam: 6.5rem;
+  --prof: 14;
+  --dur: 12s;
+  top: 9%;
+  left: 5%;
+}
+
+.corazon {
+  --tam: 5.25rem;
+  --prof: 22;
+  --dur: 10s;
+  --ret: -3s;
+  top: 14%;
+  right: 6%;
+}
+
+.calendario {
+  --tam: 5.75rem;
+  --prof: 18;
+  --dur: 13s;
+  --ret: -5s;
+  bottom: 12%;
+  left: 7%;
+}
+
+.estetoscopio {
+  --tam: 6.75rem;
+  --prof: 12;
+  --dur: 11s;
+  --ret: -7s;
+  right: 5%;
+  bottom: 9%;
+}
+
+@keyframes flotar {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@media (min-width: 1100px) and (prefers-reduced-motion: no-preference) {
+  :host {
+    display: block;
+  }
+
+  :host-context(.app-dark) {
+    display: none;
+  }
+}

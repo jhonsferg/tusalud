@@ -3,15 +3,15 @@ import { Router } from '@angular/router';
 import { Button } from 'primeng/button';
 
 import { AuthService, NAVEGADOR_EXTERNO, PORTAL_LOGIN } from '@tusalud/core';
-import { EmptyState } from '@tusalud/ui/empty-state';
+import { EstadoVacio } from '@tusalud/ui/estado-vacio';
 
 @Component({
   selector: 'app-not-found',
-  imports: [EmptyState, Button],
+  imports: [EstadoVacio, Button],
   template: `
     <div class="flex align-items-center justify-content-center" style="min-height: 100vh">
-      <app-empty-state
-        icon="pi-search"
+      <app-estado-vacio
+        imagen="error-404"
         title="Página no encontrada"
         message="La dirección que buscas no existe o fue movida."
       >
@@ -20,7 +20,7 @@ import { EmptyState } from '@tusalud/ui/empty-state';
           icon="pi pi-home"
           (onClick)="ir()"
         />
-      </app-empty-state>
+      </app-estado-vacio>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

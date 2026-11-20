@@ -1,0 +1,127 @@
+:host {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  background: #0f2c3b;
+}
+
+.carrusel,
+.lamina {
+  position: absolute;
+  inset: 0;
+}
+
+.diapositiva {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity 1.4s ease-in-out;
+
+  &.activa {
+    opacity: 1;
+    animation: acercamiento 16s ease-out forwards;
+  }
+
+  &.quieta.activa {
+    animation: none;
+  }
+}
+
+@keyframes acercamiento {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.06);
+  }
+}
+
+.velo {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgb(15 44 59 / 92%) 0%,
+      rgb(15 44 59 / 70%) 55%,
+      rgb(15 44 59 / 38%) 100%
+    ),
+    linear-gradient(0deg, rgb(11 36 52 / 85%) 0%, rgb(11 36 52 / 10%) 45%, rgb(11 36 52 / 55%) 100%);
+}
+
+.controles {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 1.1rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pausa {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  color: #ffffff;
+  font-size: 0.7rem;
+  background: rgb(255 255 255 / 14%);
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 50%;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: rgb(255 255 255 / 28%);
+  }
+}
+
+.puntos {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.punto {
+  width: 0.65rem;
+  height: 0.65rem;
+  padding: 0;
+  background: rgb(255 255 255 / 35%);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    background 0.3s,
+    transform 0.3s;
+
+  &.activo {
+    background: #ffffff;
+    transform: scale(1.25);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+  }
+}
+
+@media (max-width: 900px) {
+  .controles {
+    right: 0.9rem;
+    bottom: 0.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diapositiva {
+    transition: none;
+    animation: none !important;
+  }
+}

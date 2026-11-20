@@ -1,7 +1,15 @@
 <div class="auth">
   <aside class="brand">
+    <app-carrusel-portada />
     <div class="logo">
-      <span class="logo-mark"><i class="pi pi-heart-fill"></i></span>
+      <img
+        class="logo-mark"
+        src="img/comun/marca/icon-192.png"
+        width="40"
+        height="40"
+        alt=""
+        decoding="async"
+      />
       TuSalud
     </div>
     <div class="mensaje">
@@ -25,6 +33,29 @@
     <small class="pie">© 2026 TuSalud. Todos los derechos reservados.</small>
   </aside>
   <main class="content">
+    <img
+      class="fondo-tema fondo-claro"
+      src="img/portal/fondo-claro-1536.webp"
+      srcset="img/portal/fondo-claro-1536.webp 1536w, img/portal/fondo-claro-2400.webp 2400w"
+      sizes="55vw"
+      width="1536"
+      height="1024"
+      decoding="async"
+      alt=""
+      aria-hidden="true"
+    />
+    <img
+      class="fondo-tema fondo-oscuro"
+      src="img/portal/fondo-oscuro-1536.webp"
+      srcset="img/portal/fondo-oscuro-1536.webp 1536w, img/portal/fondo-oscuro-2400.webp 2400w"
+      sizes="55vw"
+      width="1536"
+      height="1024"
+      decoding="async"
+      alt=""
+      aria-hidden="true"
+    />
+    <app-objetos-flotantes />
     <div class="card"><router-outlet /></div>
     <p class="aviso-equipo">
       <i class="pi pi-desktop" aria-hidden="true"></i>
