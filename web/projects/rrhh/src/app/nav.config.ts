@@ -47,6 +47,42 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         link: '/rrhh/ausencias',
         roles: ['ROLE_RRHH'],
       },
+      {
+        label: 'Planilla mensual',
+        icon: 'pi-wallet',
+        link: '/planilla',
+        roles: ['ROLE_RRHH'],
+      },
+      {
+        label: 'Contratos laborales',
+        icon: 'pi-id-card',
+        link: '/contratos-laborales',
+        roles: ['ROLE_RRHH'],
+      },
+      {
+        label: 'Asistencia',
+        icon: 'pi-stopwatch',
+        link: '/asistencia',
+        roles: ['ROLE_RRHH'],
+      },
+      {
+        label: 'Terminales de asistencia',
+        icon: 'pi-tablet',
+        link: '/terminales-asistencia',
+        roles: ['ROLE_RRHH'],
+      },
+      {
+        label: 'Conceptos de planilla',
+        icon: 'pi-list',
+        link: '/conceptos-planilla',
+        roles: ['ROLE_RRHH'],
+      },
+      {
+        label: 'Parámetros laborales',
+        icon: 'pi-sliders-h',
+        link: '/parametros-planilla',
+        roles: ['ROLE_RRHH'],
+      },
     ],
   },
   {
@@ -56,6 +92,18 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         label: 'Mi espacio',
         icon: 'pi-clock',
         link: '/mi-espacio/turnos',
+        roles: ['ROLE_RRHH'],
+      },
+      {
+        label: 'Mis boletas',
+        icon: 'pi-money-bill',
+        link: '/mis-boletas',
+        roles: ['ROLE_RRHH'],
+      },
+      {
+        label: 'Mi asistencia',
+        icon: 'pi-stopwatch',
+        link: '/mi-asistencia',
         roles: ['ROLE_RRHH'],
       },
       {

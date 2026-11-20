@@ -6,7 +6,8 @@ export type TipoDocumentoPdf =
   | 'constancia'
   | 'resumen-historia'
   | 'liquidacion'
-  | 'orden-compra';
+  | 'orden-compra'
+  | 'boleta-pago';
 
 export type TipoExportacion =
   | 'reporte-ejecutivo'
@@ -24,6 +25,8 @@ export type TipoExportacion =
   | 'stock'
   | 'ausencias'
   | 'turnos'
+  | 'reporte-planilla'
+  | 'asistencia-personal'
   | 'mis-citas';
 
 export type FormatoExportacion = 'PDF' | 'XLSX';
@@ -46,6 +49,8 @@ export const ETIQUETA_TIPO_EXPORTACION: Readonly<Record<string, string>> = {
   stock: 'Stock del almacén',
   ausencias: 'Ausencias del personal',
   turnos: 'Turnos del personal',
+  'reporte-planilla': 'Planilla mensual',
+  'asistencia-personal': 'Asistencia del personal',
   'mis-citas': 'Mis citas',
 };
 

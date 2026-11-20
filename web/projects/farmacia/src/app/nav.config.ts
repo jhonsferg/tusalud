@@ -81,6 +81,18 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         roles: ['ROLE_FARMACIA'],
       },
       {
+        label: 'Mis boletas',
+        icon: 'pi-money-bill',
+        link: '/mis-boletas',
+        roles: ['ROLE_FARMACIA'],
+      },
+      {
+        label: 'Mi asistencia',
+        icon: 'pi-stopwatch',
+        link: '/mi-asistencia',
+        roles: ['ROLE_FARMACIA'],
+      },
+      {
         label: 'Notificaciones',
         icon: 'pi-bell',
         link: '/notificaciones',

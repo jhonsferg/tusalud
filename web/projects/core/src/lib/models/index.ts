@@ -31,3 +31,4 @@ export * from './facturacion.model';
 export * from './proteccion-datos.model';
 export * from './compras.model';
 export * from './contabilidad.model';
+export * from './planilla.model';

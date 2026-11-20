@@ -105,6 +105,29 @@ export const routes: Routes = [
           import('@tusalud/features/contabilidad').then((m) => m.PLANTILLAS_ASIENTO_ROUTES),
       },
       {
+        path: 'planilla',
+        loadChildren: () => import('@tusalud/features/planilla').then((m) => m.PLANILLAS_ROUTES),
+      },
+      {
+        path: 'conceptos-planilla',
+        loadChildren: () =>
+          import('@tusalud/features/planilla').then((m) => m.CONCEPTOS_PLANILLA_ROUTES),
+      },
+      {
+        path: 'parametros-planilla',
+        loadChildren: () =>
+          import('@tusalud/features/planilla').then((m) => m.PARAMETROS_PLANILLA_ROUTES),
+      },
+      {
+        path: 'mis-boletas',
+        loadChildren: () => import('@tusalud/features/planilla').then((m) => m.MIS_BOLETAS_ROUTES),
+      },
+      {
+        path: 'mi-asistencia',
+        loadChildren: () =>
+          import('@tusalud/features/planilla').then((m) => m.MI_ASISTENCIA_ROUTES),
+      },
+      {
         path: 'mi-espacio',
         loadChildren: () => import('@tusalud/features/rrhh').then((m) => m.MI_ESPACIO_ROUTES),
       },

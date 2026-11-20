@@ -47,6 +47,9 @@ export type TipoNotificacion =
   | 'ORDEN_COMPRA_POR_APROBAR'
   | 'ORDEN_COMPRA_RESUELTA'
   | 'CUENTA_POR_PAGAR_VENCIDA'
+  | 'PLANILLA_POR_APROBAR'
+  | 'PLANILLA_APROBADA'
+  | 'BOLETA_DISPONIBLE'
   | 'SISTEMA';
 
 export interface NotificacionResponse {

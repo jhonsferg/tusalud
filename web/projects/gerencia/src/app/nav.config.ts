@@ -160,12 +160,41 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Planilla',
+    items: [
+      {
+        label: 'Planilla mensual',
+        icon: 'pi-wallet',
+        link: '/planilla',
+        roles: ['ROLE_GERENCIA'],
+      },
+      {
+        label: 'Parámetros laborales',
+        icon: 'pi-sliders-h',
+        link: '/parametros-planilla',
+        roles: ['ROLE_GERENCIA'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {
         label: 'Mi espacio',
         icon: 'pi-clock',
         link: '/mi-espacio/turnos',
+        roles: ['ROLE_GERENCIA'],
+      },
+      {
+        label: 'Mis boletas',
+        icon: 'pi-money-bill',
+        link: '/mis-boletas',
+        roles: ['ROLE_GERENCIA'],
+      },
+      {
+        label: 'Mi asistencia',
+        icon: 'pi-stopwatch',
+        link: '/mi-asistencia',
         roles: ['ROLE_GERENCIA'],
       },
       {

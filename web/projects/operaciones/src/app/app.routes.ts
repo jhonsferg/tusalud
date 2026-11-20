@@ -42,6 +42,15 @@ export const routes: Routes = [
         loadChildren: () => import('@tusalud/features/respaldos').then((m) => m.RESPALDOS_ROUTES),
       },
       {
+        path: 'mis-boletas',
+        loadChildren: () => import('@tusalud/features/planilla').then((m) => m.MIS_BOLETAS_ROUTES),
+      },
+      {
+        path: 'mi-asistencia',
+        loadChildren: () =>
+          import('@tusalud/features/planilla').then((m) => m.MI_ASISTENCIA_ROUTES),
+      },
+      {
         path: 'mi-espacio',
         loadChildren: () => import('@tusalud/features/rrhh').then((m) => m.MI_ESPACIO_ROUTES),
       },
