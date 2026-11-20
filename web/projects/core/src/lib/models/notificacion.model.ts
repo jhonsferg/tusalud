@@ -42,6 +42,11 @@ export type TipoNotificacion =
   | 'ARCO_RECIBIDA'
   | 'ARCO_RESUELTA'
   | 'INCIDENTE_DATOS'
+  | 'REQUISICION_ENVIADA'
+  | 'REQUISICION_RESUELTA'
+  | 'ORDEN_COMPRA_POR_APROBAR'
+  | 'ORDEN_COMPRA_RESUELTA'
+  | 'CUENTA_POR_PAGAR_VENCIDA'
   | 'SISTEMA';
 
 export interface NotificacionResponse {

@@ -14,6 +14,7 @@
         <th>Razón social</th>
         <th>RUC</th>
         <th>Contacto</th>
+        <th>Condiciones</th>
         <th>Estado</th>
         <th style="width: 6rem"></th>
       </tr>
@@ -26,6 +27,16 @@
           {{ proveedor.contacto || '—' }}
           @if (proveedor.telefono) {
             <small class="text-muted block">{{ proveedor.telefono }}</small>
+          }
+        </td>
+        <td>
+          {{
+            proveedor.condicionPagoDias === 0
+              ? 'Contado'
+              : proveedor.condicionPagoDias + ' días de crédito'
+          }}
+          @if (proveedor.plazoEntregaDias !== null && proveedor.plazoEntregaDias !== undefined) {
+            <small class="text-muted block">Entrega en {{ proveedor.plazoEntregaDias }} días</small>
           }
         </td>
         <td>
@@ -48,7 +59,7 @@
     </ng-template>
     <ng-template #emptymessage>
       <tr>
-        <td colspan="5">
+        <td colspan="6">
           <app-empty-state
             icon="pi-truck"
             title="Sin proveedores"
@@ -76,7 +87,7 @@
       >RUC <input pInputText id="prv-ruc" formControlName="ruc" maxlength="11" class="w-full"
     /></label>
     @if (form.controls.ruc.touched && form.controls.ruc.invalid) {
-      <small class="text-red-600">El RUC debe tener 11 dígitos.</small>
+      <small class="text-red-600">El RUC debe tener 11 dígitos y ser válido.</small>
     }
     <label
       >Razón social <input pInputText id="prv-razon" formControlName="razonSocial" class="w-full"
@@ -87,6 +98,36 @@
     </div>
     <label>Correo <input pInputText type="email" formControlName="email" class="w-full" /></label>
     <label>Dirección <input pInputText formControlName="direccion" class="w-full" /></label>
+    <div class="dos">
+      <label
+        >Condición de pago en días
+        <p-inputnumber
+          formControlName="condicionPagoDias"
+          [min]="0"
+          [max]="365"
+          [useGrouping]="false"
+          inputId="prv-pago"
+      /></label>
+      <label
+        >Plazo de entrega en días
+        <p-inputnumber
+          formControlName="plazoEntregaDias"
+          [min]="0"
+          [max]="365"
+          [useGrouping]="false"
+          inputId="prv-entrega"
+      /></label>
+    </div>
+    <div class="dos">
+      <label
+        >Banco <input pInputText formControlName="banco" maxlength="80" class="w-full"
+      /></label>
+      <label
+        >Cuenta bancaria
+        <input pInputText formControlName="cuentaBancaria" maxlength="40" class="w-full"
+      /></label>
+    </div>
+    <label>Notas <input pInputText formControlName="notas" maxlength="300" class="w-full" /></label>
     <label class="check"><p-toggleswitch formControlName="activo" /> Proveedor activo</label>
   </form>
   <ng-template #footer>

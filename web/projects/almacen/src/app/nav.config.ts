@@ -56,6 +56,29 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Compras',
+    items: [
+      {
+        label: 'Requisiciones',
+        icon: 'pi-clipboard',
+        link: '/compras/requisiciones',
+        roles: ['ROLE_ALMACEN'],
+      },
+      {
+        label: 'Órdenes de compra',
+        icon: 'pi-shopping-cart',
+        link: '/compras/ordenes',
+        roles: ['ROLE_ALMACEN'],
+      },
+      {
+        label: 'Recepciones y devoluciones',
+        icon: 'pi-download',
+        link: '/compras/recepciones',
+        roles: ['ROLE_ALMACEN'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

@@ -43,6 +43,11 @@ export const ICONO_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   COMPROBANTE_RECHAZADO: 'pi-times-circle',
   ARCO_RECIBIDA: 'pi-inbox',
   ARCO_RESUELTA: 'pi-shield',
+  REQUISICION_ENVIADA: 'pi-clipboard',
+  REQUISICION_RESUELTA: 'pi-clipboard',
+  ORDEN_COMPRA_POR_APROBAR: 'pi-shopping-cart',
+  ORDEN_COMPRA_RESUELTA: 'pi-shopping-cart',
+  CUENTA_POR_PAGAR_VENCIDA: 'pi-wallet',
   INCIDENTE_DATOS: 'pi-exclamation-triangle',
   SISTEMA: 'pi-info-circle',
 };
@@ -90,6 +95,11 @@ export const COLOR_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   COMPROBANTE_RECHAZADO: '#dc2626',
   ARCO_RECIBIDA: '#2563eb',
   ARCO_RESUELTA: '#16a34a',
+  REQUISICION_ENVIADA: '#2563eb',
+  REQUISICION_RESUELTA: '#2563eb',
+  ORDEN_COMPRA_POR_APROBAR: '#d97706',
+  ORDEN_COMPRA_RESUELTA: '#16a34a',
+  CUENTA_POR_PAGAR_VENCIDA: '#dc2626',
   INCIDENTE_DATOS: '#dc2626',
   SISTEMA: '#64748b',
 };

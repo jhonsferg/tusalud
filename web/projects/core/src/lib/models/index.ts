@@ -29,3 +29,4 @@ export * from './seguros.model';
 export * from './teleconsulta.model';
 export * from './facturacion.model';
 export * from './proteccion-datos.model';
+export * from './compras.model';

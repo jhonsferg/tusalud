@@ -39,6 +39,10 @@ export const routes: Routes = [
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },
       {
+        path: 'compras/requisiciones',
+        loadChildren: () => import('@tusalud/features/compras').then((m) => m.REQUISICIONES_ROUTES),
+      },
+      {
         path: 'mi-espacio',
         loadChildren: () => import('@tusalud/features/rrhh').then((m) => m.MI_ESPACIO_ROUTES),
       },

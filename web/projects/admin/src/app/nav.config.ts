@@ -447,6 +447,41 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Compras y pagos',
+    items: [
+      {
+        label: 'Requisiciones',
+        icon: 'pi-clipboard',
+        link: '/compras/requisiciones',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Órdenes de compra',
+        icon: 'pi-shopping-cart',
+        link: '/compras/ordenes',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Recepciones',
+        icon: 'pi-download',
+        link: '/compras/recepciones',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Cuentas por pagar',
+        icon: 'pi-wallet',
+        link: '/compras/cuentas-por-pagar',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Compras por proveedor',
+        icon: 'pi-chart-bar',
+        link: '/compras/reporte',
+        roles: ['ROLE_ADMIN'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

@@ -37,6 +37,21 @@ export const routes: Routes = [
         loadChildren: () => import('@tusalud/features/rrhh').then((m) => m.RRHH_ROUTES),
       },
       {
+        path: 'compras/ordenes',
+        loadChildren: () =>
+          import('@tusalud/features/compras').then((m) => m.ORDENES_COMPRA_ROUTES),
+      },
+      {
+        path: 'compras/cuentas-por-pagar',
+        loadChildren: () =>
+          import('@tusalud/features/compras').then((m) => m.CUENTAS_POR_PAGAR_ROUTES),
+      },
+      {
+        path: 'compras/reporte',
+        loadChildren: () =>
+          import('@tusalud/features/compras').then((m) => m.REPORTE_COMPRAS_ROUTES),
+      },
+      {
         path: 'mi-espacio',
         loadChildren: () => import('@tusalud/features/rrhh').then((m) => m.MI_ESPACIO_ROUTES),
       },

@@ -5880,7 +5880,13 @@
                   "pm.collectionVariables.set('fechaVence', d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()));",
                   "const sufijo = String(Date.now());",
                   "pm.collectionVariables.set('sufijoUnico', sufijo.slice(-9));",
-                  "pm.collectionVariables.set('rucUnico', '20' + sufijo.slice(-9));"
+                  "const pesos = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];",
+                  "const base = '20' + sufijo.slice(-8);",
+                  "let suma = 0;",
+                  "for (let i = 0; i < 10; i++) { suma += Number(base[i]) * pesos[i]; }",
+                  "let digito = 11 - (suma % 11);",
+                  "digito = digito === 10 ? 0 : digito === 11 ? 1 : digito;",
+                  "pm.collectionVariables.set('rucUnico', base + digito);"
                 ]
               }
             },
@@ -21781,8 +21787,8 @@
                 "exec": [
                   "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
                   "const lista = pm.response.json();",
-                  "pm.test('Están las veinte plantillas del sistema', () => {",
-                  "    pm.expect(lista).to.have.length(20);",
+                  "pm.test('Están las veintiuna plantillas del sistema', () => {",
+                  "    pm.expect(lista).to.have.length(21);",
                   "    ['comprobante', 'receta', 'resultados-laboratorio', 'informe-imagen', 'constancia', 'resumen-historia', 'reporte-ejecutivo', 'reporte-financiero', 'reporte-operativo', 'reporte-calidad'].forEach(c => pm.expect(lista.map(p => p.codigo)).to.include(c));",
                   "});"
                 ]
@@ -41210,6 +41216,4964 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "32 - Compras y cuentas por pagar",
+      "item": [
+        {
+          "name": "Login farmacia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('cpFarmaciaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"farmacia@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login almacén",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('cpAlmacenToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"almacen@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login finanzas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('cpFinanzasToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"finanzas@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login gerencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('cpGerenciaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"gerencia@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('cpAdminToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('cpMedicoToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('cpPacienteToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Proveedor con RUC inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('El mensaje habla del RUC', () => pm.expect(pm.response.json().message).to.include('RUC'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/proveedores",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "proveedores"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ruc\": \"20123456780\",\n  \"razonSocial\": \"Proveedor con RUC inválido\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar el primer proveedor con condiciones",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const num = (n) => String(n);",
+                  "function rucValido() {",
+                  "  const pesos = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];",
+                  "  let base = '20' + String(Math.floor(10000000 + Math.random() * 80000000));",
+                  "  let suma = 0;",
+                  "  for (let i = 0; i < 10; i++) { suma += Number(base[i]) * pesos[i]; }",
+                  "  let d = 11 - (suma % 11);",
+                  "  d = d === 10 ? 0 : d === 11 ? 1 : d;",
+                  "  return base + d;",
+                  "}",
+                  "const sufijo = String(Date.now()).slice(-7);",
+                  "pm.collectionVariables.set('cpSufijo', sufijo);",
+                  "pm.collectionVariables.set('cpRuc1', rucValido());",
+                  "pm.collectionVariables.set('cpRuc2', rucValido());",
+                  "pm.collectionVariables.set('cpNumero', String(Date.now()).slice(-8));",
+                  "const hoy = new Date();",
+                  "const mas = (d) => { const x = new Date(hoy); x.setDate(x.getDate() + d); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); };",
+                  "pm.collectionVariables.set('cpVence', mas(240));",
+                  "pm.collectionVariables.set('cpVigencia', mas(20));",
+                  "pm.collectionVariables.set('cpEmision', mas(-1));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Guarda las condiciones comerciales', () => { pm.expect(j.condicionPagoDias).to.eql(30); pm.expect(j.plazoEntregaDias).to.eql(3); pm.expect(j.banco).to.eql('BCP'); });",
+                  "pm.collectionVariables.set('cpProveedor1Id', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/proveedores",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "proveedores"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ruc\": \"{{cpRuc1}}\",\n  \"razonSocial\": \"Droguería Postman {{cpSufijo}} A\",\n  \"contacto\": \"Ana Prueba\",\n  \"condicionPagoDias\": 30,\n  \"plazoEntregaDias\": 3,\n  \"banco\": \"BCP\",\n  \"cuentaBancaria\": \"191-0000000-0-00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar el segundo proveedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('cpProveedor2Id', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/proveedores",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "proveedores"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ruc\": \"{{cpRuc2}}\",\n  \"razonSocial\": \"Droguería Postman {{cpSufijo}} B\",\n  \"condicionPagoDias\": 15,\n  \"plazoEntregaDias\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un RUC repetido se rechaza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/proveedores",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "proveedores"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ruc\": \"{{cpRuc1}}\",\n  \"razonSocial\": \"Duplicado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas consulta los proveedores",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Encuentra al proveedor por RUC', () => pm.expect(pm.response.json().length).to.eql(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/proveedores?q={{cpRuc1}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "proveedores"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{cpRuc1}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La farmacia no consulta proveedores (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/proveedores",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "proveedores"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear el producto de la compra",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('cpProductoId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/productos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "productos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"CP-{{cpSufijo}}\",\n  \"nombre\": \"Producto de compra {{cpSufijo}}\",\n  \"tipo\": \"MEDICAMENTO\",\n  \"principioActivo\": \"Principio\",\n  \"presentacion\": \"Caja\",\n  \"unidad\": \"unidad\",\n  \"precioVenta\": 3,\n  \"stockMinimo\": 500,\n  \"requiereReceta\": false,\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un paciente no ve requisiciones (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "requisiciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un médico no ve requisiciones (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "requisiciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas no crea requisiciones (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "requisiciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productoId\": \"{{cpProductoId}}\",\n      \"cantidad\": 5\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La farmacia ve las sugerencias por stock bajo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('El producto sin stock aparece sugerido', () => { const s = pm.response.json().find(x => x.productoId === pm.collectionVariables.get('cpProductoId')); pm.expect(s).to.not.be.undefined; pm.expect(s.cantidadSugerida).to.eql(1000); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones/sugeridas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "requisiciones", "sugeridas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La farmacia crea una requisición",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Nace en borrador con código correlativo', () => { pm.expect(j.resumen.estado).to.eql('BORRADOR'); pm.expect(j.resumen.codigo).to.match(/^REQ-\\d{4}-\\d{6}$/); pm.expect(j.resumen.area).to.eql('FARMACIA'); });",
+                  "pm.collectionVariables.set('cpReqId', j.resumen.id);",
+                  "pm.collectionVariables.set('cpReqCodigo', j.resumen.codigo);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "requisiciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prioridad\": \"URGENTE\",\n  \"motivo\": \"Reposición solicitada desde Postman\",\n  \"sugerida\": true,\n  \"items\": [\n    {\n      \"productoId\": \"{{cpProductoId}}\",\n      \"cantidad\": 100,\n      \"observacion\": \"Stock agotado\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un producto repetido se rechaza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "requisiciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productoId\": \"{{cpProductoId}}\",\n      \"cantidad\": 1\n    },\n    {\n      \"productoId\": \"{{cpProductoId}}\",\n      \"cantidad\": 2\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén no envía la requisición de otro (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones/{{cpReqId}}/enviar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "requisiciones",
+                "{{cpReqId}}",
+                "enviar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La farmacia envía su requisición",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda enviada', () => pm.expect(pm.response.json().resumen.estado).to.eql('ENVIADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones/{{cpReqId}}/enviar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "requisiciones",
+                "{{cpReqId}}",
+                "enviar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una requisición enviada no se edita (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones/{{cpReqId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "requisiciones", "{{cpReqId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"productoId\": \"{{cpProductoId}}\",\n      \"cantidad\": 7\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La farmacia ve solo sus requisiciones",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Todas son suyas', () => pm.expect(pm.response.json().every(r => r.area === 'FARMACIA')).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "requisiciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén ve la requisición con sus productos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae el producto y el stock actual', () => { const i = pm.response.json().items[0]; pm.expect(i.cantidad).to.eql(100); pm.expect(i.stockActual).to.eql(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones/{{cpReqId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "requisiciones", "{{cpReqId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La farmacia no ve las cotizaciones (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones/{{cpReqId}}/cotizaciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "requisiciones",
+                "{{cpReqId}}",
+                "cotizaciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cotización del primer proveedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Calcula el total', () => pm.expect(pm.response.json().total).to.eql(200)); ",
+                  "pm.collectionVariables.set('cpCot1Id', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones/{{cpReqId}}/cotizaciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "requisiciones",
+                "{{cpReqId}}",
+                "cotizaciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor1Id}}\",\n  \"vigenciaHasta\": \"{{cpVigencia}}\",\n  \"plazoEntregaDias\": 3,\n  \"condicionPagoDias\": 30,\n  \"items\": [\n    {\n      \"productoId\": \"{{cpProductoId}}\",\n      \"precioUnitario\": 2\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cotización del segundo proveedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('cpCot2Id', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones/{{cpReqId}}/cotizaciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "requisiciones",
+                "{{cpReqId}}",
+                "cotizaciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor2Id}}\",\n  \"plazoEntregaDias\": 2,\n  \"condicionPagoDias\": 15,\n  \"items\": [\n    {\n      \"productoId\": \"{{cpProductoId}}\",\n      \"precioUnitario\": 1.5\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una segunda cotización del mismo proveedor se rechaza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones/{{cpReqId}}/cotizaciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "requisiciones",
+                "{{cpReqId}}",
+                "cotizaciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor1Id}}\",\n  \"items\": [\n    {\n      \"productoId\": \"{{cpProductoId}}\",\n      \"precioUnitario\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una cotización de un producto ajeno se rechaza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones/{{cpReqId}}/cotizaciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "requisiciones",
+                "{{cpReqId}}",
+                "cotizaciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor1Id}}\",\n  \"items\": [\n    {\n      \"productoId\": \"00000000-0000-4000-8000-000000000000\",\n      \"precioUnitario\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El cuadro comparativo marca la mejor oferta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Hay dos columnas y una fila', () => { pm.expect(j.columnas.length).to.eql(2); pm.expect(j.filas.length).to.eql(1); });",
+                  "pm.test('La mejor oferta es la del segundo proveedor', () => { pm.expect(j.filas[0].mejorCotizacionId).to.eql(pm.collectionVariables.get('cpCot2Id')); pm.expect(j.columnas.filter(c => c.mejorTotal).length).to.eql(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones/{{cpReqId}}/comparativa",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "requisiciones",
+                "{{cpReqId}}",
+                "comparativa"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén selecciona la mejor cotización",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda seleccionada', () => pm.expect(pm.response.json().estado).to.eql('SELECCIONADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/cotizaciones/{{cpCot2Id}}/seleccionar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "cotizaciones",
+                "{{cpCot2Id}}",
+                "seleccionar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La otra cotización queda descartada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('La primera quedó descartada', () => pm.expect(pm.response.json().find(c => c.id === pm.collectionVariables.get('cpCot1Id')).estado).to.eql('DESCARTADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones/{{cpReqId}}/cotizaciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "requisiciones",
+                "{{cpReqId}}",
+                "cotizaciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una orden desde una cotización descartada se rechaza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/desde-cotizacion/{{cpCot1Id}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "desde-cotizacion",
+                "{{cpCot1Id}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén genera la orden desde la cotización",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Nace en borrador sin número y con IGV', () => { pm.expect(j.resumen.estado).to.eql('BORRADOR'); pm.expect(j.resumen.codigo == null).to.be.true; pm.expect(j.subtotal).to.eql(150); pm.expect(j.igv).to.eql(27); pm.expect(j.total).to.eql(177); });",
+                  "pm.collectionVariables.set('cpOrdenId', j.resumen.id);",
+                  "pm.collectionVariables.set('cpOrdenItemId', j.items[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/desde-cotizacion/{{cpCot2Id}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "desde-cotizacion",
+                "{{cpCot2Id}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una orden en borrador no se aprueba (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén envía la orden a aprobación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Requiere aprobación de finanzas', () => { const j = pm.response.json(); pm.expect(j.resumen.estado).to.eql('PENDIENTE_APROBACION'); pm.expect(j.resumen.nivelAprobacion).to.eql('FINANZAS'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/enviar-aprobacion",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "enviar-aprobacion"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén no aprueba su propia orden (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La farmacia no aprueba órdenes (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas aprueba la orden",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Recibe número correlativo y huella', () => { pm.expect(j.resumen.estado).to.eql('APROBADA'); pm.expect(j.resumen.codigo).to.match(/^OC-\\d{4}-\\d{6}$/); pm.expect(j.hash).to.have.length(64); });",
+                  "pm.collectionVariables.set('cpOrdenCodigo', j.resumen.codigo);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La requisición queda atendida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Atendida y enlazada a la orden', () => { const j = pm.response.json(); pm.expect(j.resumen.estado).to.eql('ATENDIDA'); pm.expect(j.ordenes.length).to.eql(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones/{{cpReqId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "requisiciones", "{{cpReqId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una orden aprobada es inmutable (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "ordenes", "{{cpOrdenId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor2Id}}\",\n  \"items\": [\n    {\n      \"productoId\": \"{{cpProductoId}}\",\n      \"cantidad\": 1,\n      \"precioUnitario\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una orden aprobada no se aprueba dos veces (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El PDF de la orden de compra",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/orden-compra/{{cpOrdenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "orden-compra",
+                "{{cpOrdenId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La farmacia no obtiene el PDF de la orden (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/orden-compra/{{cpOrdenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "orden-compra",
+                "{{cpOrdenId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La configuración informa el límite de aprobación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Informa límite e IGV', () => { const j = pm.response.json(); pm.expect(j.limiteFinanzas).to.be.above(0); pm.expect(j.tasaIgv).to.eql(0.18); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/configuracion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "configuracion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas no recibe mercadería (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/recepciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "recepciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guiaRemision\": \"T001-{{cpNumero}}\",\n  \"items\": [\n    {\n      \"ordenItemId\": \"{{cpOrdenItemId}}\",\n      \"cantidadRecibida\": 10,\n      \"cantidadRechazada\": 0,\n      \"ubicacion\": \"Anaquel A\",\n      \"numeroLote\": \"X-1\",\n      \"fechaVencimiento\": \"{{cpVence}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recibir más de lo pendiente se rechaza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/recepciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "recepciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guiaRemision\": \"T001-{{cpNumero}}\",\n  \"items\": [\n    {\n      \"ordenItemId\": \"{{cpOrdenItemId}}\",\n      \"cantidadRecibida\": 101,\n      \"cantidadRechazada\": 0,\n      \"ubicacion\": \"Anaquel A\",\n      \"numeroLote\": \"X-2\",\n      \"fechaVencimiento\": \"{{cpVence}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un lote vencido se rechaza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/recepciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "recepciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"ordenItemId\": \"{{cpOrdenItemId}}\",\n      \"cantidadRecibida\": 5,\n      \"numeroLote\": \"X-3\",\n      \"fechaVencimiento\": \"2020-01-01\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un rechazo sin motivo se rechaza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/recepciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "recepciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guiaRemision\": \"T001-{{cpNumero}}\",\n  \"items\": [\n    {\n      \"ordenItemId\": \"{{cpOrdenItemId}}\",\n      \"cantidadRecibida\": 5,\n      \"cantidadRechazada\": 2,\n      \"ubicacion\": \"Anaquel A\",\n      \"numeroLote\": \"X-4\",\n      \"fechaVencimiento\": \"{{cpVence}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Primera recepción parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Recepción con código y sin discrepancia', () => { pm.expect(j.resumen.codigo).to.match(/^REC-\\d{4}-\\d{6}$/); pm.expect(j.resumen.conDiscrepancia).to.eql(false); pm.expect(j.items[0].loteId).to.be.a('string'); });",
+                  "pm.collectionVariables.set('cpRecepcion1Id', j.resumen.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/recepciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "recepciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guiaRemision\": \"T001-{{cpNumero}}\",\n  \"items\": [\n    {\n      \"ordenItemId\": \"{{cpOrdenItemId}}\",\n      \"cantidadRecibida\": 60,\n      \"cantidadRechazada\": 0,\n      \"ubicacion\": \"Anaquel A\",\n      \"numeroLote\": \"LP-{{cpSufijo}}-A\",\n      \"fechaVencimiento\": \"{{cpVence}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La orden queda parcialmente recibida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Parcial al 60 %', () => { const j = pm.response.json(); pm.expect(j.resumen.estado).to.eql('PARCIAL'); pm.expect(j.resumen.porcentajeRecibido).to.eql(60); pm.expect(j.items[0].pendiente).to.eql(40); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "ordenes", "{{cpOrdenId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El stock del producto sube con la recepción",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Hay 60 unidades', () => pm.expect(pm.response.json()[0].stockActual).to.eql(60));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/productos?q=CP-{{cpSufijo}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "productos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "CP-{{cpSufijo}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Segunda recepción con unidades rechazadas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda marcada con discrepancia', () => { pm.expect(j.resumen.conDiscrepancia).to.eql(true); pm.expect(j.items[0].rechazada).to.eql(5); });",
+                  "pm.collectionVariables.set('cpRecepcion2Id', j.resumen.id);",
+                  "pm.collectionVariables.set('cpRecepcionItemId', j.items[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/recepciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "recepciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guiaRemision\": \"T001-{{cpNumero}}\",\n  \"items\": [\n    {\n      \"ordenItemId\": \"{{cpOrdenItemId}}\",\n      \"cantidadRecibida\": 35,\n      \"cantidadRechazada\": 5,\n      \"ubicacion\": \"Anaquel A\",\n      \"numeroLote\": \"LP-{{cpSufijo}}-B\",\n      \"fechaVencimiento\": \"{{cpVence}}\",\n      \"motivoDiscrepancia\": \"Cajas dañadas\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La orden queda recibida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Recibida con dos recepciones', () => { const j = pm.response.json(); pm.expect(j.resumen.estado).to.eql('RECIBIDA'); pm.expect(j.recepciones.length).to.eql(2); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "ordenes", "{{cpOrdenId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar las recepciones con discrepancia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Solo la segunda tiene discrepancia', () => { const j = pm.response.json(); pm.expect(j.length).to.eql(1); pm.expect(j[0].id).to.eql(pm.collectionVariables.get('cpRecepcion2Id')); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/recepciones?soloDiscrepancias=true&ordenId={{cpOrdenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "recepciones"],
+              "query": [
+                {
+                  "key": "soloDiscrepancias",
+                  "value": "true"
+                },
+                {
+                  "key": "ordenId",
+                  "value": "{{cpOrdenId}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una orden recibida no admite más recepciones (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/recepciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "recepciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"guiaRemision\": \"T001-{{cpNumero}}\",\n  \"items\": [\n    {\n      \"ordenItemId\": \"{{cpOrdenItemId}}\",\n      \"cantidadRecibida\": 1,\n      \"cantidadRechazada\": 0,\n      \"ubicacion\": \"Anaquel A\",\n      \"numeroLote\": \"X-5\",\n      \"fechaVencimiento\": \"{{cpVence}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una orden con recepciones no se anula (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "anular"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Intento tardío\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén no registra comprobantes (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "comprobantes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor2Id}}\",\n  \"ordenId\": \"{{cpOrdenId}}\",\n  \"tipo\": \"FACTURA\",\n  \"serie\": \"F001\",\n  \"numero\": \"{{cpNumero}}\",\n  \"rucEmisor\": \"{{cpRuc2}}\",\n  \"fechaEmision\": \"{{cpEmision}}\",\n  \"subtotal\": 142.5,\n  \"igv\": 25.65\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un RUC de emisor inválido se rechaza (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "comprobantes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor2Id}}\",\n  \"ordenId\": \"{{cpOrdenId}}\",\n  \"tipo\": \"FACTURA\",\n  \"serie\": \"F001\",\n  \"numero\": \"{{cpNumero}}\",\n  \"rucEmisor\": \"20123456780\",\n  \"fechaEmision\": \"{{cpEmision}}\",\n  \"subtotal\": 142.5,\n  \"igv\": 25.65\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El RUC de otro proveedor se rechaza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "comprobantes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor2Id}}\",\n  \"ordenId\": \"{{cpOrdenId}}\",\n  \"tipo\": \"FACTURA\",\n  \"serie\": \"F001\",\n  \"numero\": \"{{cpNumero}}\",\n  \"rucEmisor\": \"20123456786\",\n  \"fechaEmision\": \"{{cpEmision}}\",\n  \"subtotal\": 142.5,\n  \"igv\": 25.65\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un comprobante que excede lo recibido se rechaza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "comprobantes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor2Id}}\",\n  \"ordenId\": \"{{cpOrdenId}}\",\n  \"tipo\": \"FACTURA\",\n  \"serie\": \"F001\",\n  \"numero\": \"{{cpNumero}}\",\n  \"rucEmisor\": \"{{cpRuc2}}\",\n  \"fechaEmision\": \"{{cpEmision}}\",\n  \"subtotal\": 900,\n  \"igv\": 162\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas registra la factura del proveedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Total, vencimiento por condición y saldo', () => { pm.expect(j.total).to.eql(168.15); pm.expect(j.saldo).to.eql(168.15); pm.expect(j.estado).to.eql('PENDIENTE'); pm.expect(j.numero).to.match(/^F001-/); });",
+                  "pm.collectionVariables.set('cpComprobanteId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "comprobantes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor2Id}}\",\n  \"ordenId\": \"{{cpOrdenId}}\",\n  \"tipo\": \"FACTURA\",\n  \"serie\": \"F001\",\n  \"numero\": \"{{cpNumero}}\",\n  \"rucEmisor\": \"{{cpRuc2}}\",\n  \"fechaEmision\": \"{{cpEmision}}\",\n  \"subtotal\": 142.5,\n  \"igv\": 25.65\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un comprobante duplicado se rechaza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Avisa que ya estaba registrado', () => pm.expect(pm.response.json().message).to.include('Ya se registró'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "comprobantes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor2Id}}\",\n  \"ordenId\": \"{{cpOrdenId}}\",\n  \"tipo\": \"FACTURA\",\n  \"serie\": \"F001\",\n  \"numero\": \"{{cpNumero}}\",\n  \"rucEmisor\": \"{{cpRuc2}}\",\n  \"fechaEmision\": \"{{cpEmision}}\",\n  \"subtotal\": 142.5,\n  \"igv\": 25.65\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén devuelve mercadería sin comprobante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('cpDevolucionId', j.id);",
+                  "pm.test('Monto con IGV y código', () => { pm.expect(j.monto).to.eql(5.31); pm.expect(j.codigo).to.match(/^DEV-/); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/devoluciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "devoluciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recepcionId\": \"{{cpRecepcion2Id}}\",\n  \"motivo\": \"Cajas aplastadas\",\n  \"items\": [\n    {\n      \"recepcionItemId\": \"{{cpRecepcionItemId}}\",\n      \"cantidad\": 3\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén no aplica créditos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/devoluciones/{{cpDevolucionId}}/aplicar-credito",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "devoluciones",
+                "{{cpDevolucionId}}",
+                "aplicar-credito"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comprobanteId\": \"{{cpComprobanteId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas aplica el crédito de la devolución",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('La devolución queda enlazada', () => pm.expect(pm.response.json().comprobanteId).to.eql(pm.collectionVariables.get('cpComprobanteId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/devoluciones/{{cpDevolucionId}}/aplicar-credito",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "devoluciones",
+                "{{cpDevolucionId}}",
+                "aplicar-credito"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comprobanteId\": \"{{cpComprobanteId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El crédito no se aplica dos veces (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/devoluciones/{{cpDevolucionId}}/aplicar-credito",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "devoluciones",
+                "{{cpDevolucionId}}",
+                "aplicar-credito"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comprobanteId\": \"{{cpComprobanteId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No se devuelve más de lo recibido (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/devoluciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "devoluciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recepcionId\": \"{{cpRecepcion2Id}}\",\n  \"motivo\": \"Exceso\",\n  \"items\": [\n    {\n      \"recepcionItemId\": \"{{cpRecepcionItemId}}\",\n      \"cantidad\": 33\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El stock baja con la devolución",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Quedan 92 unidades', () => pm.expect(pm.response.json()[0].stockActual).to.eql(92));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/almacen/productos?q=CP-{{cpSufijo}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "almacen", "productos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "CP-{{cpSufijo}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El comprobante refleja el crédito",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Saldo menos el crédito', () => { const j = pm.response.json(); pm.expect(j.montoCredito).to.eql(5.31); pm.expect(j.saldo).to.eql(162.84); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes/{{cpComprobanteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "comprobantes",
+                "{{cpComprobanteId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén no paga comprobantes (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes/{{cpComprobanteId}}/pagos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "comprobantes",
+                "{{cpComprobanteId}}",
+                "pagos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monto\": 10,\n  \"metodo\": \"EFECTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un pago mayor al saldo se rechaza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes/{{cpComprobanteId}}/pagos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "comprobantes",
+                "{{cpComprobanteId}}",
+                "pagos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monto\": 500,\n  \"metodo\": \"TRANSFERENCIA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Primer pago parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Queda parcial con un pago', () => { const j = pm.response.json(); pm.expect(j.estado).to.eql('PARCIAL'); pm.expect(j.saldo).to.eql(62.84); pm.expect(j.pagos.length).to.eql(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes/{{cpComprobanteId}}/pagos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "comprobantes",
+                "{{cpComprobanteId}}",
+                "pagos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monto\": 100,\n  \"metodo\": \"TRANSFERENCIA\",\n  \"referencia\": \"OP-{{cpSufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un comprobante con pagos no se anula (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes/{{cpComprobanteId}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "comprobantes",
+                "{{cpComprobanteId}}",
+                "anular"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Error\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Pago final que cancela la deuda",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Queda pagado', () => { const j = pm.response.json(); pm.expect(j.estado).to.eql('PAGADO'); pm.expect(j.saldo).to.eql(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes/{{cpComprobanteId}}/pagos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "comprobantes",
+                "{{cpComprobanteId}}",
+                "pagos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monto\": 62.84,\n  \"metodo\": \"CHEQUE\",\n  \"referencia\": \"CH-{{cpSufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un comprobante pagado no admite pagos (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes/{{cpComprobanteId}}/pagos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "comprobantes",
+                "{{cpComprobanteId}}",
+                "pagos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monto\": 1,\n  \"metodo\": \"EFECTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Comprobante vencido sin orden para el aging",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Aparece vencido', () => { const j = pm.response.json(); pm.expect(j.vencido).to.eql(true); pm.expect(j.diasVencido).to.be.above(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "comprobantes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor1Id}}\",\n  \"tipo\": \"RECIBO\",\n  \"serie\": \"R001\",\n  \"numero\": \"{{cpNumero}}\",\n  \"rucEmisor\": \"{{cpRuc1}}\",\n  \"fechaEmision\": \"2026-01-10\",\n  \"fechaVencimiento\": \"2026-02-10\",\n  \"subtotal\": 80\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resumen de cuentas por pagar con vencimientos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Cinco tramos y total vencido', () => { pm.expect(j.tramos.length).to.eql(5); pm.expect(j.totalVencido).to.be.at.least(80); pm.expect(j.porProveedor.length).to.be.above(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/cuentas-por-pagar/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "cuentas-por-pagar", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar solo los comprobantes vencidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Hay uno vencido', () => pm.expect(pm.response.json().length).to.eql(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes?soloVencidos=true&proveedorId={{cpProveedor1Id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "comprobantes"],
+              "query": [
+                {
+                  "key": "soloVencidos",
+                  "value": "true"
+                },
+                {
+                  "key": "proveedorId",
+                  "value": "{{cpProveedor1Id}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Administración consulta las cuentas por pagar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/comprobantes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "comprobantes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén no ve las cuentas por pagar (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/cuentas-por-pagar/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "cuentas-por-pagar", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La farmacia no ve las órdenes (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "ordenes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El resumen de compras oculta montos al almacén",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Sin montos por pagar', () => { const j = pm.response.json(); pm.expect(j.porPagar).to.eql(undefined); pm.expect(j.limiteFinanzas).to.be.above(0); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El resumen de compras para finanzas incluye los montos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Con montos por pagar', () => pm.expect(pm.response.json().porPagar).to.be.a('number'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una orden mayor al límite crea una orden directa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('cpOrdenGerId', pm.response.json().resumen.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "ordenes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor1Id}}\",\n  \"afectaIgv\": true,\n  \"condicionPagoDias\": 30,\n  \"observaciones\": \"Compra grande desde Postman\",\n  \"items\": [\n    {\n      \"productoId\": \"{{cpProductoId}}\",\n      \"cantidad\": 10,\n      \"precioUnitario\": 1000\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La orden grande pide aprobación de gerencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Nivel gerencia', () => pm.expect(pm.response.json().resumen.nivelAprobacion).to.eql('GERENCIA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenGerId}}/enviar-aprobacion",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenGerId}}",
+                "enviar-aprobacion"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas no aprueba una orden mayor al límite (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenGerId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenGerId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia rechaza la orden con motivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Rechazada y sin número', () => { const j = pm.response.json(); pm.expect(j.resumen.estado).to.eql('RECHAZADA'); pm.expect(j.resumen.codigo == null).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenGerId}}/rechazar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenGerId}}",
+                "rechazar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Excede el presupuesto del mes\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un rechazo sin motivo es inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenGerId}}/rechazar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenGerId}}",
+                "rechazar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén anula un borrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('cpOrdenBorradorId', pm.response.json().resumen.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "ordenes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor1Id}}\",\n  \"items\": [\n    {\n      \"productoId\": \"{{cpProductoId}}\",\n      \"cantidad\": 1,\n      \"precioUnitario\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El borrador se anula con motivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Anulada', () => pm.expect(pm.response.json().resumen.estado).to.eql('ANULADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenBorradorId}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenBorradorId}}",
+                "anular"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Orden duplicada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén crea una requisición propia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('cpReq2Id', pm.response.json().resumen.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "requisiciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Requisición del propio almacén\",\n  \"items\": [\n    {\n      \"productoId\": \"{{cpProductoId}}\",\n      \"cantidad\": 20\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén envía su requisición",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/requisiciones/{{cpReq2Id}}/enviar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "requisiciones",
+                "{{cpReq2Id}}",
+                "enviar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén genera la orden de su requisición",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('cpOrden2Id', pm.response.json().resumen.id);",
+                  "pm.collectionVariables.set('cpOrden2ItemId', pm.response.json().items[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "ordenes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proveedorId\": \"{{cpProveedor1Id}}\",\n  \"requisicionId\": \"{{cpReq2Id}}\",\n  \"afectaIgv\": false,\n  \"items\": [\n    {\n      \"productoId\": \"{{cpProductoId}}\",\n      \"cantidad\": 20,\n      \"precioUnitario\": 2\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén envía la orden de su requisición",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrden2Id}}/enviar-aprobacion",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrden2Id}}",
+                "enviar-aprobacion"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia aprueba la orden de su requisición",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrden2Id}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrden2Id}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Quien solicitó la requisición no recibe la orden (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('El mensaje explica la regla', () => pm.expect(pm.response.json().message).to.include('solicita'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrden2Id}}/recepciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrden2Id}}",
+                "recepciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"ordenItemId\": \"{{cpOrden2ItemId}}\",\n      \"cantidadRecibida\": 20,\n      \"numeroLote\": \"SEG-{{cpSufijo}}\",\n      \"fechaVencimiento\": \"{{cpVence}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reporte de compras por proveedor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resume ordenado, recibido y facturado', () => { const j = pm.response.json(); pm.expect(j.length).to.eql(1); pm.expect(j[0].montoOrdenado).to.eql(177); pm.expect(j[0].montoRecibido).to.eql(168.15); pm.expect(j[0].facturado).to.eql(168.15); pm.expect(j[0].pagado).to.eql(162.84); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/reportes/por-proveedor?proveedorId={{cpProveedor2Id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "reportes", "por-proveedor"],
+              "query": [
+                {
+                  "key": "proveedorId",
+                  "value": "{{cpProveedor2Id}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén no ve el reporte por proveedor (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/reportes/por-proveedor",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "reportes", "por-proveedor"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Pedir el reporte de compras en Excel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Se acepta la solicitud', () => pm.expect(pm.response.code).to.be.oneOf([200, 201, 202]));",
+                  "pm.collectionVariables.set('cpExportacionId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"reporte-compras\",\n  \"formato\": \"XLSX\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén no exporta el reporte de compras (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"reporte-compras\",\n  \"formato\": \"XLSX\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Auditoría de la orden de compra",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Registra cada paso en orden', () => { const a = pm.response.json().map(x => x.accion); pm.expect(a).to.eql(['CREAR', 'ENVIAR_APROBACION', 'APROBAR']); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/auditoria",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "auditoria"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Almacén no ve la auditoría (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes/{{cpOrdenId}}/auditoria",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "compras",
+                "ordenes",
+                "{{cpOrdenId}}",
+                "auditoria"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpAlmacenToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Auditoría general filtrada por entidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Solo comprobantes', () => { const j = pm.response.json(); pm.expect(j.length).to.be.above(0); pm.expect(j.every(a => a.entidad === 'COMPROBANTE')).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/auditoria?entidad=COMPROBANTE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "auditoria"],
+              "query": [
+                {
+                  "key": "entidad",
+                  "value": "COMPROBANTE"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cpGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sin token no hay acceso (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/compras/ordenes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "compras", "ordenes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -42188,6 +47152,146 @@
       "key": "cnPlantillaVersion",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "cpFarmaciaToken",
+      "value": ""
+    },
+    {
+      "key": "cpAlmacenToken",
+      "value": ""
+    },
+    {
+      "key": "cpFinanzasToken",
+      "value": ""
+    },
+    {
+      "key": "cpGerenciaToken",
+      "value": ""
+    },
+    {
+      "key": "cpAdminToken",
+      "value": ""
+    },
+    {
+      "key": "cpMedicoToken",
+      "value": ""
+    },
+    {
+      "key": "cpPacienteToken",
+      "value": ""
+    },
+    {
+      "key": "cpSufijo",
+      "value": ""
+    },
+    {
+      "key": "cpVence",
+      "value": ""
+    },
+    {
+      "key": "cpVigencia",
+      "value": ""
+    },
+    {
+      "key": "cpNumero",
+      "value": ""
+    },
+    {
+      "key": "cpRuc1",
+      "value": ""
+    },
+    {
+      "key": "cpRuc2",
+      "value": ""
+    },
+    {
+      "key": "cpProveedor1Id",
+      "value": ""
+    },
+    {
+      "key": "cpProveedor2Id",
+      "value": ""
+    },
+    {
+      "key": "cpProductoId",
+      "value": ""
+    },
+    {
+      "key": "cpReqId",
+      "value": ""
+    },
+    {
+      "key": "cpReqCodigo",
+      "value": ""
+    },
+    {
+      "key": "cpCot1Id",
+      "value": ""
+    },
+    {
+      "key": "cpCot2Id",
+      "value": ""
+    },
+    {
+      "key": "cpOrdenId",
+      "value": ""
+    },
+    {
+      "key": "cpOrdenItemId",
+      "value": ""
+    },
+    {
+      "key": "cpOrdenCodigo",
+      "value": ""
+    },
+    {
+      "key": "cpRecepcion1Id",
+      "value": ""
+    },
+    {
+      "key": "cpRecepcion2Id",
+      "value": ""
+    },
+    {
+      "key": "cpRecepcionItemId",
+      "value": ""
+    },
+    {
+      "key": "cpComprobanteId",
+      "value": ""
+    },
+    {
+      "key": "cpOrdenGerId",
+      "value": ""
+    },
+    {
+      "key": "cpReq2Id",
+      "value": ""
+    },
+    {
+      "key": "cpEmision",
+      "value": ""
+    },
+    {
+      "key": "cpOrden2Id",
+      "value": ""
+    },
+    {
+      "key": "cpOrden2ItemId",
+      "value": ""
+    },
+    {
+      "key": "cpOrdenBorradorId",
+      "value": ""
+    },
+    {
+      "key": "cpExportacionId",
+      "value": ""
+    },
+    {
+      "key": "cpDevolucionId",
+      "value": ""
     }
   ]
 }

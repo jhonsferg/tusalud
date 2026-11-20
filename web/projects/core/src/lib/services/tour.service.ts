@@ -176,6 +176,27 @@ export const PASOS_TOUR_PREDETERMINADOS: readonly TourStep[] = [
     roles: ['ROLE_ALMACEN'],
   },
   {
+    target: 'nav:/compras/requisiciones',
+    icon: 'pi-clipboard',
+    title: 'Requisiciones',
+    text: 'Pide los productos que necesitas reponer. Puedes cargar los sugeridos por stock bajo. El almacén las cotiza y las convierte en órdenes de compra.',
+    roles: ['ROLE_FARMACIA', 'ROLE_ALMACEN'],
+  },
+  {
+    target: 'nav:/compras/ordenes',
+    icon: 'pi-shopping-cart',
+    title: 'Órdenes de compra',
+    text: 'Crea, aprueba y recibe las compras a proveedores. Finanzas aprueba hasta el límite configurado y la gerencia lo que lo supera.',
+    roles: ['ROLE_ALMACEN', 'ROLE_FINANZAS', 'ROLE_GERENCIA', 'ROLE_ADMIN'],
+  },
+  {
+    target: 'nav:/compras/cuentas-por-pagar',
+    icon: 'pi-wallet',
+    title: 'Cuentas por pagar',
+    text: 'Registra los comprobantes de los proveedores, controla vencimientos y registra pagos parciales o totales.',
+    roles: ['ROLE_FINANZAS', 'ROLE_GERENCIA', 'ROLE_ADMIN'],
+  },
+  {
     target: 'nav:/cola',
     icon: 'pi-users',
     title: 'Cola de pacientes',

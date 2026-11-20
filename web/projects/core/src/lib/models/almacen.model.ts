@@ -33,6 +33,11 @@ export interface ProveedorResponse {
   email?: string | null;
   direccion?: string | null;
   activo: boolean;
+  condicionPagoDias: number;
+  plazoEntregaDias?: number | null;
+  banco?: string | null;
+  cuentaBancaria?: string | null;
+  notas?: string | null;
 }
 
 export interface ProveedorRequest {
@@ -43,6 +48,11 @@ export interface ProveedorRequest {
   email?: string | null;
   direccion?: string | null;
   activo: boolean;
+  condicionPagoDias?: number | null;
+  plazoEntregaDias?: number | null;
+  banco?: string | null;
+  cuentaBancaria?: string | null;
+  notas?: string | null;
 }
 
 export interface ProductoResponse {

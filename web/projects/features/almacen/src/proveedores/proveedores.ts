@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Button } from 'primeng/button';
 import { Dialog } from 'primeng/dialog';
+import { InputNumber } from 'primeng/inputnumber';
 import { InputText } from 'primeng/inputtext';
 import { Message } from 'primeng/message';
 import { TableModule } from 'primeng/table';
@@ -18,6 +19,7 @@ import { PageHeader } from '@tusalud/ui/page-header';
     ReactiveFormsModule,
     Button,
     Dialog,
+    InputNumber,
     InputText,
     Message,
     TableModule,
@@ -48,6 +50,11 @@ export class Proveedores implements OnInit {
     email: ['', [Validators.email]],
     direccion: ['', [Validators.maxLength(200)]],
     activo: [true],
+    condicionPagoDias: [0],
+    plazoEntregaDias: [null as number | null],
+    banco: ['', [Validators.maxLength(80)]],
+    cuentaBancaria: ['', [Validators.maxLength(40)]],
+    notas: ['', [Validators.maxLength(300)]],
   });
 
   ngOnInit(): void {
@@ -65,6 +72,11 @@ export class Proveedores implements OnInit {
       email: proveedor?.email ?? '',
       direccion: proveedor?.direccion ?? '',
       activo: proveedor?.activo ?? true,
+      condicionPagoDias: proveedor?.condicionPagoDias ?? 0,
+      plazoEntregaDias: proveedor?.plazoEntregaDias ?? null,
+      banco: proveedor?.banco ?? '',
+      cuentaBancaria: proveedor?.cuentaBancaria ?? '',
+      notas: proveedor?.notas ?? '',
     });
     this.visible.set(true);
   }
@@ -84,6 +96,11 @@ export class Proveedores implements OnInit {
       email: valor.email.trim() || null,
       direccion: valor.direccion.trim() || null,
       activo: valor.activo,
+      condicionPagoDias: valor.condicionPagoDias,
+      plazoEntregaDias: valor.plazoEntregaDias,
+      banco: valor.banco.trim() || null,
+      cuentaBancaria: valor.cuentaBancaria.trim() || null,
+      notas: valor.notas.trim() || null,
     };
     const actual = this.editando();
     this.guardando.set(true);

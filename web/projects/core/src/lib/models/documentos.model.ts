@@ -5,7 +5,8 @@ export type TipoDocumentoPdf =
   | 'informe-imagen'
   | 'constancia'
   | 'resumen-historia'
-  | 'liquidacion';
+  | 'liquidacion'
+  | 'orden-compra';
 
 export type TipoExportacion =
   | 'reporte-ejecutivo'
@@ -15,6 +16,7 @@ export type TipoExportacion =
   | 'reporte-morbilidad'
   | 'listado-comprobantes'
   | 'kardex'
+  | 'reporte-compras'
   | 'stock'
   | 'ausencias'
   | 'turnos'
@@ -32,6 +34,7 @@ export const ETIQUETA_TIPO_EXPORTACION: Readonly<Record<string, string>> = {
   'reporte-morbilidad': 'Reporte de morbilidad',
   'listado-comprobantes': 'Listado de comprobantes',
   kardex: 'Kardex del almacén',
+  'reporte-compras': 'Reporte de compras',
   stock: 'Stock del almacén',
   ausencias: 'Ausencias del personal',
   turnos: 'Turnos del personal',
