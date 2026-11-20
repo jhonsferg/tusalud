@@ -1,0 +1,8 @@
+[Unit]
+Description=Guardian de acceso: reabre el SSH a Peru si wg0 no esta operativo tras el arranque
+After=wg-quick@wg0.service ssh.service geoblock.service docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/etc/geoblock/guardian.sh
+SuccessExitStatus=0 1

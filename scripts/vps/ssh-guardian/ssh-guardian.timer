@@ -1,0 +1,9 @@
+[Unit]
+Description=Ejecuta el guardian de acceso una vez, cuatro minutos tras el arranque
+
+[Timer]
+OnBootSec=4min
+Unit=ssh-guardian.service
+
+[Install]
+WantedBy=timers.target
