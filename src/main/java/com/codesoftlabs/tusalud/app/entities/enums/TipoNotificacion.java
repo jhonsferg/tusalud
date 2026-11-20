@@ -62,5 +62,6 @@ public enum TipoNotificacion {
     CIRUGIA_PROGRAMADA,
     CIRUGIA_ASIGNADA,
     ESTERILIZACION_ALERTA,
+    RECETA_EMITIDA,
     SISTEMA
 }

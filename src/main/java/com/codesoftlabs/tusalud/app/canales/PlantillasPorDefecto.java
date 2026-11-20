@@ -45,6 +45,9 @@ public final class PlantillasPorDefecto {
                         "Tiene un procedimiento programado",
                         "Se programó un procedimiento a su nombre. Revise los detalles en la aplicación."));
         TEXTOS.put(
+                TipoNotificacion.RECETA_EMITIDA,
+                new Texto("Tiene una receta nueva", "Se emitió una receta a su nombre. Revísela en la aplicación."));
+        TEXTOS.put(
                 TipoNotificacion.VACUNA_PROXIMA,
                 new Texto(
                         "Tiene una vacuna próxima",

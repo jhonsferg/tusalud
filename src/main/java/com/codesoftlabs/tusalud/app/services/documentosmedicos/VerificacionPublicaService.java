@@ -34,6 +34,8 @@ public class VerificacionPublicaService {
     private final DocumentoMedicoRepository documentos;
     private final ConsentimientoRepository consentimientos;
     private final CarneVacunacionRepository carnes;
+    private final com.codesoftlabs.tusalud.app.repositories.RecetaElectronicaRepository recetas;
+    private final com.codesoftlabs.tusalud.app.services.receta.RecetaFirma recetaFirma;
 
     @Value("${app.documentos-medicos.verificacion-por-minuto:20}")
     private int porMinuto;
@@ -82,6 +84,31 @@ public class VerificacionPublicaService {
                     c.getEmitidoEn(),
                     c.getEmitidoPor().getNombreCompleto(),
                     null,
+                    ESTABLECIMIENTO);
+        }
+        Optional<com.codesoftlabs.tusalud.app.entities.RecetaElectronica> receta = recetas.findByCodigo(normalizado);
+        if (receta.isPresent()) {
+            var r = receta.get();
+            boolean intacta =
+                    CodigoDocumentoClinico.sha256(r.getContenidoCanonico()).equals(r.getHash())
+                            && recetaFirma.verificar(r.getContenidoCanonico(), r.getFirma(), r.getCertificadoDer());
+            String resultado;
+            if (!intacta) {
+                resultado = "ALTERADO";
+            } else if (r.getEstado()
+                    == com.codesoftlabs.tusalud.app.entities.enums.RecetaEnums.EstadoRecetaElectronica.ANULADA) {
+                resultado = "ANULADO";
+            } else if (java.time.LocalDateTime.now().isAfter(r.getVigenteHasta())) {
+                resultado = "VENCIDO";
+            } else {
+                resultado = "VALIDO";
+            }
+            return new VerificacionPublicaResponse(
+                    resultado,
+                    "Receta electrónica",
+                    r.getEmitidaEn(),
+                    r.getMedico().getUsuario().getNombreCompleto(),
+                    r.getMedico().getColegiatura(),
                     ESTABLECIMIENTO);
         }
         return new VerificacionPublicaResponse("NO_ENCONTRADO", null, null, null, null, null);

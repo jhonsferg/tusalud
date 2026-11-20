@@ -23,12 +23,15 @@ public class SecuenciasDocumentosMedicos {
     }
 
     public int siguiente(TipoDocumentoMedico tipo, int anio) {
-        SecuenciaDocumentoMedico secuencia =
-                repositorio.bloquear(tipo.name(), anio).orElse(null);
+        return siguiente(tipo.name(), anio);
+    }
+
+    public int siguiente(String clave, int anio) {
+        SecuenciaDocumentoMedico secuencia = repositorio.bloquear(clave, anio).orElse(null);
         if (secuencia == null) {
-            asegurar(tipo, anio);
+            asegurar(clave, anio);
             secuencia = repositorio
-                    .bloquear(tipo.name(), anio)
+                    .bloquear(clave, anio)
                     .orElseThrow(() -> new IllegalStateException("No se pudo crear la secuencia del documento"));
         }
         secuencia.setUltimo(secuencia.getUltimo() + 1);
@@ -36,10 +39,10 @@ public class SecuenciasDocumentosMedicos {
         return secuencia.getUltimo();
     }
 
-    private void asegurar(TipoDocumentoMedico tipo, int anio) {
+    private void asegurar(String clave, int anio) {
         try {
             nueva.executeWithoutResult(
-                    estado -> repositorio.saveAndFlush(new SecuenciaDocumentoMedico(null, tipo.name(), anio, 0)));
+                    estado -> repositorio.saveAndFlush(new SecuenciaDocumentoMedico(null, clave, anio, 0)));
         } catch (DataIntegrityViolationException ex) {
             return;
         }

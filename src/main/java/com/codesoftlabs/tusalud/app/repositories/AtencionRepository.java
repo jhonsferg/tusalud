@@ -12,6 +12,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AtencionRepository extends JpaRepository<Atencion, UUID> {
 
+    java.util.Optional<Atencion> findFirstByPacienteIdAndPesoKgIsNotNullOrderByFechaDesc(UUID pacienteId);
+
     boolean existsByCitaId(UUID citaId);
 
     @Query("""

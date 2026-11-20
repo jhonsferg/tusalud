@@ -24,6 +24,8 @@ public interface ProductoRepository extends JpaRepository<Producto, UUID> {
     List<Producto> buscar(
             @Param("q") String q, @Param("tipo") TipoProducto tipo, @Param("activo") Boolean activo, Pageable pageable);
 
+    java.util.Optional<Producto> findByCodigo(String codigo);
+
     boolean existsByCodigo(String codigo);
 
     boolean existsByCodigoAndIdNot(String codigo, UUID id);

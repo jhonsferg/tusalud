@@ -72,6 +72,7 @@ public class FarmaciaServiceImpl implements FarmaciaService {
     private final InventarioService inventarioService;
     private final NotificacionService notificacionService;
     private final ProductoResponseMapper mapper;
+    private final com.codesoftlabs.tusalud.app.services.receta.RecetaDispensacionPuerto recetasElectronicas;
 
     @Override
     public List<CatalogoFarmaciaResponse> catalogo(String q) {
@@ -136,6 +137,9 @@ public class FarmaciaServiceImpl implements FarmaciaService {
                     .findById(item.productoId())
                     .orElseThrow(() -> new ResourceNotFoundException("Producto", "id", item.productoId()));
             validarProducto(producto, item, atencion, posiciones);
+            if (item.recetaItemId() != null && atencion != null) {
+                recetasElectronicas.validar(atencion, item.recetaItemId(), item.cantidad());
+            }
             productos.put(producto.getId(), producto);
             demanda.merge(producto.getId(), item.cantidad(), Integer::sum);
             BigDecimal subtotal = producto.getPrecioVenta().multiply(BigDecimal.valueOf(item.cantidad()));
@@ -162,7 +166,11 @@ public class FarmaciaServiceImpl implements FarmaciaService {
                     usuario,
                     null);
             if (item.getRecetaPosicion() != null) {
-                marcarReceta(atencion, item.getRecetaPosicion(), true);
+                boolean completo = recetasElectronicas.registrar(
+                        atencion, item.getRecetaPosicion(), item.getCantidad(), dispensacion.getId(), usuario.getId());
+                if (completo) {
+                    marcarReceta(atencion, item.getRecetaPosicion(), true);
+                }
             }
         }
         if (paciente != null) {
@@ -213,6 +221,7 @@ public class FarmaciaServiceImpl implements FarmaciaService {
             throw new ConflictException("La dispensación " + dispensacion.getComprobante() + " ya fue anulada");
         }
         inventarioService.devolverPorReferencia(dispensacion.getComprobante(), usuario);
+        recetasElectronicas.revertir(dispensacion.getId());
         for (DispensacionItem item : dispensacion.getItems()) {
             if (item.getRecetaPosicion() != null && dispensacion.getAtencion() != null) {
                 marcarReceta(dispensacion.getAtencion(), item.getRecetaPosicion(), false);

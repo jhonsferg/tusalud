@@ -58,6 +58,7 @@ public class AtencionServiceImpl implements AtencionService {
     private final NotificacionService notificacionService;
     private final Cie10Service cie10Service;
     private final AuditoriaClinicaService auditoriaClinicaService;
+    private final com.codesoftlabs.tusalud.app.repositories.RecetaElectronicaRepository recetasElectronicas;
 
     @Override
     @Transactional
@@ -109,6 +110,12 @@ public class AtencionServiceImpl implements AtencionService {
         if (atencion.getFecha().isBefore(LocalDateTime.now().minusHours(VENTANA_EDICION_HORAS))) {
             throw new ConflictException(
                     "La atención ya no se puede modificar: pasaron más de " + VENTANA_EDICION_HORAS + " horas");
+        }
+        if (recetasElectronicas.existsByAtencionIdAndEstadoNot(
+                atencion.getId(),
+                com.codesoftlabs.tusalud.app.entities.enums.RecetaEnums.EstadoRecetaElectronica.ANULADA)) {
+            throw new ConflictException(
+                    "La atención tiene una receta electrónica emitida. Anúlela para modificar la receta");
         }
         if (dispensacionRepository.existsByAtencionIdAndEstado(atencion.getId(), EstadoDispensacion.EMITIDA)) {
             throw new ConflictException("La receta de esta atención ya fue dispensada y no se puede modificar");

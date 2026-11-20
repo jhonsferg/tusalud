@@ -32,6 +32,7 @@ public final class PoliticaCanales {
         registrar(TipoNotificacion.CONSENTIMIENTO_PENDIENTE, false, false, "Documentos", "Consentimiento por firmar");
         registrar(TipoNotificacion.VACUNA_PROXIMA, false, false, "Vacunas", "Vacuna próxima");
         registrar(TipoNotificacion.CIRUGIA_PROGRAMADA, false, false, "Cirugías", "Cirugía programada");
+        registrar(TipoNotificacion.RECETA_EMITIDA, false, false, "Recetas", "Receta electrónica emitida");
         registrar(TipoNotificacion.COMPROBANTE_EMITIDO, false, false, "Pagos", "Comprobante emitido");
         registrar(TipoNotificacion.ARCO_RESUELTA, false, false, "Privacidad", "Respuesta a su solicitud de privacidad");
         registrar(TipoNotificacion.CONTRASENA_CAMBIADA, true, true, "Seguridad", "Cambio de contraseña");
