@@ -29,8 +29,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portal",
+                "output": "img/portal"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -205,8 +215,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/paciente",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -381,8 +401,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/medico",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -557,8 +587,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/admin",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -733,8 +773,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/gerencia",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -909,8 +959,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/finanzas",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -1085,8 +1145,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/operaciones",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -1261,8 +1331,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/calidad",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -1437,8 +1517,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/rrhh",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -1613,8 +1703,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/recepcion",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -1789,8 +1889,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/caja",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -1965,8 +2075,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/enfermeria",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -2141,8 +2261,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/laboratorio",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -2317,8 +2447,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/imagenes",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -2493,8 +2633,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/farmacia",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]
@@ -2669,8 +2819,18 @@
             "allowedCommonJsDependencies": ["qrcode"],
             "assets": [
               {
-                "glob": "**/*",
+                "glob": "favicon.ico",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/comun",
+                "output": "img/comun"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/img/portadas/almacen",
+                "output": "img/portada"
               }
             ],
             "styles": ["projects/ui/styles/tusalud.scss"]

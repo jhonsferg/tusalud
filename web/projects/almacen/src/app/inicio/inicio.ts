@@ -10,7 +10,7 @@ import {
   MovimientoResponse,
   ResumenAlmacenResponse,
 } from '@tusalud/core';
-import { PageHeader } from '@tusalud/ui/page-header';
+import { HeroPortada } from '@tusalud/ui/hero-portada';
 import {
   AccionRapida,
   ItemTarea,
@@ -25,9 +25,9 @@ import {
 
 @Component({
   selector: 'app-inicio-almacen',
-  imports: [CurrencyPipe, RouterLink, PageHeader, SectionCard, StatCard, TaskList, QuickActions],
+  imports: [CurrencyPipe, RouterLink, HeroPortada, SectionCard, StatCard, TaskList, QuickActions],
   template: `
-    <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-box" />
+    <app-hero-portada app="almacen" [title]="saludo()" [subtitle]="fecha()" />
 
     <div class="fila-stats stats">
       <app-stat-card

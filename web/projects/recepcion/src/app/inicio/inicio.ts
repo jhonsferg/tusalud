@@ -19,7 +19,7 @@ import {
   SegurosStore,
   TurnoResponse,
 } from '@tusalud/core';
-import { PageHeader } from '@tusalud/ui/page-header';
+import { HeroPortada } from '@tusalud/ui/hero-portada';
 import {
   AccionRapida,
   ItemLineaTiempo,
@@ -40,7 +40,7 @@ import {
     FormsModule,
     RouterLink,
     Button,
-    PageHeader,
+    HeroPortada,
     SectionCard,
     StatCard,
     Timeline,
@@ -48,7 +48,7 @@ import {
     QuickActions,
   ],
   template: `
-    <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-users" />
+    <app-hero-portada app="recepcion" [title]="saludo()" [subtitle]="fecha()" />
 
     <form
       class="buscador"

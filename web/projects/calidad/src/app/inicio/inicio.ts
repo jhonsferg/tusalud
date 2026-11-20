@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 
 import { AsyncState, AuthService, ReporteCalidadResponse, ReportesApiService } from '@tusalud/core';
-import { PageHeader } from '@tusalud/ui/page-header';
+import { HeroPortada } from '@tusalud/ui/hero-portada';
 import {
   AccionRapida,
   BarList,
@@ -30,11 +30,11 @@ import {
 
 @Component({
   selector: 'app-inicio-calidad',
-  imports: [PageHeader, SectionCard, StatCard, BarList, TaskList, QuickActions, SelectorPeriodo],
+  imports: [HeroPortada, SectionCard, StatCard, BarList, TaskList, QuickActions, SelectorPeriodo],
   template: `
-    <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-verified">
+    <app-hero-portada app="calidad" [title]="saludo()" [subtitle]="fecha()">
       <app-selector-periodo [valor]="dias()" (cambio)="cambiarPeriodo($event)" />
-    </app-page-header>
+    </app-hero-portada>
 
     @if (reporte.error(); as error) {
       <p class="error" role="alert">{{ error.message }}</p>

@@ -8,7 +8,7 @@ import {
   ResumenRrhhResponse,
   RrhhApiService,
 } from '@tusalud/core';
-import { PageHeader } from '@tusalud/ui/page-header';
+import { HeroPortada } from '@tusalud/ui/hero-portada';
 import {
   AccionRapida,
   BarList,
@@ -41,9 +41,9 @@ const AREAS: Readonly<Record<string, string>> = {
 
 @Component({
   selector: 'app-inicio-rrhh',
-  imports: [RouterLink, PageHeader, SectionCard, StatCard, TaskList, BarList, QuickActions],
+  imports: [RouterLink, HeroPortada, SectionCard, StatCard, TaskList, BarList, QuickActions],
   template: `
-    <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-id-card" />
+    <app-hero-portada app="rrhh" [title]="saludo()" [subtitle]="fecha()" />
 
     <div class="fila-stats stats">
       <app-stat-card

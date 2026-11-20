@@ -14,7 +14,7 @@ import {
   ReporteEjecutivoResponse,
   ReportesApiService,
 } from '@tusalud/core';
-import { PageHeader } from '@tusalud/ui/page-header';
+import { HeroPortada } from '@tusalud/ui/hero-portada';
 import {
   AccionRapida,
   BarChart,
@@ -37,7 +37,7 @@ import {
   selector: 'app-inicio-gerencia',
   imports: [
     CurrencyPipe,
-    PageHeader,
+    HeroPortada,
     SectionCard,
     StatCard,
     BarChart,
@@ -45,9 +45,9 @@ import {
     SelectorPeriodo,
   ],
   template: `
-    <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-briefcase">
+    <app-hero-portada app="gerencia" [title]="saludo()" [subtitle]="fecha()">
       <app-selector-periodo [valor]="dias()" (cambio)="cambiarPeriodo($event)" />
-    </app-page-header>
+    </app-hero-portada>
 
     @if (reporte.error(); as error) {
       <p class="error" role="alert">{{ error.message }}</p>

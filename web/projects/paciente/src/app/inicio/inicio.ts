@@ -16,7 +16,7 @@ import {
   OrdenResponse,
 } from '@tusalud/core';
 import { ProximaTeleconsulta } from '@tusalud/features/telemedicina';
-import { PageHeader } from '@tusalud/ui/page-header';
+import { HeroPortada } from '@tusalud/ui/hero-portada';
 import {
   AccionRapida,
   ItemLineaTiempo,
@@ -52,7 +52,7 @@ const ETIQUETA_CITA: Readonly<Record<string, string>> = {
     DatePipe,
     RouterLink,
     Button,
-    PageHeader,
+    HeroPortada,
     SectionCard,
     StatusBadge,
     Timeline,
@@ -60,7 +60,7 @@ const ETIQUETA_CITA: Readonly<Record<string, string>> = {
     TaskList,
   ],
   template: `
-    <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-heart" />
+    <app-hero-portada app="paciente" [title]="saludo()" [subtitle]="fecha()" />
     <app-proxima-teleconsulta />
 
     <div class="tablero">

@@ -10,7 +10,7 @@ import {
   MapaCamasResponse,
   ResumenHospResponse,
 } from '@tusalud/core';
-import { PageHeader } from '@tusalud/ui/page-header';
+import { HeroPortada } from '@tusalud/ui/hero-portada';
 import {
   AccionRapida,
   BarList,
@@ -42,9 +42,9 @@ const NIVEL: Readonly<Record<number, { texto: string; tono: TonoTablero }>> = {
 
 @Component({
   selector: 'app-inicio-enfermeria',
-  imports: [RouterLink, PageHeader, SectionCard, StatCard, TaskList, BarList, QuickActions],
+  imports: [RouterLink, HeroPortada, SectionCard, StatCard, TaskList, BarList, QuickActions],
   template: `
-    <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-building" />
+    <app-hero-portada app="enfermeria" [title]="saludo()" [subtitle]="fecha()" />
 
     <div class="fila-stats stats">
       <app-stat-card

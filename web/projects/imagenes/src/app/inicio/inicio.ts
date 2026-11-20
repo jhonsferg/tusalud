@@ -10,7 +10,7 @@ import {
   OrdenImagenResponse,
   ResumenImagenesResponse,
 } from '@tusalud/core';
-import { PageHeader } from '@tusalud/ui/page-header';
+import { HeroPortada } from '@tusalud/ui/hero-portada';
 import {
   AccionRapida,
   ItemLineaTiempo,
@@ -28,9 +28,9 @@ import {
 
 @Component({
   selector: 'app-inicio-imagenes',
-  imports: [RouterLink, PageHeader, SectionCard, StatCard, TaskList, Timeline, QuickActions],
+  imports: [RouterLink, HeroPortada, SectionCard, StatCard, TaskList, Timeline, QuickActions],
   template: `
-    <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-image" />
+    <app-hero-portada app="imagenes" [title]="saludo()" [subtitle]="fecha()" />
 
     <div class="fila-stats stats">
       <app-stat-card

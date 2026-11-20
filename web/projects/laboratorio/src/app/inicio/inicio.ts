@@ -9,7 +9,7 @@ import {
   OrdenResponse,
   ResumenLaboratorioResponse,
 } from '@tusalud/core';
-import { PageHeader } from '@tusalud/ui/page-header';
+import { HeroPortada } from '@tusalud/ui/hero-portada';
 import {
   AccionRapida,
   ItemTarea,
@@ -32,9 +32,9 @@ function esperaTexto(fecha: string): string {
 
 @Component({
   selector: 'app-inicio-laboratorio',
-  imports: [RouterLink, PageHeader, SectionCard, StatCard, TaskList, QuickActions],
+  imports: [RouterLink, HeroPortada, SectionCard, StatCard, TaskList, QuickActions],
   template: `
-    <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-filter" />
+    <app-hero-portada app="laboratorio" [title]="saludo()" [subtitle]="fecha()" />
 
     <div class="fila-stats stats">
       <app-stat-card

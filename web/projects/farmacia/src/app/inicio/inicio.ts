@@ -11,7 +11,7 @@ import {
   RecetaFarmaciaResponse,
   ResumenFarmaciaResponse,
 } from '@tusalud/core';
-import { PageHeader } from '@tusalud/ui/page-header';
+import { HeroPortada } from '@tusalud/ui/hero-portada';
 import {
   AccionRapida,
   ItemTarea,
@@ -25,9 +25,9 @@ import {
 
 @Component({
   selector: 'app-inicio-farmacia',
-  imports: [CurrencyPipe, RouterLink, PageHeader, SectionCard, StatCard, TaskList, QuickActions],
+  imports: [CurrencyPipe, RouterLink, HeroPortada, SectionCard, StatCard, TaskList, QuickActions],
   template: `
-    <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-plus-circle" />
+    <app-hero-portada app="farmacia" [title]="saludo()" [subtitle]="fecha()" />
 
     <div class="fila-stats stats">
       <app-stat-card

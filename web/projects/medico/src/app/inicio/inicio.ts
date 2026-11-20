@@ -16,7 +16,7 @@ import {
   TurnoResponse,
 } from '@tusalud/core';
 import { ProximaTeleconsulta } from '@tusalud/features/telemedicina';
-import { PageHeader } from '@tusalud/ui/page-header';
+import { HeroPortada } from '@tusalud/ui/hero-portada';
 import {
   AccionRapida,
   ItemLineaTiempo,
@@ -58,7 +58,7 @@ function hora(fecha: string): string {
   imports: [
     RouterLink,
     ProximaTeleconsulta,
-    PageHeader,
+    HeroPortada,
     SectionCard,
     StatCard,
     Timeline,
@@ -66,7 +66,7 @@ function hora(fecha: string): string {
     TaskList,
   ],
   template: `
-    <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-heart" />
+    <app-hero-portada app="medico" [title]="saludo()" [subtitle]="fecha()" />
     <app-proxima-teleconsulta />
 
     <div class="fila-stats stats">

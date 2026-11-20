@@ -15,7 +15,7 @@ import {
   RolResumenResponse,
   UsuarioAdminResponse,
 } from '@tusalud/core';
-import { PageHeader } from '@tusalud/ui/page-header';
+import { HeroPortada } from '@tusalud/ui/hero-portada';
 import {
   AccionRapida,
   BarList,
@@ -43,7 +43,7 @@ const TONO_ESTADO: Readonly<Record<string, TonoTablero>> = {
   imports: [
     CurrencyPipe,
     RouterLink,
-    PageHeader,
+    HeroPortada,
     SectionCard,
     StatCard,
     BarList,
@@ -52,7 +52,7 @@ const TONO_ESTADO: Readonly<Record<string, TonoTablero>> = {
     StatusBadge,
   ],
   template: `
-    <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-cog" />
+    <app-hero-portada app="admin" [title]="saludo()" [subtitle]="fecha()" />
 
     <div class="fila-stats stats">
       <app-stat-card

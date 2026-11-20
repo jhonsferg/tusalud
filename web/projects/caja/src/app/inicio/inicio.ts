@@ -14,7 +14,7 @@ import {
   ResumenCajaResponse,
   SesionCajaResponse,
 } from '@tusalud/core';
-import { PageHeader } from '@tusalud/ui/page-header';
+import { HeroPortada } from '@tusalud/ui/hero-portada';
 import {
   AccionRapida,
   BarList,
@@ -36,7 +36,7 @@ import {
     DatePipe,
     RouterLink,
     Button,
-    PageHeader,
+    HeroPortada,
     SectionCard,
     StatCard,
     StatusBadge,
@@ -45,7 +45,7 @@ import {
     QuickActions,
   ],
   template: `
-    <app-page-header [title]="saludo()" [subtitle]="fecha()" icon="pi-wallet" />
+    <app-hero-portada app="caja" [title]="saludo()" [subtitle]="fecha()" />
 
     <div class="estado-caja" [class.abierta]="abierta()">
       <div class="info">
