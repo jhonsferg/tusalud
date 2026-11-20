@@ -1,0 +1,7 @@
+[Unit]
+Description=Actualiza las listas de IPs de Perú para el bloqueo
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/etc/geoblock/geoblock.sh actualizar

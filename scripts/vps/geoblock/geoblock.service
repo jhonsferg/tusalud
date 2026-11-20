@@ -1,0 +1,14 @@
+[Unit]
+Description=Bloqueo de IPs fuera de Perú
+After=network-online.target docker.service
+Wants=network-online.target
+PartOf=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/etc/geoblock/geoblock.sh aplicar
+ExecStop=/etc/geoblock/geoblock.sh quitar
+
+[Install]
+WantedBy=multi-user.target

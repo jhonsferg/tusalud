@@ -1,0 +1,10 @@
+[Unit]
+Description=Actualización semanal de las listas de IPs de Perú
+
+[Timer]
+OnCalendar=Sun 04:30
+RandomizedDelaySec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

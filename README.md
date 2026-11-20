@@ -3110,6 +3110,8 @@ El servidor TURN usa los puertos 3478 en UDP y TCP y el rango 49160 a 49200 en U
 
 `datos-volumen.sql` crea 220 pacientes, 8 médicos con sus horarios y alrededor de 6000 citas entre pasadas y futuras, con atenciones, diagnósticos CIE-10, recetas, pagos, valoraciones y órdenes de laboratorio con resultados. Se ejecuta una sola vez con `psql` sobre la base del servidor y no es idempotente.
 
+El servidor bloquea de forma permanente todo el tráfico entrante que no venga de Perú con una tabla de nftables, instalada por `scripts/vps/geoblock`. Las listas de redes peruanas se extraen de la base GeoLite2 que ya usa nginx, de modo que el firewall y nginx coinciden, y se refrescan cada domingo. Quedan abiertos el puerto 80, porque nginx ya filtra por país y Let's Encrypt necesita validar, y el puerto 443 para los webhooks de GitHub.
+
 ### Almacenamiento de objetos
 
 El servicio `storage` ejecuta SeaweedFS en modo de servidor único con el filer y la puerta de enlace S3 en el puerto interno 8333, y guarda los datos en el volumen `storage-data`. Las credenciales S3 se toman de `STORAGE_ACCESS_KEY` y `STORAGE_SECRET_KEY`, que en `compose.dev.yaml` y `compose.qa.yaml` traen valores de desarrollo y en `compose.yaml` no tienen valor por defecto: sin ellas el servicio se niega a arrancar. El contenedor `storage-init` espera a que el almacén esté sano y crea los buckets `avatares`, `imagenes`, `documentos`, `reportes` y `plantillas` de forma idempotente con `weed shell`. Como la creación de buckets es infraestructura, no hay código de arranque en Java que cargue datos. La API depende de que `storage-init` termine bien.
