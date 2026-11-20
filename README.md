@@ -146,6 +146,7 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Archivos de Compose](#archivos-de-compose)
   - [Producción](#producción)
   - [Desarrollo y QA](#desarrollo-y-qa)
+  - [Despliegue de QA en un VPS](#despliegue-de-qa-en-un-vps)
   - [Almacenamiento de objetos](#almacenamiento-de-objetos)
   - [Gateway](#gateway)
   - [PostgreSQL 18](#postgresql-18)
@@ -3014,6 +3015,22 @@ docker compose -f compose.yaml -f compose.qa.yaml up -d --build
 ```
 
 Para no repetir `-f` en cada comando, define `COMPOSE_FILE` en `.env` o en la terminal, por ejemplo `COMPOSE_FILE=compose.yaml:compose.dev.yaml`. En Windows el separador es `;`.
+
+### Despliegue de QA en un VPS
+
+`compose.vps.yaml` despliega solo la API y la aplicación web en un servidor que ya tiene PostgreSQL, MinIO y un nginx público. No incluye base de datos, almacén, gateway, Jaeger ni OpenTelemetry, y la API arranca con el perfil `prod`, que no carga datos de demostración.
+
+| Pieza          | Detalle                                                                                                                                  |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Web            | `tusalud.codesoftlabs.com`, imagen `tusalud-web:vps`, compilada con la configuración `vps`, que apunta a la API por su dominio completo  |
+| API            | `api.tusalud.codesoftlabs.com`, imagen `tusalud-api:vps`, con CORS limitado al dominio de la web y sin la documentación OpenAPI expuesta |
+| Base de datos  | Base y usuario propios en el PostgreSQL del servidor, creados por `scripts/vps/preparar-servidor.sh`                                     |
+| Almacenamiento | Cinco buckets con prefijo `tusalud-` y un usuario de MinIO limitado a ellos, accesibles mediante el contenedor `almacen-proxy`           |
+| nginx público  | Configuraciones en `docker/vps/nginx`, con certificados de Let's Encrypt por webroot, bloqueo por país y WebSocket para la señalización  |
+
+Las imágenes se construyen en local con `docker compose -f compose.vps.yaml build` y se suben al servidor con `docker save` y `docker load` por SSH. Todos los secretos se generan en el servidor, en un `.env` con permisos restringidos, y nunca viajan por el repositorio. `scripts/vps/crear-admin.sh` crea el administrador inicial, y el resto de usuarios se crean desde la aplicación.
+
+Con esta configuración la telemedicina no usa servidor TURN, porque el servidor no expone los puertos UDP necesarios, y las copias de seguridad de TuSalud no corren. El almacén necesita el contenedor `almacen-proxy` porque el nombre del contenedor de MinIO lleva guion bajo y el cliente S3 de Java lo rechaza como host.
 
 ### Almacenamiento de objetos
 
