@@ -27,6 +27,18 @@ export const routes: Routes = [
         loadComponent: () => import('./inicio/inicio').then((m) => m.InicioCalidad),
       },
       {
+        path: 'seguridad-paciente',
+        canMatch: [roleGuard('ROLE_CALIDAD')],
+        loadChildren: () =>
+          import('@tusalud/features/seguridad-paciente').then((m) => m.EVENTOS_GESTION_ROUTES),
+      },
+      {
+        path: 'guias',
+        canMatch: [roleGuard('ROLE_CALIDAD')],
+        loadChildren: () =>
+          import('@tusalud/features/seguridad-paciente').then((m) => m.GUIAS_CLINICAS_ROUTES),
+      },
+      {
         path: 'reportes',
         canMatch: [roleGuard('ROLE_CALIDAD')],
         loadChildren: () => import('@tusalud/features/reportes').then((m) => m.REPORTES_ROUTES),

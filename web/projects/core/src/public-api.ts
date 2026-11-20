@@ -98,3 +98,6 @@ export * from './lib/services/api/pediatria-api.service';
 export * from './lib/services/api/recetas-api.service';
 export * from './lib/services/api/odontologia-api.service';
 export * from './lib/services/api/quirofano-api.service';
+export * from './lib/services/api/hce-api.service';
+export * from './lib/services/api/seguridad-paciente-api.service';
+export * from './lib/services/api/planes-api.service';

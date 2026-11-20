@@ -27,6 +27,18 @@ export const routes: Routes = [
         loadComponent: () => import('./inicio/inicio').then((m) => m.InicioEnfermeria),
       },
       {
+        path: 'eventos-seguridad',
+        canMatch: [roleGuard('ROLE_ENFERMERIA')],
+        loadChildren: () =>
+          import('@tusalud/features/seguridad-paciente').then((m) => m.NOTIFICAR_EVENTO_ROUTES),
+      },
+      {
+        path: 'guias',
+        canMatch: [roleGuard('ROLE_ENFERMERIA')],
+        loadChildren: () =>
+          import('@tusalud/features/seguridad-paciente').then((m) => m.GUIAS_CLINICAS_ROUTES),
+      },
+      {
         path: 'hospitalizacion',
         loadChildren: () =>
           import('@tusalud/features/hospitalizacion').then((m) => m.HOSPITALIZACION_ROUTES),

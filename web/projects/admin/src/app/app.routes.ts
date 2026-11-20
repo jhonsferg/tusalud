@@ -27,6 +27,17 @@ export const routes: Routes = [
         loadComponent: () => import('./inicio/inicio').then((m) => m.InicioAdmin),
       },
       {
+        path: 'hce',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () => import('@tusalud/features/hce').then((m) => m.HCE_ADMIN_ROUTES),
+      },
+      {
+        path: 'guias',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () =>
+          import('@tusalud/features/seguridad-paciente').then((m) => m.GUIAS_CLINICAS_ROUTES),
+      },
+      {
         path: 'admin',
         canMatch: [roleGuard('ROLE_ADMIN')],
         loadChildren: () => import('@tusalud/features/admin').then((m) => m.ADMIN_ROUTES),

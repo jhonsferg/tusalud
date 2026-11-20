@@ -27,6 +27,29 @@ export const routes: Routes = [
         loadComponent: () => import('./inicio/inicio').then((m) => m.InicioMedico),
       },
       {
+        path: 'historial-clinico',
+        canMatch: [roleGuard('ROLE_MEDICO')],
+        loadChildren: () => import('@tusalud/features/hce').then((m) => m.HISTORIAL_CLINICO_ROUTES),
+      },
+      {
+        path: 'pacientes-cronicos',
+        canMatch: [roleGuard('ROLE_MEDICO')],
+        loadChildren: () =>
+          import('@tusalud/features/planes-tratamiento').then((m) => m.PACIENTES_CRONICOS_ROUTES),
+      },
+      {
+        path: 'eventos-seguridad',
+        canMatch: [roleGuard('ROLE_MEDICO')],
+        loadChildren: () =>
+          import('@tusalud/features/seguridad-paciente').then((m) => m.NOTIFICAR_EVENTO_ROUTES),
+      },
+      {
+        path: 'guias',
+        canMatch: [roleGuard('ROLE_MEDICO')],
+        loadChildren: () =>
+          import('@tusalud/features/seguridad-paciente').then((m) => m.GUIAS_CLINICAS_ROUTES),
+      },
+      {
         path: 'agenda',
         canMatch: [roleGuard('ROLE_MEDICO')],
         loadChildren: () => import('@tusalud/features/agenda').then((m) => m.AGENDA_ROUTES),

@@ -20,6 +20,23 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Seguridad del paciente',
+    items: [
+      {
+        label: 'Eventos adversos',
+        icon: 'pi-shield',
+        link: '/seguridad-paciente',
+        roles: ['ROLE_CALIDAD'],
+      },
+      {
+        label: 'Guías clínicas',
+        icon: 'pi-book',
+        link: '/guias',
+        roles: ['ROLE_CALIDAD'],
+      },
+    ],
+  },
+  {
     title: 'Calidad',
     items: [
       {

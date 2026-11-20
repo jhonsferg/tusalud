@@ -1,5 +1,17 @@
 import { Route, Routes } from '@angular/router';
 
+import { MI_PLAN_ROUTES, PACIENTES_CRONICOS_ROUTES } from '@tusalud/features/planes-tratamiento';
+import {
+  HCE_ADMIN_ROUTES,
+  HISTORIAL_CLINICO_ROUTES,
+  MI_HISTORIA_ROUTES,
+} from '@tusalud/features/hce';
+import {
+  EVENTOS_GESTION_ROUTES,
+  GUIAS_CLINICAS_ROUTES,
+  NOTIFICAR_EVENTO_ROUTES,
+} from '@tusalud/features/seguridad-paciente';
+
 import { ADMIN_ROUTES } from '@tusalud/features/admin';
 import { AGENDA_ROUTES } from '@tusalud/features/agenda';
 import { ALMACEN_ROUTES } from '@tusalud/features/almacen';
@@ -198,6 +210,14 @@ const DOMINIOS: Record<string, Routes> = {
   CRECIMIENTO_CLINICA_ROUTES,
   MI_VACUNACION_ROUTES,
   MI_CRECIMIENTO_ROUTES,
+  HCE_ADMIN_ROUTES,
+  HISTORIAL_CLINICO_ROUTES,
+  MI_HISTORIA_ROUTES,
+  MI_PLAN_ROUTES,
+  PACIENTES_CRONICOS_ROUTES,
+  EVENTOS_GESTION_ROUTES,
+  GUIAS_CLINICAS_ROUTES,
+  NOTIFICAR_EVENTO_ROUTES,
   ESQUEMAS_VACUNACION_ADMIN_ROUTES,
   ODONTOLOGIA_CLINICA_ROUTES,
   PLANES_ODONTOLOGICOS_ROUTES,

@@ -38,6 +38,23 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Historia clínica',
+    items: [
+      {
+        label: 'Conservación y duplicados',
+        icon: 'pi-folder-open',
+        link: '/hce',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Guías clínicas',
+        icon: 'pi-book',
+        link: '/guias',
+        roles: ['ROLE_ADMIN'],
+      },
+    ],
+  },
+  {
     title: 'Recepción',
     items: [
       {

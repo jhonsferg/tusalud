@@ -36,3 +36,6 @@ export * from './pediatria.model';
 export * from './odontologia.model';
 export * from './quirofano.model';
 export * from './receta.model';
+export * from './hce.model';
+export * from './calidad.model';
+export * from './cronicos.model';

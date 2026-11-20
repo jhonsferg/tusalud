@@ -44,6 +44,29 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Calidad y seguridad',
+    items: [
+      {
+        label: 'Guías clínicas',
+        icon: 'pi-book',
+        link: '/guias',
+        roles: ['ROLE_MEDICO'],
+      },
+      {
+        label: 'Pacientes crónicos',
+        icon: 'pi-heart',
+        link: '/pacientes-cronicos',
+        roles: ['ROLE_MEDICO'],
+      },
+      {
+        label: 'Notificar un evento',
+        icon: 'pi-exclamation-triangle',
+        link: '/eventos-seguridad',
+        roles: ['ROLE_MEDICO'],
+      },
+    ],
+  },
+  {
     title: 'Hospitalización',
     items: [
       {

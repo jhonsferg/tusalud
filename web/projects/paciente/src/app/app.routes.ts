@@ -27,6 +27,17 @@ export const routes: Routes = [
         loadComponent: () => import('./inicio/inicio').then((m) => m.InicioPaciente),
       },
       {
+        path: 'mi-plan',
+        canMatch: [roleGuard('ROLE_PACIENTE')],
+        loadChildren: () =>
+          import('@tusalud/features/planes-tratamiento').then((m) => m.MI_PLAN_ROUTES),
+      },
+      {
+        path: 'mi-historia-impresa',
+        canMatch: [roleGuard('ROLE_PACIENTE')],
+        loadChildren: () => import('@tusalud/features/hce').then((m) => m.MI_HISTORIA_ROUTES),
+      },
+      {
         path: 'citas',
         loadChildren: () => import('@tusalud/features/citas').then((m) => m.CITAS_ROUTES),
       },

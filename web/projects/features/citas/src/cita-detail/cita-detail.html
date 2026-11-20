@@ -82,6 +82,15 @@
               }"
             />
           }
+          @if (puedeAtender(cita) && clinica.atencion.value(); as atencionClinica) {
+            <p-button
+              label="Historial y rectificación"
+              icon="pi pi-history"
+              severity="secondary"
+              [outlined]="true"
+              [routerLink]="['/historial-clinico', atencionClinica.id]"
+            />
+          }
           @if (puedeReprogramar(cita)) {
             <p-button
               label="Reprogramar"

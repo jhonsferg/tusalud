@@ -72739,6 +72739,5156 @@
           ]
         }
       ]
+    },
+    {
+      "name": "38 - Historia clínica electrónica",
+      "description": "Cierre y firma de la atención, rectificación con adenda y corrección con rastro, inmutabilidad, línea de tiempo, impresión de la historia en PDF, políticas de conservación, duplicados y fusión, y la seguridad por rol y por relación asistencial.",
+      "item": [
+        {
+          "name": "Login del médico",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('hcMedicoToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login del médico sin relación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dra.vega@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('hcMedico2Token', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login del paciente alérgico a la penicilina",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('hcPacienteToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de otro paciente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria.rodriguez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('hcPaciente2Token', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de farmacia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"farmacia@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('hcFarmaciaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de recepción",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recepcion@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('hcRecepcionToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de caja",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"caja@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('hcCajaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de enfermería",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"enfermeria@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('hcEnfermeriaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login del administrador",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('hcAdminToken', pm.response.json().token);",
+                  "pm.collectionVariables.set('hcSufijo', String(Date.now()).slice(-8));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Médicos para reservar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const garcia = pm.response.json().find(m => /García/.test(m.apellido));",
+                  "pm.test(\"Existe el médico con especialidad\", () => pm.expect(garcia.especialidades).to.not.be.empty);",
+                  "pm.collectionVariables.set(\"hcMedicoId\", garcia.id);",
+                  "pm.collectionVariables.set(\"hcEspecialidadId\", garcia.especialidades[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reservar la primera cita",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": \"{{hcMedicoId}}\",\n  \"especialidadId\": \"{{hcEspecialidadId}}\",\n  \"fechaHora\": \"{{hcFechaHora}}\",\n  \"motivo\": \"Control con receta electrónica\",\n  \"modalidad\": \"PRESENCIAL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let fecha;",
+                  "do {",
+                  "    fecha = new Date();",
+                  "    fecha.setDate(fecha.getDate() + 140 + Math.floor(Math.random() * 120));",
+                  "} while (fecha.getDay() === 0 || fecha.getDay() === 6);",
+                  "const dos = (n) => String(n).padStart(2, \"0\");",
+                  "const hora = 8 + Math.floor(Math.random() * 4);",
+                  "const minutos = Math.random() < 0.5 ? \"00\" : \"30\";",
+                  "pm.collectionVariables.set(\"hcFechaHora\", fecha.getFullYear() + \"-\" + dos(fecha.getMonth() + 1) + \"-\" + dos(fecha.getDate()) + \"T\" + dos(hora) + \":\" + minutos + \":00\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"hcCitaId\", pm.response.json().id);",
+                  "pm.collectionVariables.set(\"hcPacienteId\", pm.response.json().pacienteId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Confirmar la primera cita",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{hcCitaId}}/confirmar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{hcCitaId}}", "confirmar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico registra la atención con tres medicamentos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{hcCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{hcCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnostico\": \"Control con tratamiento\",\n  \"diagnosticos\": [\n    {\n      \"codigo\": \"I10\",\n      \"tipo\": \"DEFINITIVO\",\n      \"principal\": true\n    }\n  ],\n  \"pesoKg\": 72,\n  \"receta\": [\n    {\n      \"medicamento\": \"Paracetamol 500 mg\",\n      \"dosis\": \"1 tableta\",\n      \"frecuencia\": \"Cada 8 horas\",\n      \"duracion\": \"5 días\"\n    },\n    {\n      \"medicamento\": \"Amoxicilina 500 mg\",\n      \"dosis\": \"1 cápsula\",\n      \"frecuencia\": \"Cada 8 horas\",\n      \"duracion\": \"7 días\"\n    },\n    {\n      \"medicamento\": \"Ibuprofeno 400 mg\",\n      \"dosis\": \"1 tableta\",\n      \"frecuencia\": \"Cada 8 horas\",\n      \"duracion\": \"3 días\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const a = pm.response.json();",
+                  "pm.test(\"Guarda las tres líneas de la receta\", () => pm.expect(a.receta).to.have.length(3));",
+                  "pm.collectionVariables.set(\"hcAtencionId\", a.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Estado de cierre antes de cerrar",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/atenciones/{{hcAtencionId}}/cierre",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "atenciones",
+                "{{hcAtencionId}}",
+                "cierre"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Aún no está cerrada', () => pm.expect(pm.response.json().cerrada).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una adenda antes del cierre se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/atenciones/{{hcAtencionId}}/adendas",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "atenciones",
+                "{{hcAtencionId}}",
+                "adendas"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Nota\",\n  \"motivo\": \"Aclaración\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente no puede cerrar la atención",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/atenciones/{{hcAtencionId}}/cierre",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "atenciones",
+                "{{hcAtencionId}}",
+                "cierre"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otro médico no puede cerrar la atención",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/atenciones/{{hcAtencionId}}/cierre",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "atenciones",
+                "{{hcAtencionId}}",
+                "cierre"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedico2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico cierra y firma la atención",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/atenciones/{{hcAtencionId}}/cierre",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "atenciones",
+                "{{hcAtencionId}}",
+                "cierre"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const c = pm.response.json();",
+                  "pm.test('Queda cerrada con firma válida', () => { pm.expect(c.cerrada).to.eql(true); pm.expect(c.firmaValida).to.eql(true); });",
+                  "pm.test('Trae la huella corta', () => pm.expect(c.hashCorto).to.have.length(16));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cerrar de nuevo se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/atenciones/{{hcAtencionId}}/cierre",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "atenciones",
+                "{{hcAtencionId}}",
+                "cierre"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una atención cerrada no se edita directamente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{hcCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{hcCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnostico\": \"Otro\",\n  \"diagnosticos\": [\n    {\n      \"codigo\": \"I10\",\n      \"tipo\": \"DEFINITIVO\",\n      \"principal\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Corrección del diagnóstico con motivo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/atenciones/{{hcAtencionId}}/correcciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "atenciones",
+                "{{hcAtencionId}}",
+                "correcciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"campo\": \"DIAGNOSTICO\",\n  \"valorNuevo\": \"Hipertensión arterial controlada\",\n  \"motivo\": \"Precisión del diagnóstico\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Conserva el valor anterior', () => { const v = pm.response.json(); pm.expect(v.numero).to.eql(1); pm.expect(v.valorAnterior).to.eql('Control con tratamiento'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Corregir al mismo valor se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/atenciones/{{hcAtencionId}}/correcciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "atenciones",
+                "{{hcAtencionId}}",
+                "correcciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"campo\": \"DIAGNOSTICO\",\n  \"valorNuevo\": \"Hipertensión arterial controlada\",\n  \"motivo\": \"Sin cambio real\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Corrección sin motivo suficiente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/atenciones/{{hcAtencionId}}/correcciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "atenciones",
+                "{{hcAtencionId}}",
+                "correcciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"campo\": \"TRATAMIENTO\",\n  \"valorNuevo\": \"Reposo\",\n  \"motivo\": \"no\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Adenda con motivo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/atenciones/{{hcAtencionId}}/adendas",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "atenciones",
+                "{{hcAtencionId}}",
+                "adendas"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"El paciente refiere mejoría\",\n  \"motivo\": \"Seguimiento telefónico\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Es la versión dos', () => { const v = pm.response.json(); pm.expect(v.numero).to.eql(2); pm.expect(v.tipo).to.eql('ADENDA'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente ve la línea de tiempo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/atenciones/{{hcAtencionId}}/versiones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "atenciones",
+                "{{hcAtencionId}}",
+                "versiones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const h = pm.response.json();",
+                  "pm.test('Original y vigente difieren', () => { pm.expect(h.original.diagnostico).to.eql('Control con tratamiento'); pm.expect(h.vigente.diagnostico).to.eql('Hipertensión arterial controlada'); });",
+                  "pm.test('Dos versiones en orden', () => { pm.expect(h.versiones).to.have.length(2); pm.expect(h.versiones[0].numero).to.eql(1); pm.expect(h.versiones[1].numero).to.eql(2); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico sin relación no ve el historial",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/atenciones/{{hcAtencionId}}/versiones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "atenciones",
+                "{{hcAtencionId}}",
+                "versiones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedico2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otro paciente no ve el historial",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/atenciones/{{hcAtencionId}}/versiones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "atenciones",
+                "{{hcAtencionId}}",
+                "versiones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcPaciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recepción no ve el historial",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/atenciones/{{hcAtencionId}}/versiones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "atenciones",
+                "{{hcAtencionId}}",
+                "versiones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente descarga su historia en PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/mi-historia/impresion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hce", "mi-historia", "impresion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf'));",
+                  "pm.test('Tiene contenido', () => pm.expect(pm.response.stream.length).to.be.above(1000));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico con relación imprime la historia",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/pacientes/{{hcPacienteId}}/impresion",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "pacientes",
+                "{{hcPacienteId}}",
+                "impresion"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico sin relación no imprime la historia",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/pacientes/{{hcPacienteId}}/impresion",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "pacientes",
+                "{{hcPacienteId}}",
+                "impresion"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedico2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un administrador no imprime historias clínicas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/pacientes/{{hcPacienteId}}/impresion",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "hce",
+                "pacientes",
+                "{{hcPacienteId}}",
+                "impresion"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Las políticas de conservación las ve administración",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/conservacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hce", "conservacion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Todas tienen la depuración bloqueada', () => { const p = pm.response.json(); pm.expect(p).to.not.be.empty; pm.expect(p.every(x => x.depuracionBloqueada)).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico no ve las políticas de conservación",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/conservacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hce", "conservacion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ajustar un plazo no desbloquea la depuración",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/conservacion/HISTORIA_CLINICA",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hce", "conservacion", "HISTORIA_CLINICA"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"aniosMinimos\": 20,\n  \"referencia\": \"Plazo referencial por confirmar con el asesor legal\",\n  \"porConfirmar\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Sigue bloqueada', () => pm.expect(pm.response.json().depuracionBloqueada).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un plazo fuera de rango se rechaza",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/conservacion/HISTORIA_CLINICA",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hce", "conservacion", "HISTORIA_CLINICA"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"aniosMinimos\": 0,\n  \"referencia\": null,\n  \"porConfirmar\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un tipo de registro inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/conservacion/NO_EXISTE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hce", "conservacion", "NO_EXISTE"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"aniosMinimos\": 5,\n  \"referencia\": null,\n  \"porConfirmar\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Duplicados de pacientes para administración",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/pacientes/duplicados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hce", "pacientes", "duplicados"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente no ve los duplicados",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/pacientes/duplicados",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hce", "pacientes", "duplicados"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Fusionar exige motivo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/pacientes/fusion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hce", "pacientes", "fusion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origenId\": \"{{hcPacienteId}}\",\n  \"destinoId\": \"{{hcPacienteId}}\",\n  \"motivo\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "No se fusiona un paciente consigo mismo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/pacientes/fusion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hce", "pacientes", "fusion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origenId\": \"{{hcPacienteId}}\",\n  \"destinoId\": \"{{hcPacienteId}}\",\n  \"motivo\": \"Prueba de validación\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Solo administración fusiona historias",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/pacientes/fusion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hce", "pacientes", "fusion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origenId\": \"{{hcPacienteId}}\",\n  \"destinoId\": \"{{hcPacienteId}}\",\n  \"motivo\": \"Prueba de permisos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Historial de fusiones",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/hce/pacientes/fusiones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "hce", "pacientes", "fusiones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{hcAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "39 - Seguridad del paciente y guías clínicas",
+      "description": "Notificación de eventos adversos y casi incidentes con confidencialidad, análisis de causa, acciones de mejora, cierre con verificación, tablero y exportación, y la biblioteca de guías de práctica clínica con versiones y sugerencia por diagnóstico, con la seguridad por rol.",
+      "item": [
+        {
+          "name": "Login del médico",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('spMedicoToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login del paciente alérgico a la penicilina",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('spPacienteToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de enfermería",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"enfermeria@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('spEnfermeriaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login del administrador",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('spAdminToken', pm.response.json().token);",
+                  "pm.collectionVariables.set('spSufijo', String(Date.now()).slice(-8));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de calidad",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"calidad@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('spCalidadToken', pm.response.json().token);",
+                  "pm.collectionVariables.set('spCalidadId', pm.response.json().usuarioId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de gerencia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"gerencia@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('spGerenciaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente no notifica eventos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "eventos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"CASI_INCIDENTE\",\n  \"severidad\": \"LEVE\",\n  \"area\": \"Farmacia\",\n  \"descripcion\": \"Descripción suficientemente larga\",\n  \"anonimo\": false,\n  \"ocurridoEn\": \"2026-01-01T10:00:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Enfermería notifica un evento adverso",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "eventos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spEnfermeriaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"EVENTO_ADVERSO\",\n  \"severidad\": \"MODERADO\",\n  \"area\": \"Hospitalización\",\n  \"descripcion\": \"Caída de un paciente al levantarse de la cama\",\n  \"anonimo\": false,\n  \"ocurridoEn\": \"{{spHaceUnaHora}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date(Date.now() - 36 * 3600000); pm.collectionVariables.set('spHaceUnaHora', d.toISOString().slice(0, 19));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const e = pm.response.json(); pm.test('Tiene código EA', () => pm.expect(e.codigo).to.match(/^EA-\\d{4}-\\d{4}$/)); pm.collectionVariables.set('spEventoId', e.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un reporte anónimo no vincula paciente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "eventos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spEnfermeriaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"CASI_INCIDENTE\",\n  \"severidad\": \"LEVE\",\n  \"area\": \"Farmacia\",\n  \"descripcion\": \"Etiqueta equivocada detectada a tiempo\",\n  \"anonimo\": true,\n  \"ocurridoEn\": \"{{spHaceUnaHora}}\",\n  \"pacienteId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una fecha futura se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "eventos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spEnfermeriaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"CASI_INCIDENTE\",\n  \"severidad\": \"LEVE\",\n  \"area\": \"Farmacia\",\n  \"descripcion\": \"Descripción suficientemente larga\",\n  \"anonimo\": false,\n  \"ocurridoEn\": \"2099-01-01T10:00:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Enfermería ve sus propios reportes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos/mios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "eventos", "mios"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spEnfermeriaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye el reporte', () => pm.expect(pm.response.json().some(e => e.id === pm.collectionVariables.get('spEventoId'))).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Enfermería no ve todos los reportes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "eventos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spEnfermeriaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Calidad ve todos los reportes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "eventos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spCalidadToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gerencia ve todos los reportes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "eventos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El notificante ve su detalle",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos/{{spEventoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "eventos",
+                "{{spEventoId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spEnfermeriaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otro miembro del personal no ve el detalle",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos/{{spEventoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "eventos",
+                "{{spEventoId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gerencia no registra análisis",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos/{{spEventoId}}/analisis",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "eventos",
+                "{{spEventoId}}",
+                "analisis"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"metodo\": \"CINCO_PORQUES\",\n  \"causas\": [\n    {\n      \"categoria\": \"PORQUE\",\n      \"texto\": \"Sin barandas\"\n    }\n  ],\n  \"conclusion\": \"Falta de evaluación\",\n  \"clasificacion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Calidad registra el análisis de causa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos/{{spEventoId}}/analisis",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "eventos",
+                "{{spEventoId}}",
+                "analisis"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spCalidadToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"metodo\": \"CINCO_PORQUES\",\n  \"causas\": [\n    {\n      \"categoria\": \"PORQUE\",\n      \"texto\": \"No había barandas\"\n    },\n    {\n      \"categoria\": \"PORQUE\",\n      \"texto\": \"No se evaluó el riesgo de caída\"\n    }\n  ],\n  \"conclusion\": \"Falta de evaluación del riesgo al ingreso\",\n  \"clasificacion\": \"Caída sin lesión grave\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Pasa a en análisis', () => { const d = pm.response.json(); pm.expect(d.estado).to.eql('EN_ANALISIS'); pm.expect(d.causas).to.have.length(2); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "No se cierra sin acciones de mejora",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos/{{spEventoId}}/cierre",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "eventos",
+                "{{spEventoId}}",
+                "cierre"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spCalidadToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"verificacion\": \"Sin nuevas caídas\",\n  \"accionEficaz\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La fecha límite no puede estar en el pasado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos/{{spEventoId}}/acciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "eventos",
+                "{{spEventoId}}",
+                "acciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spCalidadToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Evaluar el riesgo al ingreso\",\n  \"responsableId\": \"{{spCalidadId}}\",\n  \"fechaLimite\": \"2020-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Calidad asigna una acción de mejora",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos/{{spEventoId}}/acciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "eventos",
+                "{{spEventoId}}",
+                "acciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spCalidadToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Evaluar el riesgo de caída al ingreso\",\n  \"responsableId\": \"{{spCalidadId}}\",\n  \"fechaLimite\": \"{{spLimite}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = new Date(Date.now() + 10 * 86400000); pm.collectionVariables.set('spLimite', d.toISOString().slice(0, 10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const d = pm.response.json(); pm.test('Queda en acción con una acción pendiente', () => { pm.expect(d.estado).to.eql('EN_ACCION'); pm.expect(d.acciones).to.have.length(1); }); pm.collectionVariables.set('spAccionId', d.acciones[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "No se cierra con acciones pendientes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos/{{spEventoId}}/cierre",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "eventos",
+                "{{spEventoId}}",
+                "cierre"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spCalidadToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"verificacion\": \"Sin nuevas caídas\",\n  \"accionEficaz\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Solo el responsable o calidad completan la acción",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/acciones/{{spAccionId}}/completar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "acciones",
+                "{{spAccionId}}",
+                "completar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spEnfermeriaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El responsable completa la acción",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/acciones/{{spAccionId}}/completar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "acciones",
+                "{{spAccionId}}",
+                "completar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spCalidadToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('La acción queda hecha', () => pm.expect(pm.response.json().acciones[0].estado).to.eql('HECHA'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Calidad cierra con verificación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos/{{spEventoId}}/cierre",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "eventos",
+                "{{spEventoId}}",
+                "cierre"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spCalidadToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"verificacion\": \"Sin nuevas caídas durante tres meses\",\n  \"accionEficaz\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda cerrado', () => pm.expect(pm.response.json().estado).to.eql('CERRADO'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un reporte cerrado no admite análisis",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos/{{spEventoId}}/analisis",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "eventos",
+                "{{spEventoId}}",
+                "analisis"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spCalidadToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"metodo\": \"CINCO_PORQUES\",\n  \"causas\": [\n    {\n      \"categoria\": \"PORQUE\",\n      \"texto\": \"Otra\"\n    }\n  ],\n  \"conclusion\": \"Otra\",\n  \"clasificacion\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El tablero lo ven calidad y gerencia",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/tablero",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "tablero"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae totales y tendencia', () => { const t = pm.response.json(); pm.expect(t.total).to.be.at.least(1); pm.expect(t.porMes).to.be.an('object'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El tablero no lo ve enfermería",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/tablero",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "tablero"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spEnfermeriaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Exportación a Excel de los reportes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/eventos/exportacion",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "eventos",
+                "exportacion"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spCalidadToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un libro de Excel', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('spreadsheetml'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El personal busca guías por diagnóstico",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/guias?q=hipertensi%C3%B3n",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "guias"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "hipertensi%C3%B3n"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Hay una guía de hipertensión', () => { const g = pm.response.json(); pm.expect(g.length).to.be.at.least(1); pm.collectionVariables.set('spGuiaId', g[0].id); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente no ve la biblioteca de guías",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/guias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "guias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Se sugiere la guía según el código CIE-10",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/guias/sugeridas?codigos=I10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "guias", "sugeridas"],
+              "query": [
+                {
+                  "key": "codigos",
+                  "value": "I10"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Sugiere la guía de hipertensión', () => pm.expect(pm.response.json().some(g => g.codigo === 'GPC-HTA')).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un diagnóstico sin guía no sugiere nada",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/guias/sugeridas?codigos=Z99",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "guias", "sugeridas"],
+              "query": [
+                {
+                  "key": "codigos",
+                  "value": "Z99"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Lista vacía', () => pm.expect(pm.response.json()).to.have.length(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Detalle de una guía con sus versiones",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/guias/{{spGuiaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "guias",
+                "{{spGuiaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae contenido y versiones', () => { const d = pm.response.json(); pm.expect(d.contenido).to.not.be.empty; pm.expect(d.versiones).to.not.be.empty; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico no publica guías",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/guias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "guias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"GPC-X\",\n  \"titulo\": \"X\",\n  \"resumen\": \"X\",\n  \"contenido\": \"X\",\n  \"codigosCie10\": [\n    \"I10\"\n  ],\n  \"vigenteDesde\": \"2026-01-01\",\n  \"porValidar\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Calidad publica una guía y luego la versiona",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/guias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "guias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spCalidadToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"GPC-{{spSufijo}}\",\n  \"titulo\": \"Guía de prueba {{spSufijo}}\",\n  \"resumen\": \"Resumen de prueba\",\n  \"contenido\": \"Contenido de la guía\",\n  \"codigosCie10\": [\n    \"Z98\"\n  ],\n  \"vigenteDesde\": \"2026-01-01\",\n  \"porValidar\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('spSufijo', String(Date.now()).slice(-8));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const d = pm.response.json(); pm.test('Versión uno', () => pm.expect(d.guia.version).to.eql(1)); pm.collectionVariables.set('spGuiaNuevaId', d.guia.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Publicar de nuevo el mismo código se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/guias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seguridad-paciente", "guias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spCalidadToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"GPC-{{spSufijo}}\",\n  \"titulo\": \"Otra\",\n  \"resumen\": \"X\",\n  \"contenido\": \"X\",\n  \"codigosCie10\": [\n    \"Z98\"\n  ],\n  \"vigenteDesde\": \"2026-01-01\",\n  \"porValidar\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una nueva versión deja obsoleta la anterior",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seguridad-paciente/guias/{{spGuiaNuevaId}}/versiones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "seguridad-paciente",
+                "guias",
+                "{{spGuiaNuevaId}}",
+                "versiones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{spCalidadToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"GPC-{{spSufijo}}\",\n  \"titulo\": \"Guía de prueba {{spSufijo}} actualizada\",\n  \"resumen\": \"Resumen nuevo\",\n  \"contenido\": \"Contenido nuevo\",\n  \"codigosCie10\": [\n    \"Z98\"\n  ],\n  \"vigenteDesde\": \"2026-02-01\",\n  \"porValidar\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Versión dos', () => pm.expect(pm.response.json().guia.version).to.eql(2));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "40 - Planes de tratamiento y seguimiento de crónicos",
+      "description": "Creación del plan con metas y controles, mediciones del paciente con alerta fuera de rango, tablero del médico, cumplimiento de controles y cierre del plan.",
+      "item": [
+        {
+          "name": "Login del médico",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('plMedicoToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login del paciente alérgico a la penicilina",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('plPacienteToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de otro paciente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria.rodriguez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('plPaciente2Token', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de enfermería",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"enfermeria@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('plEnfermeriaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Médicos para reservar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const garcia = pm.response.json().find(m => /García/.test(m.apellido));",
+                  "pm.test(\"Existe el médico con especialidad\", () => pm.expect(garcia.especialidades).to.not.be.empty);",
+                  "pm.collectionVariables.set(\"plMedicoId\", garcia.id);",
+                  "pm.collectionVariables.set(\"plEspecialidadId\", garcia.especialidades[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reservar la primera cita",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": \"{{plMedicoId}}\",\n  \"especialidadId\": \"{{plEspecialidadId}}\",\n  \"fechaHora\": \"{{plFechaHora}}\",\n  \"motivo\": \"Control con receta electrónica\",\n  \"modalidad\": \"PRESENCIAL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let fecha;",
+                  "do {",
+                  "    fecha = new Date();",
+                  "    fecha.setDate(fecha.getDate() + 140 + Math.floor(Math.random() * 120));",
+                  "} while (fecha.getDay() === 0 || fecha.getDay() === 6);",
+                  "const dos = (n) => String(n).padStart(2, \"0\");",
+                  "const hora = 8 + Math.floor(Math.random() * 4);",
+                  "const minutos = Math.random() < 0.5 ? \"00\" : \"30\";",
+                  "pm.collectionVariables.set(\"plFechaHora\", fecha.getFullYear() + \"-\" + dos(fecha.getMonth() + 1) + \"-\" + dos(fecha.getDate()) + \"T\" + dos(hora) + \":\" + minutos + \":00\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"plCitaId\", pm.response.json().id);",
+                  "pm.collectionVariables.set(\"plPacienteId\", pm.response.json().pacienteId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un paciente no crea planes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planes-tratamiento"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{plPacienteId}}\",\n  \"programa\": \"HIPERTENSION\",\n  \"diagnosticoCodigo\": \"I10\",\n  \"objetivos\": \"Mantener la presión arterial bajo control\",\n  \"intervenciones\": \"Dieta baja en sodio y caminata diaria\",\n  \"medicacion\": \"Según la receta vigente\",\n  \"frecuenciaControlDias\": 30,\n  \"cantidadControles\": 3,\n  \"metas\": [\n    {\n      \"parametro\": \"PRESION_SISTOLICA\",\n      \"valorMin\": 90,\n      \"valorMax\": 130,\n      \"unidad\": \"mmHg\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico crea el plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planes-tratamiento"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{plPacienteId}}\",\n  \"programa\": \"HIPERTENSION\",\n  \"diagnosticoCodigo\": \"I10\",\n  \"objetivos\": \"Mantener la presión arterial bajo control\",\n  \"intervenciones\": \"Dieta baja en sodio y caminata diaria\",\n  \"medicacion\": \"Según la receta vigente\",\n  \"frecuenciaControlDias\": 30,\n  \"cantidadControles\": 3,\n  \"metas\": [\n    {\n      \"parametro\": \"PRESION_SISTOLICA\",\n      \"valorMin\": 90,\n      \"valorMax\": 130,\n      \"unidad\": \"mmHg\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const d = pm.response.json();",
+                  "pm.test('Plan activo con tres controles', () => { pm.expect(d.estado).to.eql('ACTIVO'); pm.expect(d.controles.length).to.eql(3); });",
+                  "pm.collectionVariables.set('plPlanId', d.id);",
+                  "pm.collectionVariables.set('plControlId', d.controles[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una meta repetida se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planes-tratamiento"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{plPacienteId}}\",\n  \"programa\": \"HIPERTENSION\",\n  \"diagnosticoCodigo\": \"I10\",\n  \"objetivos\": \"Mantener la presión arterial bajo control\",\n  \"intervenciones\": \"Dieta baja en sodio y caminata diaria\",\n  \"medicacion\": \"Según la receta vigente\",\n  \"frecuenciaControlDias\": 30,\n  \"cantidadControles\": 3,\n  \"metas\": [\n    {\n      \"parametro\": \"PRESION_SISTOLICA\",\n      \"valorMin\": 90,\n      \"valorMax\": 130,\n      \"unidad\": \"mmHg\"\n    },\n    {\n      \"parametro\": \"PRESION_SISTOLICA\",\n      \"valorMin\": 90,\n      \"valorMax\": 130,\n      \"unidad\": \"mmHg\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sin metas se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planes-tratamiento"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{plPacienteId}}\",\n  \"programa\": \"HIPERTENSION\",\n  \"diagnosticoCodigo\": \"I10\",\n  \"objetivos\": \"Mantener la presión arterial bajo control\",\n  \"intervenciones\": \"Dieta baja en sodio y caminata diaria\",\n  \"medicacion\": \"Según la receta vigente\",\n  \"frecuenciaControlDias\": 30,\n  \"cantidadControles\": 3,\n  \"metas\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente ve su plan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/mios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planes-tratamiento", "mios"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye el plan', () => pm.expect(pm.response.json().some(p => p.id === pm.collectionVariables.get('plPlanId'))).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otro paciente no ve el plan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/{{plPlanId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planes-tratamiento", "{{plPlanId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPaciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente registra una medición normal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/{{plPlanId}}/mediciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planes-tratamiento",
+                "{{plPlanId}}",
+                "mediciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parametro\": \"PRESION_SISTOLICA\",\n  \"valor\": 120\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Sin alerta de rango', () => pm.expect(pm.response.json().mediciones.some(m => m.fueraDeRango)).to.be.false);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una medición fuera de rango se marca",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/{{plPlanId}}/mediciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planes-tratamiento",
+                "{{plPlanId}}",
+                "mediciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parametro\": \"PRESION_SISTOLICA\",\n  \"valor\": 170\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Marcada fuera de rango', () => pm.expect(pm.response.json().mediciones.some(m => m.fueraDeRango && m.valor === 170)).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una medición futura se rechaza",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/{{plPlanId}}/mediciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planes-tratamiento",
+                "{{plPlanId}}",
+                "mediciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parametro\": \"PRESION_SISTOLICA\",\n  \"valor\": 118,\n  \"medidoEn\": \"{{plFuturo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('plFuturo', new Date(Date.now() + 48 * 3600000).toISOString().slice(0, 19));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otro paciente no registra mediciones",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/{{plPlanId}}/mediciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planes-tratamiento",
+                "{{plPlanId}}",
+                "mediciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPaciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parametro\": \"PRESION_SISTOLICA\",\n  \"valor\": 120\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico ve el tablero de crónicos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/tablero",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planes-tratamiento", "tablero"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye el plan', () => pm.expect(pm.response.json().some(p => p.id === pm.collectionVariables.get('plPlanId'))).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente no ve el tablero",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/tablero",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planes-tratamiento", "tablero"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico cumple un control",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/{{plPlanId}}/controles/{{plControlId}}/cumplir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planes-tratamiento",
+                "{{plPlanId}}",
+                "controles",
+                "{{plControlId}}",
+                "cumplir"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Control cumplido', () => pm.expect(pm.response.json().controles[0].estado).to.eql('CUMPLIDO'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un control cumplido no se repite",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/{{plPlanId}}/controles/{{plControlId}}/cumplir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planes-tratamiento",
+                "{{plPlanId}}",
+                "controles",
+                "{{plControlId}}",
+                "cumplir"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente no cumple controles",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/{{plPlanId}}/controles/{{plControlId}}/cumplir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planes-tratamiento",
+                "{{plPlanId}}",
+                "controles",
+                "{{plControlId}}",
+                "cumplir"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico suspende el plan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/{{plPlanId}}/estado",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planes-tratamiento",
+                "{{plPlanId}}",
+                "estado"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"SUSPENDIDO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un plan suspendido no admite mediciones",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/{{plPlanId}}/mediciones",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planes-tratamiento",
+                "{{plPlanId}}",
+                "mediciones"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"parametro\": \"PRESION_SISTOLICA\",\n  \"valor\": 120\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico completa el plan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/{{plPlanId}}/estado",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planes-tratamiento",
+                "{{plPlanId}}",
+                "estado"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"COMPLETADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un plan completado no se reactiva",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planes-tratamiento/{{plPlanId}}/estado",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planes-tratamiento",
+                "{{plPlanId}}",
+                "estado"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"ACTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "variable": [
@@ -74181,6 +79331,216 @@
     {
       "key": "rxInteraccionId",
       "value": ""
+    },
+    {
+      "key": "hcPacienteToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcMedicoId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcEspecialidadId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcFechaHora",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcCitaId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcMedicoToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcAtencionId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcMedico2Token",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcPaciente2Token",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcRecepcionToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcPacienteId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcAdminToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "spPacienteToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "spEnfermeriaToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "spHaceUnaHora",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "spCalidadToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "spGerenciaToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "spEventoId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "spMedicoToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "spCalidadId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "spLimite",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "spAccionId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "spGuiaId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "spSufijo",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "spGuiaNuevaId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcFarmaciaToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcCajaToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcEnfermeriaToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "hcSufijo",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "spAdminToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "plMedicoToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "plPacienteToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "plPaciente2Token",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "plEnfermeriaToken",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "plMedicoId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "plEspecialidadId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "plFechaHora",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "plCitaId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "plPacienteId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "plPlanId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "plControlId",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "plFuturo",
+      "value": "",
+      "type": "any"
     }
   ]
 }

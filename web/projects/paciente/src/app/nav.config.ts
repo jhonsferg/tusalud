@@ -44,6 +44,23 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Mi historia impresa',
+    items: [
+      {
+        label: 'Mi plan de tratamiento',
+        icon: 'pi-heart',
+        link: '/mi-plan',
+        roles: ['ROLE_PACIENTE'],
+      },
+      {
+        label: 'Mi historia en PDF',
+        icon: 'pi-file-pdf',
+        link: '/mi-historia-impresa',
+        roles: ['ROLE_PACIENTE'],
+      },
+    ],
+  },
+  {
     title: 'Mi salud',
     items: [
       {
