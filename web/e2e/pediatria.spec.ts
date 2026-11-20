@@ -10,7 +10,7 @@ function cabecera(token: string): { Authorization: string } {
 
 async function elegirPaciente(page: Page, texto: string, nombre: string): Promise<void> {
   await page.getByLabel('Buscar por nombre o DNI').fill(texto);
-  await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+  await page.getByRole('button', { name: /Buscar$/ }).click();
   await page.getByRole('option', { name: new RegExp(nombre) }).click();
 }
 

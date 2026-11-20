@@ -8,7 +8,7 @@ function cabecera(token: string): { Authorization: string } {
 
 async function elegirPaciente(page: Page, texto: string, nombre: string): Promise<void> {
   await page.getByLabel('Buscar por nombre o DNI').fill(texto);
-  await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+  await page.getByRole('button', { name: /Buscar$/ }).click();
   await page.getByRole('option', { name: new RegExp(nombre) }).click();
 }
 
@@ -30,7 +30,7 @@ test.describe('odontología', () => {
     await expect(page.getByRole('button', { name: /^Pieza 11,.*Corona/ })).toBeVisible();
 
     await page.getByRole('button', { name: /^Pieza 16,/ }).click();
-    await expect(page.getByRole('heading', { name: 'Pieza 16' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Pieza 16', exact: true })).toBeVisible();
     await expect(page.getByText('solo lectura')).toBeVisible();
     await expect(page.getByText('Caries oclusal')).toBeVisible();
   });
@@ -47,7 +47,7 @@ test.describe('odontología', () => {
     await page.keyboard.press('ArrowDown');
     await expect(page.getByRole('button', { name: /^Pieza 45,/ })).toBeFocused();
     await page.keyboard.press('Enter');
-    await expect(page.getByRole('heading', { name: 'Pieza 45' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Pieza 45', exact: true })).toBeVisible();
   });
 
   test('la odontóloga registra un cambio en una pieza y queda en el historial', async ({

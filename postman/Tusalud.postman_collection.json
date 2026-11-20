@@ -36482,7 +36482,7 @@
                   "const j = pm.response.json();",
                   "pm.test('Objetivos y semáforo', () => {",
                   "  pm.expect(j.rpoObjetivoHoras).to.eql(24);",
-                  "  pm.expect(j.rtoObjetivoMinutos).to.eql(63);",
+                  "  pm.expect(j.rtoObjetivoMinutos).to.eql(60);",
                   "  pm.expect(['VERDE', 'AMARILLO', 'ROJO']).to.include(j.semaforo);",
                   "  pm.expect(j.ultimoRespaldoExitoso).to.not.be.null;",
                   "  pm.expect(j.ultimaPruebaExitosa).to.not.be.null;",
