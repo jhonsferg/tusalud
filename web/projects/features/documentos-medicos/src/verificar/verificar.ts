@@ -50,6 +50,15 @@ import { DocumentosMedicosApiService, VerificacionPublica } from '@tusalud/core'
                 El documento existe pero fue anulado por el médico emisor y ya no tiene validez.
               </p>
             }
+            @case ('ALTERADO') {
+              <h2>
+                <i class="pi pi-exclamation-triangle" aria-hidden="true"></i> Documento alterado
+              </h2>
+              <p>
+                El contenido no coincide con su firma electrónica. No lo aceptes y avisa al
+                establecimiento.
+              </p>
+            }
             @case ('VENCIDO') {
               <h2><i class="pi pi-clock" aria-hidden="true"></i> Documento vencido</h2>
               <p>El documento es auténtico pero su vigencia terminó.</p>
@@ -133,6 +142,7 @@ import { DocumentosMedicosApiService, VerificacionPublica } from '@tusalud/core'
     }
 
     .resultado[data-resultado='ANULADO'],
+    .resultado[data-resultado='ALTERADO'],
     .resultado[data-resultado='NO_ENCONTRADO'] {
       border-color: #b91c1c;
       background: #fef2f2;

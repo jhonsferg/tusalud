@@ -31,6 +31,12 @@ export const routes: Routes = [
         loadChildren: () => import('@tusalud/features/farmacia').then((m) => m.FARMACIA_ROUTES),
       },
       {
+        path: 'recetas-electronicas',
+        canMatch: [roleGuard('ROLE_FARMACIA')],
+        loadChildren: () =>
+          import('@tusalud/features/recetas').then((m) => m.DISPENSACION_RECETAS_ROUTES),
+      },
+      {
         path: 'almacen',
         loadChildren: () => import('@tusalud/features/almacen').then((m) => m.ALMACEN_ROUTES),
       },

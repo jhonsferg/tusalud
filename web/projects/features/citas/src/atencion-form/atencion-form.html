@@ -283,6 +283,15 @@
         [outlined]="true"
         [routerLink]="['/citas', id()]"
       />
+      @if (editando() && receta.length > 0) {
+        <p-button
+          label="Receta electrónica"
+          icon="pi pi-file-edit"
+          severity="secondary"
+          [outlined]="true"
+          [routerLink]="['/recetas/emitir', id()]"
+        />
+      }
       <p-button type="submit" label="Guardar atención" icon="pi pi-check" [loading]="guardando()" />
     </div>
   </form>

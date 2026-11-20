@@ -82,6 +82,11 @@ export const routes: Routes = [
           import('@tusalud/features/seguros').then((m) => m.SEGUROS_PACIENTE_ROUTES),
       },
       {
+        path: 'mis-recetas',
+        canMatch: [roleGuard('ROLE_PACIENTE')],
+        loadChildren: () => import('@tusalud/features/recetas').then((m) => m.MIS_RECETAS_ROUTES),
+      },
+      {
         path: 'mis-documentos',
         canMatch: [roleGuard('ROLE_PACIENTE')],
         loadChildren: () =>

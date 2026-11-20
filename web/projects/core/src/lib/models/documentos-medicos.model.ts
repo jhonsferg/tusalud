@@ -217,7 +217,7 @@ export interface ResumenIngresoDocumentos {
   consentimientos: ConsentimientoResumen[];
 }
 
-export type ResultadoVerificacion = 'VALIDO' | 'ANULADO' | 'VENCIDO' | 'NO_ENCONTRADO';
+export type ResultadoVerificacion = 'VALIDO' | 'ANULADO' | 'VENCIDO' | 'ALTERADO' | 'NO_ENCONTRADO';
 
 export interface VerificacionPublica {
   resultado: ResultadoVerificacion;

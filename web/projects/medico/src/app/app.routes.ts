@@ -85,6 +85,12 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'recetas',
+        canMatch: [roleGuard('ROLE_MEDICO')],
+        loadChildren: () =>
+          import('@tusalud/features/recetas').then((m) => m.RECETAS_MEDICO_ROUTES),
+      },
+      {
         path: 'vacunacion',
         canMatch: [roleGuard('ROLE_MEDICO')],
         loadChildren: () =>

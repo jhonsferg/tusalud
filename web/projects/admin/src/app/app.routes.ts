@@ -137,6 +137,12 @@ export const routes: Routes = [
           import('@tusalud/features/pediatria').then((m) => m.ESQUEMAS_VACUNACION_ADMIN_ROUTES),
       },
       {
+        path: 'catalogo-medicamentos',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () =>
+          import('@tusalud/features/recetas').then((m) => m.CATALOGO_MEDICAMENTOS_ROUTES),
+      },
+      {
         path: 'procedimientos-odontologicos',
         canMatch: [roleGuard('ROLE_ADMIN')],
         loadChildren: () =>

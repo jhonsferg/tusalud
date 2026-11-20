@@ -55,6 +55,7 @@ export type TipoNotificacion =
   | 'CIRUGIA_ASIGNADA'
   | 'ESTERILIZACION_ALERTA'
   | 'PLAN_ODONTOLOGICO_PRESENTADO'
+  | 'RECETA_EMITIDA'
   | 'SISTEMA';
 
 export interface NotificacionResponse {

@@ -56,6 +56,7 @@ export const ICONO_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   CIRUGIA_ASIGNADA: 'pi-calendar-plus',
   ESTERILIZACION_ALERTA: 'pi-exclamation-triangle',
   PLAN_ODONTOLOGICO_PRESENTADO: 'pi-file-edit',
+  RECETA_EMITIDA: 'pi-file-edit',
   INCIDENTE_DATOS: 'pi-exclamation-triangle',
   SISTEMA: 'pi-info-circle',
 };
@@ -116,6 +117,7 @@ export const COLOR_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   CIRUGIA_ASIGNADA: '#1d4ed8',
   ESTERILIZACION_ALERTA: '#dc2626',
   PLAN_ODONTOLOGICO_PRESENTADO: '#1d4ed8',
+  RECETA_EMITIDA: '#0f766e',
   INCIDENTE_DATOS: '#dc2626',
   SISTEMA: '#64748b',
 };

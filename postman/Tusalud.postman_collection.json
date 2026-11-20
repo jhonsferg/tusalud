@@ -35806,7 +35806,7 @@
                   "const j = pm.response.json();",
                   "pm.test('Variables permitidas y una plantilla por aviso y canal', () => {",
                   "  pm.expect(j.variables).to.eql(['centro', 'enlace', 'nombre']);",
-                  "  pm.expect(j.plantillas.length).to.eql(66);",
+                  "  pm.expect(j.plantillas.length).to.eql(69);",
                   "  const seg = j.plantillas.filter(p => p.categoria === 'Seguridad');",
                   "  pm.expect(seg.length).to.be.at.least(15);",
                   "});",
@@ -67265,6 +67265,5480 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "37 - Recetas electrónicas y medicamentos",
+      "description": "Catálogo de medicamentos por denominación común, alertas de alergias, interacciones, dosis y embarazo al prescribir, receta electrónica numerada y firmada, anulación y reemplazo, dispensación parcial en farmacia, verificación pública y seguridad por rol. Los datos de interacciones y dosis son de demostración y están por validar con un químico farmacéutico.",
+      "item": [
+        {
+          "name": "Login del médico",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('rxMedicoToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login del médico sin relación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dra.vega@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('rxMedico2Token', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login del paciente alérgico a la penicilina",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('rxPacienteToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de otro paciente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria.rodriguez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('rxPaciente2Token', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de farmacia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"farmacia@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('rxFarmaciaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de recepción",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recepcion@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('rxRecepcionToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de caja",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"caja@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('rxCajaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login de enfermería",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"enfermeria@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('rxEnfermeriaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login del administrador",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('rxAdminToken', pm.response.json().token);",
+                  "pm.collectionVariables.set('rxSufijo', String(Date.now()).slice(-8));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Médicos para reservar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const garcia = pm.response.json().find(m => /García/.test(m.apellido));",
+                  "pm.test(\"Existe el médico con especialidad\", () => pm.expect(garcia.especialidades).to.not.be.empty);",
+                  "pm.collectionVariables.set(\"rxMedicoId\", garcia.id);",
+                  "pm.collectionVariables.set(\"rxEspecialidadId\", garcia.especialidades[0].id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reservar la primera cita",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": \"{{rxMedicoId}}\",\n  \"especialidadId\": \"{{rxEspecialidadId}}\",\n  \"fechaHora\": \"{{rxFechaHora}}\",\n  \"motivo\": \"Control con receta electrónica\",\n  \"modalidad\": \"PRESENCIAL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let fecha;",
+                  "do {",
+                  "    fecha = new Date();",
+                  "    fecha.setDate(fecha.getDate() + 140 + Math.floor(Math.random() * 120));",
+                  "} while (fecha.getDay() === 0 || fecha.getDay() === 6);",
+                  "const dos = (n) => String(n).padStart(2, \"0\");",
+                  "const hora = 8 + Math.floor(Math.random() * 4);",
+                  "const minutos = Math.random() < 0.5 ? \"00\" : \"30\";",
+                  "pm.collectionVariables.set(\"rxFechaHora\", fecha.getFullYear() + \"-\" + dos(fecha.getMonth() + 1) + \"-\" + dos(fecha.getDate()) + \"T\" + dos(hora) + \":\" + minutos + \":00\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"rxCitaId\", pm.response.json().id);",
+                  "pm.collectionVariables.set(\"rxPacienteId\", pm.response.json().pacienteId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Confirmar la primera cita",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{rxCitaId}}/confirmar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{rxCitaId}}", "confirmar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico registra la atención con tres medicamentos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{rxCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{rxCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnostico\": \"Control con tratamiento\",\n  \"diagnosticos\": [\n    {\n      \"codigo\": \"I10\",\n      \"tipo\": \"DEFINITIVO\",\n      \"principal\": true\n    }\n  ],\n  \"pesoKg\": 72,\n  \"receta\": [\n    {\n      \"medicamento\": \"Paracetamol 500 mg\",\n      \"dosis\": \"1 tableta\",\n      \"frecuencia\": \"Cada 8 horas\",\n      \"duracion\": \"5 días\"\n    },\n    {\n      \"medicamento\": \"Amoxicilina 500 mg\",\n      \"dosis\": \"1 cápsula\",\n      \"frecuencia\": \"Cada 8 horas\",\n      \"duracion\": \"7 días\"\n    },\n    {\n      \"medicamento\": \"Ibuprofeno 400 mg\",\n      \"dosis\": \"1 tableta\",\n      \"frecuencia\": \"Cada 8 horas\",\n      \"duracion\": \"3 días\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const a = pm.response.json();",
+                  "pm.test(\"Guarda las tres líneas de la receta\", () => pm.expect(a.receta).to.have.length(3));",
+                  "pm.collectionVariables.set(\"rxAtencionId\", a.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar paracetamol por su principio activo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos?q=paracetamol",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "paracetamol"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test(\"El catálogo devuelve resultados\", () => pm.expect(lista.length).to.be.at.least(1));",
+                  "const m = lista.find(x => x.dci === 'Paracetamol' && x.concentracion === '500 mg' && x.formaFarmaceutica === 'Tableta');",
+                  "pm.test(\"Encuentra la presentación buscada\", () => pm.expect(m).to.not.be.undefined);",
+                  "pm.collectionVariables.set(\"rxMedParaId\", m.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar amoxicilina",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos?q=amoxicilina",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "amoxicilina"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test(\"El catálogo devuelve resultados\", () => pm.expect(lista.length).to.be.at.least(1));",
+                  "const m = lista.find(x => x.dci === 'Amoxicilina' && x.concentracion === '500 mg');",
+                  "pm.test(\"Encuentra la presentación buscada\", () => pm.expect(m).to.not.be.undefined);",
+                  "pm.collectionVariables.set(\"rxMedAmoxId\", m.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar warfarina",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos?q=warfarina",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "warfarina"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test(\"El catálogo devuelve resultados\", () => pm.expect(lista.length).to.be.at.least(1));",
+                  "const m = lista.find(x => x.dci === 'Warfarina');",
+                  "pm.test(\"Encuentra la presentación buscada\", () => pm.expect(m).to.not.be.undefined);",
+                  "pm.collectionVariables.set(\"rxMedWarfId\", m.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar ibuprofeno",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos?q=ibuprofeno",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "ibuprofeno"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test(\"El catálogo devuelve resultados\", () => pm.expect(lista.length).to.be.at.least(1));",
+                  "const m = lista.find(x => x.dci === 'Ibuprofeno' && x.concentracion === '400 mg');",
+                  "pm.test(\"Encuentra la presentación buscada\", () => pm.expect(m).to.not.be.undefined);",
+                  "pm.collectionVariables.set(\"rxMedIbuId\", m.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar diazepam de control especial",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos?q=diazepam",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "diazepam"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test(\"El catálogo devuelve resultados\", () => pm.expect(lista.length).to.be.at.least(1));",
+                  "const m = lista.find(x => x.dci === 'Diazepam' && x.formaFarmaceutica === 'Tableta');",
+                  "pm.test(\"Encuentra la presentación buscada\", () => pm.expect(m).to.not.be.undefined);",
+                  "pm.collectionVariables.set(\"rxMedDiazId\", m.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar cefalexina",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos?q=cefalexina",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "cefalexina"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test(\"El catálogo devuelve resultados\", () => pm.expect(lista.length).to.be.at.least(1));",
+                  "const m = lista.find(x => x.dci === 'Cefalexina');",
+                  "pm.test(\"Encuentra la presentación buscada\", () => pm.expect(m).to.not.be.undefined);",
+                  "pm.collectionVariables.set(\"rxMedCefaId\", m.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La búsqueda por clase terapéutica también funciona",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos?q=anticoagulantes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "anticoagulantes"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Trae anticoagulantes\", () => pm.expect(pm.response.json().some(m => m.dci === 'Warfarina')).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un medicamento de control especial lo indica",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/{{rxMedDiazId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "{{rxMedDiazId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es psicotrópico\", () => pm.expect(pm.response.json().categoriaControl).to.eql(\"PSICOTROPICO\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Farmacia consulta el catálogo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos?q=paracetamol",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "paracetamol"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente no consulta el catálogo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos?q=paracetamol",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "paracetamol"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recepción no consulta el catálogo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos?q=paracetamol",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "paracetamol"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sin sesión el catálogo es 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos?q=paracetamol",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "paracetamol"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El administrador lista los principios activos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/principios-activos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "principios-activos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Hay un catálogo amplio de demostración\", () => pm.expect(pm.response.json().length).to.be.at.least(100));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El administrador lista las interacciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/interacciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "interacciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Hay interacciones de demostración\", () => pm.expect(pm.response.json().length).to.be.at.least(50));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente no ve las interacciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/interacciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "interacciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Amoxicilina con alergia a la penicilina es contraindicada",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "alertas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{rxPacienteId}}\",\n  \"items\": [\n    {\n      \"medicamentoId\": \"{{rxMedAmoxId}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json();",
+                  "const a = r.alertas.find(x => x.tipo === \"ALERGIA\");",
+                  "pm.test(\"Detecta la alergia directa\", () => pm.expect(a.severidad).to.eql(\"CONTRAINDICADA\"));",
+                  "pm.test(\"Exige una justificación de treinta caracteres\", () => { pm.expect(a.requiereJustificacion).to.be.true; pm.expect(a.minimoJustificacion).to.eql(30); });",
+                  "pm.test(\"Cuenta lo pendiente de justificar\", () => { pm.expect(r.pendientesDeJustificar).to.eql(1); pm.expect(r.hayContraindicadas).to.be.true; });",
+                  "pm.collectionVariables.set(\"rxClaveAmox\", a.clave);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cefalexina con alergia a la penicilina es una reacción cruzada grave",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "alertas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{rxPacienteId}}\",\n  \"items\": [\n    {\n      \"medicamentoId\": \"{{rxMedCefaId}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const a = pm.response.json().alertas.find(x => x.tipo === \"ALERGIA\");",
+                  "pm.test(\"Es grave y no contraindicada\", () => pm.expect(a.severidad).to.eql(\"GRAVE\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Warfarina con ibuprofeno es una interacción grave",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "alertas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{rxPacienteId}}\",\n  \"items\": [\n    {\n      \"medicamentoId\": \"{{rxMedWarfId}}\"\n    },\n    {\n      \"medicamentoId\": \"{{rxMedIbuId}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const a = pm.response.json().alertas.find(x => x.tipo === \"INTERACCION\");",
+                  "pm.test(\"La interacción es grave y trae recomendación\", () => { pm.expect(a.severidad).to.eql(\"GRAVE\"); pm.expect(a.recomendacion).to.not.be.empty; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una dosis diaria sobre el máximo es una alerta grave",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "alertas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{rxPacienteId}}\",\n  \"items\": [\n    {\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"dosisUnitariaMg\": 1000,\n      \"vecesPorDia\": 5\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Alerta la dosis máxima\", () => pm.expect(pm.response.json().alertas.some(x => x.tipo === \"DOSIS_MAXIMA\" && x.severidad === \"GRAVE\")).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una dosis dentro del máximo no alerta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "alertas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{rxPacienteId}}\",\n  \"items\": [\n    {\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"dosisUnitariaMg\": 500,\n      \"vecesPorDia\": 3\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Sin alerta de dosis\", () => pm.expect(pm.response.json().alertas.some(x => x.tipo === \"DOSIS_MAXIMA\")).to.be.false);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El mismo principio activo dos veces es una duplicidad",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "alertas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{rxPacienteId}}\",\n  \"items\": [\n    {\n      \"medicamentoId\": \"{{rxMedParaId}}\"\n    },\n    {\n      \"medicamentoId\": \"{{rxMedParaId}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Alerta la duplicidad\", () => pm.expect(pm.response.json().alertas.some(x => x.tipo === \"DUPLICIDAD\")).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Con embarazo marcado el diazepam es una alerta grave",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "alertas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{rxPacienteId}}\",\n  \"items\": [\n    {\n      \"medicamentoId\": \"{{rxMedDiazId}}\"\n    }\n  ],\n  \"embarazada\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Alerta el embarazo\", () => pm.expect(pm.response.json().alertas.some(x => x.tipo === \"EMBARAZO\" && x.severidad === \"GRAVE\")).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico sin relación no evalúa alertas del paciente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "alertas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedico2Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{rxPacienteId}}\",\n  \"items\": [\n    {\n      \"medicamentoId\": \"{{rxMedParaId}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente no evalúa alertas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "alertas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{rxPacienteId}}\",\n  \"items\": [\n    {\n      \"medicamentoId\": \"{{rxMedParaId}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Farmacia no evalúa alertas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "alertas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{rxPacienteId}}\",\n  \"items\": [\n    {\n      \"medicamentoId\": \"{{rxMedParaId}}\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una lista de medicamentos vacía es 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "alertas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{rxPacienteId}}\",\n  \"items\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Emitir sin justificar la contraindicación es 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"atencionId\": \"{{rxAtencionId}}\",\n  \"indicaciones\": \"Tomar con abundante agua\",\n  \"items\": [\n    {\n      \"atencionPosicion\": 0,\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"cantidad\": 10\n    },\n    {\n      \"atencionPosicion\": 1,\n      \"medicamentoId\": \"{{rxMedAmoxId}}\",\n      \"cantidad\": 21\n    },\n    {\n      \"atencionPosicion\": 2,\n      \"medicamentoId\": \"{{rxMedIbuId}}\",\n      \"cantidad\": 6\n    }\n  ],\n  \"justificaciones\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test(\"Pide las justificaciones\", () => pm.expect(pm.response.json().message).to.include(\"Faltan justificaciones\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una justificación corta no basta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"atencionId\": \"{{rxAtencionId}}\",\n  \"indicaciones\": \"Tomar con abundante agua\",\n  \"items\": [\n    {\n      \"atencionPosicion\": 0,\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"cantidad\": 10\n    },\n    {\n      \"atencionPosicion\": 1,\n      \"medicamentoId\": \"{{rxMedAmoxId}}\",\n      \"cantidad\": 21\n    },\n    {\n      \"atencionPosicion\": 2,\n      \"medicamentoId\": \"{{rxMedIbuId}}\",\n      \"cantidad\": 6\n    }\n  ],\n  \"justificaciones\": [\n    {\n      \"clave\": \"{{rxClaveAmox}}\",\n      \"texto\": \"La tolera\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una posición que no existe en la atención es 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"atencionId\": \"{{rxAtencionId}}\",\n  \"indicaciones\": \"Tomar con abundante agua\",\n  \"items\": [\n    {\n      \"atencionPosicion\": 9,\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"cantidad\": 1\n    }\n  ],\n  \"justificaciones\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una posición repetida es 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"atencionId\": \"{{rxAtencionId}}\",\n  \"indicaciones\": \"Tomar con abundante agua\",\n  \"items\": [\n    {\n      \"atencionPosicion\": 0,\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"cantidad\": 1\n    },\n    {\n      \"atencionPosicion\": 0,\n      \"medicamentoId\": \"{{rxMedIbuId}}\",\n      \"cantidad\": 1\n    }\n  ],\n  \"justificaciones\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una cantidad cero es 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"atencionId\": \"{{rxAtencionId}}\",\n  \"indicaciones\": \"Tomar con abundante agua\",\n  \"items\": [\n    {\n      \"atencionPosicion\": 0,\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"cantidad\": 0\n    }\n  ],\n  \"justificaciones\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente no emite recetas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"atencionId\": \"{{rxAtencionId}}\",\n  \"indicaciones\": \"Tomar con abundante agua\",\n  \"items\": [\n    {\n      \"atencionPosicion\": 0,\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"cantidad\": 10\n    },\n    {\n      \"atencionPosicion\": 1,\n      \"medicamentoId\": \"{{rxMedAmoxId}}\",\n      \"cantidad\": 21\n    },\n    {\n      \"atencionPosicion\": 2,\n      \"medicamentoId\": \"{{rxMedIbuId}}\",\n      \"cantidad\": 6\n    }\n  ],\n  \"justificaciones\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Farmacia no emite recetas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"atencionId\": \"{{rxAtencionId}}\",\n  \"indicaciones\": \"Tomar con abundante agua\",\n  \"items\": [\n    {\n      \"atencionPosicion\": 0,\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"cantidad\": 10\n    },\n    {\n      \"atencionPosicion\": 1,\n      \"medicamentoId\": \"{{rxMedAmoxId}}\",\n      \"cantidad\": 21\n    },\n    {\n      \"atencionPosicion\": 2,\n      \"medicamentoId\": \"{{rxMedIbuId}}\",\n      \"cantidad\": 6\n    }\n  ],\n  \"justificaciones\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico que no atendió no emite la receta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedico2Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"atencionId\": \"{{rxAtencionId}}\",\n  \"indicaciones\": \"Tomar con abundante agua\",\n  \"items\": [\n    {\n      \"atencionPosicion\": 0,\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"cantidad\": 10\n    },\n    {\n      \"atencionPosicion\": 1,\n      \"medicamentoId\": \"{{rxMedAmoxId}}\",\n      \"cantidad\": 21\n    },\n    {\n      \"atencionPosicion\": 2,\n      \"medicamentoId\": \"{{rxMedIbuId}}\",\n      \"cantidad\": 6\n    }\n  ],\n  \"justificaciones\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sin sesión emitir es 401",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"atencionId\": \"{{rxAtencionId}}\",\n  \"indicaciones\": \"Tomar con abundante agua\",\n  \"items\": [\n    {\n      \"atencionPosicion\": 0,\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"cantidad\": 10\n    },\n    {\n      \"atencionPosicion\": 1,\n      \"medicamentoId\": \"{{rxMedAmoxId}}\",\n      \"cantidad\": 21\n    },\n    {\n      \"atencionPosicion\": 2,\n      \"medicamentoId\": \"{{rxMedIbuId}}\",\n      \"cantidad\": 6\n    }\n  ],\n  \"justificaciones\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico emite la receta con la justificación registrada",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"atencionId\": \"{{rxAtencionId}}\",\n  \"indicaciones\": \"Tomar con abundante agua\",\n  \"items\": [\n    {\n      \"atencionPosicion\": 0,\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"cantidad\": 10\n    },\n    {\n      \"atencionPosicion\": 1,\n      \"medicamentoId\": \"{{rxMedAmoxId}}\",\n      \"cantidad\": 21\n    },\n    {\n      \"atencionPosicion\": 2,\n      \"medicamentoId\": \"{{rxMedIbuId}}\",\n      \"cantidad\": 6\n    }\n  ],\n  \"justificaciones\": [\n    {\n      \"clave\": \"{{rxClaveAmox}}\",\n      \"texto\": \"Alergia descartada con una prueba cutánea negativa reciente\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Numeración correlativa\", () => pm.expect(r.numero).to.match(/^RX-\\d{4}-\\d{6}$/));",
+                  "pm.test(\"Queda emitida, vigente y firmada\", () => { pm.expect(r.estado).to.eql(\"EMITIDA\"); pm.expect(r.vigente).to.be.true; pm.expect(r.firmaValida).to.be.true; });",
+                  "pm.test(\"Marca la firma de prueba como no acreditada\", () => pm.expect(r.certificadoDePrueba).to.be.true);",
+                  "pm.test(\"Trae el código de verificación pública\", () => pm.expect(r.codigoVerificacion).to.match(/^[A-HJ-NP-Z2-9]{4}(-[A-HJ-NP-Z2-9]{4}){3}$/));",
+                  "pm.test(\"Conserva el diagnóstico CIE-10 principal\", () => pm.expect(r.diagnosticoCodigo).to.eql(\"I10\"));",
+                  "pm.test(\"Registra la alerta justificada con su autor\", () => { const a = r.alertas.find(x => x.clave === pm.collectionVariables.get(\"rxClaveAmox\")); pm.expect(a.justificacion).to.not.be.empty; pm.expect(a.justificadaPor).to.not.be.empty; });",
+                  "pm.test(\"Los tres ítems nacen sin dispensar\", () => { pm.expect(r.items).to.have.length(3); pm.expect(r.items.every(i => i.cantidadDispensada === 0 && i.pendiente === i.cantidad)).to.be.true; });",
+                  "pm.collectionVariables.set(\"rxRecetaId\", r.id);",
+                  "pm.collectionVariables.set(\"rxRecetaNumero\", r.numero);",
+                  "pm.collectionVariables.set(\"rxRecetaCodigo\", r.codigoVerificacion);",
+                  "pm.collectionVariables.set(\"rxItemParaId\", r.items.find(i => i.atencionPosicion === 0).id);",
+                  "pm.collectionVariables.set(\"rxItemAmoxId\", r.items.find(i => i.atencionPosicion === 1).id);",
+                  "pm.collectionVariables.set(\"rxItemIbuId\", r.items.find(i => i.atencionPosicion === 2).id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La atención no admite una segunda receta vigente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"atencionId\": \"{{rxAtencionId}}\",\n  \"indicaciones\": \"Tomar con abundante agua\",\n  \"items\": [\n    {\n      \"atencionPosicion\": 0,\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"cantidad\": 1\n    }\n  ],\n  \"justificaciones\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Modificar la atención con una receta vigente es 409",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{rxCitaId}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{rxCitaId}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnostico\": \"Cambio\",\n  \"diagnosticos\": [\n    {\n      \"codigo\": \"I10\",\n      \"tipo\": \"DEFINITIVO\",\n      \"principal\": true\n    }\n  ],\n  \"receta\": [\n    {\n      \"medicamento\": \"Otro\",\n      \"dosis\": \"1\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test(\"Pide anular la receta\", () => pm.expect(pm.response.json().message).to.include(\"receta electrónica\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico ve la receta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Ve las alertas justificadas\", () => pm.expect(pm.response.json().alertas.length).to.be.at.least(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente ve su receta sin las alertas internas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Ve la receta firmada\", () => pm.expect(r.firmaValida).to.be.true);",
+                  "pm.test(\"No ve las justificaciones del médico\", () => pm.expect(r.alertas).to.have.length(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otro paciente no ve la receta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPaciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico sin relación no ve la receta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedico2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recepción no ve la receta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Caja no ve la receta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El administrador no ve la receta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Enfermería no ve la receta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxEnfermeriaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una receta que no existe es 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/00000000-0000-4000-8000-000000000000",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "recetas",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente descarga el PDF de su receta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}", "pdf"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es un PDF\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico descarga el PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}", "pdf"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es un PDF\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Farmacia descarga el PDF para dispensar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}", "pdf"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es un PDF\", () => pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/pdf\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recepción no descarga el PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}", "pdf"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otro paciente no descarga el PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}", "pdf"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPaciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verificar la firma de la receta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}/firma",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}", "firma"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const f = pm.response.json();",
+                  "pm.test(\"El contenido no fue alterado y la firma es válida\", () => { pm.expect(f.hashCoincide).to.be.true; pm.expect(f.firmaValida).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente verifica la firma de su receta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}/firma",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}", "firma"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otro paciente no verifica la firma",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}/firma",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}", "firma"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPaciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mis recetas del paciente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/mias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "mias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Incluye la receta emitida\", () => pm.expect(pm.response.json().some(r => r.id === pm.collectionVariables.get(\"rxRecetaId\"))).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otro paciente no ve recetas ajenas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/mias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "mias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPaciente2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"No incluye la receta del otro paciente\", () => pm.expect(pm.response.json().some(r => r.id === pm.collectionVariables.get(\"rxRecetaId\"))).to.be.false);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico no tiene la ruta del paciente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/mias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "mias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recetas emitidas por el médico",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/emitidas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "emitidas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Incluye la receta\", () => pm.expect(pm.response.json().some(r => r.numero === pm.collectionVariables.get(\"rxRecetaNumero\"))).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recetas del paciente para el médico con relación",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/paciente/{{rxPacienteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "paciente", "{{rxPacienteId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico sin relación no ve las recetas del paciente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/paciente/{{rxPacienteId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "paciente", "{{rxPacienteId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedico2Token}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recetas de la atención",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/atencion/{{rxAtencionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "atencion", "{{rxAtencionId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Trae una receta\", () => pm.expect(pm.response.json()).to.have.length(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente recibió el aviso de la receta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notificaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notificaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const cuerpo = pm.response.json();",
+                  "const lista = Array.isArray(cuerpo) ? cuerpo : (cuerpo.content || []);",
+                  "pm.test(\"Tiene el aviso sin datos clínicos\", () => { const n = lista.find(x => x.tipo === \"RECETA_EMITIDA\"); pm.expect(n).to.not.be.undefined; pm.expect(n.mensaje).to.not.include(\"Amoxicilina\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verificación pública de la receta",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/verificacion/{{rxRecetaCodigo}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "verificacion", "{{rxRecetaCodigo}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const v = pm.response.json();",
+                  "pm.test(\"Es válida y de tipo receta\", () => { pm.expect(v.resultado).to.eql(\"VALIDO\"); pm.expect(v.tipo).to.eql(\"Receta electrónica\"); });",
+                  "pm.test(\"No expone al paciente ni su diagnóstico\", () => { const t = JSON.stringify(v); pm.expect(t).to.not.include(\"Juan\"); pm.expect(t).to.not.include(\"12345678\"); pm.expect(t).to.not.include(\"I10\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Farmacia busca la receta por su número",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/farmacia?q={{rxRecetaNumero}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "farmacia"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{rxRecetaNumero}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"La encuentra\", () => pm.expect(pm.response.json().some(r => r.id === pm.collectionVariables.get(\"rxRecetaId\"))).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Farmacia ve solo lo necesario para dispensar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/farmacia/{{rxRecetaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "farmacia", "{{rxRecetaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const t = pm.response.text();",
+                  "pm.test(\"Sin diagnóstico, indicaciones ni firma\", () => { pm.expect(t).to.not.include(\"diagnostico\"); pm.expect(t).to.not.include(\"indicaciones\"); pm.expect(t).to.not.include(\"firma\"); });",
+                  "pm.test(\"Cada ítem trae su producto de farmacia\", () => pm.expect(pm.response.json().items.every(i => i.productoId)).to.be.true);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico no usa la vista de farmacia",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/farmacia/{{rxRecetaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "farmacia", "{{rxRecetaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente no usa la vista de farmacia",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/farmacia",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "farmacia"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recepción no usa la vista de farmacia",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/farmacia",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "farmacia"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxRecepcionToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico no dispensa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/farmacia/{{rxRecetaId}}/dispensar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "recetas",
+                "farmacia",
+                "{{rxRecetaId}}",
+                "dispensar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"itemId\": \"{{rxItemParaId}}\",\n      \"cantidad\": 1\n    }\n  ],\n  \"metodoPago\": \"EFECTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un ítem ajeno a la receta es 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/farmacia/{{rxRecetaId}}/dispensar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "recetas",
+                "farmacia",
+                "{{rxRecetaId}}",
+                "dispensar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"itemId\": \"00000000-0000-4000-8000-000000000000\",\n      \"cantidad\": 1\n    }\n  ],\n  \"metodoPago\": \"EFECTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una cantidad cero es 400 al dispensar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/farmacia/{{rxRecetaId}}/dispensar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "recetas",
+                "farmacia",
+                "{{rxRecetaId}}",
+                "dispensar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"itemId\": \"{{rxItemParaId}}\",\n      \"cantidad\": 0\n    }\n  ],\n  \"metodoPago\": \"EFECTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dispensación parcial del paracetamol",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/farmacia/{{rxRecetaId}}/dispensar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "recetas",
+                "farmacia",
+                "{{rxRecetaId}}",
+                "dispensar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"itemId\": \"{{rxItemParaId}}\",\n      \"cantidad\": 4\n    }\n  ],\n  \"metodoPago\": \"EFECTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const d = pm.response.json();",
+                  "pm.test(\"Emite el comprobante\", () => pm.expect(d.comprobante).to.not.be.empty);",
+                  "pm.test(\"Dispensa cuatro unidades\", () => pm.expect(d.items[0].cantidad).to.eql(4));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La receta queda dispensada en parte",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Estado parcial\", () => pm.expect(r.estado).to.eql(\"DISPENSADA_PARCIAL\"));",
+                  "pm.test(\"Quedan seis pendientes\", () => pm.expect(r.items.find(i => i.atencionPosicion === 0).pendiente).to.eql(6));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dispensar más de lo pendiente es 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/farmacia/{{rxRecetaId}}/dispensar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "recetas",
+                "farmacia",
+                "{{rxRecetaId}}",
+                "dispensar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"itemId\": \"{{rxItemParaId}}\",\n      \"cantidad\": 7\n    }\n  ],\n  \"metodoPago\": \"EFECTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una receta con dispensaciones no se anula",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}", "anular"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Intento de anulación\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dispensar el resto de la receta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/farmacia/{{rxRecetaId}}/dispensar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "recetas",
+                "farmacia",
+                "{{rxRecetaId}}",
+                "dispensar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"itemId\": \"{{rxItemParaId}}\",\n      \"cantidad\": 6\n    },\n    {\n      \"itemId\": \"{{rxItemAmoxId}}\",\n      \"cantidad\": 21\n    },\n    {\n      \"itemId\": \"{{rxItemIbuId}}\",\n      \"cantidad\": 6\n    }\n  ],\n  \"metodoPago\": \"EFECTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La receta queda dispensada por completo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxRecetaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxRecetaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Estado dispensada\", () => pm.expect(pm.response.json().estado).to.eql(\"DISPENSADA\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una receta dispensada no se vuelve a dispensar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/farmacia/{{rxRecetaId}}/dispensar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "recetas",
+                "farmacia",
+                "{{rxRecetaId}}",
+                "dispensar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"itemId\": \"{{rxItemParaId}}\",\n      \"cantidad\": 1\n    }\n  ],\n  \"metodoPago\": \"EFECTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reservar la segunda cita",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicoId\": \"{{rxMedicoId}}\",\n  \"especialidadId\": \"{{rxEspecialidadId}}\",\n  \"fechaHora\": \"{{rxFechaHora2}}\",\n  \"motivo\": \"Segunda cita para anular recetas\",\n  \"modalidad\": \"PRESENCIAL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let fecha;",
+                  "do {",
+                  "    fecha = new Date();",
+                  "    fecha.setDate(fecha.getDate() + 140 + Math.floor(Math.random() * 120));",
+                  "} while (fecha.getDay() === 0 || fecha.getDay() === 6);",
+                  "const dos = (n) => String(n).padStart(2, \"0\");",
+                  "const hora = 8 + Math.floor(Math.random() * 4);",
+                  "const minutos = Math.random() < 0.5 ? \"00\" : \"30\";",
+                  "pm.collectionVariables.set(\"rxFechaHora2\", fecha.getFullYear() + \"-\" + dos(fecha.getMonth() + 1) + \"-\" + dos(fecha.getDate()) + \"T\" + dos(hora) + \":\" + minutos + \":00\");"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"rxCita2Id\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Confirmar la segunda cita",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{rxCita2Id}}/confirmar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{rxCita2Id}}", "confirmar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registrar la segunda atención con un medicamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/citas/{{rxCita2Id}}/atencion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "citas", "{{rxCita2Id}}", "atencion"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnostico\": \"Dolor\",\n  \"diagnosticos\": [\n    {\n      \"codigo\": \"I10\",\n      \"tipo\": \"DEFINITIVO\",\n      \"principal\": true\n    }\n  ],\n  \"receta\": [\n    {\n      \"medicamento\": \"Paracetamol 500 mg\",\n      \"dosis\": \"1 tableta\",\n      \"frecuencia\": \"Cada 8 horas\",\n      \"duracion\": \"5 días\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"rxAtencion2Id\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Emitir la segunda receta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"atencionId\": \"{{rxAtencion2Id}}\",\n  \"items\": [\n    {\n      \"atencionPosicion\": 0,\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"cantidad\": 12\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"rxReceta2Id\", pm.response.json().id);",
+                  "pm.collectionVariables.set(\"rxReceta2Numero\", pm.response.json().numero);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anular sin motivo es 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxReceta2Id}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxReceta2Id}}", "anular"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Otro médico no anula la receta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxReceta2Id}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxReceta2Id}}", "anular"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedico2Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"No me corresponde\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El paciente no anula la receta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxReceta2Id}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxReceta2Id}}", "anular"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"No me corresponde\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico anula la receta con motivo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxReceta2Id}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxReceta2Id}}", "anular"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Error en la cantidad a dispensar\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Queda anulada con su motivo\", () => { pm.expect(r.estado).to.eql(\"ANULADA\"); pm.expect(r.motivoAnulacion).to.include(\"cantidad\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Anular dos veces es 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxReceta2Id}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxReceta2Id}}", "anular"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Segundo intento\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Farmacia no dispensa una receta anulada",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/farmacia/{{rxReceta2Id}}/dispensar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "recetas",
+                "farmacia",
+                "{{rxReceta2Id}}",
+                "dispensar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"itemId\": \"00000000-0000-4000-8000-000000000000\",\n      \"cantidad\": 1\n    }\n  ],\n  \"metodoPago\": \"EFECTIVO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La verificación pública marca la receta anulada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas/{{rxReceta2Id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas", "{{rxReceta2Id}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set(\"rxReceta2Codigo\", pm.response.json().codigoVerificacion);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La receta anulada figura como anulada en la verificación",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/verificacion/{{rxReceta2Codigo}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "verificacion", "{{rxReceta2Codigo}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Resultado anulado\", () => pm.expect(pm.response.json().resultado).to.eql(\"ANULADO\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Emitir un reemplazo de la receta anulada",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"atencionId\": \"{{rxAtencion2Id}}\",\n  \"reemplazaId\": \"{{rxReceta2Id}}\",\n  \"items\": [\n    {\n      \"atencionPosicion\": 0,\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"cantidad\": 6\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Indica la receta que reemplaza\", () => pm.expect(r.reemplazaNumero).to.eql(pm.collectionVariables.get(\"rxReceta2Numero\")));",
+                  "pm.test(\"Tiene un número nuevo\", () => pm.expect(r.numero).to.not.eql(pm.collectionVariables.get(\"rxReceta2Numero\")));",
+                  "pm.collectionVariables.set(\"rxReemplazoId\", r.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una receta vigente no se puede reemplazar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/recetas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "recetas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"atencionId\": \"{{rxAtencion2Id}}\",\n  \"reemplazaId\": \"{{rxReemplazoId}}\",\n  \"items\": [\n    {\n      \"atencionPosicion\": 0,\n      \"medicamentoId\": \"{{rxMedParaId}}\",\n      \"cantidad\": 3\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico no crea principios activos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/principios-activos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "principios-activos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dci\": \"No permitido {{rxSufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Farmacia no crea principios activos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/principios-activos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "principios-activos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxFarmaciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dci\": \"No permitido {{rxSufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El administrador crea un principio activo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/principios-activos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "principios-activos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dci\": \"Principio de prueba {{rxSufijo}}\",\n  \"claseTerapeutica\": \"Clase de prueba\",\n  \"dosisMaxAdultoMgDia\": 500,\n  \"categoriaEmbarazo\": \"B\",\n  \"lactancia\": \"COMPATIBLE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"rxPrincipioId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear dos veces el mismo principio activo es 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/principios-activos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "principios-activos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dci\": \"Principio de prueba {{rxSufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una denominación vacía es 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/principios-activos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "principios-activos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dci\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El administrador crea un medicamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"principioActivoId\": \"{{rxPrincipioId}}\",\n  \"formaFarmaceutica\": \"Tableta\",\n  \"concentracion\": \"10 mg\",\n  \"viaAdministracion\": \"Oral\",\n  \"categoriaControl\": \"NINGUNA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"rxMedicamentoId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear la misma presentación es 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"principioActivoId\": \"{{rxPrincipioId}}\",\n  \"formaFarmaceutica\": \"tableta\",\n  \"concentracion\": \"10 MG\",\n  \"viaAdministracion\": \"Oral\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El administrador actualiza el medicamento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/{{rxMedicamentoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "{{rxMedicamentoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"principioActivoId\": \"{{rxPrincipioId}}\",\n  \"formaFarmaceutica\": \"Tableta\",\n  \"concentracion\": \"10 mg\",\n  \"viaAdministracion\": \"Oral\",\n  \"presentacion\": \"Caja x 30\",\n  \"categoriaControl\": \"ANTIBIOTICO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Guarda el cambio\", () => { pm.expect(pm.response.json().presentacion).to.eql(\"Caja x 30\"); pm.expect(pm.response.json().categoriaControl).to.eql(\"ANTIBIOTICO\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico no crea medicamentos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"principioActivoId\": \"{{rxPrincipioId}}\",\n  \"formaFarmaceutica\": \"Cápsula\",\n  \"concentracion\": \"5 mg\",\n  \"viaAdministracion\": \"Oral\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Segundo principio para la interacción",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/principios-activos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "principios-activos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dci\": \"Segundo principio {{rxSufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"rxPrincipio2Id\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El administrador registra una interacción",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/interacciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "interacciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"principioAId\": \"{{rxPrincipioId}}\",\n  \"principioBId\": \"{{rxPrincipio2Id}}\",\n  \"severidad\": \"GRAVE\",\n  \"descripcion\": \"Interacción de prueba.\",\n  \"recomendacion\": \"Evitar.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"rxInteraccionId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La misma interacción en orden inverso es 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/interacciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "interacciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"principioAId\": \"{{rxPrincipio2Id}}\",\n  \"principioBId\": \"{{rxPrincipioId}}\",\n  \"severidad\": \"LEVE\",\n  \"descripcion\": \"Repetida.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una interacción de un principio consigo mismo es 400",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/interacciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "interacciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"principioAId\": \"{{rxPrincipioId}}\",\n  \"principioBId\": \"{{rxPrincipioId}}\",\n  \"severidad\": \"LEVE\",\n  \"descripcion\": \"Igual.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico no registra interacciones",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/interacciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "medicamentos", "interacciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"principioAId\": \"{{rxPrincipioId}}\",\n  \"principioBId\": \"{{rxPrincipio2Id}}\",\n  \"severidad\": \"LEVE\",\n  \"descripcion\": \"No permitido.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El administrador elimina la interacción",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/interacciones/{{rxInteraccionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "medicamentos",
+                "interacciones",
+                "{{rxInteraccionId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La plantilla de importación se descarga en CSV",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/importaciones/plantilla",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "medicamentos",
+                "importaciones",
+                "plantilla"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test(\"Es un CSV con la cabecera\", () => { pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"text/csv\"); pm.expect(pm.response.text()).to.include(\"dci;clase_terapeutica\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico no descarga la plantilla",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/medicamentos/importaciones/plantilla",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "medicamentos",
+                "importaciones",
+                "plantilla"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{rxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "variable": [
@@ -68546,6 +74020,166 @@
     },
     {
       "key": "coTesoreriaId",
+      "value": ""
+    },
+    {
+      "key": "rxMedicoToken",
+      "value": ""
+    },
+    {
+      "key": "rxMedico2Token",
+      "value": ""
+    },
+    {
+      "key": "rxPacienteToken",
+      "value": ""
+    },
+    {
+      "key": "rxPaciente2Token",
+      "value": ""
+    },
+    {
+      "key": "rxFarmaciaToken",
+      "value": ""
+    },
+    {
+      "key": "rxRecepcionToken",
+      "value": ""
+    },
+    {
+      "key": "rxCajaToken",
+      "value": ""
+    },
+    {
+      "key": "rxAdminToken",
+      "value": ""
+    },
+    {
+      "key": "rxEnfermeriaToken",
+      "value": ""
+    },
+    {
+      "key": "rxMedicoId",
+      "value": ""
+    },
+    {
+      "key": "rxEspecialidadId",
+      "value": ""
+    },
+    {
+      "key": "rxFechaHora",
+      "value": ""
+    },
+    {
+      "key": "rxCitaId",
+      "value": ""
+    },
+    {
+      "key": "rxPacienteId",
+      "value": ""
+    },
+    {
+      "key": "rxAtencionId",
+      "value": ""
+    },
+    {
+      "key": "rxMedParaId",
+      "value": ""
+    },
+    {
+      "key": "rxMedAmoxId",
+      "value": ""
+    },
+    {
+      "key": "rxMedWarfId",
+      "value": ""
+    },
+    {
+      "key": "rxMedIbuId",
+      "value": ""
+    },
+    {
+      "key": "rxMedDiazId",
+      "value": ""
+    },
+    {
+      "key": "rxMedCefaId",
+      "value": ""
+    },
+    {
+      "key": "rxClaveAmox",
+      "value": ""
+    },
+    {
+      "key": "rxRecetaId",
+      "value": ""
+    },
+    {
+      "key": "rxRecetaNumero",
+      "value": ""
+    },
+    {
+      "key": "rxRecetaCodigo",
+      "value": ""
+    },
+    {
+      "key": "rxItemParaId",
+      "value": ""
+    },
+    {
+      "key": "rxItemAmoxId",
+      "value": ""
+    },
+    {
+      "key": "rxItemIbuId",
+      "value": ""
+    },
+    {
+      "key": "rxReceta2Codigo",
+      "value": ""
+    },
+    {
+      "key": "rxFechaHora2",
+      "value": ""
+    },
+    {
+      "key": "rxCita2Id",
+      "value": ""
+    },
+    {
+      "key": "rxAtencion2Id",
+      "value": ""
+    },
+    {
+      "key": "rxReceta2Id",
+      "value": ""
+    },
+    {
+      "key": "rxReceta2Numero",
+      "value": ""
+    },
+    {
+      "key": "rxReemplazoId",
+      "value": ""
+    },
+    {
+      "key": "rxSufijo",
+      "value": ""
+    },
+    {
+      "key": "rxPrincipioId",
+      "value": ""
+    },
+    {
+      "key": "rxPrincipio2Id",
+      "value": ""
+    },
+    {
+      "key": "rxMedicamentoId",
+      "value": ""
+    },
+    {
+      "key": "rxInteraccionId",
       "value": ""
     }
   ]
