@@ -174,6 +174,17 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Mis procedimientos',
+    items: [
+      {
+        label: 'Mis cirugías',
+        icon: 'pi-calendar-plus',
+        link: '/mis-cirugias',
+        roles: ['ROLE_PACIENTE'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

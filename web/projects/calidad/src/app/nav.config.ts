@@ -72,6 +72,17 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Esterilización',
+    items: [
+      {
+        label: 'Esterilización',
+        icon: 'pi-shield',
+        link: '/esterilizacion',
+        roles: ['ROLE_CALIDAD'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

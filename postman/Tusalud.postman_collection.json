@@ -35806,7 +35806,7 @@
                   "const j = pm.response.json();",
                   "pm.test('Variables permitidas y una plantilla por aviso y canal', () => {",
                   "  pm.expect(j.variables).to.eql(['centro', 'enlace', 'nombre']);",
-                  "  pm.expect(j.plantillas.length).to.eql(63);",
+                  "  pm.expect(j.plantillas.length).to.eql(66);",
                   "  const seg = j.plantillas.filter(p => p.categoria === 'Seguridad');",
                   "  pm.expect(seg.length).to.be.at.least(15);",
                   "});",
@@ -61702,6 +61702,5564 @@
                   "type": "string"
                 }
               ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "36 - Quirófano y esterilización",
+      "item": [
+        {
+          "name": "Login del cirujano",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('qxMedicoToken', pm.response.json().token);",
+                  "const parte = pm.response.json().token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');",
+                  "const relleno = parte + \"=\".repeat((4 - (parte.length % 4)) % 4);",
+                  "pm.collectionVariables.set('qxMedicoId', JSON.parse(CryptoJS.enc.Base64.parse(relleno).toString(CryptoJS.enc.Utf8)).uid);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login del anestesiólogo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('qxAnesToken', pm.response.json().token);",
+                  "const parte = pm.response.json().token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');",
+                  "const relleno = parte + \"=\".repeat((4 - (parte.length % 4)) % 4);",
+                  "pm.collectionVariables.set('qxAnesId', JSON.parse(CryptoJS.enc.Base64.parse(relleno).toString(CryptoJS.enc.Utf8)).uid);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.salazar@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login del médico sin relación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('qxAjenoToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.delgado@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de enfermería",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('qxEnfToken', pm.response.json().token);",
+                  "const parte = pm.response.json().token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');",
+                  "const relleno = parte + \"=\".repeat((4 - (parte.length % 4)) % 4);",
+                  "pm.collectionVariables.set('qxEnfId', JSON.parse(CryptoJS.enc.Base64.parse(relleno).toString(CryptoJS.enc.Utf8)).uid);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"enfermeria@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de calidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('qxCalToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"calidad@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login del administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('qxAdminToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de recepción",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('qxRecToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recepcion@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de caja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('qxCajaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"caja@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login del paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('qxPacToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login de otra paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('qxOtroToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria.rodriguez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador crea un quirófano con su equipamiento",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const sufijo = Date.now().toString().slice(-8);",
+                  "pm.collectionVariables.set('qxCodigo', 'PM' + sufijo);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('qxQuirofanoId', j.id);",
+                  "pm.test('Trae su equipamiento', () => pm.expect(j.equipos.length).to.eql(2));",
+                  "pm.test('Queda disponible', () => pm.expect(j.estado).to.eql('DISPONIBLE'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/quirofanos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "quirofanos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{qxCodigo}}\",\n  \"nombre\": \"Quirófano de pruebas {{qxCodigo}}\",\n  \"ubicacion\": \"Bloque de pruebas\",\n  \"estado\": \"DISPONIBLE\",\n  \"activo\": true,\n  \"equipos\": [{ \"nombre\": \"Mesa quirúrgica\", \"serie\": \"MQ-1\" }, { \"nombre\": \"Lámpara cialítica\", \"serie\": \"LC-2\" }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un código de quirófano repetido se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/quirofanos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "quirofanos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{qxCodigo}}\",\n  \"nombre\": \"Quirófano de pruebas {{qxCodigo}}\",\n  \"ubicacion\": \"Bloque de pruebas\",\n  \"estado\": \"DISPONIBLE\",\n  \"activo\": true,\n  \"equipos\": [{ \"nombre\": \"Mesa quirúrgica\", \"serie\": \"MQ-1\" }, { \"nombre\": \"Lámpara cialítica\", \"serie\": \"LC-2\" }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no crea quirófanos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/quirofanos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "quirofanos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{qxCodigo}}\",\n  \"nombre\": \"Quirófano de pruebas {{qxCodigo}}\",\n  \"ubicacion\": \"Bloque de pruebas\",\n  \"estado\": \"DISPONIBLE\",\n  \"activo\": true,\n  \"equipos\": [{ \"nombre\": \"Mesa quirúrgica\", \"serie\": \"MQ-1\" }, { \"nombre\": \"Lámpara cialítica\", \"serie\": \"LC-2\" }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enfermería no crea quirófanos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/quirofanos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "quirofanos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{qxCodigo}}\",\n  \"nombre\": \"Quirófano de pruebas {{qxCodigo}}\",\n  \"ubicacion\": \"Bloque de pruebas\",\n  \"estado\": \"DISPONIBLE\",\n  \"activo\": true,\n  \"equipos\": [{ \"nombre\": \"Mesa quirúrgica\", \"serie\": \"MQ-1\" }, { \"nombre\": \"Lámpara cialítica\", \"serie\": \"LC-2\" }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no crea quirófanos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/quirofanos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "quirofanos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{qxCodigo}}\",\n  \"nombre\": \"Quirófano de pruebas {{qxCodigo}}\",\n  \"ubicacion\": \"Bloque de pruebas\",\n  \"estado\": \"DISPONIBLE\",\n  \"activo\": true,\n  \"equipos\": [{ \"nombre\": \"Mesa quirúrgica\", \"serie\": \"MQ-1\" }, { \"nombre\": \"Lámpara cialítica\", \"serie\": \"LC-2\" }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxRecToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico lista los quirófanos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye el quirófano creado', () => pm.expect(pm.response.json().some((q) => q.id === pm.collectionVariables.get('qxQuirofanoId'))).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/quirofanos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "quirofanos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no lista quirófanos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/quirofanos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "quirofanos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxRecToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Caja no lista quirófanos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/quirofanos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "quirofanos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no lista quirófanos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/quirofanos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "quirofanos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxPacToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador actualiza el quirófano",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Se actualiza el nombre y el equipo', () => { const j = pm.response.json(); pm.expect(j.nombre).to.eql('Quirófano de pruebas renovado'); pm.expect(j.equipos.length).to.eql(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/quirofanos/{{qxQuirofanoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "quirofanos",
+                "{{qxQuirofanoId}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{qxCodigo}}\",\n  \"nombre\": \"Quirófano de pruebas renovado\",\n  \"ubicacion\": \"Bloque de pruebas\",\n  \"estado\": \"DISPONIBLE\",\n  \"activo\": true,\n  \"equipos\": [{ \"nombre\": \"Mesa quirúrgica\", \"serie\": \"MQ-1\" }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador crea un esterilizador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('qxEsterilizadorId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/esterilizadores",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "esterilizadores"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"codigo\": \"A{{qxCodigo}}\", \"nombre\": \"Autoclave de pruebas\", \"tipo\": \"VAPOR\", \"activo\": true }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El administrador crea un set de instrumental",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('qxSetId', pm.response.json().id);",
+                  "pm.test('Vigencia de 30 días', () => pm.expect(pm.response.json().vigenciaDias).to.eql(30));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/sets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "sets"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"codigo\": \"S{{qxCodigo}}\", \"nombre\": \"Set de pruebas\", \"descripcion\": \"Instrumental de pruebas\", \"vigenciaDias\": 30, \"activo\": true }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no crea sets",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/sets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "sets"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"codigo\": \"X1\", \"nombre\": \"Set\", \"vigenciaDias\": 30 }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enfermería no crea sets",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/sets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "sets"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"codigo\": \"X1\", \"nombre\": \"Set\", \"vigenciaDias\": 30 }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enfermería lista los sets",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye el set creado', () => pm.expect(pm.response.json().some((s) => s.id === pm.collectionVariables.get('qxSetId'))).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/sets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "sets"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enfermería registra un ciclo con dos lotes",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('qxInicioCiclo', new Date(Date.now() - 7 * 3600 * 1000).toISOString().substring(0, 19));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('qxCicloId', j.id);",
+                  "pm.collectionVariables.set('qxLote1', j.lotes[0].id);",
+                  "pm.collectionVariables.set('qxLote2', j.lotes[1].id);",
+                  "pm.test('Crea los dos lotes', () => pm.expect(j.lotes.length).to.eql(2));",
+                  "pm.test('Nacen sin indicadores y no se pueden usar', () => { pm.expect(j.resultado).to.eql('EN_PROCESO'); pm.expect(j.lotes[0].estado).to.eql('EN_ESPERA_DE_INDICADOR'); pm.expect(j.lotes[0].utilizable).to.be.false; });",
+                  "pm.test('Numeración correlativa', () => pm.expect(j.numero).to.match(/^CE-\\d{6}$/));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/ciclos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "ciclos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"esterilizadorId\": \"{{qxEsterilizadorId}}\",\n  \"iniciadoEn\": \"{{qxInicioCiclo}}\",\n  \"temperaturaC\": 134.0,\n  \"presionKpa\": 210.0,\n  \"duracionMin\": 30,\n  \"observaciones\": \"Carga de pruebas\",\n  \"sets\": [{ \"setId\": \"{{qxSetId}}\", \"cantidad\": 2 }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no registra ciclos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/ciclos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "ciclos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"esterilizadorId\": \"{{qxEsterilizadorId}}\",\n  \"iniciadoEn\": \"{{qxInicioCiclo}}\",\n  \"temperaturaC\": 134.0,\n  \"presionKpa\": 210.0,\n  \"duracionMin\": 30,\n  \"observaciones\": \"Carga de pruebas\",\n  \"sets\": [{ \"setId\": \"{{qxSetId}}\", \"cantidad\": 2 }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad no registra ciclos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/ciclos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "ciclos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"esterilizadorId\": \"{{qxEsterilizadorId}}\",\n  \"iniciadoEn\": \"{{qxInicioCiclo}}\",\n  \"temperaturaC\": 134.0,\n  \"presionKpa\": 210.0,\n  \"duracionMin\": 30,\n  \"observaciones\": \"Carga de pruebas\",\n  \"sets\": [{ \"setId\": \"{{qxSetId}}\", \"cantidad\": 2 }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxCalToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no registra ciclos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/ciclos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "ciclos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"esterilizadorId\": \"{{qxEsterilizadorId}}\",\n  \"iniciadoEn\": \"{{qxInicioCiclo}}\",\n  \"temperaturaC\": 134.0,\n  \"presionKpa\": 210.0,\n  \"duracionMin\": 30,\n  \"observaciones\": \"Carga de pruebas\",\n  \"sets\": [{ \"setId\": \"{{qxSetId}}\", \"cantidad\": 2 }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxRecToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un lote sin indicadores conformes no se puede usar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('No aparece entre los utilizables', () => pm.expect(pm.response.json().some((l) => l.id === pm.collectionVariables.get('qxLote1'))).to.be.false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/lotes?soloUtilizables=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "lotes"],
+              "query": [
+                {
+                  "key": "soloUtilizables",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Los indicadores conformes cierran el ciclo y liberan los lotes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Ciclo conforme', () => pm.expect(j.resultado).to.eql('CONFORME'));",
+                  "pm.test('Lotes estériles y utilizables', () => j.lotes.forEach((l) => { pm.expect(l.estado).to.eql('ESTERIL'); pm.expect(l.utilizable).to.be.true; }));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/ciclos/{{qxCicloId}}/indicadores",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "esterilizacion",
+                "ciclos",
+                "{{qxCicloId}}",
+                "indicadores"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"quimico\": \"CONFORME\", \"biologico\": \"CONFORME\", \"observaciones\": \"Sin hallazgos\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un ciclo cerrado no se modifica",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/ciclos/{{qxCicloId}}/indicadores",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "esterilizacion",
+                "ciclos",
+                "{{qxCicloId}}",
+                "indicadores"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"quimico\": \"NO_CONFORME\", \"biologico\": \"CONFORME\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no registra indicadores",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/ciclos/{{qxCicloId}}/indicadores",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "esterilizacion",
+                "ciclos",
+                "{{qxCicloId}}",
+                "indicadores"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"quimico\": \"CONFORME\", \"biologico\": \"CONFORME\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un segundo ciclo con un indicador no conforme",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('qxInicioCiclo', new Date(Date.now() - 7 * 3600 * 1000).toISOString().substring(0, 19));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('qxCiclo2Id', pm.response.json().id);",
+                  "pm.collectionVariables.set('qxLoteBloqueado', pm.response.json().lotes[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/ciclos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "ciclos"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"esterilizadorId\": \"{{qxEsterilizadorId}}\",\n  \"iniciadoEn\": \"{{qxInicioCiclo}}\",\n  \"temperaturaC\": 132.0,\n  \"duracionMin\": 30,\n  \"sets\": [{ \"setId\": \"{{qxSetId}}\", \"cantidad\": 1 }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El indicador biológico no conforme bloquea los lotes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Ciclo no conforme y cerrado', () => { pm.expect(j.resultado).to.eql('NO_CONFORME'); pm.expect(j.cerradoEn).to.not.be.null; });",
+                  "pm.test('Lotes bloqueados', () => j.lotes.forEach((l) => { pm.expect(l.estado).to.eql('BLOQUEADO'); pm.expect(l.utilizable).to.be.false; }));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/ciclos/{{qxCiclo2Id}}/indicadores",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "esterilizacion",
+                "ciclos",
+                "{{qxCiclo2Id}}",
+                "indicadores"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"quimico\": \"CONFORME\", \"biologico\": \"NO_CONFORME\", \"observaciones\": \"Esporas viables\" }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enfermería ve la alerta del lote bloqueado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye el lote bloqueado', () => pm.expect(pm.response.json().some((a) => a.tipo === 'LOTE_BLOQUEADO' || a.tipo === 'LOTE_NO_CONFORME_USADO')).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "alertas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad consulta las alertas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "alertas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxCalToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Calidad consulta los ciclos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae el ciclo conforme', () => pm.expect(pm.response.json().some((c) => c.id === pm.collectionVariables.get('qxCicloId'))).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/ciclos?limite=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "ciclos"],
+              "query": [
+                {
+                  "key": "limite",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxCalToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no consulta los ciclos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/ciclos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "ciclos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no consulta los ciclos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/ciclos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "ciclos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxPacToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no consulta las alertas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/alertas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "alertas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxRecToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Caja no consulta los lotes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/lotes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "esterilizacion", "lotes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La trazabilidad no se expone al médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/lotes/{{qxLote1}}/trazabilidad",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "esterilizacion",
+                "lotes",
+                "{{qxLote1}}",
+                "trazabilidad"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La trazabilidad de un lote sin uso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Sin usos todavía', () => pm.expect(j.usos.length).to.eql(0));",
+                  "pm.test('No expone datos del paciente', () => pm.expect(JSON.stringify(j)).to.not.include('paciente'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/lotes/{{qxLote1}}/trazabilidad",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "esterilizacion",
+                "lotes",
+                "{{qxLote1}}",
+                "trazabilidad"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxCalToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico busca a su paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Encuentra al paciente', () => pm.expect(j.length).to.be.at.least(1));",
+                  "pm.collectionVariables.set('qxPacienteId', j[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/vacunacion/pacientes?q=Juan",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "vacunacion", "pacientes"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Juan"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no solicita cirugías",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{qxPacienteId}}\",\n  \"diagnosticoCodigo\": \"K35.8\",\n  \"procedimiento\": \"Apendicectomía laparoscópica de pruebas\",\n  \"tipo\": \"ELECTIVA\",\n  \"tipoAnestesia\": \"GENERAL\",\n  \"indicacionesPreoperatorias\": \"Ayuno de 8 horas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxPacToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enfermería no solicita cirugías",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{qxPacienteId}}\",\n  \"diagnosticoCodigo\": \"K35.8\",\n  \"procedimiento\": \"Apendicectomía laparoscópica de pruebas\",\n  \"tipo\": \"ELECTIVA\",\n  \"tipoAnestesia\": \"GENERAL\",\n  \"indicacionesPreoperatorias\": \"Ayuno de 8 horas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no solicita cirugías",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{qxPacienteId}}\",\n  \"diagnosticoCodigo\": \"K35.8\",\n  \"procedimiento\": \"Apendicectomía laparoscópica de pruebas\",\n  \"tipo\": \"ELECTIVA\",\n  \"tipoAnestesia\": \"GENERAL\",\n  \"indicacionesPreoperatorias\": \"Ayuno de 8 horas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxRecToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico solicita una cirugía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('qxCirId', j.resumen.id);",
+                  "pm.collectionVariables.set('qxCirCodigo', j.resumen.codigo);",
+                  "pm.test('Queda solicitada con su número', () => { pm.expect(j.resumen.estado).to.eql('SOLICITADA'); pm.expect(j.resumen.codigo).to.match(/^CIR-\\d{6}$/); });",
+                  "pm.test('Guarda el diagnóstico CIE-10', () => pm.expect(j.diagnosticoCodigo).to.eql('K35.8'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{qxPacienteId}}\",\n  \"diagnosticoCodigo\": \"K35.8\",\n  \"procedimiento\": \"Apendicectomía laparoscópica de pruebas\",\n  \"tipo\": \"ELECTIVA\",\n  \"tipoAnestesia\": \"GENERAL\",\n  \"indicacionesPreoperatorias\": \"Ayuno de 8 horas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un diagnóstico inexistente se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{qxPacienteId}}\",\n  \"diagnosticoCodigo\": \"ZZZ99\",\n  \"procedimiento\": \"Apendicectomía laparoscópica de pruebas\",\n  \"tipo\": \"ELECTIVA\",\n  \"tipoAnestesia\": \"GENERAL\",\n  \"indicacionesPreoperatorias\": \"Ayuno de 8 horas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un médico sin relación no solicita la cirugía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{qxPacienteId}}\",\n  \"diagnosticoCodigo\": \"K35.8\",\n  \"procedimiento\": \"Apendicectomía laparoscópica de pruebas\",\n  \"tipo\": \"ELECTIVA\",\n  \"tipoAnestesia\": \"GENERAL\",\n  \"indicacionesPreoperatorias\": \"Ayuno de 8 horas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxAjenoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La solicitud aparece pendiente en la agenda de enfermería",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().find((x) => x.id === pm.collectionVariables.get('qxCirId'));",
+                  "pm.test('La ve con el nombre del paciente', () => { pm.expect(c).to.not.be.undefined; pm.expect(c.estado).to.eql('SOLICITADA'); pm.expect(c.pacienteNombre).to.not.be.null; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/agenda?desde=2030-01-01T00:00:00&hasta=2060-01-01T00:00:00",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias", "agenda"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "2030-01-01T00:00:00"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2060-01-01T00:00:00"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un médico sin relación ve la agenda sin datos del paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().find((x) => x.id === pm.collectionVariables.get('qxCirId'));",
+                  "pm.test('Aparece reservada', () => { pm.expect(c).to.not.be.undefined; pm.expect(c.detalleVisible).to.be.false; pm.expect(c.pacienteNombre).to.not.exist; pm.expect(c.procedimiento).to.not.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/agenda?desde=2030-01-01T00:00:00&hasta=2060-01-01T00:00:00",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias", "agenda"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "2030-01-01T00:00:00"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2060-01-01T00:00:00"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxAjenoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un médico sin relación no abre el detalle",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias", "{{qxCirId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxAjenoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no abre el detalle de la cirugía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias", "{{qxCirId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxPacToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no abre el detalle de la cirugía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias", "{{qxCirId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxRecToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La agenda no la ve caja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/agenda?desde=2030-01-01T00:00:00&hasta=2031-01-01T00:00:00",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias", "agenda"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "2030-01-01T00:00:00"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2031-01-01T00:00:00"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La agenda no la ve el paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/agenda?desde=2030-01-01T00:00:00&hasta=2031-01-01T00:00:00",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias", "agenda"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "2030-01-01T00:00:00"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2031-01-01T00:00:00"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxPacToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Programar sin cirujano se rechaza",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const anio = 2032 + Math.floor(Math.random() * 12);",
+                  "const mes = String(1 + Math.floor(Math.random() * 12)).padStart(2, '0');",
+                  "const dia = String(1 + Math.floor(Math.random() * 28)).padStart(2, '0');",
+                  "pm.collectionVariables.set('qxInicio', anio + '-' + mes + '-' + dia + 'T09:00:00');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/programar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "programar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quirofanoId\": \"{{qxQuirofanoId}}\",\n  \"inicio\": \"2032-05-05T09:00:00\",\n  \"duracionMin\": 60,\n  \"equipo\": [{ \"usuarioId\": \"{{qxEnfId}}\", \"rol\": \"INSTRUMENTISTA\" }]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no programa cirugías",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/programar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "programar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quirofanoId\": \"{{qxQuirofanoId}}\",\n  \"inicio\": \"{{qxInicio}}\",\n  \"duracionMin\": 120,\n  \"equipo\": [\n    { \"usuarioId\": \"{{qxMedicoId}}\", \"rol\": \"CIRUJANO\" },\n    { \"usuarioId\": \"{{qxAnesId}}\", \"rol\": \"ANESTESIOLOGO\" },\n    { \"usuarioId\": \"{{qxEnfId}}\", \"rol\": \"INSTRUMENTISTA\" }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxRecToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente no programa cirugías",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/programar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "programar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quirofanoId\": \"{{qxQuirofanoId}}\",\n  \"inicio\": \"{{qxInicio}}\",\n  \"duracionMin\": 120,\n  \"equipo\": [\n    { \"usuarioId\": \"{{qxMedicoId}}\", \"rol\": \"CIRUJANO\" },\n    { \"usuarioId\": \"{{qxAnesId}}\", \"rol\": \"ANESTESIOLOGO\" },\n    { \"usuarioId\": \"{{qxEnfId}}\", \"rol\": \"INSTRUMENTISTA\" }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxPacToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enfermería programa la cirugía con su equipo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda programada en el quirófano', () => { pm.expect(j.resumen.estado).to.eql('PROGRAMADA'); pm.expect(j.resumen.quirofanoId).to.eql(pm.collectionVariables.get('qxQuirofanoId')); });",
+                  "pm.test('Tiene el equipo asignado', () => pm.expect(j.equipo.length).to.eql(3));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/programar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "programar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quirofanoId\": \"{{qxQuirofanoId}}\",\n  \"inicio\": \"{{qxInicio}}\",\n  \"duracionMin\": 120,\n  \"equipo\": [\n    { \"usuarioId\": \"{{qxMedicoId}}\", \"rol\": \"CIRUJANO\" },\n    { \"usuarioId\": \"{{qxAnesId}}\", \"rol\": \"ANESTESIOLOGO\" },\n    { \"usuarioId\": \"{{qxEnfId}}\", \"rol\": \"INSTRUMENTISTA\" }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otra cirugía solicitada para el mismo horario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('qxCir2Id', pm.response.json().resumen.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias"]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": \"{{qxPacienteId}}\",\n  \"diagnosticoCodigo\": \"K35.8\",\n  \"procedimiento\": \"Colecistectomía de pruebas\",\n  \"tipo\": \"ELECTIVA\",\n  \"tipoAnestesia\": \"GENERAL\",\n  \"indicacionesPreoperatorias\": \"Ayuno de 8 horas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No se programa dos cirugías en el mismo quirófano y horario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Avisa que el quirófano está ocupado', () => pm.expect(pm.response.text()).to.include('quirófano'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCir2Id}}/programar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCir2Id}}",
+                "programar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quirofanoId\": \"{{qxQuirofanoId}}\",\n  \"inicio\": \"{{qxInicio}}\",\n  \"duracionMin\": 60,\n  \"equipo\": [\n    { \"usuarioId\": \"{{qxMedicoId}}\", \"rol\": \"CIRUJANO\" },\n    { \"usuarioId\": \"{{qxAnesId}}\", \"rol\": \"ANESTESIOLOGO\" }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico solicita los consentimientos al paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('qxConsQuirId', j.consentimientoQuirurgico.id);",
+                  "pm.collectionVariables.set('qxConsAnesId', j.consentimientoAnestesico.id);",
+                  "pm.test('Ambos quedan pendientes de firma', () => { pm.expect(j.consentimientoQuirurgico.estado).to.eql('PENDIENTE_FIRMA'); pm.expect(j.consentimientoAnestesico.estado).to.eql('PENDIENTE_FIRMA'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/consentimientos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "consentimientos"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enfermería no solicita consentimientos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/consentimientos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "consentimientos"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Pasar la cirugía a preparación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Está en preparación', () => pm.expect(pm.response.json().resumen.estado).to.eql('EN_PREPARACION'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/preparar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "preparar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No se inicia sin consentimientos firmados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Pide el consentimiento quirúrgico', () => pm.expect(pm.response.text()).to.include('consentimiento'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/iniciar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "iniciar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Solo el cirujano inicia la cirugía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/iniciar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "iniciar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxAnesToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente firma el consentimiento anestésico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda firmado', () => pm.expect(pm.response.json().resumen.estado).to.eql('FIRMADO'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{qxConsAnesId}}/firma",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "consentimientos",
+                "{{qxConsAnesId}}",
+                "firma"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firmaPng\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABQCAYAAAAnSfh8AAADsklEQVR4nO3bW27bQBBEUe4gn9lD9r+/BDCcQJb5mBl2d1WH9+MAsSSKleaUJVH09uPnrw1AT/IAANbJAwBYJw8AYJ08AIB18gAA1skDAFgnD3Di9wl1NsDCZliIs+JSYuDFZlaG0fJSYuClwA5lmC2vS25AZjMow2w5KTHwaRMX4c6rKiXG4/39h6oId0tIifForz9UFyGqfJQYj/X6Q2UJoktHifFI7zdUlCCrbBQYj7N3Y2YRsl8pKTEeZe/GilfIrILxVhqPcnRHdAkqi0WB8Rhnd0YVQfGqSInxCGd3RhRP+Za2Q4HvXMgCXP45YdRVUuqrvOSDHpiPw8zQzMiDZhaX20J0yDAyH0qMJaMPXFl4LgvQLUfHGcLUzIO7LjyHPDMzcp4lzMxu0K28e7mV++52HgHmVjfsUty9vKr9ruy/w2whJA9QqLoIUb/cKDEOyQMUqypC9DsTSoxd8gDFKkqQ9bGCEuMbeQCBzBJknxOgwPhCHkCkomBZJaPE+EceQCS6aNVn4ykxPsgDCEUVTvFVGgXGB3kAsbvFU34P3qXEXa4VaEkewMDq4nJYmM6lOLrQxzlzO/IABmYXl9NiVO9/Zj5Oc/tvyAOYmF10TovQJcedOapztyUPYKTz4nPIMjoj5zm2Iw9gqFNx9zKr9z+aw32mLcgDmOpU3r3M6lnd2V49x1bkARrotLCqs0aVjxIvkgdAqMoSRJeOAi+QB0C4iiJkvWJS4knyAAiX/Xa08vnVs7QnD4AUWSWo+KxKgSfIAyBNdBEqTzRR4kHyAEgVVQTFWWJKPEAeAKkiiqf8HrxDgaXXCaj/88gXeZGF8iIR9RxHZlM+K/UQUGN2cckW5EUW9Ryv5lM+N/UgUGd20TmU9z23eoZ35piSRz0M1LJZeDdyu+SwmKX6wKBet/Lu5VbvfzRH+kzVBwUa3cr7nlk9r6ptL6kPCvScS+uQNaKAaSVWHxBgVmWJI4uXUmL1wQBmVRU4o3Dhz6k+GMCK7BJnfm6lwEBRwSp+Qdx6LvVBAFa1eIs7uK/l51EfBOAO+5NMg/tbfh71AQDusv6aZ2K/S8+hHj4QYbWADhewUGA83koRHcr7nmN6e/XggSh7hZzhkn1qW/XQgUgdy/uefWo7dWggWsfyvuce3k4dGsjSpbhHmYe2UQcGsnUo7l7WoW3UgQF8NVVidVgA3w2XWB0UwHcUGGhuqMTqkACOXZZYHRDAscsz6OqAAM6dllgdDsC1wxKrgwEYs3s12R9Dw32G8CYgZQAAAABJRU5ErkJggg==\",\n  \"firmanteTipo\": \"PACIENTE\",\n  \"nombre\": \"Juan Pérez\",\n  \"dni\": \"12345678\",\n  \"via\": \"APP_PACIENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxPacToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico registra la firma quirúrgica con testigo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda firmado', () => pm.expect(pm.response.json().resumen.estado).to.eql('FIRMADO'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/consentimientos/{{qxConsQuirId}}/firma",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "consentimientos",
+                "{{qxConsQuirId}}",
+                "firma"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firmaPng\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAABQCAYAAAAnSfh8AAADsklEQVR4nO3bW27bQBBEUe4gn9lD9r+/BDCcQJb5mBl2d1WH9+MAsSSKleaUJVH09uPnrw1AT/IAANbJAwBYJw8AYJ08AIB18gAA1skDAFgnD3Di9wl1NsDCZliIs+JSYuDFZlaG0fJSYuClwA5lmC2vS25AZjMow2w5KTHwaRMX4c6rKiXG4/39h6oId0tIifForz9UFyGqfJQYj/X6Q2UJoktHifFI7zdUlCCrbBQYj7N3Y2YRsl8pKTEeZe/GilfIrILxVhqPcnRHdAkqi0WB8Rhnd0YVQfGqSInxCGd3RhRP+Za2Q4HvXMgCXP45YdRVUuqrvOSDHpiPw8zQzMiDZhaX20J0yDAyH0qMJaMPXFl4LgvQLUfHGcLUzIO7LjyHPDMzcp4lzMxu0K28e7mV++52HgHmVjfsUty9vKr9ruy/w2whJA9QqLoIUb/cKDEOyQMUqypC9DsTSoxd8gDFKkqQ9bGCEuMbeQCBzBJknxOgwPhCHkCkomBZJaPE+EceQCS6aNVn4ykxPsgDCEUVTvFVGgXGB3kAsbvFU34P3qXEXa4VaEkewMDq4nJYmM6lOLrQxzlzO/IABmYXl9NiVO9/Zj5Oc/tvyAOYmF10TovQJcedOapztyUPYKTz4nPIMjoj5zm2Iw9gqFNx9zKr9z+aw32mLcgDmOpU3r3M6lnd2V49x1bkARrotLCqs0aVjxIvkgdAqMoSRJeOAi+QB0C4iiJkvWJS4knyAAiX/Xa08vnVs7QnD4AUWSWo+KxKgSfIAyBNdBEqTzRR4kHyAEgVVQTFWWJKPEAeAKkiiqf8HrxDgaXXCaj/88gXeZGF8iIR9RxHZlM+K/UQUGN2cckW5EUW9Ryv5lM+N/UgUGd20TmU9z23eoZ35piSRz0M1LJZeDdyu+SwmKX6wKBet/Lu5VbvfzRH+kzVBwUa3cr7nlk9r6ptL6kPCvScS+uQNaKAaSVWHxBgVmWJI4uXUmL1wQBmVRU4o3Dhz6k+GMCK7BJnfm6lwEBRwSp+Qdx6LvVBAFa1eIs7uK/l51EfBOAO+5NMg/tbfh71AQDusv6aZ2K/S8+hHj4QYbWADhewUGA83koRHcr7nmN6e/XggSh7hZzhkn1qW/XQgUgdy/uefWo7dWggWsfyvuce3k4dGsjSpbhHmYe2UQcGsnUo7l7WoW3UgQF8NVVidVgA3w2XWB0UwHcUGGhuqMTqkACOXZZYHRDAscsz6OqAAM6dllgdDsC1wxKrgwEYs3s12R9Dw32G8CYgZQAAAABJRU5ErkJggg==\",\n  \"firmanteTipo\": \"PACIENTE\",\n  \"nombre\": \"Juan Pérez\",\n  \"dni\": \"12345678\",\n  \"via\": \"CONSULTORIO\",\n  \"testigoNombre\": \"Carlos Mendoza\",\n  \"testigoDni\": \"40506070\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sin la lista antes de la inducción no se inicia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Pide la lista de verificación', () => pm.expect(pm.response.text()).to.include('inducción'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/iniciar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "iniciar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una lista incompleta se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Indica lo que falta', () => pm.expect(pm.response.text()).to.include('Faltan'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/checklist",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "checklist"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"momento\": \"ANTES_INDUCCION\",\n  \"items\": [\n    \"IDENTIDAD_CONFIRMADA\",\n    \"SITIO_MARCADO\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Quien no es del equipo no registra la lista",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/checklist",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "checklist"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"momento\": \"ANTES_INDUCCION\",\n  \"items\": [\n    \"IDENTIDAD_CONFIRMADA\",\n    \"SITIO_MARCADO\",\n    \"CONSENTIMIENTOS_VERIFICADOS\",\n    \"EQUIPO_ANESTESIA_REVISADO\",\n    \"ALERGIAS_REVISADAS\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxAjenoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La lista antes de la incisión exige la anterior",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/checklist",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "checklist"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"momento\": \"ANTES_INCISION\",\n  \"items\": [\n    \"EQUIPO_SE_PRESENTO\",\n    \"PROCEDIMIENTO_CONFIRMADO\",\n    \"ANTIBIOTICO_ADMINISTRADO\",\n    \"ESTERILIDAD_CONFIRMADA\",\n    \"IMAGENES_DISPONIBLES\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enfermería completa la lista antes de la inducción",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda registrada con su responsable', () => { const k = pm.response.json().checklists.find((c) => c.momento === 'ANTES_INDUCCION'); pm.expect(k).to.not.be.undefined; pm.expect(k.completadoPor).to.not.be.empty; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/checklist",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "checklist"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"momento\": \"ANTES_INDUCCION\",\n  \"items\": [\n    \"IDENTIDAD_CONFIRMADA\",\n    \"SITIO_MARCADO\",\n    \"CONSENTIMIENTOS_VERIFICADOS\",\n    \"EQUIPO_ANESTESIA_REVISADO\",\n    \"ALERGIAS_REVISADAS\"\n  ],\n  \"observaciones\": \"Todo en orden\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La misma lista no se registra dos veces",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/checklist",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "checklist"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"momento\": \"ANTES_INDUCCION\",\n  \"items\": [\n    \"IDENTIDAD_CONFIRMADA\",\n    \"SITIO_MARCADO\",\n    \"CONSENTIMIENTOS_VERIFICADOS\",\n    \"EQUIPO_ANESTESIA_REVISADO\",\n    \"ALERGIAS_REVISADAS\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El cirujano inicia la cirugía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Está en curso', () => { pm.expect(j.resumen.estado).to.eql('EN_CURSO'); pm.expect(j.inicioReal).to.not.be.null; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/iniciar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "iniciar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No se finaliza sin las listas ni la nota",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Pide la nota operatoria', () => pm.expect(pm.response.text()).to.include('nota operatoria'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/finalizar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "finalizar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enfermería registra el uso del set esterilizado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Queda el set en la cirugía', () => pm.expect(pm.response.json().sets.length).to.eql(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/sets",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "sets"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loteId\": \"{{qxLote1}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El mismo lote no se usa dos veces",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/sets",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "sets"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loteId\": \"{{qxLote1}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un lote de un ciclo no conforme se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Explica el motivo', () => pm.expect(pm.response.text()).to.include('no conforme'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/sets",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "sets"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loteId\": \"{{qxLoteBloqueado}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Quien no es del equipo no usa sets",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/sets",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "sets"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loteId\": \"{{qxLote2}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxAjenoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Insumos disponibles para la cirugía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const gasa = pm.response.json().find((i) => i.codigo === 'INS-GASA');",
+                  "pm.test('Trae la gasa del almacén con su stock', () => { pm.expect(gasa).to.not.be.undefined; pm.expect(gasa.stock).to.be.at.least(2); });",
+                  "pm.collectionVariables.set('qxInsumoId', gasa.id);",
+                  "pm.collectionVariables.set('qxStockAntes', gasa.stock);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/insumos?q=gasa",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "insumos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "gasa"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no ve los insumos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/insumos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "insumos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxRecToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enfermería descuenta un insumo del inventario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Queda el insumo registrado', () => pm.expect(pm.response.json().insumos.length).to.eql(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/insumos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "insumos"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productoId\": \"{{qxInsumoId}}\",\n  \"cantidad\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El stock del insumo bajó",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const gasa = pm.response.json().find((i) => i.codigo === 'INS-GASA');",
+                  "pm.test('Se descontaron 2 unidades', () => pm.expect(gasa.stock).to.eql(Number(pm.collectionVariables.get('qxStockAntes')) - 2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/insumos?q=gasa",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "insumos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "gasa"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Más insumo que el stock se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/insumos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "insumos"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productoId\": \"{{qxInsumoId}}\",\n  \"cantidad\": 1000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Completar la lista antes de la incisión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/checklist",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "checklist"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"momento\": \"ANTES_INCISION\",\n  \"items\": [\n    \"EQUIPO_SE_PRESENTO\",\n    \"PROCEDIMIENTO_CONFIRMADO\",\n    \"ANTIBIOTICO_ADMINISTRADO\",\n    \"ESTERILIDAD_CONFIRMADA\",\n    \"IMAGENES_DISPONIBLES\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Completar la lista antes de salir",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Las tres listas están registradas', () => pm.expect(pm.response.json().checklists.length).to.eql(3));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/checklist",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "checklist"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"momento\": \"ANTES_SALIDA\",\n  \"items\": [\n    \"PROCEDIMIENTO_REGISTRADO\",\n    \"CONTEO_INSTRUMENTAL_COMPLETO\",\n    \"MUESTRAS_ETIQUETADAS\",\n    \"PROBLEMAS_DEL_EQUIPO_REVISADOS\",\n    \"PLAN_POSTOPERATORIO_DEFINIDO\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El anestesiólogo no registra la nota operatoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/nota-operatoria",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "nota-operatoria"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hallazgos\": \"Apéndice inflamado sin perforación\",\n  \"tecnica\": \"Laparoscópica con tres puertos\",\n  \"complicaciones\": null,\n  \"sangradoMl\": 30,\n  \"diagnosticoPostoperatorio\": \"Apendicitis aguda\",\n  \"indicacionesPostoperatorias\": \"Dieta líquida a las 6 horas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxAnesToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enfermería no registra la nota operatoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/nota-operatoria",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "nota-operatoria"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hallazgos\": \"Apéndice inflamado sin perforación\",\n  \"tecnica\": \"Laparoscópica con tres puertos\",\n  \"complicaciones\": null,\n  \"sangradoMl\": 30,\n  \"diagnosticoPostoperatorio\": \"Apendicitis aguda\",\n  \"indicacionesPostoperatorias\": \"Dieta líquida a las 6 horas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El cirujano registra la nota operatoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda la nota con su responsable', () => { const n = pm.response.json().notaOperatoria; pm.expect(n.tecnica).to.include('Laparoscópica'); pm.expect(n.registradaPor).to.not.be.null; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/nota-operatoria",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "nota-operatoria"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hallazgos\": \"Apéndice inflamado sin perforación\",\n  \"tecnica\": \"Laparoscópica con tres puertos\",\n  \"complicaciones\": null,\n  \"sangradoMl\": 30,\n  \"diagnosticoPostoperatorio\": \"Apendicitis aguda\",\n  \"indicacionesPostoperatorias\": \"Dieta líquida a las 6 horas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Aún falta el registro anestésico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Pide el registro anestésico', () => pm.expect(pm.response.text()).to.include('registro anestésico'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/finalizar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "finalizar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El cirujano no registra la anestesia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/registro-anestesico",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "registro-anestesico"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asa\": 2,\n  \"inicio\": \"2032-05-05T09:00:00\",\n  \"fin\": \"2032-05-05T11:00:00\",\n  \"observaciones\": \"Sin incidentes\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un fin anterior al inicio se rechaza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/registro-anestesico",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "registro-anestesico"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asa\": 2,\n  \"inicio\": \"2032-05-05T11:00:00\",\n  \"fin\": \"2032-05-05T09:00:00\",\n  \"observaciones\": \"Sin incidentes\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxAnesToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El anestesiólogo registra la anestesia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda el registro con la clase ASA', () => pm.expect(pm.response.json().registroAnestesico.asa).to.eql(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/registro-anestesico",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "registro-anestesico"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"asa\": 2,\n  \"inicio\": \"2032-05-05T09:00:00\",\n  \"fin\": \"2032-05-05T11:00:00\",\n  \"observaciones\": \"Sin incidentes\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxAnesToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El cirujano finaliza la cirugía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda finalizada con su hora real', () => { pm.expect(j.resumen.estado).to.eql('FINALIZADA'); pm.expect(j.finReal).to.not.be.null; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/finalizar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "finalizar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una cirugía finalizada no se cancela",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/cancelar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "cancelar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Error de registro\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El historial de la cirugía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const acciones = pm.response.json().map((e) => e.accion);",
+                  "pm.test('Registra el ciclo completo', () => ['SOLICITADA', 'PROGRAMADA', 'INICIADA', 'FINALIZADA'].forEach((a) => pm.expect(acciones).to.include(a)));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}/historial",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCirId}}",
+                "historial"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El lote usado quedó trazado a la cirugía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Un solo uso, en la cirugía finalizada', () => { pm.expect(j.usos.length).to.eql(1); pm.expect(j.usos[0].cirugiaCodigo).to.eql(pm.collectionVariables.get('qxCirCodigo')); pm.expect(j.usos[0].estado).to.eql('FINALIZADA'); });",
+                  "pm.test('El lote quedó usado', () => pm.expect(j.lote.estado).to.eql('USADO'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/lotes/{{qxLote1}}/trazabilidad",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "esterilizacion",
+                "lotes",
+                "{{qxLote1}}",
+                "trazabilidad"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxCalToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La trazabilidad del ciclo cubre sus lotes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae los dos lotes del ciclo', () => pm.expect(pm.response.json().length).to.eql(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/esterilizacion/ciclos/{{qxCicloId}}/trazabilidad",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "esterilizacion",
+                "ciclos",
+                "{{qxCicloId}}",
+                "trazabilidad"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El paciente ve sus cirugías y sus consentimientos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().find((x) => x.id === pm.collectionVariables.get('qxCirId'));",
+                  "pm.test('Ve su cirugía finalizada con los consentimientos firmados', () => { pm.expect(c).to.not.be.undefined; pm.expect(c.estado).to.eql('FINALIZADA'); pm.expect(c.consentimientoQuirurgico.estado).to.eql('FIRMADO'); pm.expect(c.consentimientoAnestesico.estado).to.eql('FIRMADO'); });",
+                  "pm.test('No recibe la nota operatoria ni el diagnóstico', () => pm.expect(JSON.stringify(c)).to.not.include('hallazgos'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/mias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias", "mias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxPacToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Otra paciente no ve cirugías ajenas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('No aparece la cirugía de otro paciente', () => pm.expect(pm.response.json().some((x) => x.id === pm.collectionVariables.get('qxCirId'))).to.be.false);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/mias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias", "mias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxOtroToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico no usa la vista del paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/mias",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias", "mias"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El médico ve el detalle clínico de su cirugía",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Ve diagnóstico, nota y anestesia', () => { pm.expect(j.clinicoVisible).to.be.true; pm.expect(j.diagnosticoCodigo).to.eql('K35.8'); pm.expect(j.notaOperatoria).to.not.be.null; pm.expect(j.registroAnestesico).to.not.be.null; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCirId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias", "{{qxCirId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Enfermería ajena al equipo no ve la parte clínica",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('No ve diagnóstico ni nota', () => { pm.expect(j.clinicoVisible).to.be.false; pm.expect(j.diagnosticoCodigo).to.not.exist; pm.expect(j.notaOperatoria).to.not.exist; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCir2Id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "cirugias", "{{qxCir2Id}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Suspender una cirugía exige motivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCir2Id}}/suspender",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCir2Id}}",
+                "suspender"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recepción no cancela cirugías",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCir2Id}}/cancelar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCir2Id}}",
+                "cancelar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"No procede\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxRecToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una cirugía solicitada no se suspende",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCir2Id}}/suspender",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCir2Id}}",
+                "suspender"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Paciente con fiebre\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancelar la cirugía con su motivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda cancelada con el motivo', () => { pm.expect(j.resumen.estado).to.eql('CANCELADA'); pm.expect(j.motivo).to.include('decidió'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCir2Id}}/cancelar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCir2Id}}",
+                "cancelar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"El paciente decidió no operarse\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una cirugía cancelada no se programa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/cirugias/{{qxCir2Id}}/programar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "quirofano",
+                "cirugias",
+                "{{qxCir2Id}}",
+                "programar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quirofanoId\": \"{{qxQuirofanoId}}\",\n  \"inicio\": \"{{qxInicio}}\",\n  \"duracionMin\": 120,\n  \"equipo\": [\n    { \"usuarioId\": \"{{qxMedicoId}}\", \"rol\": \"CIRUJANO\" },\n    { \"usuarioId\": \"{{qxAnesId}}\", \"rol\": \"ANESTESIOLOGO\" },\n    { \"usuarioId\": \"{{qxEnfId}}\", \"rol\": \"INSTRUMENTISTA\" }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{qxEnfToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sin sesión no se accede al quirófano",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401 o 403', () => pm.expect([401, 403]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quirofano/quirofanos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "quirofano", "quirofanos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
             }
           },
           "response": []

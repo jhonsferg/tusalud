@@ -88,6 +88,12 @@ export const routes: Routes = [
           import('@tusalud/features/notificaciones').then((m) => m.NOTIFICACIONES_ROUTES),
       },
       {
+        path: 'esterilizacion',
+        canMatch: [roleGuard('ROLE_CALIDAD')],
+        loadChildren: () =>
+          import('@tusalud/features/esterilizacion').then((m) => m.ESTERILIZACION_ROUTES),
+      },
+      {
         path: 'perfil',
         loadChildren: () => import('@tusalud/features/perfil').then((m) => m.PERFIL_ROUTES),
       },

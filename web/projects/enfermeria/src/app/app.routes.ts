@@ -70,6 +70,17 @@ export const routes: Routes = [
           import('@tusalud/features/notificaciones').then((m) => m.NOTIFICACIONES_ROUTES),
       },
       {
+        path: 'quirofano',
+        canMatch: [roleGuard('ROLE_ENFERMERIA')],
+        loadChildren: () => import('@tusalud/features/quirofano').then((m) => m.QUIROFANO_ROUTES),
+      },
+      {
+        path: 'esterilizacion',
+        canMatch: [roleGuard('ROLE_ENFERMERIA')],
+        loadChildren: () =>
+          import('@tusalud/features/esterilizacion').then((m) => m.ESTERILIZACION_ROUTES),
+      },
+      {
         path: 'perfil',
         loadChildren: () => import('@tusalud/features/perfil').then((m) => m.PERFIL_ROUTES),
       },

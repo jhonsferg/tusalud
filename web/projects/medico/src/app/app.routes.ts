@@ -140,6 +140,11 @@ export const routes: Routes = [
           import('@tusalud/features/notificaciones').then((m) => m.NOTIFICACIONES_ROUTES),
       },
       {
+        path: 'quirofano',
+        canMatch: [roleGuard('ROLE_MEDICO')],
+        loadChildren: () => import('@tusalud/features/quirofano').then((m) => m.QUIROFANO_ROUTES),
+      },
+      {
         path: 'perfil',
         loadChildren: () => import('@tusalud/features/perfil').then((m) => m.PERFIL_ROUTES),
       },

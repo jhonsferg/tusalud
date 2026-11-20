@@ -237,6 +237,18 @@ export const routes: Routes = [
           import('@tusalud/features/notificaciones').then((m) => m.NOTIFICACIONES_ROUTES),
       },
       {
+        path: 'quirofanos',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () =>
+          import('@tusalud/features/quirofano').then((m) => m.QUIROFANOS_ADMIN_ROUTES),
+      },
+      {
+        path: 'esterilizacion-catalogo',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () =>
+          import('@tusalud/features/esterilizacion').then((m) => m.CATALOGO_ESTERILIZACION_ROUTES),
+      },
+      {
         path: 'perfil',
         loadChildren: () => import('@tusalud/features/perfil').then((m) => m.PERFIL_ROUTES),
       },

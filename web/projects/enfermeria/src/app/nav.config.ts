@@ -67,6 +67,23 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Quirófano y esterilización',
+    items: [
+      {
+        label: 'Agenda quirúrgica',
+        icon: 'pi-calendar-plus',
+        link: '/quirofano',
+        roles: ['ROLE_ENFERMERIA'],
+      },
+      {
+        label: 'Esterilización',
+        icon: 'pi-shield',
+        link: '/esterilizacion',
+        roles: ['ROLE_ENFERMERIA'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

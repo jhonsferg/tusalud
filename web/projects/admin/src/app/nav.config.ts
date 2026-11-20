@@ -494,6 +494,23 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Quirófano',
+    items: [
+      {
+        label: 'Quirófanos y equipos',
+        icon: 'pi-building',
+        link: '/quirofanos',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Esterilizadores y sets',
+        icon: 'pi-box',
+        link: '/esterilizacion-catalogo',
+        roles: ['ROLE_ADMIN'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

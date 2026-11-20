@@ -168,6 +168,17 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Quirófano',
+    items: [
+      {
+        label: 'Agenda quirúrgica',
+        icon: 'pi-calendar-plus',
+        link: '/quirofano',
+        roles: ['ROLE_MEDICO'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {
