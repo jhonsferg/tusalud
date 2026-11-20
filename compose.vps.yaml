@@ -76,7 +76,8 @@ services:
       - "--log-file=stdout"
       - "--realm=tusalud"
       - "--use-auth-secret"
-      - "--static-auth-secret=${TURN_SECRET}"
+      - "-c"
+      - "/etc/coturn/turnserver.conf"
       - "--listening-port=3478"
       - "--min-port=49160"
       - "--max-port=49200"
@@ -94,6 +95,8 @@ services:
       - "--denied-peer-ip=172.16.0.0-172.31.255.255"
       - "--denied-peer-ip=192.168.0.0-192.168.255.255"
       - "--external-ip=${TURN_EXTERNAL_IP}"
+    volumes:
+      - ./docker/vps/turnserver.conf:/etc/coturn/turnserver.conf:ro
     ports:
       - "3478:3478/udp"
       - "3478:3478/tcp"

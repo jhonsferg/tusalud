@@ -1,0 +1,18 @@
+TuSalud VPS: notas de operacion
+
+Secreto de TURN
+El secreto de coturn no va en la linea de comandos ni en el repositorio. El compose monta el archivo docker/vps/turnserver.conf, que se genera en el servidor, pertenece al usuario nobody del contenedor y no se versiona.
+
+Generar o rotar el secreto, desde /root/tusalud:
+  NUEVO=$(openssl rand -hex 32)
+  sed -i "s/^TURN_SECRET=.*/TURN_SECRET=$NUEVO/" .env
+  printf 'static-auth-secret=%s\n' "$NUEVO" > docker/vps/turnserver.conf
+  chown 165534:165534 docker/vps/turnserver.conf
+  chmod 600 docker/vps/turnserver.conf
+  docker compose -f compose.vps.yaml up -d --force-recreate turn app
+
+El uid 165534 corresponde al usuario nobody del contenedor con userns-remap activo. La API y coturn deben compartir el mismo valor, por eso se recrean los dos servicios.
+
+Comprobacion:
+  docker ps --filter name=tusalud
+  docker exec tusalud-turn turnutils_stunclient 127.0.0.1
