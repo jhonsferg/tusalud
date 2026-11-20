@@ -22,6 +22,8 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SERVER_PORT: 8080
+      SPRING_FLYWAY_LOCATIONS: classpath:db/migration,classpath:db/demo
+      SPRING_FLYWAY_OUT_OF_ORDER: "true"
       DB_URL: jdbc:postgresql://databases_postgres:5432/${TUSALUD_DB_NAME}
       DB_USERNAME: ${TUSALUD_DB_USER}
       DB_PASSWORD: ${TUSALUD_DB_PASSWORD}
@@ -30,7 +32,9 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       MFA_CLAVE_CIFRADO: ${MFA_CLAVE_CIFRADO}
       PAGOS_SIMULACION_HABILITADA: "true"
-      TURN_HABILITADO: "false"
+      TURN_HABILITADO: "true"
+      TURN_HOST: tusalud.codesoftlabs.com
+      TURN_PORT: 3478
       TURN_SECRET: ${TURN_SECRET}
       CANALES_URL_BASE: https://tusalud.codesoftlabs.com
       CANALES_SECRETO: ${CANALES_SECRETO}
@@ -62,6 +66,38 @@ services:
     networks:
       - storages
       - interna
+
+  turn:
+    image: coturn/coturn:4.7.0-alpine
+    container_name: tusalud-turn
+    restart: unless-stopped
+    mem_limit: 128m
+    command:
+      - "--log-file=stdout"
+      - "--realm=tusalud"
+      - "--use-auth-secret"
+      - "--static-auth-secret=${TURN_SECRET}"
+      - "--listening-port=3478"
+      - "--min-port=49160"
+      - "--max-port=49200"
+      - "--fingerprint"
+      - "--no-cli"
+      - "--no-tls"
+      - "--no-dtls"
+      - "--no-multicast-peers"
+      - "--no-tcp-relay"
+      - "--denied-peer-ip=0.0.0.0-0.255.255.255"
+      - "--denied-peer-ip=127.0.0.0-127.255.255.255"
+      - "--denied-peer-ip=169.254.0.0-169.254.255.255"
+      - "--denied-peer-ip=100.64.0.0-100.127.255.255"
+      - "--denied-peer-ip=10.0.0.0-10.255.255.255"
+      - "--denied-peer-ip=172.16.0.0-172.31.255.255"
+      - "--denied-peer-ip=192.168.0.0-192.168.255.255"
+      - "--external-ip=${TURN_EXTERNAL_IP}"
+    ports:
+      - "3478:3478/udp"
+      - "3478:3478/tcp"
+      - "49160-49200:49160-49200/udp"
 
   web:
     build:
