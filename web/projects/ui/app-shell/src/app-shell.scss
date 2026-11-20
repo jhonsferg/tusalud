@@ -4,7 +4,7 @@
 
 .shell {
   display: grid;
-  grid-template-columns: 16.5rem minmax(0, 1fr);
+  grid-template-columns: 20.5rem minmax(0, 1fr);
   min-height: 100vh;
   transition: grid-template-columns 0.2s ease;
 
@@ -24,6 +24,7 @@
   flex-direction: column;
   height: 100vh;
   padding: 1rem 0.75rem;
+  overflow-x: hidden;
   overflow-y: auto;
   background: var(--app-sidebar-bg);
   color: var(--app-sidebar-text);
@@ -142,6 +143,9 @@ nav {
 
   .label {
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
