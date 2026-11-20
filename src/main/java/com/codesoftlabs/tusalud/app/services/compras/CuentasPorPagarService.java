@@ -64,6 +64,7 @@ public class CuentasPorPagarService {
     private final NotificacionRepository notificacionRepository;
     private final ComprasAuditor auditor;
     private final ComprasAvisos avisos;
+    private final org.springframework.context.ApplicationEventPublisher eventos;
 
     public List<ComprobanteProveedorResponse> listar(
             EstadoComprobanteProveedor estado,
@@ -153,6 +154,14 @@ public class CuentasPorPagarService {
                 comprobante.getId(),
                 "REGISTRAR",
                 comprobante.numeroCompleto() + " " + proveedor.getRazonSocial() + " S/ " + total);
+        eventos.publishEvent(new com.codesoftlabs.tusalud.app.services.events.HechosContables.CompraRegistrada(
+                comprobante.getId(),
+                comprobante.numeroCompleto(),
+                proveedor.getRazonSocial(),
+                comprobante.getFechaEmision(),
+                subtotal,
+                igv,
+                total));
         return respuesta(comprobante);
     }
 
@@ -175,7 +184,7 @@ public class CuentasPorPagarService {
             throw new ConflictException("La fecha del pago no puede ser futura");
         }
         Usuario usuario = usuario(actor);
-        pagoRepository.save(PagoProveedor.builder()
+        PagoProveedor pago = pagoRepository.save(PagoProveedor.builder()
                 .comprobante(comprobante)
                 .monto(monto)
                 .metodo(request.metodo())
@@ -195,6 +204,14 @@ public class CuentasPorPagarService {
                 id,
                 "PAGAR",
                 "S/ " + monto + " " + request.metodo() + " saldo " + comprobante.saldo());
+        eventos.publishEvent(new com.codesoftlabs.tusalud.app.services.events.HechosContables.PagoProveedorRegistrado(
+                pago.getId(),
+                id,
+                comprobante.numeroCompleto(),
+                comprobante.getProveedor().getRazonSocial(),
+                fecha,
+                monto,
+                request.metodo()));
         return respuesta(comprobante);
     }
 
@@ -213,6 +230,8 @@ public class CuentasPorPagarService {
         comprobante.setAnuladoEn(LocalDateTime.now());
         comprobante.setMotivoAnulacion(motivo.strip());
         auditor.registrar(usuario(actor), ENTIDAD, id, "ANULAR", motivo);
+        eventos.publishEvent(new com.codesoftlabs.tusalud.app.services.events.HechosContables.CompraAnulada(
+                id, comprobante.numeroCompleto(), LocalDate.now(), motivo.strip()));
         return respuesta(comprobante);
     }
 

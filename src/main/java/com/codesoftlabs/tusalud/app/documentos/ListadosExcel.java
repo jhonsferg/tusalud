@@ -38,12 +38,16 @@ public class ListadosExcel {
     private final CitaService citaService;
     private final com.codesoftlabs.tusalud.app.services.compras.ReportesComprasService comprasService;
     private final com.codesoftlabs.tusalud.app.services.compras.OrdenCompraService ordenCompraService;
+    private final com.codesoftlabs.tusalud.app.services.contabilidad.LibrosContablesService librosContables;
 
     public Listado armar(UsuarioPrincipal actor, TipoDocumento tipo, ParametrosDocumento parametros) {
         return switch (tipo) {
             case LISTADO_COMPROBANTES -> comprobantes(parametros);
             case KARDEX -> kardex(parametros);
             case REPORTE_COMPRAS -> compras(parametros);
+            case LIBRO_DIARIO -> libroDiario(parametros);
+            case LIBRO_MAYOR -> libroMayor(parametros);
+            case BALANCE_COMPROBACION -> balanceComprobacion(parametros);
             case STOCK -> stock(actor, parametros);
             case AUSENCIAS -> ausencias(actor, parametros);
             case TURNOS -> turnos(parametros);
@@ -137,6 +141,81 @@ public class ListadosExcel {
         }
         return new Listado(
                 List.of(resumen, ordenes), "compras-" + rango[0] + "-a-" + rango[1], "Compras por proveedor");
+    }
+
+    private Listado libroDiario(ParametrosDocumento p) {
+        LocalDate[] rango = p.rango(LocalDate.now().withDayOfMonth(1), LocalDate.now());
+        HojaExcel hoja = HojaExcel.de(
+                "Libro diario", "Fecha", "Asiento", "Origen", "Estado", "Cuenta", "Nombre", "Glosa", "Debe", "Haber");
+        for (var f : librosContables.diario(rango[0], rango[1])) {
+            hoja.fila(
+                    f.fecha(),
+                    f.asiento(),
+                    f.origen().name(),
+                    f.estado().name(),
+                    f.cuentaCodigo(),
+                    f.cuentaNombre(),
+                    f.glosa(),
+                    f.debe(),
+                    f.haber());
+        }
+        return new Listado(List.of(hoja), "libro-diario-" + rango[0] + "-a-" + rango[1], "Libro diario");
+    }
+
+    private Listado libroMayor(ParametrosDocumento p) {
+        LocalDate[] rango = p.rango(LocalDate.now().withDayOfMonth(1), LocalDate.now());
+        UUID cuentaId = p.uuid("cuentaId");
+        if (cuentaId == null) {
+            throw new com.codesoftlabs.tusalud.app.exceptions.DatosInvalidosException("Indique la cuenta del mayor");
+        }
+        var mayor = librosContables.mayor(cuentaId, rango[0], rango[1]);
+        HojaExcel hoja = HojaExcel.de("Libro mayor", "Fecha", "Asiento", "Glosa", "Debe", "Haber", "Saldo");
+        hoja.fila(rango[0], "", "Saldo inicial", "", "", mayor.saldoInicial());
+        for (var f : mayor.movimientos()) {
+            hoja.fila(f.fecha(), f.asiento(), f.glosa(), f.debe(), f.haber(), f.saldo());
+        }
+        return new Listado(
+                List.of(hoja),
+                "libro-mayor-" + mayor.cuenta().codigo() + "-" + rango[0] + "-a-" + rango[1],
+                "Libro mayor de " + mayor.cuenta().codigo() + " "
+                        + mayor.cuenta().nombre());
+    }
+
+    private Listado balanceComprobacion(ParametrosDocumento p) {
+        LocalDate[] rango = p.rango(LocalDate.now().withDayOfMonth(1), LocalDate.now());
+        var balance = librosContables.balanceComprobacion(rango[0], rango[1]);
+        HojaExcel hoja = HojaExcel.de(
+                "Balance de comprobación",
+                "Cuenta",
+                "Nombre",
+                "Inicial deudor",
+                "Inicial acreedor",
+                "Debe",
+                "Haber",
+                "Saldo deudor",
+                "Saldo acreedor");
+        for (var f : balance.filas()) {
+            hoja.fila(
+                    f.codigo(),
+                    f.nombre(),
+                    f.inicialDeudor(),
+                    f.inicialAcreedor(),
+                    f.debe(),
+                    f.haber(),
+                    f.finalDeudor(),
+                    f.finalAcreedor());
+        }
+        hoja.fila(
+                "",
+                "Totales",
+                "",
+                "",
+                balance.totalDebe(),
+                balance.totalHaber(),
+                balance.totalDeudor(),
+                balance.totalAcreedor());
+        return new Listado(
+                List.of(hoja), "balance-comprobacion-" + rango[0] + "-a-" + rango[1], "Balance de comprobación");
     }
 
     private Listado kardex(ParametrosDocumento p) {

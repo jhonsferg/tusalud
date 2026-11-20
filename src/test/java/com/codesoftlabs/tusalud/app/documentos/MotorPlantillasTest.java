@@ -98,7 +98,8 @@ class MotorPlantillasTest {
                 "REPORTE_EJECUTIVO",
                 "REPORTE_FINANCIERO",
                 "REPORTE_OPERATIVO",
-                "REPORTE_CALIDAD"
+                "REPORTE_CALIDAD",
+                "REPORTE_CONTABLE"
             })
     void generaUnPdfValidoConTildesYEnies(TipoDocumento tipo) throws Exception {
         byte[] pdf = motor.renderizarPdf(ficha(tipo));

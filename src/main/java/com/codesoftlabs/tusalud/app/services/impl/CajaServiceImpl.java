@@ -101,6 +101,7 @@ public class CajaServiceImpl implements CajaService {
     private final CoberturaCobroService coberturaCobro;
     private final FacturacionService facturacion;
     private final ConfiguracionFiscalService configuracionFiscal;
+    private final org.springframework.context.ApplicationEventPublisher eventos;
 
     @Override
     @Transactional
@@ -308,6 +309,15 @@ public class CajaServiceImpl implements CajaService {
         }
         comprobante = comprobanteRepository.save(comprobante);
         facturacion.registrarDesdeComprobante(comprobante);
+        eventos.publishEvent(new com.codesoftlabs.tusalud.app.services.events.HechosContables.CobroRegistrado(
+                comprobante.getId(),
+                comprobante.getCodigo(),
+                comprobante.getFecha().toLocalDate(),
+                comprobante.getMetodoPago(),
+                comprobante.getSubtotal(),
+                comprobante.getIgv(),
+                comprobante.getTotal(),
+                comprobante.getMontoCubierto()));
         if (desglose != null) {
             coberturaCobro.registrarCuenta(
                     comprobante,
@@ -433,6 +443,8 @@ public class CajaServiceImpl implements CajaService {
         comprobante.setAnuladoEn(LocalDateTime.now());
         revertirOrigen(comprobante);
         coberturaCobro.revertir(comprobante);
+        eventos.publishEvent(new com.codesoftlabs.tusalud.app.services.events.HechosContables.CobroAnulado(
+                comprobante.getId(), comprobante.getCodigo(), LocalDate.now(), motivo.trim()));
         log.info("Comprobante {} anulado por {}", comprobante.getCodigo(), actor.getId());
         return ComprobanteResponse.from(comprobante);
     }

@@ -1,5 +1,9 @@
 package com.codesoftlabs.tusalud.app.documentos;
 
+import com.codesoftlabs.tusalud.app.dto.response.ContabilidadResponses.EstadoResultadosResponse;
+import com.codesoftlabs.tusalud.app.dto.response.ContabilidadResponses.EstadoSituacionResponse;
+import com.codesoftlabs.tusalud.app.dto.response.ContabilidadResponses.LineaEstado;
+import com.codesoftlabs.tusalud.app.dto.response.ContabilidadResponses.SeccionEstado;
 import com.codesoftlabs.tusalud.app.dto.response.IndicadorReporte;
 import com.codesoftlabs.tusalud.app.dto.response.PeriodoReporte;
 import com.codesoftlabs.tusalud.app.dto.response.ReporteCalidadResponse;
@@ -8,6 +12,7 @@ import com.codesoftlabs.tusalud.app.dto.response.ReporteFinancieroResponse;
 import com.codesoftlabs.tusalud.app.dto.response.ReporteMorbilidadResponse;
 import com.codesoftlabs.tusalud.app.dto.response.ReporteOperativoResponse;
 import com.codesoftlabs.tusalud.app.entities.enums.AgrupacionReporte;
+import com.codesoftlabs.tusalud.app.services.contabilidad.LibrosContablesService;
 import com.codesoftlabs.tusalud.app.services.interfaces.ReporteService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,6 +31,7 @@ public class DocumentosReportes {
     private static final String SIN_DATO = "-";
 
     private final ReporteService reporteService;
+    private final LibrosContablesService libros;
 
     public ReporteArmado armar(
             TipoDocumento tipo, LocalDate desde, LocalDate hasta, AgrupacionReporte agrupacion, boolean conGraficos) {
@@ -35,8 +41,47 @@ public class DocumentosReportes {
             case REPORTE_OPERATIVO -> operativo(reporteService.operativo(desde, hasta, agrupacion), conGraficos);
             case REPORTE_CALIDAD -> calidad(reporteService.calidad(desde, hasta, agrupacion), conGraficos);
             case REPORTE_MORBILIDAD -> morbilidad(reporteService.morbilidad(desde, hasta, agrupacion), conGraficos);
+            case REPORTE_CONTABLE -> contable(desde, hasta);
             default -> throw new IllegalArgumentException("El documento no es un reporte: " + tipo);
         };
+    }
+
+    private ReporteArmado contable(LocalDate desde, LocalDate hasta) {
+        EstadoSituacionResponse situacion = libros.estadoSituacion(hasta);
+        EstadoResultadosResponse resultados = libros.estadoResultados(desde, hasta);
+        FichaDocumento ficha = FichaDocumento.de(TipoDocumento.REPORTE_CONTABLE)
+                .titulo("Estados financieros", "Del " + Formato.fecha(desde) + " al " + Formato.fecha(hasta))
+                .par("Situación al", Formato.fecha(hasta))
+                .par("Resultados del", Formato.fecha(desde) + " al " + Formato.fecha(hasta));
+        HojaExcel hojaSituacion = HojaExcel.de("Situación", "Sección", "Código", "Cuenta", "Importe");
+        ficha.seccion("Estado de situación financiera").cabecera("Código", "Cuenta", "Importe");
+        seccionContable(ficha, hojaSituacion, situacion.activo());
+        seccionContable(ficha, hojaSituacion, situacion.pasivo());
+        seccionContable(ficha, hojaSituacion, situacion.patrimonio());
+        ficha.filaTipo("T", "", "Pasivo y patrimonio", Formato.moneda(situacion.totalPasivoPatrimonio()));
+        hojaSituacion.fila("Pasivo y patrimonio", "", "Total", situacion.totalPasivoPatrimonio());
+        hojaSituacion.fila("Control", "", situacion.cuadra() ? "Cuadra" : "No cuadra", BigDecimal.ZERO);
+        HojaExcel hojaResultados = HojaExcel.de("Resultados", "Sección", "Código", "Cuenta", "Importe");
+        ficha.seccion("Estado de resultados").cabecera("Código", "Cuenta", "Importe");
+        seccionContable(ficha, hojaResultados, resultados.ingresos());
+        seccionContable(ficha, hojaResultados, resultados.gastos());
+        ficha.filaTipo("T", "", "Resultado del periodo", Formato.moneda(resultados.resultado()));
+        hojaResultados.fila("Resultado", "", "Resultado del periodo", resultados.resultado());
+        return new ReporteArmado(
+                ficha,
+                List.of(hojaSituacion, hojaResultados),
+                "Estados financieros",
+                "estados-financieros-" + desde + "-a-" + hasta);
+    }
+
+    private void seccionContable(FichaDocumento ficha, HojaExcel hoja, SeccionEstado seccion) {
+        ficha.filaTipo("S", seccion.titulo(), "", "");
+        for (LineaEstado linea : seccion.lineas()) {
+            ficha.fila(linea.codigo(), linea.nombre(), Formato.moneda(linea.importe()));
+            hoja.fila(seccion.titulo(), linea.codigo(), linea.nombre(), linea.importe());
+        }
+        ficha.filaTipo("T", "", "Total " + seccion.titulo().toLowerCase(), Formato.moneda(seccion.total()));
+        hoja.fila(seccion.titulo(), "", "Total", seccion.total());
     }
 
     private ReporteArmado ejecutivo(ReporteEjecutivoResponse r, boolean graficos) {

@@ -46,7 +46,8 @@ class ValidadorPlantillaTest {
                 "REPORTE_EJECUTIVO",
                 "REPORTE_FINANCIERO",
                 "REPORTE_OPERATIVO",
-                "REPORTE_CALIDAD"
+                "REPORTE_CALIDAD",
+                "REPORTE_CONTABLE"
             })
     void aceptaLasPlantillasPorDefecto(TipoDocumento tipo) throws Exception {
         try (InputStream entrada = getClass().getResourceAsStream("/reportes/" + tipo.plantilla() + ".jrxml")) {
