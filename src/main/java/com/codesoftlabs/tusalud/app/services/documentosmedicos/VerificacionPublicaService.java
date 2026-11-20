@@ -36,6 +36,7 @@ public class VerificacionPublicaService {
     private final CarneVacunacionRepository carnes;
     private final com.codesoftlabs.tusalud.app.repositories.RecetaElectronicaRepository recetas;
     private final com.codesoftlabs.tusalud.app.services.receta.RecetaFirma recetaFirma;
+    private final com.codesoftlabs.tusalud.app.repositories.HceImpresionRepository historias;
 
     @Value("${app.documentos-medicos.verificacion-por-minuto:20}")
     private int porMinuto;
@@ -109,6 +110,18 @@ public class VerificacionPublicaService {
                     r.getEmitidaEn(),
                     r.getMedico().getUsuario().getNombreCompleto(),
                     r.getMedico().getColegiatura(),
+                    ESTABLECIMIENTO);
+        }
+        Optional<com.codesoftlabs.tusalud.app.entities.HceImpresion> historia =
+                historias.findByCodigoVerificacion(normalizado);
+        if (historia.isPresent()) {
+            var h = historia.get();
+            return new VerificacionPublicaResponse(
+                    "VALIDO",
+                    "Historia clínica impresa",
+                    h.getEmitidoEn(),
+                    h.getEmitidoPor().getNombreCompleto(),
+                    null,
                     ESTABLECIMIENTO);
         }
         return new VerificacionPublicaResponse("NO_ENCONTRADO", null, null, null, null, null);

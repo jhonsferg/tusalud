@@ -59,6 +59,7 @@ public class AtencionServiceImpl implements AtencionService {
     private final Cie10Service cie10Service;
     private final AuditoriaClinicaService auditoriaClinicaService;
     private final com.codesoftlabs.tusalud.app.repositories.RecetaElectronicaRepository recetasElectronicas;
+    private final com.codesoftlabs.tusalud.app.repositories.AtencionCierreRepository cierres;
 
     @Override
     @Transactional
@@ -107,6 +108,10 @@ public class AtencionServiceImpl implements AtencionService {
             throw new ForbiddenOperationException("Solo el médico de la cita puede editar su atención");
         }
         Atencion atencion = buscarAtencion(citaId);
+        if (cierres.existsByAtencionId(atencion.getId())) {
+            throw new ConflictException(
+                    "La atención está cerrada y firmada: use una adenda o una corrección con motivo");
+        }
         if (atencion.getFecha().isBefore(LocalDateTime.now().minusHours(VENTANA_EDICION_HORAS))) {
             throw new ConflictException(
                     "La atención ya no se puede modificar: pasaron más de " + VENTANA_EDICION_HORAS + " horas");
