@@ -52,6 +52,56 @@ export const routes: Routes = [
           import('@tusalud/features/compras').then((m) => m.REPORTE_COMPRAS_ROUTES),
       },
       {
+        path: 'contabilidad',
+        pathMatch: 'full',
+        loadChildren: () =>
+          import('@tusalud/features/contabilidad').then((m) => m.CONTABILIDAD_RESUMEN_ROUTES),
+      },
+      {
+        path: 'contabilidad/asientos',
+        loadChildren: () => import('@tusalud/features/contabilidad').then((m) => m.ASIENTOS_ROUTES),
+      },
+      {
+        path: 'contabilidad/plan-cuentas',
+        loadChildren: () =>
+          import('@tusalud/features/contabilidad').then((m) => m.PLAN_CUENTAS_ROUTES),
+      },
+      {
+        path: 'contabilidad/periodos',
+        loadChildren: () =>
+          import('@tusalud/features/contabilidad').then((m) => m.PERIODOS_CONTABLES_ROUTES),
+      },
+      {
+        path: 'contabilidad/libros',
+        loadChildren: () =>
+          import('@tusalud/features/contabilidad').then((m) => m.LIBROS_CONTABLES_ROUTES),
+      },
+      {
+        path: 'contabilidad/tesoreria',
+        loadChildren: () =>
+          import('@tusalud/features/contabilidad').then((m) => m.TESORERIA_ROUTES),
+      },
+      {
+        path: 'contabilidad/conciliacion',
+        loadChildren: () =>
+          import('@tusalud/features/contabilidad').then((m) => m.CONCILIACION_ROUTES),
+      },
+      {
+        path: 'contabilidad/flujo-caja',
+        loadChildren: () =>
+          import('@tusalud/features/contabilidad').then((m) => m.FLUJO_CAJA_ROUTES),
+      },
+      {
+        path: 'contabilidad/libros-electronicos',
+        loadChildren: () =>
+          import('@tusalud/features/contabilidad').then((m) => m.LIBROS_ELECTRONICOS_ROUTES),
+      },
+      {
+        path: 'contabilidad/plantillas',
+        loadChildren: () =>
+          import('@tusalud/features/contabilidad').then((m) => m.PLANTILLAS_ASIENTO_ROUTES),
+      },
+      {
         path: 'mi-espacio',
         loadChildren: () => import('@tusalud/features/rrhh').then((m) => m.MI_ESPACIO_ROUTES),
       },

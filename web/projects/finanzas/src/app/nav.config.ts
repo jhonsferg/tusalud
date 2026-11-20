@@ -124,6 +124,77 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Contabilidad',
+    items: [
+      {
+        label: 'Resumen contable',
+        icon: 'pi-book',
+        link: '/contabilidad',
+        roles: ['ROLE_FINANZAS'],
+        exact: true,
+      },
+      {
+        label: 'Asientos',
+        icon: 'pi-pencil',
+        link: '/contabilidad/asientos',
+        roles: ['ROLE_FINANZAS'],
+      },
+      {
+        label: 'Libros y estados',
+        icon: 'pi-chart-bar',
+        link: '/contabilidad/libros',
+        roles: ['ROLE_FINANZAS'],
+      },
+      {
+        label: 'Periodos',
+        icon: 'pi-calendar',
+        link: '/contabilidad/periodos',
+        roles: ['ROLE_FINANZAS'],
+      },
+      {
+        label: 'Plan contable',
+        icon: 'pi-list',
+        link: '/contabilidad/plan-cuentas',
+        roles: ['ROLE_FINANZAS'],
+      },
+      {
+        label: 'Plantillas de asiento',
+        icon: 'pi-sliders-h',
+        link: '/contabilidad/plantillas',
+        roles: ['ROLE_FINANZAS'],
+      },
+      {
+        label: 'Libros electrónicos',
+        icon: 'pi-file-export',
+        link: '/contabilidad/libros-electronicos',
+        roles: ['ROLE_FINANZAS'],
+      },
+    ],
+  },
+  {
+    title: 'Tesorería',
+    items: [
+      {
+        label: 'Cuentas y movimientos',
+        icon: 'pi-wallet',
+        link: '/contabilidad/tesoreria',
+        roles: ['ROLE_FINANZAS'],
+      },
+      {
+        label: 'Conciliación',
+        icon: 'pi-check-square',
+        link: '/contabilidad/conciliacion',
+        roles: ['ROLE_FINANZAS'],
+      },
+      {
+        label: 'Flujo de caja',
+        icon: 'pi-chart-line',
+        link: '/contabilidad/flujo-caja',
+        roles: ['ROLE_FINANZAS'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

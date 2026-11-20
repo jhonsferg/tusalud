@@ -124,6 +124,42 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Contabilidad',
+    items: [
+      {
+        label: 'Resumen contable',
+        icon: 'pi-book',
+        link: '/contabilidad',
+        roles: ['ROLE_GERENCIA'],
+        exact: true,
+      },
+      {
+        label: 'Libros y estados',
+        icon: 'pi-chart-bar',
+        link: '/contabilidad/libros',
+        roles: ['ROLE_GERENCIA'],
+      },
+      {
+        label: 'Periodos y cierre',
+        icon: 'pi-calendar',
+        link: '/contabilidad/periodos',
+        roles: ['ROLE_GERENCIA'],
+      },
+      {
+        label: 'Tesorería',
+        icon: 'pi-wallet',
+        link: '/contabilidad/tesoreria',
+        roles: ['ROLE_GERENCIA'],
+      },
+      {
+        label: 'Flujo de caja',
+        icon: 'pi-chart-line',
+        link: '/contabilidad/flujo-caja',
+        roles: ['ROLE_GERENCIA'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

@@ -17,6 +17,10 @@ export type TipoExportacion =
   | 'listado-comprobantes'
   | 'kardex'
   | 'reporte-compras'
+  | 'reporte-contable'
+  | 'libro-diario'
+  | 'libro-mayor'
+  | 'balance-comprobacion'
   | 'stock'
   | 'ausencias'
   | 'turnos'
@@ -35,6 +39,10 @@ export const ETIQUETA_TIPO_EXPORTACION: Readonly<Record<string, string>> = {
   'listado-comprobantes': 'Listado de comprobantes',
   kardex: 'Kardex del almacén',
   'reporte-compras': 'Reporte de compras',
+  'reporte-contable': 'Estados financieros',
+  'libro-diario': 'Libro diario',
+  'libro-mayor': 'Libro mayor',
+  'balance-comprobacion': 'Balance de comprobación',
   stock: 'Stock del almacén',
   ausencias: 'Ausencias del personal',
   turnos: 'Turnos del personal',

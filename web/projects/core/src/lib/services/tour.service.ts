@@ -197,6 +197,20 @@ export const PASOS_TOUR_PREDETERMINADOS: readonly TourStep[] = [
     roles: ['ROLE_FINANZAS', 'ROLE_GERENCIA', 'ROLE_ADMIN'],
   },
   {
+    target: 'nav:/contabilidad',
+    icon: 'pi-book',
+    title: 'Contabilidad',
+    text: 'Revisa el periodo contable, los asientos que genera el sistema desde caja y compras, y los hechos que quedaron sin contabilizar.',
+    roles: ['ROLE_FINANZAS', 'ROLE_GERENCIA'],
+  },
+  {
+    target: 'nav:/contabilidad/tesoreria',
+    icon: 'pi-wallet',
+    title: 'Tesorería',
+    text: 'Controla las cuentas de caja y bancos, registra movimientos y concilia el extracto bancario.',
+    roles: ['ROLE_FINANZAS', 'ROLE_GERENCIA'],
+  },
+  {
     target: 'nav:/cola',
     icon: 'pi-users',
     title: 'Cola de pacientes',

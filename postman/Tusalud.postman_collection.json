@@ -21787,8 +21787,8 @@
                 "exec": [
                   "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
                   "const lista = pm.response.json();",
-                  "pm.test('Están las veintiuna plantillas del sistema', () => {",
-                  "    pm.expect(lista).to.have.length(21);",
+                  "pm.test('Están las veintidós plantillas del sistema', () => {",
+                  "    pm.expect(lista).to.have.length(22);",
                   "    ['comprobante', 'receta', 'resultados-laboratorio', 'informe-imagen', 'constancia', 'resumen-historia', 'reporte-ejecutivo', 'reporte-financiero', 'reporte-operativo', 'reporte-calidad'].forEach(c => pm.expect(lista.map(p => p.codigo)).to.include(c));",
                   "});"
                 ]
@@ -46174,6 +46174,5217 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "33 - Contabilidad y tesorería",
+      "description": "Plan contable, periodos y cierre con segregación de funciones, asientos con reversa, plantillas, tesorería, conciliación bancaria con extracto CSV, libros y estados financieros, libros electrónicos, flujo de caja y la contabilización automática de cobros.",
+      "item": [
+        {
+          "name": "Login finanzas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('coFinanzasToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"finanzas@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login gerencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('coGerenciaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"gerencia@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('coAdminToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login caja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('coCajaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"caja@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('coMedicoToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('coPacienteToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Preparar datos únicos de la corrida",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const hoy = new Date();",
+                  "pm.collectionVariables.set('coHoy', fmt(hoy));",
+                  "pm.collectionVariables.set('coInicioMes', fmt(new Date(hoy.getFullYear(), hoy.getMonth(), 1)));",
+                  "pm.collectionVariables.set('coAnioActual', String(hoy.getFullYear()));",
+                  "pm.collectionVariables.set('coMesActual', String(hoy.getMonth() + 1));",
+                  "pm.sendRequest({ url: pm.variables.get('baseUrl') + '/api/v1/contabilidad/periodos', method: 'GET', header: { Authorization: 'Bearer ' + pm.collectionVariables.get('coFinanzasToken') } }, (err, res) => {",
+                  "  const usados = new Set((res.json() || []).map(p => p.anio * 100 + p.mes));",
+                  "  let anio = 2000, mes = 1;",
+                  "  while (usados.has(anio * 100 + mes)) { mes++; if (mes > 12) { mes = 1; anio++; } }",
+                  "  pm.collectionVariables.set('coAnioP', String(anio));",
+                  "  pm.collectionVariables.set('coMesP', String(mes));",
+                  "  pm.collectionVariables.set('coFechaP', anio + '-' + String(mes).padStart(2, '0') + '-15');",
+                  "});",
+                  "const base = 8000000 + (Date.now() % 1000000);",
+                  "pm.collectionVariables.set('coCodigoA', String(base));",
+                  "pm.collectionVariables.set('coCodigoB', String(base + 1));",
+                  "pm.collectionVariables.set('coSufijo', String(Date.now()).slice(-7));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('El resumen trae los indicadores', () => { pm.expect(j).to.have.property('saldoTesoreria'); pm.expect(j).to.have.property('porPagar'); pm.expect(j).to.have.property('porCobrar'); });",
+                  "pm.test('Hay un periodo actual abierto por la demostración', () => pm.expect(j.periodoActual).to.match(/^\\d{4}-\\d{2}$/));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sin token la contabilidad responde 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "cuentas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El rol paciente no ve el resumen contable (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El rol médico no ve el resumen contable (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El rol caja no ve el resumen contable (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El rol administración no ve el resumen contable (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Administración tampoco ve los asientos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "asientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Plan contable de finanzas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "const codigos = lista.map(c => c.codigo);",
+                  "pm.test('Trae el plan simplificado', () => ['1011', '1041', '1213', '4212', '40111', '6011', '7041', '5011'].forEach(c => pm.expect(codigos).to.include(c)));",
+                  "const por = c => lista.find(x => x.codigo === c);",
+                  "pm.test('Las agrupaciones no reciben asientos', () => pm.expect(por('10').aceptaMovimientos).to.eql(false));",
+                  "pm.test('Las cuentas del sistema están marcadas', () => pm.expect(por('1011').sistema).to.eql(true));",
+                  "pm.collectionVariables.set('coCajaCuentaId', por('1011').id);",
+                  "pm.collectionVariables.set('coBancoCuentaId', por('1041').id);",
+                  "pm.collectionVariables.set('coCapitalCuentaId', por('5011').id);",
+                  "pm.collectionVariables.set('coAgrupacionId', por('10').id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "cuentas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia consulta el plan contable",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "cuentas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia no crea cuentas (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "cuentas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"1099\",\n  \"nombre\": \"Cuenta de gerencia\",\n  \"tipo\": \"ACTIVO\",\n  \"aceptaMovimientos\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear la cuenta A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Nace activa, deudora y de usuario', () => { pm.expect(j.activa).to.eql(true); pm.expect(j.naturaleza).to.eql('DEUDORA'); pm.expect(j.sistema).to.eql(false); });",
+                  "pm.collectionVariables.set('coCuentaAId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "cuentas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{coCodigoA}}\",\n  \"nombre\": \"Cuenta de prueba A {{coSufijo}}\",\n  \"tipo\": \"ACTIVO\",\n  \"aceptaMovimientos\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear la cuenta B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('El patrimonio es acreedor', () => pm.expect(j.naturaleza).to.eql('ACREEDORA'));",
+                  "pm.collectionVariables.set('coCuentaBId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "cuentas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{coCodigoB}}\",\n  \"nombre\": \"Cuenta de prueba B {{coSufijo}}\",\n  \"tipo\": \"PATRIMONIO\",\n  \"aceptaMovimientos\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear una cuenta con código repetido (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "cuentas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{coCodigoA}}\",\n  \"nombre\": \"Repetida\",\n  \"tipo\": \"ACTIVO\",\n  \"aceptaMovimientos\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear una cuenta con código inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "cuentas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"abc\",\n  \"nombre\": \"Mala\",\n  \"tipo\": \"ACTIVO\",\n  \"aceptaMovimientos\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Renombrar la cuenta A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Cambia el nombre', () => pm.expect(pm.response.json().nombre).to.include('renombrada'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/cuentas/{{coCuentaAId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "cuentas",
+                "{{coCuentaAId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Cuenta A renombrada {{coSufijo}}\",\n  \"aceptaMovimientos\": true,\n  \"activa\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No se desactiva una cuenta del sistema (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/cuentas/{{coCajaCuentaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "cuentas",
+                "{{coCajaCuentaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Caja\",\n  \"aceptaMovimientos\": true,\n  \"activa\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar los periodos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('El periodo actual existe y está abierto', () => { const p = pm.response.json().find(x => x.anio === Number(pm.collectionVariables.get('coAnioActual')) && x.mes === Number(pm.collectionVariables.get('coMesActual'))); pm.expect(p).to.exist; pm.expect(p.estado).to.eql('ABIERTO'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/periodos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "periodos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Abrir un periodo de prueba",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda abierto y vacío', () => { pm.expect(j.estado).to.eql('ABIERTO'); pm.expect(j.asientos).to.eql(0); });",
+                  "pm.collectionVariables.set('coPeriodoId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/periodos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "periodos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"anio\": {{coAnioP}},\n  \"mes\": {{coMesP}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Abrir el mismo periodo otra vez (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/periodos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "periodos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"anio\": {{coAnioP}},\n  \"mes\": {{coMesP}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia no abre periodos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/periodos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "periodos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"anio\": 2002,\n  \"mes\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear un asiento descuadrado como borrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Es un borrador sin número', () => { pm.expect(j.estado).to.eql('BORRADOR'); pm.expect(j.numero).to.not.be.ok; });",
+                  "pm.collectionVariables.set('coAsientoMalId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "asientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"{{coFechaP}}\",\n  \"glosa\": \"Descuadrado {{coSufijo}}\",\n  \"lineas\": [\n    { \"cuentaId\": \"{{coCuentaAId}}\", \"debe\": 100.00 },\n    { \"cuentaId\": \"{{coCuentaBId}}\", \"haber\": 90.00 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Contabilizar un asiento que no cuadra (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Dice que no cuadra', () => pm.expect(pm.response.json().message).to.include('no cuadra'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsientoMalId}}/contabilizar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsientoMalId}}",
+                "contabilizar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar el borrador descuadrado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsientoMalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsientoMalId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una línea con debe y haber a la vez se rechaza (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "asientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"{{coFechaP}}\",\n  \"glosa\": \"Mala línea\",\n  \"lineas\": [\n    { \"cuentaId\": \"{{coCuentaAId}}\", \"debe\": 5.00, \"haber\": 5.00 },\n    { \"cuentaId\": \"{{coCuentaBId}}\", \"haber\": 5.00 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una cuenta de agrupación no recibe asientos (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "asientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"{{coFechaP}}\",\n  \"glosa\": \"Agrupación\",\n  \"lineas\": [\n    { \"cuentaId\": \"{{coAgrupacionId}}\", \"debe\": 5.00 },\n    { \"cuentaId\": \"{{coCuentaBId}}\", \"haber\": 5.00 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un asiento con fecha futura se rechaza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "asientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"2999-01-15\",\n  \"glosa\": \"Futuro\",\n  \"lineas\": [\n    { \"cuentaId\": \"{{coCuentaAId}}\", \"debe\": 5.00 },\n    { \"cuentaId\": \"{{coCuentaBId}}\", \"haber\": 5.00 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un asiento en un periodo no abierto se rechaza (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "asientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"1989-01-15\",\n  \"glosa\": \"Sin periodo\",\n  \"lineas\": [\n    { \"cuentaId\": \"{{coCuentaAId}}\", \"debe\": 5.00 },\n    { \"cuentaId\": \"{{coCuentaBId}}\", \"haber\": 5.00 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia no registra asientos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "asientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"{{coFechaP}}\",\n  \"glosa\": \"Aporte de prueba {{coSufijo}}\",\n  \"lineas\": [\n    { \"cuentaId\": \"{{coCuentaAId}}\", \"debe\": 500.00 },\n    { \"cuentaId\": \"{{coCuentaBId}}\", \"haber\": 500.00 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear el asiento del aporte",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Totales 500', () => { pm.expect(Number(j.totalDebe)).to.eql(500); pm.expect(Number(j.totalHaber)).to.eql(500); });",
+                  "pm.collectionVariables.set('coAsientoId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "asientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"{{coFechaP}}\",\n  \"glosa\": \"Aporte de prueba {{coSufijo}}\",\n  \"lineas\": [\n    { \"cuentaId\": \"{{coCuentaAId}}\", \"debe\": 500.00 },\n    { \"cuentaId\": \"{{coCuentaBId}}\", \"haber\": 500.00 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Editar el borrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Cambia la glosa', () => pm.expect(pm.response.json().glosa).to.include('editado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsientoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsientoId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"{{coFechaP}}\",\n  \"glosa\": \"Aporte de prueba {{coSufijo}} editado\",\n  \"lineas\": [\n    { \"cuentaId\": \"{{coCuentaAId}}\", \"debe\": 500.00 },\n    { \"cuentaId\": \"{{coCuentaBId}}\", \"haber\": 500.00 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Contabilizar el asiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda contabilizado y numerado', () => { pm.expect(j.estado).to.eql('CONTABILIZADO'); pm.expect(j.numero).to.match(/^ASI-\\d{4}-\\d{6}$/); });",
+                  "pm.collectionVariables.set('coAsientoNumero', j.numero);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsientoId}}/contabilizar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsientoId}}",
+                "contabilizar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un asiento contabilizado no se edita (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsientoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsientoId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"{{coFechaP}}\",\n  \"glosa\": \"Aporte de prueba {{coSufijo}} otra vez\",\n  \"lineas\": [\n    { \"cuentaId\": \"{{coCuentaAId}}\", \"debe\": 500.00 },\n    { \"cuentaId\": \"{{coCuentaBId}}\", \"haber\": 500.00 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un asiento contabilizado no se elimina (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsientoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsientoId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia consulta el asiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Trae las dos líneas', () => pm.expect(pm.response.json().lineas).to.have.length(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsientoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsientoId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar el asiento por número",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Aparece en el libro diario', () => pm.expect(pm.response.json().map(a => a.id)).to.include(pm.collectionVariables.get('coAsientoId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos?q={{coAsientoNumero}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "asientos"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "{{coAsientoNumero}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Libro mayor de la cuenta A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Un movimiento y saldo 500', () => { pm.expect(j.movimientos).to.have.length(1); pm.expect(Number(j.saldoFinal)).to.eql(500); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/libros/mayor/{{coCuentaAId}}?desde={{coFechaP}}&hasta={{coFechaP}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "libros",
+                "mayor",
+                "{{coCuentaAId}}"
+              ],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "{{coFechaP}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{coFechaP}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reversar sin motivo (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsientoId}}/reversar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsientoId}}",
+                "reversar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reversar el asiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Es una reversa que apunta al original', () => { pm.expect(j.origen).to.eql('REVERSA'); pm.expect(j.revierteAId).to.eql(pm.collectionVariables.get('coAsientoId')); });",
+                  "pm.test('Invierte el debe y el haber', () => { pm.expect(Number(j.lineas[0].haber)).to.eql(500); pm.expect(Number(j.lineas[1].debe)).to.eql(500); });",
+                  "pm.collectionVariables.set('coReversaId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsientoId}}/reversar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsientoId}}",
+                "reversar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Aporte registrado por error\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El original queda revertido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Estado revertido enlazado a su reversa', () => { pm.expect(j.estado).to.eql('REVERTIDO'); pm.expect(j.reversaId).to.eql(pm.collectionVariables.get('coReversaId')); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsientoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsientoId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No se reversa dos veces (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsientoId}}/reversar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsientoId}}",
+                "reversar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Otra vez\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "No se reversa una reversa (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coReversaId}}/reversar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coReversaId}}",
+                "reversar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Reversa de reversa\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar el asiento definitivo del periodo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('coAsiento2Id', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "asientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"{{coFechaP}}\",\n  \"glosa\": \"Aporte de prueba {{coSufijo}} definitivo\",\n  \"lineas\": [\n    { \"cuentaId\": \"{{coCuentaAId}}\", \"debe\": 500.00 },\n    { \"cuentaId\": \"{{coCuentaBId}}\", \"haber\": 500.00 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Contabilizar el asiento definitivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsiento2Id}}/contabilizar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsiento2Id}}",
+                "contabilizar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Quien registró asientos no cierra el periodo (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Explica la segregación de funciones', () => pm.expect(pm.response.json().message).to.include('no puede cerrarlo'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/periodos/{{coPeriodoId}}/cerrar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "periodos",
+                "{{coPeriodoId}}",
+                "cerrar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Administración no cierra periodos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/periodos/{{coPeriodoId}}/cerrar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "periodos",
+                "{{coPeriodoId}}",
+                "cerrar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia cierra el periodo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda cerrado con quien lo cerró', () => { pm.expect(j.estado).to.eql('CERRADO'); pm.expect(j.cerradoPor).to.be.a('string'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/periodos/{{coPeriodoId}}/cerrar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "periodos",
+                "{{coPeriodoId}}",
+                "cerrar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un periodo cerrado rechaza asientos (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Dice que está cerrado', () => pm.expect(pm.response.json().message).to.include('cerrado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "asientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"{{coFechaP}}\",\n  \"glosa\": \"Aporte de prueba {{coSufijo}} tarde\",\n  \"lineas\": [\n    { \"cuentaId\": \"{{coCuentaAId}}\", \"debe\": 500.00 },\n    { \"cuentaId\": \"{{coCuentaBId}}\", \"haber\": 500.00 }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cerrar un periodo cerrado (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/periodos/{{coPeriodoId}}/cerrar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "periodos",
+                "{{coPeriodoId}}",
+                "cerrar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas no reabre periodos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/periodos/{{coPeriodoId}}/reabrir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "periodos",
+                "{{coPeriodoId}}",
+                "reabrir"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Corrección necesaria\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reabrir exige un motivo (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/periodos/{{coPeriodoId}}/reabrir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "periodos",
+                "{{coPeriodoId}}",
+                "reabrir"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia reabre el periodo con motivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda abierto y guarda el motivo', () => { pm.expect(j.estado).to.eql('ABIERTO'); pm.expect(j.motivoReapertura).to.include('Corrección'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/periodos/{{coPeriodoId}}/reabrir",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "periodos",
+                "{{coPeriodoId}}",
+                "reabrir"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Corrección del cierre de prueba\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Plantillas de asiento del sistema",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('Están las cinco plantillas', () => pm.expect(lista.map(p => p.evento)).to.include.members(['COBRO_EFECTIVO', 'COBRO_ELECTRONICO', 'COMPRA_PROVEEDOR', 'PAGO_PROVEEDOR_EFECTIVO', 'PAGO_PROVEEDOR_BANCO']));",
+                  "const cobro = lista.find(p => p.evento === 'COBRO_EFECTIVO');",
+                  "pm.test('El cobro en efectivo carga caja y abona ingresos e IGV', () => { const codigos = cobro.lineas.map(l => l.lado + ':' + l.cuentaCodigo); pm.expect(codigos).to.include.members(['DEBE:1011', 'HABER:7041', 'HABER:40111']); });",
+                  "pm.collectionVariables.set('coPlantillaId', cobro.id);",
+                  "pm.collectionVariables.set('coPlantillaNombre', cobro.nombre);",
+                  "pm.collectionVariables.set('coPlantillaLineas', JSON.stringify(cobro.lineas.map(l => ({ lineaId: l.id, cuentaId: l.cuentaId }))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/plantillas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "plantillas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia no edita plantillas (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/plantillas/{{coPlantillaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "plantillas",
+                "{{coPlantillaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"X\",\n  \"activa\": true,\n  \"cuentas\": {{coPlantillaLineas}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finanzas edita el nombre de una plantilla",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Conserva sus líneas', () => pm.expect(pm.response.json().lineas.length).to.be.greaterThan(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/plantillas/{{coPlantillaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "plantillas",
+                "{{coPlantillaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"{{coPlantillaNombre}}\",\n  \"activa\": true,\n  \"cuentas\": {{coPlantillaLineas}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Una plantilla no admite cuentas de agrupación (409)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const lineas = JSON.parse(pm.collectionVariables.get('coPlantillaLineas'));",
+                  "lineas[0].cuentaId = pm.collectionVariables.get('coAgrupacionId');",
+                  "pm.collectionVariables.set('coPlantillaMala', JSON.stringify({ nombre: pm.collectionVariables.get('coPlantillaNombre'), activa: true, cuentas: lineas }));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/plantillas/{{coPlantillaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "plantillas",
+                "{{coPlantillaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{{coPlantillaMala}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cuentas de tesorería con la demostración",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('Están la caja general y el banco', () => { pm.expect(lista.map(c => c.nombre)).to.include.members(['Caja general', 'BCP cuenta corriente']); });",
+                  "pm.test('Solo un banco es predeterminado', () => pm.expect(lista.filter(c => c.tipo === 'BANCO' && c.predeterminada)).to.have.length(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "tesoreria", "cuentas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia consulta tesorería",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "tesoreria", "cuentas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear una cuenta de tesorería",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Guarda solo los 4 últimos dígitos y el saldo', () => { pm.expect(j.ultimos4).to.eql('9876'); pm.expect(Number(j.saldo)).to.eql(1000); });",
+                  "pm.collectionVariables.set('coTesoreriaId', j.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "tesoreria", "cuentas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Banco de prueba {{coSufijo}}\",\n  \"tipo\": \"BANCO\",\n  \"banco\": \"Interbank\",\n  \"ultimos4\": \"9876\",\n  \"cuentaContableId\": \"{{coBancoCuentaId}}\",\n  \"saldoInicial\": 1000.00,\n  \"predeterminada\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El número completo de cuenta no se acepta (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "tesoreria", "cuentas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Banco largo {{coSufijo}}\",\n  \"tipo\": \"BANCO\",\n  \"ultimos4\": \"1234567890\",\n  \"cuentaContableId\": \"{{coBancoCuentaId}}\",\n  \"saldoInicial\": 0,\n  \"predeterminada\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La cuenta contable de tesorería debe ser un activo (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/cuentas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "tesoreria", "cuentas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Mala cuenta {{coSufijo}}\",\n  \"tipo\": \"BANCO\",\n  \"cuentaContableId\": \"{{coCapitalCuentaId}}\",\n  \"saldoInicial\": 0,\n  \"predeterminada\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar un ingreso con su asiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Genera su asiento y queda sin conciliar', () => { pm.expect(j.asientoId).to.be.a('string'); pm.expect(j.conciliado).to.eql(false); });",
+                  "pm.collectionVariables.set('coMovimientoId', j.id);",
+                  "pm.collectionVariables.set('coMovAsientoId', j.asientoId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/movimientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "tesoreria", "movimientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaId\": \"{{coTesoreriaId}}\",\n  \"fecha\": \"{{coHoy}}\",\n  \"tipo\": \"INGRESO\",\n  \"monto\": 250.00,\n  \"descripcion\": \"Depósito de prueba {{coSufijo}}\",\n  \"referencia\": \"OP-{{coSufijo}}\",\n  \"contrapartidaId\": \"{{coCapitalCuentaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar un egreso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('coMovimiento2Id', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/movimientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "tesoreria", "movimientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaId\": \"{{coTesoreriaId}}\",\n  \"fecha\": \"{{coHoy}}\",\n  \"tipo\": \"EGRESO\",\n  \"monto\": 15.50,\n  \"descripcion\": \"Comisión de prueba {{coSufijo}}\",\n  \"contrapartidaId\": \"{{coCapitalCuentaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El saldo refleja los movimientos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const c = pm.response.json().find(x => x.id === pm.collectionVariables.get('coTesoreriaId'));",
+                  "pm.test('1000 + 250 - 15.50', () => pm.expect(Number(c.saldo)).to.eql(1234.5));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/cuentas?soloActivas=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "tesoreria", "cuentas"],
+              "query": [
+                {
+                  "key": "soloActivas",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El asiento del movimiento es de tesorería",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Origen tesorería y contabilizado', () => { pm.expect(j.origen).to.eql('MOVIMIENTO_TESORERIA'); pm.expect(j.estado).to.eql('CONTABILIZADO'); });",
+                  "pm.test('Debita la cuenta de la tesorería', () => pm.expect(j.lineas[0].cuentaCodigo).to.eql('1041'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coMovAsientoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coMovAsientoId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "La contrapartida no puede ser la misma cuenta (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/movimientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "tesoreria", "movimientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaId\": \"{{coTesoreriaId}}\",\n  \"fecha\": \"{{coHoy}}\",\n  \"tipo\": \"INGRESO\",\n  \"monto\": 10.00,\n  \"descripcion\": \"Mala contrapartida\",\n  \"contrapartidaId\": \"{{coBancoCuentaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia no registra movimientos (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/movimientos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "tesoreria", "movimientos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaId\": \"{{coTesoreriaId}}\",\n  \"fecha\": \"{{coHoy}}\",\n  \"tipo\": \"INGRESO\",\n  \"monto\": 10.00,\n  \"descripcion\": \"No permitido\",\n  \"contrapartidaId\": \"{{coCapitalCuentaId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar los movimientos de la cuenta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Dos movimientos', () => pm.expect(pm.response.json()).to.have.length(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/movimientos?cuentaId={{coTesoreriaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "tesoreria", "movimientos"],
+              "query": [
+                {
+                  "key": "cuentaId",
+                  "value": "{{coTesoreriaId}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Importar el extracto bancario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Importa las tres líneas', () => pm.expect(pm.response.json().lineas).to.eql(3));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/conciliacion/extractos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "tesoreria",
+                "conciliacion",
+                "extractos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaId\": \"{{coTesoreriaId}}\",\n  \"archivo\": \"extracto-{{coSufijo}}.csv\",\n  \"contenido\": \"fecha,descripcion,referencia,monto\\n{{coHoy}},Abono OP-{{coSufijo}},OP-{{coSufijo}},250.00\\n{{coHoy}},Cargo por comision,,-15.50\\n{{coHoy}},Cargo desconocido,,-99.99\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Importar otra vez no duplica las líneas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Todas repetidas', () => { pm.expect(j.lineas).to.eql(0); pm.expect(j.duplicadas).to.eql(3); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/conciliacion/extractos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "tesoreria",
+                "conciliacion",
+                "extractos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaId\": \"{{coTesoreriaId}}\",\n  \"archivo\": \"extracto-{{coSufijo}}.csv\",\n  \"contenido\": \"fecha,descripcion,referencia,monto\\n{{coHoy}},Abono OP-{{coSufijo}},OP-{{coSufijo}},250.00\\n{{coHoy}},Cargo por comision,,-15.50\\n{{coHoy}},Cargo desconocido,,-99.99\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Un extracto con errores se rechaza con la línea (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Indica la línea', () => pm.expect(pm.response.json().message).to.include('línea 2'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/conciliacion/extractos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "tesoreria",
+                "conciliacion",
+                "extractos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuentaId\": \"{{coTesoreriaId}}\",\n  \"archivo\": \"malo.csv\",\n  \"contenido\": \"fecha,descripcion,referencia,monto\\nno-es-fecha,Mal,,abc\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sugerencias de conciliación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('Sugiere los dos importes que coinciden', () => pm.expect(lista).to.have.length(2));",
+                  "const abono = lista.find(s => Number(s.linea.monto) === 250);",
+                  "pm.test('El abono con referencia tiene más confianza', () => pm.expect(abono.puntaje).to.be.greaterThan(110));",
+                  "pm.collectionVariables.set('coLineaId', abono.linea.id);",
+                  "pm.collectionVariables.set('coSugerenciaMovId', abono.movimiento.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/conciliacion/{{coTesoreriaId}}/sugerencias",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "tesoreria",
+                "conciliacion",
+                "{{coTesoreriaId}}",
+                "sugerencias"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gerencia no concilia (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/conciliacion/conciliar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "tesoreria",
+                "conciliacion",
+                "conciliar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lineaId\": \"{{coLineaId}}\",\n  \"movimientoId\": \"{{coSugerenciaMovId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Conciliar el abono",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda conciliada', () => pm.expect(pm.response.json().estado).to.eql('CONCILIADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/conciliacion/conciliar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "tesoreria",
+                "conciliacion",
+                "conciliar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lineaId\": \"{{coLineaId}}\",\n  \"movimientoId\": \"{{coSugerenciaMovId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Conciliar otra vez la misma línea (409)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/conciliacion/conciliar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "tesoreria",
+                "conciliacion",
+                "conciliar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lineaId\": \"{{coLineaId}}\",\n  \"movimientoId\": \"{{coSugerenciaMovId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resumen de la conciliación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Quedan dos líneas y un movimiento por conciliar', () => { pm.expect(j.lineasPendientes).to.eql(2); pm.expect(j.movimientosSinConciliar).to.eql(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/conciliacion/{{coTesoreriaId}}/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "tesoreria",
+                "conciliacion",
+                "{{coTesoreriaId}}",
+                "resumen"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deshacer la conciliación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Vuelve a pendiente', () => pm.expect(pm.response.json().estado).to.eql('PENDIENTE'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/conciliacion/lineas/{{coLineaId}}/deshacer",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "tesoreria",
+                "conciliacion",
+                "lineas",
+                "{{coLineaId}}",
+                "deshacer"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ignorar una línea del extracto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda ignorada', () => pm.expect(pm.response.json().estado).to.eql('IGNORADA'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/conciliacion/lineas/{{coLineaId}}/ignorar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "tesoreria",
+                "conciliacion",
+                "lineas",
+                "{{coLineaId}}",
+                "ignorar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Líneas ignoradas del extracto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Una ignorada', () => pm.expect(pm.response.json()).to.have.length(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/conciliacion/{{coTesoreriaId}}/lineas?estado=IGNORADA",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "tesoreria",
+                "conciliacion",
+                "{{coTesoreriaId}}",
+                "lineas"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "IGNORADA"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Extractos importados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Dos importaciones, la repetida sin líneas nuevas', () => { const j = pm.response.json(); pm.expect(j).to.have.length(2); pm.expect(j.map(e => e.lineas).sort()).to.eql([0, 3]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/conciliacion/extractos?cuentaId={{coTesoreriaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "tesoreria",
+                "conciliacion",
+                "extractos"
+              ],
+              "query": [
+                {
+                  "key": "cuentaId",
+                  "value": "{{coTesoreriaId}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Balance de comprobación del mes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Cuadra', () => { pm.expect(j.cuadra).to.eql(true); pm.expect(Number(j.totalDebe)).to.eql(Number(j.totalHaber)); });",
+                  "pm.test('Agrupa la cuenta 10 sobre caja y bancos', () => pm.expect(j.filas.find(f => f.codigo === '10').agregada).to.eql(true));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/libros/balance-comprobacion?desde={{coInicioMes}}&hasta={{coHoy}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "libros",
+                "balance-comprobacion"
+              ],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "{{coInicioMes}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{coHoy}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Balance con el rango invertido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/libros/balance-comprobacion?desde={{coHoy}}&hasta={{coInicioMes}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "libros",
+                "balance-comprobacion"
+              ],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "{{coHoy}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{coInicioMes}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Estado de situación cuadra",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('El activo es igual al pasivo más el patrimonio', () => { pm.expect(j.cuadra).to.eql(true); pm.expect(Number(j.activo.total)).to.eql(Number(j.totalPasivoPatrimonio)); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/libros/estado-situacion?al={{coHoy}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "libros",
+                "estado-situacion"
+              ],
+              "query": [
+                {
+                  "key": "al",
+                  "value": "{{coHoy}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Estado de resultados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('El resultado es ingresos menos gastos', () => pm.expect(Number(j.resultado)).to.be.closeTo(Number(j.ingresos.total) - Number(j.gastos.total), 0.01));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/libros/estado-resultados?desde={{coInicioMes}}&hasta={{coHoy}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "libros",
+                "estado-resultados"
+              ],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "{{coInicioMes}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{coHoy}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Paciente no ve los estados financieros (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/libros/estado-situacion?al={{coHoy}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "libros",
+                "estado-situacion"
+              ],
+              "query": [
+                {
+                  "key": "al",
+                  "value": "{{coHoy}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Libro diario por Excel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Se acepta la solicitud', () => pm.expect(pm.response.code).to.be.oneOf([200, 201, 202]));",
+                  "pm.test('Devuelve el id y un estado', () => pm.expect(pm.response.json().estado).to.be.oneOf(['SOLICITADA', 'PROCESANDO', 'LISTA']));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"libro-diario\",\n  \"formato\": \"XLSX\",\n  \"parametros\": { \"desde\": \"{{coInicioMes}}\", \"hasta\": \"{{coHoy}}\" }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Estados financieros en PDF",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Se acepta la solicitud', () => pm.expect(pm.response.code).to.be.oneOf([200, 201, 202]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"reporte-contable\",\n  \"formato\": \"PDF\",\n  \"parametros\": { \"desde\": \"{{coInicioMes}}\", \"hasta\": \"{{coHoy}}\" }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Administración no exporta el libro diario (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"libro-diario\",\n  \"formato\": \"XLSX\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Libro electrónico del diario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Formato por validar y nombre PLE', () => { pm.expect(j.estado).to.eql('POR_VALIDAR'); pm.expect(j.nombreArchivo).to.match(/^LE\\d{11}\\d{6}00050100001[01]11\\.txt$/); });",
+                  "pm.test('Una línea por registro separada con barras', () => { const filas = j.contenido.trim().split('\\n'); pm.expect(filas.length).to.eql(j.registros); pm.expect(filas[0].endsWith('|')).to.eql(true); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/libros/electronicos/DIARIO?anio={{coAnioActual}}&mes={{coMesActual}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "libros",
+                "electronicos",
+                "DIARIO"
+              ],
+              "query": [
+                {
+                  "key": "anio",
+                  "value": "{{coAnioActual}}"
+                },
+                {
+                  "key": "mes",
+                  "value": "{{coMesActual}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Registro de compras del mes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Nombre del registro de compras', () => pm.expect(pm.response.json().nombreArchivo).to.include('080100'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/libros/electronicos/COMPRAS?anio={{coAnioActual}}&mes={{coMesActual}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "libros",
+                "electronicos",
+                "COMPRAS"
+              ],
+              "query": [
+                {
+                  "key": "anio",
+                  "value": "{{coAnioActual}}"
+                },
+                {
+                  "key": "mes",
+                  "value": "{{coMesActual}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Libro electrónico con mes inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/libros/electronicos/DIARIO?anio={{coAnioActual}}&mes=13",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "libros",
+                "electronicos",
+                "DIARIO"
+              ],
+              "query": [
+                {
+                  "key": "anio",
+                  "value": "{{coAnioActual}}"
+                },
+                {
+                  "key": "mes",
+                  "value": "13"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Flujo de caja a ocho semanas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Ocho semanas con saldo acumulado', () => { pm.expect(j.detalle).to.have.length(8); pm.expect(Number(j.saldoFinal)).to.be.closeTo(Number(j.saldoInicial) + j.detalle.reduce((s, x) => s + Number(x.neto), 0), 0.01); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/flujo-caja?semanas=8",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "tesoreria", "flujo-caja"],
+              "query": [
+                {
+                  "key": "semanas",
+                  "value": "8"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Flujo de caja con semanas inválidas (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/tesoreria/flujo-caja?semanas=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "tesoreria", "flujo-caja"],
+              "query": [
+                {
+                  "key": "semanas",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Abrir la caja de la corrida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201 o 409', () => pm.expect([201, 409]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/caja/aperturas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "caja", "aperturas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"montoApertura\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cobrar en efectivo genera el asiento del cobro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('coCobroId', pm.response.json().id);",
+                  "pm.collectionVariables.set('coCobroCodigo', pm.response.json().codigo);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/caja/cobros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "caja", "cobros"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"origen\": \"SERVICIO\",\n  \"tipoComprobante\": \"BOLETA\",\n  \"clienteTipoDoc\": \"DNI\",\n  \"clienteDoc\": \"45678912\",\n  \"clienteNombre\": \"Cliente contable\",\n  \"metodoPago\": \"EFECTIVO\",\n  \"items\": [\n    {\n      \"descripcion\": \"Curación contable\",\n      \"cantidad\": 1,\n      \"precioUnitario\": 118\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El cobro quedó contabilizado en el libro diario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('Un asiento de cobro con el comprobante en la glosa', () => { pm.expect(lista).to.have.length(1); pm.expect(lista[0].glosa).to.include(pm.collectionVariables.get('coCobroCodigo')); pm.expect(lista[0].estado).to.eql('CONTABILIZADO'); });",
+                  "pm.test('Debe y haber iguales a 118', () => { pm.expect(Number(lista[0].totalDebe)).to.eql(118); pm.expect(Number(lista[0].totalHaber)).to.eql(118); });",
+                  "pm.collectionVariables.set('coAsientoCobroId', lista[0].id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos?origen=COBRO&q={{coCobroCodigo}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "asientos"],
+              "query": [
+                {
+                  "key": "origen",
+                  "value": "COBRO"
+                },
+                {
+                  "key": "q",
+                  "value": "{{coCobroCodigo}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El asiento del cobro usa caja, ingresos e IGV",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Cuentas de la plantilla', () => pm.expect(pm.response.json().lineas.map(l => l.cuentaCodigo)).to.eql(['1011', '7041', '40111']));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsientoCobroId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsientoCobroId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Anular el cobro revierte el asiento",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/caja/comprobantes/{{coCobroId}}/anular",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "caja",
+                "comprobantes",
+                "{{coCobroId}}",
+                "anular"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coCajaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Anulación de prueba contable\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "El asiento del cobro quedó revertido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Revertido con su reversa', () => { const j = pm.response.json(); pm.expect(j.estado).to.eql('REVERTIDO'); pm.expect(j.reversaId).to.be.a('string'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsientoCobroId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsientoCobroId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Hechos pendientes de contabilizar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/pendientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "pendientes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reprocesar un pendiente inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/pendientes/00000000-0000-4000-8000-0000000000aa/reprocesar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "pendientes",
+                "00000000-0000-4000-8000-0000000000aa",
+                "reprocesar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Auditoría de la contabilidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('Registra crear, contabilizar y reversar', () => { const acciones = lista.map(a => a.accion); ['CREAR', 'CONTABILIZAR', 'REVERSAR'].forEach(a => pm.expect(acciones).to.include(a)); });",
+                  "pm.test('Los hechos automáticos figuran como sistema', () => pm.expect(lista.some(a => a.usuario === 'Sistema' && a.accion === 'AUTOMATICO')).to.eql(true));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/auditoria?entidad=ASIENTO",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "auditoria"],
+              "query": [
+                {
+                  "key": "entidad",
+                  "value": "ASIENTO"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar el asiento descuadrado ya no existe (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos/{{coAsientoMalId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "contabilidad",
+                "asientos",
+                "{{coAsientoMalId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resumen contable final",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Hay asientos del periodo actual', () => pm.expect(pm.response.json().asientosDelPeriodo).to.be.greaterThan(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{coGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
@@ -47291,6 +52502,170 @@
     },
     {
       "key": "cpDevolucionId",
+      "value": ""
+    },
+    {
+      "key": "coAdminToken",
+      "value": ""
+    },
+    {
+      "key": "coAgrupacionId",
+      "value": ""
+    },
+    {
+      "key": "coAnioActual",
+      "value": ""
+    },
+    {
+      "key": "coAnioP",
+      "value": ""
+    },
+    {
+      "key": "coAsiento2Id",
+      "value": ""
+    },
+    {
+      "key": "coAsientoCobroId",
+      "value": ""
+    },
+    {
+      "key": "coAsientoId",
+      "value": ""
+    },
+    {
+      "key": "coAsientoMalId",
+      "value": ""
+    },
+    {
+      "key": "coAsientoNumero",
+      "value": ""
+    },
+    {
+      "key": "coBancoCuentaId",
+      "value": ""
+    },
+    {
+      "key": "coCajaCuentaId",
+      "value": ""
+    },
+    {
+      "key": "coCajaToken",
+      "value": ""
+    },
+    {
+      "key": "coCapitalCuentaId",
+      "value": ""
+    },
+    {
+      "key": "coCobroCodigo",
+      "value": ""
+    },
+    {
+      "key": "coCobroId",
+      "value": ""
+    },
+    {
+      "key": "coCodigoA",
+      "value": ""
+    },
+    {
+      "key": "coCodigoB",
+      "value": ""
+    },
+    {
+      "key": "coCuentaAId",
+      "value": ""
+    },
+    {
+      "key": "coCuentaBId",
+      "value": ""
+    },
+    {
+      "key": "coFechaP",
+      "value": ""
+    },
+    {
+      "key": "coFinanzasToken",
+      "value": ""
+    },
+    {
+      "key": "coGerenciaToken",
+      "value": ""
+    },
+    {
+      "key": "coHoy",
+      "value": ""
+    },
+    {
+      "key": "coInicioMes",
+      "value": ""
+    },
+    {
+      "key": "coLineaId",
+      "value": ""
+    },
+    {
+      "key": "coMedicoToken",
+      "value": ""
+    },
+    {
+      "key": "coMesActual",
+      "value": ""
+    },
+    {
+      "key": "coMesP",
+      "value": ""
+    },
+    {
+      "key": "coMovAsientoId",
+      "value": ""
+    },
+    {
+      "key": "coMovimiento2Id",
+      "value": ""
+    },
+    {
+      "key": "coMovimientoId",
+      "value": ""
+    },
+    {
+      "key": "coPacienteToken",
+      "value": ""
+    },
+    {
+      "key": "coPeriodoId",
+      "value": ""
+    },
+    {
+      "key": "coPlantillaId",
+      "value": ""
+    },
+    {
+      "key": "coPlantillaLineas",
+      "value": ""
+    },
+    {
+      "key": "coPlantillaMala",
+      "value": ""
+    },
+    {
+      "key": "coPlantillaNombre",
+      "value": ""
+    },
+    {
+      "key": "coReversaId",
+      "value": ""
+    },
+    {
+      "key": "coSufijo",
+      "value": ""
+    },
+    {
+      "key": "coSugerenciaMovId",
+      "value": ""
+    },
+    {
+      "key": "coTesoreriaId",
       "value": ""
     }
   ]

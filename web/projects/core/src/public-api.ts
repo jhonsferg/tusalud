@@ -26,6 +26,7 @@ export * from './lib/services/api/cie10-api.service';
 export * from './lib/services/api/canales-api.service';
 export * from './lib/services/api/clinica-api.service';
 export * from './lib/services/api/compras-api.service';
+export * from './lib/services/api/contabilidad-api.service';
 export * from './lib/services/api/especialidades-api.service';
 export * from './lib/services/api/facturacion-api.service';
 export * from './lib/services/api/farmacia-api.service';
