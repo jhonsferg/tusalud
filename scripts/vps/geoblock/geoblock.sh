@@ -55,6 +55,10 @@ lista() {
 generar() {
     local ifz p4 p6 g4 g6
     ifz=$(interfaz)
+    local bloq_ssh=""
+    if [ -f "${DIR}/ssh-solo-vpn" ]; then
+        bloq_ssh="iifname \"${ifz}\" tcp dport 2222 drop"
+    fi
     p4=$(lista "${DIR}/pe4.txt")
     p6=$(lista "${DIR}/pe6.txt")
     g4=$(lista "${DIR}/github4.txt" 2>/dev/null || true)
@@ -94,6 +98,8 @@ table inet geoblock {
         type filter hook input priority -150; policy accept;
         iifname != "${ifz}" accept
         ct state established,related accept
+        ${bloq_ssh}
+        udp dport 51820 accept
         ip saddr @pais4 accept
         ip6 saddr @pais6 accept
         ip6 saddr fe80::/10 accept
