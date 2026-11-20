@@ -3,7 +3,7 @@ USUARIOS DE PRUEBA DE TUSALUD, SISTEMA DE GESTION CLINICA INTEGRAL
 
 Este archivo lista los usuarios, roles y datos de ejemplo con los que se prueba todo el sistema: la atención ambulatoria, la admisión, el apoyo diagnóstico, la hospitalización, la farmacia y el almacén, la caja y los seguros, los recursos humanos, los reportes gerenciales y la administración.
 
-Los datos son ficticios y los carga Flyway con las migraciones de db/demo, de la V100 a la V113, en los perfiles local, dev y qa.
+Los datos son ficticios y los carga Flyway con las migraciones de db/demo, de la V100 a la V119, en los perfiles local, dev y qa.
 Para cargarlos: docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml up -d --build
 Para reiniciarlos desde cero: docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml down -v
 Todo se abre en http://localhost:4200, que es el gateway. El portal de acceso está en la raíz y, al iniciar sesión, cada usuario entra a la aplicación de su rol.
@@ -205,3 +205,9 @@ Sin usuarios nuevos. farmacia@tusalud.com pide productos desde Requisiciones en 
 Para probar el flujo completo: farmacia crea y envía una requisición, almacén la abre desde su lista y registra dos cotizaciones con los botones de su detalle, selecciona la más barata y genera la orden, finanzas la aprueba, almacén registra la recepción con lote y vencimiento y finanzas registra el comprobante desde el detalle de la orden. Quien solicitó una requisición no puede aprobar ni recibir su orden. Una requisición creada por almacén@tusalud.com no la puede recibir el mismo usuario, así que para esa prueba usa una requisición de farmacia.
 Datos de ejemplo: 3 proveedores nuevos con RUC válidos y condiciones de pago, los 2 anteriores con crédito de 30 y 15 días, una requisición de farmacia enviada con paracetamol e ibuprofeno, una orden de 212.40 soles pendiente de aprobación de finanzas, una factura vencida de 1003.00 soles y otra con pago parcial.
 Para ver un RUC inválido al crear un proveedor usa 20123456780. Un RUC válido de ejemplo es 20123456786.
+
+CONTABILIDAD Y TESORERIA
+------------------------
+Sin usuarios nuevos. finanzas@tusalud.com entra a Contabilidad en /finanzas/contabilidad y registra asientos desde Asientos, abre y revisa periodos, configura las plantillas, ve los libros y estados, registra movimientos en Cuentas y movimientos de tesorería, importa el extracto del banco en Conciliación y proyecta el Flujo de caja. gerencia@tusalud.com consulta los libros, los estados, la tesorería y el flujo de caja desde /gerencia/, cierra periodos y es el único que los reabre con un motivo. Los demás roles, incluido admin@tusalud.com, no ven la contabilidad.
+Para probar el flujo completo: finanzas registra un asiento con el botón Nuevo asiento, lo guarda como borrador, lo contabiliza y lo reversa con un motivo. Después caja@tusalud.com cobra una boleta en efectivo y el asiento del cobro aparece solo en Asientos, con origen Cobro en caja. Para probar la segregación de funciones, finanzas intenta cerrar un periodo en el que registró asientos y la pantalla se lo rechaza, y gerencia lo cierra. Para conciliar, finanzas sube un CSV con las columnas fecha, descripción, referencia y monto, con abonos positivos y cargos negativos, y confirma las coincidencias sugeridas.
+Datos de ejemplo: el periodo del mes actual abierto, el plan contable simplificado con las plantillas de asiento, las cuentas de tesorería Caja general y BCP cuenta corriente, esta última predeterminada, un aporte de capital de 20000 soles ya contabilizado y un extracto con una línea que coincide con ese aporte y otra de comisión sin movimiento. Los libros electrónicos usan el RUC 20601234565 de la configuración fiscal y su formato está por validar.
