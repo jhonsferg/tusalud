@@ -40,6 +40,11 @@ public final class PlantillasPorDefecto {
                 TipoNotificacion.DOCUMENTO_EMITIDO,
                 new Texto("Tiene un documento nuevo", "Se emitió un documento a su nombre."));
         TEXTOS.put(
+                TipoNotificacion.VACUNA_PROXIMA,
+                new Texto(
+                        "Tiene una vacuna próxima",
+                        "Hay una dosis de vacunación programada para usted o para su familiar."));
+        TEXTOS.put(
                 TipoNotificacion.COMPROBANTE_EMITIDO,
                 new Texto("Tiene un comprobante nuevo", "Se emitió un comprobante de pago a su nombre."));
         TEXTOS.put(

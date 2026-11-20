@@ -50,6 +50,23 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Vacunación y crecimiento',
+    items: [
+      {
+        label: 'Vacunación',
+        icon: 'pi-shield',
+        link: '/vacunacion',
+        roles: ['ROLE_ENFERMERIA'],
+      },
+      {
+        label: 'Crecimiento',
+        icon: 'pi-chart-line',
+        link: '/crecimiento',
+        roles: ['ROLE_ENFERMERIA'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

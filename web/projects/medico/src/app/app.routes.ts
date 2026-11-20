@@ -85,6 +85,30 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'vacunacion',
+        canMatch: [roleGuard('ROLE_MEDICO')],
+        loadChildren: () =>
+          import('@tusalud/features/pediatria').then((m) => m.VACUNACION_CLINICA_ROUTES),
+      },
+      {
+        path: 'crecimiento',
+        canMatch: [roleGuard('ROLE_MEDICO')],
+        loadChildren: () =>
+          import('@tusalud/features/pediatria').then((m) => m.CRECIMIENTO_CLINICA_ROUTES),
+      },
+      {
+        path: 'odontograma',
+        canMatch: [roleGuard('ROLE_MEDICO')],
+        loadChildren: () =>
+          import('@tusalud/features/odontologia').then((m) => m.ODONTOLOGIA_CLINICA_ROUTES),
+      },
+      {
+        path: 'planes-odontologicos',
+        canMatch: [roleGuard('ROLE_MEDICO')],
+        loadChildren: () =>
+          import('@tusalud/features/odontologia').then((m) => m.PLANES_ODONTOLOGICOS_ROUTES),
+      },
+      {
         path: 'calendario',
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },

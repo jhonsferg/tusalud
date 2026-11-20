@@ -32,6 +32,18 @@ export const routes: Routes = [
           import('@tusalud/features/hospitalizacion').then((m) => m.HOSPITALIZACION_ROUTES),
       },
       {
+        path: 'vacunacion',
+        canMatch: [roleGuard('ROLE_ENFERMERIA')],
+        loadChildren: () =>
+          import('@tusalud/features/pediatria').then((m) => m.VACUNACION_CLINICA_ROUTES),
+      },
+      {
+        path: 'crecimiento',
+        canMatch: [roleGuard('ROLE_ENFERMERIA')],
+        loadChildren: () =>
+          import('@tusalud/features/pediatria').then((m) => m.CRECIMIENTO_CLINICA_ROUTES),
+      },
+      {
         path: 'calendario',
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },

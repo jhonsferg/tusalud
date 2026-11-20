@@ -131,6 +131,20 @@ export const routes: Routes = [
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },
       {
+        path: 'esquemas-vacunacion',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () =>
+          import('@tusalud/features/pediatria').then((m) => m.ESQUEMAS_VACUNACION_ADMIN_ROUTES),
+      },
+      {
+        path: 'procedimientos-odontologicos',
+        canMatch: [roleGuard('ROLE_ADMIN')],
+        loadChildren: () =>
+          import('@tusalud/features/odontologia').then(
+            (m) => m.PROCEDIMIENTOS_ODONTOLOGICOS_ADMIN_ROUTES,
+          ),
+      },
+      {
         path: 'cie10',
         canMatch: [roleGuard('ROLE_ADMIN')],
         loadChildren: () => import('@tusalud/features/cie10').then((m) => m.CIE10_ROUTES),

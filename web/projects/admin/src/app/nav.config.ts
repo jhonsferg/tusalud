@@ -224,6 +224,18 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         roles: ['ROLE_ADMIN'],
       },
       {
+        label: 'Esquemas de vacunación',
+        icon: 'pi-shield',
+        link: '/esquemas-vacunacion',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
+        label: 'Procedimientos odontológicos',
+        icon: 'pi-list',
+        link: '/procedimientos-odontologicos',
+        roles: ['ROLE_ADMIN'],
+      },
+      {
         label: 'Cupones',
         icon: 'pi-ticket',
         link: '/admin/cupones',

@@ -94,3 +94,5 @@ export * from './lib/services/api/plantillas-api.service';
 export * from './lib/services/descarga.service';
 export * from './lib/state/exportaciones.store';
 export * from './lib/state/plantillas.store';
+export * from './lib/services/api/pediatria-api.service';
+export * from './lib/services/api/odontologia-api.service';

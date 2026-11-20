@@ -2,11 +2,13 @@ package com.codesoftlabs.tusalud.app.services.documentosmedicos;
 
 import com.codesoftlabs.tusalud.app.documentos.CodigoDocumentoClinico;
 import com.codesoftlabs.tusalud.app.dto.response.DocumentosMedicosResponses.VerificacionPublicaResponse;
+import com.codesoftlabs.tusalud.app.entities.CarneVacunacion;
 import com.codesoftlabs.tusalud.app.entities.Consentimiento;
 import com.codesoftlabs.tusalud.app.entities.DocumentoMedico;
 import com.codesoftlabs.tusalud.app.entities.enums.DocumentosMedicosEnums.EstadoConsentimiento;
 import com.codesoftlabs.tusalud.app.entities.enums.DocumentosMedicosEnums.EstadoDocumentoMedico;
 import com.codesoftlabs.tusalud.app.exceptions.DemasiadosIntentosException;
+import com.codesoftlabs.tusalud.app.repositories.CarneVacunacionRepository;
 import com.codesoftlabs.tusalud.app.repositories.ConsentimientoRepository;
 import com.codesoftlabs.tusalud.app.repositories.DocumentoMedicoRepository;
 import java.time.Instant;
@@ -31,6 +33,7 @@ public class VerificacionPublicaService {
 
     private final DocumentoMedicoRepository documentos;
     private final ConsentimientoRepository consentimientos;
+    private final CarneVacunacionRepository carnes;
 
     @Value("${app.documentos-medicos.verificacion-por-minuto:20}")
     private int porMinuto;
@@ -68,6 +71,17 @@ public class VerificacionPublicaService {
                     c.getFirmadoEn(),
                     c.getMedico().getUsuario().getNombreCompleto(),
                     c.getMedico().getColegiatura(),
+                    ESTABLECIMIENTO);
+        }
+        Optional<CarneVacunacion> carne = carnes.findByCodigo(normalizado);
+        if (carne.isPresent()) {
+            CarneVacunacion c = carne.get();
+            return new VerificacionPublicaResponse(
+                    "VALIDO",
+                    "Carné de vacunación",
+                    c.getEmitidoEn(),
+                    c.getEmitidoPor().getNombreCompleto(),
+                    null,
                     ESTABLECIMIENTO);
         }
         return new VerificacionPublicaResponse("NO_ENCONTRADO", null, null, null, null, null);

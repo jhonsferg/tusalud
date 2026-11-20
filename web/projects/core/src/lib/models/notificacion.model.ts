@@ -50,6 +50,8 @@ export type TipoNotificacion =
   | 'PLANILLA_POR_APROBAR'
   | 'PLANILLA_APROBADA'
   | 'BOLETA_DISPONIBLE'
+  | 'VACUNA_PROXIMA'
+  | 'PLAN_ODONTOLOGICO_PRESENTADO'
   | 'SISTEMA';
 
 export interface NotificacionResponse {

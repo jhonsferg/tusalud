@@ -96,6 +96,24 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'mi-vacunacion',
+        canMatch: [roleGuard('ROLE_PACIENTE')],
+        loadChildren: () =>
+          import('@tusalud/features/pediatria').then((m) => m.MI_VACUNACION_ROUTES),
+      },
+      {
+        path: 'mi-crecimiento',
+        canMatch: [roleGuard('ROLE_PACIENTE')],
+        loadChildren: () =>
+          import('@tusalud/features/pediatria').then((m) => m.MI_CRECIMIENTO_ROUTES),
+      },
+      {
+        path: 'mi-salud-dental',
+        canMatch: [roleGuard('ROLE_PACIENTE')],
+        loadChildren: () =>
+          import('@tusalud/features/odontologia').then((m) => m.MI_SALUD_DENTAL_ROUTES),
+      },
+      {
         path: 'mis-comprobantes',
         loadChildren: () =>
           import('@tusalud/features/facturacion').then((m) => m.MIS_COMPROBANTES_ROUTES),

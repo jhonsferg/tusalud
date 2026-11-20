@@ -56,6 +56,17 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Odontología',
+    items: [
+      {
+        label: 'Cobros odontológicos',
+        icon: 'pi-wallet',
+        link: '/cobros-odontologicos',
+        roles: ['ROLE_CAJA'],
+      },
+    ],
+  },
+  {
     title: 'Facturación electrónica',
     items: [
       {

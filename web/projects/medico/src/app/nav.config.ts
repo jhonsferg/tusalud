@@ -139,6 +139,35 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Especialidades',
+    items: [
+      {
+        label: 'Vacunación',
+        icon: 'pi-shield',
+        link: '/vacunacion',
+        roles: ['ROLE_MEDICO'],
+      },
+      {
+        label: 'Crecimiento',
+        icon: 'pi-chart-line',
+        link: '/crecimiento',
+        roles: ['ROLE_MEDICO'],
+      },
+      {
+        label: 'Odontograma',
+        icon: 'pi-heart',
+        link: '/odontograma',
+        roles: ['ROLE_MEDICO'],
+      },
+      {
+        label: 'Planes odontológicos',
+        icon: 'pi-list-check',
+        link: '/planes-odontologicos',
+        roles: ['ROLE_MEDICO'],
+      },
+    ],
+  },
+  {
     title: 'Cuenta',
     items: [
       {

@@ -51,6 +51,8 @@ export const ICONO_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   PLANILLA_POR_APROBAR: 'pi-users',
   PLANILLA_APROBADA: 'pi-users',
   BOLETA_DISPONIBLE: 'pi-money-bill',
+  VACUNA_PROXIMA: 'pi-shield',
+  PLAN_ODONTOLOGICO_PRESENTADO: 'pi-file-edit',
   INCIDENTE_DATOS: 'pi-exclamation-triangle',
   SISTEMA: 'pi-info-circle',
 };
@@ -106,6 +108,8 @@ export const COLOR_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   PLANILLA_POR_APROBAR: '#d97706',
   PLANILLA_APROBADA: '#16a34a',
   BOLETA_DISPONIBLE: '#16a34a',
+  VACUNA_PROXIMA: '#0f766e',
+  PLAN_ODONTOLOGICO_PRESENTADO: '#1d4ed8',
   INCIDENTE_DATOS: '#dc2626',
   SISTEMA: '#64748b',
 };

@@ -10,6 +10,16 @@ export const CUENTAS = {
   },
   medico: { email: 'dr.garcia@tusalud.com', password: 'Medico123!', home: /\/medico\/inicio$/ },
   medico2: { email: 'dra.lopez@tusalud.com', password: 'Medico123!', home: /\/medico\/inicio$/ },
+  odontologa: {
+    email: 'dra.montoya@tusalud.com',
+    password: 'Medico123!',
+    home: /\/medico\/inicio$/,
+  },
+  lactante: {
+    email: 'luciana.ramos@correo.com',
+    password: 'Paciente123!',
+    home: /\/paciente\/inicio$/,
+  },
   paciente2: {
     email: 'maria.rodriguez@correo.com',
     password: 'Paciente123!',
