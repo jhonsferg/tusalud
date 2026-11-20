@@ -197,6 +197,7 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Validaciones](#validaciones)
   - [Interfaz y componentes](#interfaz-y-componentes)
   - [Sistema de diseño y experiencia por rol](#sistema-de-diseño-y-experiencia-por-rol)
+  - [Identidad visual y recursos gráficos](#identidad-visual-y-recursos-gráficos)
   - [Pruebas del frontend](#pruebas-del-frontend)
   - [Entornos](#entornos)
   - [Comandos](#comandos)
@@ -4343,6 +4344,23 @@ La interfaz está pensada para una clínica seria: sobria, legible y rápida de 
 - La pantalla de acceso recuerda cerrar la sesión en equipos compartidos, ningún título de pestaña incluye datos personales y los campos sensibles no usan el autocompletado del navegador.
 
 **Accesibilidad y adaptación.** El foco es visible en todo elemento interactivo, los objetivos táctiles miden al menos 44 píxeles en dispositivos táctiles y todo se maneja con teclado. El paciente tiene una barra de navegación inferior en el móvil con sus cuatro accesos principales, y las tablas anchas se desplazan sin romper la página. Los comprobantes y constancias tienen estilos de impresión sobrios que ocultan la navegación.
+
+### Identidad visual y recursos gráficos
+
+La identidad visual se apoya en fotografías generadas con inteligencia artificial, con personas ficticias y sin marcas, textos ni logotipos visibles, y en escenas y objetos tridimensionales de aspecto sobrio. Las fotografías son ilustrativas y no representan a ninguna persona real.
+
+| Pieza                   | Dónde se usa                                                 | Comportamiento                                                                                                                                                                                                                                                                                                                                                           |
+| ----------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `app-carrusel-portada`  | Portal de acceso, en el inicio de sesión y en el registro    | Rota cuatro fotografías con fundido cada siete segundos y medio y con un acercamiento lento. Se pausa al pasar el cursor o al enfocar, tiene botón de pausa y puntos de navegación accesibles, y no se mueve ni avanza sola cuando el sistema pide reducir el movimiento. Sobre las fotos hay un degradado oscuro de la marca y el mensaje de bienvenida escrito en HTML |
+| `app-objetos-flotantes` | Panel del formulario del portal                              | Muestra cuatro objetos tridimensionales, un escudo con cruz, un corazón con pulso, un calendario y un estetoscopio, con una flotación lenta y un leve paralaje con el cursor. Solo se ve en tema claro, en pantallas de al menos mil cien píxeles y sin reducción de movimiento. Es decorativo, no recibe eventos de puntero y está oculto para los lectores de pantalla |
+| `app-hero-portada`      | Pantalla de inicio de las quince aplicaciones por rol        | Encabeza la pantalla con una fotografía panorámica propia de cada rol, con el punto focal definido por aplicación, un degradado de lectura y el saludo y la fecha encima en blanco                                                                                                                                                                                       |
+| `app-estado-vacio`      | Acceso denegado, página no encontrada y lista vacía de citas | Presenta una escena tridimensional en una tarjeta redondeada con título, descripción y una acción                                                                                                                                                                                                                                                                        |
+
+El portal usa además un fondo abstracto claro o oscuro según el tema, el isotipo como logotipo, y cada aplicación declara su favicon, su icono táctil y el color de tema. El portal incluye también la imagen para compartir el enlace.
+
+Los recursos están en `web/public/img`. Las fotografías se publican en WebP con tres anchos, 768, 1536 y 2400 píxeles, y se eligen con `srcset`; las escenas y los objetos tienen dos anchos. Los derivados de mayor tamaño se obtienen ampliando desde los originales de 1536 píxeles con reescalado de alta calidad, y se retocaron los logotipos que aparecían en cinco imágenes. El archivo `angular.json` empaqueta por aplicación solo lo que necesita: lo común de `img/comun` y su propia portada, y el portal únicamente sus diapositivas y fondos. Los originales y las herramientas de procesado no se versionan.
+
+Como límite, la imagen para compartir el enlace usa una ruta relativa, así que las vistas previas de redes externas necesitarán una dirección absoluta cuando se defina el dominio público.
 
 ### Pruebas del frontend
 
