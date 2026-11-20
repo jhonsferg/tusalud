@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -73,9 +74,25 @@ public class Empleado {
     @Column(name = "contacto_emergencia_telefono", length = 20)
     private String contactoEmergenciaTelefono;
 
+    @Column(name = "codigo_marcacion", length = 12)
+    private String codigoMarcacion;
+
     @Column(name = "dias_vacaciones_anuales", nullable = false)
     @Builder.Default
     private int diasVacacionesAnuales = 30;
+
+    @PrePersist
+    void asignarCodigoMarcacion() {
+        if (codigoMarcacion == null) {
+            codigoMarcacion = java.util
+                    .UUID
+                    .randomUUID()
+                    .toString()
+                    .replace("-", "")
+                    .substring(0, 8)
+                    .toUpperCase();
+        }
+    }
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

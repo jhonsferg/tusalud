@@ -13,6 +13,8 @@ import com.codesoftlabs.tusalud.app.services.events.HechosContables.CobroRegistr
 import com.codesoftlabs.tusalud.app.services.events.HechosContables.CompraAnulada;
 import com.codesoftlabs.tusalud.app.services.events.HechosContables.CompraRegistrada;
 import com.codesoftlabs.tusalud.app.services.events.HechosContables.PagoProveedorRegistrado;
+import com.codesoftlabs.tusalud.app.services.events.HechosContables.PlanillaAprobada;
+import com.codesoftlabs.tusalud.app.services.events.HechosContables.PlanillaPagada;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -135,6 +137,8 @@ public class AsientosPendientesService {
             case "CompraRegistrada" -> CompraRegistrada.class;
             case "CompraAnulada" -> CompraAnulada.class;
             case "PagoProveedorRegistrado" -> PagoProveedorRegistrado.class;
+            case "PlanillaAprobada" -> PlanillaAprobada.class;
+            case "PlanillaPagada" -> PlanillaPagada.class;
             default -> throw new ConflictException("Evento desconocido: " + pendiente.getEvento());
         };
         return mapper.readValue(pendiente.getPayload(), tipo);

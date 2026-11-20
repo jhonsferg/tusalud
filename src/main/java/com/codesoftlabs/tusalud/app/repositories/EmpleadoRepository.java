@@ -25,6 +25,13 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, UUID> {
 
     @Query("""
             SELECT e FROM Empleado e JOIN FETCH e.usuario u
+            WHERE UPPER(e.codigoMarcacion) = UPPER(:codigo) AND e.estado = :estado
+            """)
+    Optional<Empleado> findByCodigoMarcacionIgnoreCaseAndEstado(
+            @Param("codigo") String codigo, @Param("estado") EstadoEmpleado estado);
+
+    @Query("""
+            SELECT e FROM Empleado e JOIN FETCH e.usuario u
             WHERE e.id = :id
             """)
     Optional<Empleado> findByIdConUsuario(@Param("id") UUID id);

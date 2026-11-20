@@ -53,7 +53,7 @@ public class AsientoService {
 
     public List<AsientoResumen> listar(
             UUID periodoId, EstadoAsiento estado, OrigenAsiento origen, LocalDate desde, LocalDate hasta, String q) {
-        String termino = q == null || q.isBlank() ? null : q.strip();
+        String termino = q == null || q.isBlank() ? null : "%" + q.strip().toLowerCase() + "%";
         return asientos.filtrar(periodoId, estado, origen, desde, hasta, termino, PageRequest.of(0, LIMITE)).stream()
                 .map(ContabilidadMapper::resumen)
                 .toList();

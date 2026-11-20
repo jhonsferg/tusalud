@@ -18,6 +18,8 @@ import com.codesoftlabs.tusalud.app.services.events.HechosContables.CobroRegistr
 import com.codesoftlabs.tusalud.app.services.events.HechosContables.CompraAnulada;
 import com.codesoftlabs.tusalud.app.services.events.HechosContables.CompraRegistrada;
 import com.codesoftlabs.tusalud.app.services.events.HechosContables.PagoProveedorRegistrado;
+import com.codesoftlabs.tusalud.app.services.events.HechosContables.PlanillaAprobada;
+import com.codesoftlabs.tusalud.app.services.events.HechosContables.PlanillaPagada;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -43,6 +45,8 @@ public class Contabilizador {
             case CompraRegistrada h -> compra(h);
             case CompraAnulada h -> compraAnulada(h);
             case PagoProveedorRegistrado h -> pagoProveedor(h);
+            case PlanillaAprobada h -> planillaAprobada(h);
+            case PlanillaPagada h -> planillaPagada(h);
             default -> throw new IllegalArgumentException("Hecho contable desconocido: " + hecho.getClass());
         }
     }
@@ -123,6 +127,44 @@ public class Contabilizador {
                     h.numero(),
                     asiento);
         }
+    }
+
+    private void planillaAprobada(PlanillaAprobada h) {
+        Map<ConceptoMonto, BigDecimal> importes = new EnumMap<>(ConceptoMonto.class);
+        importes.put(ConceptoMonto.REMUNERACION_BRUTA, h.remuneracionBruta());
+        importes.put(ConceptoMonto.APORTE_EMPLEADOR, h.aporteEmpleador());
+        importes.put(ConceptoMonto.RETENCION_PENSION, h.retencionPension());
+        importes.put(ConceptoMonto.RETENCION_RENTA, h.retencionRenta());
+        importes.put(ConceptoMonto.OTROS_DESCUENTOS, h.otrosDescuentos());
+        importes.put(ConceptoMonto.NETO_PAGAR, h.neto());
+        generar(
+                EventoContable.PLANILLA_APROBADA,
+                OrigenAsiento.PLANILLA,
+                h.planillaId(),
+                h.fecha(),
+                "Planilla " + h.codigo(),
+                importes);
+    }
+
+    private void planillaPagada(PlanillaPagada h) {
+        Map<ConceptoMonto, BigDecimal> importes = new EnumMap<>(ConceptoMonto.class);
+        importes.put(ConceptoMonto.NETO_PAGAR, h.neto());
+        Asiento asiento = generar(
+                EventoContable.PLANILLA_PAGADA,
+                OrigenAsiento.PAGO_PLANILLA,
+                h.planillaId(),
+                h.fecha(),
+                "Pago de la planilla " + h.codigo(),
+                importes);
+        tesoreria.movimientoAutomatico(
+                OrigenMovimiento.PAGO_PLANILLA,
+                h.planillaId(),
+                h.fecha(),
+                TipoMovimientoTesoreria.EGRESO,
+                h.neto(),
+                "Pago de la planilla " + h.codigo(),
+                h.codigo(),
+                asiento);
     }
 
     private Asiento generar(

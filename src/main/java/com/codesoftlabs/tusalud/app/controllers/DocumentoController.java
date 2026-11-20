@@ -35,7 +35,8 @@ public class DocumentoController {
 
     @GetMapping("/{tipo}/{id}")
     @PreAuthorize(
-            "hasAnyRole('PACIENTE', 'MEDICO', 'CAJA', 'ADMIN', 'FARMACIA', 'LABORATORIO', 'IMAGENES', 'FINANZAS', 'GERENCIA')")
+            "hasAnyRole('PACIENTE', 'MEDICO', 'CAJA', 'ADMIN', 'FARMACIA', 'LABORATORIO', 'IMAGENES', 'FINANZAS', 'GERENCIA',"
+                    + " 'RRHH', 'ENFERMERIA', 'RECEPCION', 'ALMACEN', 'OPERACIONES', 'CALIDAD')")
     @Operation(
             summary = "Generar un documento en PDF",
             description = "Tipos: comprobante, receta, resultados-laboratorio, informe-imagen, constancia,"

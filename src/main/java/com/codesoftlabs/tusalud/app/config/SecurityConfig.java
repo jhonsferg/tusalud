@@ -55,6 +55,8 @@ public class SecurityConfig {
                         ex.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**")
                         .permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/asistencia/terminal/marcaciones")
+                        .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/verificacion/*", "/api/v1/privacidad/politica")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/canales/baja", "/api/v1/canales/webhook/*")

@@ -5,6 +5,8 @@ import com.codesoftlabs.tusalud.app.services.events.HechosContables.CobroRegistr
 import com.codesoftlabs.tusalud.app.services.events.HechosContables.CompraAnulada;
 import com.codesoftlabs.tusalud.app.services.events.HechosContables.CompraRegistrada;
 import com.codesoftlabs.tusalud.app.services.events.HechosContables.PagoProveedorRegistrado;
+import com.codesoftlabs.tusalud.app.services.events.HechosContables.PlanillaAprobada;
+import com.codesoftlabs.tusalud.app.services.events.HechosContables.PlanillaPagada;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -39,5 +41,15 @@ public class EscuchaHechosContables {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void alPagarProveedor(PagoProveedorRegistrado hecho) {
         despachador.despachar(hecho, hecho.pagoId());
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    public void alAprobarPlanilla(PlanillaAprobada hecho) {
+        despachador.despachar(hecho, hecho.planillaId());
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    public void alPagarPlanilla(PlanillaPagada hecho) {
+        despachador.despachar(hecho, hecho.planillaId());
     }
 }

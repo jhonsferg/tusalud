@@ -50,6 +50,15 @@ public interface AusenciaRepository extends JpaRepository<Ausencia, UUID> {
     List<Ausencia> findDeEmpleado(@Param("empleadoId") UUID empleadoId);
 
     @Query("""
+            SELECT a FROM Ausencia a
+            WHERE a.empleado.id = :empleadoId
+              AND a.estado = com.codesoftlabs.tusalud.app.entities.enums.EstadoAusencia.APROBADA
+              AND a.fechaFin >= :desde AND a.fechaInicio <= :hasta
+            """)
+    List<Ausencia> aprobadasDeEmpleado(
+            @Param("empleadoId") UUID empleadoId, @Param("desde") LocalDate desde, @Param("hasta") LocalDate hasta);
+
+    @Query("""
             SELECT COUNT(a) FROM Ausencia a
             WHERE a.empleado.id = :empleadoId AND a.estado IN :estados
               AND a.fechaFin >= :inicio AND a.fechaInicio <= :fin

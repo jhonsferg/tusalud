@@ -38,7 +38,9 @@ public final class ContabilidadEnums {
         COMPRA_PROVEEDOR,
         PAGO_PROVEEDOR,
         MOVIMIENTO_TESORERIA,
-        REVERSA
+        REVERSA,
+        PLANILLA,
+        PAGO_PLANILLA
     }
 
     public enum EventoContable {
@@ -46,7 +48,9 @@ public final class ContabilidadEnums {
         COBRO_ELECTRONICO,
         COMPRA_PROVEEDOR,
         PAGO_PROVEEDOR_EFECTIVO,
-        PAGO_PROVEEDOR_BANCO
+        PAGO_PROVEEDOR_BANCO,
+        PLANILLA_APROBADA,
+        PLANILLA_PAGADA
     }
 
     public enum LadoAsiento {
@@ -60,7 +64,13 @@ public final class ContabilidadEnums {
         IGV,
         CUBIERTO,
         INGRESO_BRUTO,
-        MONTO
+        MONTO,
+        REMUNERACION_BRUTA,
+        APORTE_EMPLEADOR,
+        RETENCION_PENSION,
+        RETENCION_RENTA,
+        OTROS_DESCUENTOS,
+        NETO_PAGAR
     }
 
     public enum TipoCuentaTesoreria {
@@ -76,7 +86,8 @@ public final class ContabilidadEnums {
     public enum OrigenMovimiento {
         MANUAL,
         COBRO,
-        PAGO_PROVEEDOR
+        PAGO_PROVEEDOR,
+        PAGO_PLANILLA
     }
 
     public enum EstadoLineaExtracto {

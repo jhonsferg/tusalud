@@ -57,7 +57,8 @@ public class ExportacionServiceImpl implements ExportacionService {
             "bajoStock",
             "activo",
             "area",
-            "empleadoId");
+            "empleadoId",
+            "planillaId");
     private static final String REFERENCIA = "EXPORTACION";
     private static final long MINUTOS_ATASCO = 30;
 
@@ -268,6 +269,7 @@ public class ExportacionServiceImpl implements ExportacionService {
         p.rango(java.time.LocalDate.now().minusDays(29), java.time.LocalDate.now());
         p.uuid("productoId");
         p.uuid("empleadoId");
+        p.uuid("planillaId");
         p.booleano("bajoStock");
         p.booleano("activo");
     }

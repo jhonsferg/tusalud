@@ -39,6 +39,8 @@ public class ListadosExcel {
     private final com.codesoftlabs.tusalud.app.services.compras.ReportesComprasService comprasService;
     private final com.codesoftlabs.tusalud.app.services.compras.OrdenCompraService ordenCompraService;
     private final com.codesoftlabs.tusalud.app.services.contabilidad.LibrosContablesService librosContables;
+    private final com.codesoftlabs.tusalud.app.services.planilla.PlanillaService planillaService;
+    private final com.codesoftlabs.tusalud.app.services.planilla.AsistenciaService asistenciaService;
 
     public Listado armar(UsuarioPrincipal actor, TipoDocumento tipo, ParametrosDocumento parametros) {
         return switch (tipo) {
@@ -51,6 +53,8 @@ public class ListadosExcel {
             case STOCK -> stock(actor, parametros);
             case AUSENCIAS -> ausencias(actor, parametros);
             case TURNOS -> turnos(parametros);
+            case REPORTE_PLANILLA -> reportePlanilla(actor, parametros);
+            case ASISTENCIA_PERSONAL -> asistenciaPersonal(parametros);
             case MIS_CITAS -> misCitas(actor, parametros);
             default -> throw new IllegalArgumentException("El documento no es un listado: " + tipo);
         };
@@ -299,6 +303,58 @@ public class ListadosExcel {
                     a.motivo() == null ? "" : a.motivo());
         }
         return new Listado(List.of(hoja), "ausencias-" + rango[0] + "-a-" + rango[1], "Ausencias del personal");
+    }
+
+    private Listado reportePlanilla(UsuarioPrincipal actor, ParametrosDocumento p) {
+        java.util.UUID id = p.uuid("planillaId");
+        if (id == null) {
+            throw new IllegalArgumentException("Indique la planilla");
+        }
+        var detalle = planillaService.obtener(actor, id);
+        HojaExcel hoja =
+                HojaExcel.de("Planilla", "Boleta", "Empleado", "Cargo", "Ingresos", "Descuentos", "Neto", "Banco");
+        for (var b : detalle.boletas()) {
+            hoja.fila(
+                    b.numero(),
+                    b.empleadoNombre(),
+                    b.cargo(),
+                    b.totalIngresos(),
+                    b.totalDescuentos(),
+                    b.neto(),
+                    b.banco() == null ? "" : b.banco());
+        }
+        var pl = detalle.planilla();
+        return new Listado(List.of(hoja), "planilla-" + pl.codigo(), "Planilla " + pl.codigo());
+    }
+
+    private Listado asistenciaPersonal(ParametrosDocumento p) {
+        LocalDate[] rango = p.rango(LocalDate.now().withDayOfMonth(1), LocalDate.now());
+        HojaExcel hoja = HojaExcel.de(
+                "Asistencia",
+                "Fecha",
+                "Empleado",
+                "Estado",
+                "Entrada",
+                "Salida",
+                "Tardanza min",
+                "Trabajados min",
+                "Extra min",
+                "Destino extra",
+                "Justificación");
+        for (var d : asistenciaService.dias(p.uuid("empleadoId"), rango[0], rango[1])) {
+            hoja.fila(
+                    d.fecha(),
+                    d.empleadoNombre(),
+                    d.estado().name(),
+                    d.entrada() == null ? "" : d.entrada().toLocalTime().toString(),
+                    d.salida() == null ? "" : d.salida().toLocalTime().toString(),
+                    d.minutosTardanza(),
+                    d.minutosTrabajados(),
+                    d.minutosExtra(),
+                    d.extraDestino().name(),
+                    d.justificacion() == null ? "" : d.justificacion());
+        }
+        return new Listado(List.of(hoja), "asistencia-" + rango[0] + "-a-" + rango[1], "Asistencia del personal");
     }
 
     private Listado turnos(ParametrosDocumento p) {

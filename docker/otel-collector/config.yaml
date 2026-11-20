@@ -36,6 +36,8 @@ processors:
         action: delete
       - key: http.request.header.x-auth-token
         action: delete
+      - key: http.request.header.x-terminal-token
+        action: delete
       - key: http.request.header.x-csrf-token
         action: delete
       - key: http.request.header.x-xsrf-token

@@ -41,4 +41,17 @@ public final class HechosContables {
             LocalDate fecha,
             BigDecimal monto,
             MetodoPagoProveedor metodo) {}
+
+    public record PlanillaAprobada(
+            UUID planillaId,
+            String codigo,
+            LocalDate fecha,
+            BigDecimal remuneracionBruta,
+            BigDecimal aporteEmpleador,
+            BigDecimal retencionPension,
+            BigDecimal retencionRenta,
+            BigDecimal otrosDescuentos,
+            BigDecimal neto) {}
+
+    public record PlanillaPagada(UUID planillaId, String codigo, LocalDate fecha, BigDecimal neto) {}
 }

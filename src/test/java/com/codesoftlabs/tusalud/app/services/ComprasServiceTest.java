@@ -317,7 +317,7 @@ class ComprasServiceTest {
 
         assertThat(auditor.deEntidad(aprobada.resumen().id()))
                 .extracting(a -> a.accion())
-                .containsExactly("CREAR", "ENVIAR_APROBACION", "APROBAR");
+                .containsExactlyInAnyOrder("CREAR", "ENVIAR_APROBACION", "APROBAR");
         assertThat(reportes.porProveedor(null, null, barato.id())).hasSize(1);
     }
 

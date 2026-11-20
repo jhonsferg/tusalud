@@ -47,6 +47,7 @@ public class DocumentosClinicos {
     private final com.codesoftlabs.tusalud.app.repositories.CuentaAseguradoraRepository cuentaAseguradoraRepository;
     private final HistoriaClinicaService historiaClinicaService;
     private final com.codesoftlabs.tusalud.app.repositories.OrdenCompraRepository ordenCompraRepository;
+    private final com.codesoftlabs.tusalud.app.services.planilla.PlanillaService planillaService;
 
     @Transactional(readOnly = true)
     public DocumentoPreparado preparar(UsuarioPrincipal actor, TipoDocumento tipo, UUID id) {
@@ -54,6 +55,7 @@ public class DocumentosClinicos {
             case COMPROBANTE -> comprobante(actor, id);
             case LIQUIDACION -> liquidacion(id);
             case ORDEN_COMPRA -> ordenCompra(id);
+            case BOLETA_PAGO -> boletaPago(actor, id);
             case RECETA -> receta(actor, id);
             case RESULTADOS_LABORATORIO -> resultadosLaboratorio(actor, id);
             case INFORME_IMAGEN -> informeImagen(actor, id);
@@ -177,6 +179,42 @@ public class DocumentosClinicos {
             ficha.banner("BORRADOR SIN APROBAR");
         }
         return new DocumentoPreparado(ficha, null, id.toString(), "orden-compra-" + orden.codigoVisible());
+    }
+
+    private DocumentoPreparado boletaPago(UsuarioPrincipal actor, UUID id) {
+        com.codesoftlabs.tusalud.app.entities.BoletaPago boleta = planillaService.boletaParaDocumento(actor, id);
+        com.codesoftlabs.tusalud.app.entities.Planilla planilla = boleta.getPlanilla();
+        String periodo = String.format("%02d/%d", planilla.getMes(), planilla.getAnio());
+        FichaDocumento ficha = FichaDocumento.de(TipoDocumento.BOLETA_PAGO)
+                .titulo("Boleta de pago " + boleta.getNumero(), "Planilla " + periodo)
+                .par("Trabajador", boleta.getEmpleadoNombre())
+                .par("Cargo", boleta.getCargo())
+                .par("Régimen", boleta.getRegimen().name())
+                .par("Pensión", boleta.getSistemaPensionario().name())
+                .par("Días laborados", String.valueOf(boleta.getDiasLaborados()))
+                .par("Faltas", String.valueOf(boleta.getDiasFalta()))
+                .par("Tardanza", boleta.getMinutosTardanza() + " min")
+                .par("Horas extra", boleta.getMinutosExtraPagados() + " min");
+        boleta.getLineas()
+                .forEach(linea -> ficha.fila(
+                        linea.getNombre(),
+                        switch (linea.getTipo()) {
+                            case INGRESO -> "Ingreso";
+                            case DESCUENTO -> "Descuento";
+                            case APORTE_EMPLEADOR -> "Aporte del empleador";
+                        },
+                        linea.getBase() == null ? "" : Formato.moneda(linea.getBase()),
+                        Formato.moneda(linea.getMonto())));
+        ficha.total("Total ingresos", Formato.moneda(boleta.getTotalIngresos()))
+                .total("Total descuentos", Formato.moneda(boleta.getTotalDescuentos()))
+                .total("Neto a pagar", Formato.moneda(boleta.getNeto()));
+        ficha.nota("Huella de la boleta", boleta.getHash());
+        if (planilla.getEstado() != com.codesoftlabs.tusalud.app.entities.enums.PlanillaEnums.EstadoPlanilla.PAGADA
+                && planilla.getEstado()
+                        != com.codesoftlabs.tusalud.app.entities.enums.PlanillaEnums.EstadoPlanilla.CERRADA) {
+            ficha.banner("PLANILLA SIN PAGAR");
+        }
+        return new DocumentoPreparado(ficha, null, id.toString(), "boleta-" + boleta.getNumero());
     }
 
     private DocumentoPreparado receta(UsuarioPrincipal actor, UUID id) {

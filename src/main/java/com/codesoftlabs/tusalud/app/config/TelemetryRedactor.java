@@ -31,7 +31,8 @@ public final class TelemetryRedactor {
             "x-csrf-token",
             "x-xsrf-token",
             "x-access-token",
-            "x-refresh-token");
+            "x-refresh-token",
+            "x-terminal-token");
 
     private static final Set<String> CAMPOS_EXACTOS = Set.of(
             "codigo",

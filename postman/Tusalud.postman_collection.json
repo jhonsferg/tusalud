@@ -21787,8 +21787,8 @@
                 "exec": [
                   "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
                   "const lista = pm.response.json();",
-                  "pm.test('Están las veintidós plantillas del sistema', () => {",
-                  "    pm.expect(lista).to.have.length(22);",
+                  "pm.test('Están las veintitrés plantillas del sistema', () => {",
+                  "    pm.expect(lista).to.have.length(23);",
                   "    ['comprobante', 'receta', 'resultados-laboratorio', 'informe-imagen', 'constancia', 'resumen-historia', 'reporte-ejecutivo', 'reporte-financiero', 'reporte-operativo', 'reporte-calidad'].forEach(c => pm.expect(lista.map(p => p.codigo)).to.include(c));",
                   "});"
                 ]
@@ -51383,6 +51383,6116 @@
             }
           },
           "response": []
+        }
+      ]
+    },
+    {
+      "name": "34 - Planilla y asistencia",
+      "description": "Contratos, conceptos y parámetros del régimen peruano, asistencia con marcaciones manuales y por terminal, cálculo mensual de planilla, aprobación y pago con segregación de funciones, boletas, archivos bancario y PLAME y la contabilización automática.",
+      "item": [
+        {
+          "name": "Login recursos humanos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"rrhh@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('plRrhhToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login finanzas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"finanzas@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('plFinanzasToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login gerencia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"gerencia@tusalud.com\",\n  \"password\": \"Personal123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('plGerenciaToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login administrador",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@tusalud.com\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('plAdminToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login médico",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.garcia@tusalud.com\",\n  \"password\": \"Medico123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('plMedicoToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login paciente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan.perez@correo.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('plPacienteToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preparar datos únicos de la corrida",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');",
+                  "const hoy = new Date();",
+                  "pm.collectionVariables.set('plHoy', fmt(hoy));",
+                  "pm.collectionVariables.set('plSufijo', String(Date.now()).slice(-7));",
+                  "pm.collectionVariables.set('plHace2Dias', fmt(new Date(hoy.getTime() - 2 * 86400000)));",
+                  "pm.collectionVariables.set('plHace8Dias', fmt(new Date(hoy.getTime() - 8 * 86400000)));",
+                  "pm.collectionVariables.set('plInstante', fmt(new Date(hoy.getTime() - 2 * 86400000)) + 'T' + String(hoy.getHours()).padStart(2, '0') + ':' + String(hoy.getMinutes()).padStart(2, '0') + ':' + String(hoy.getSeconds()).padStart(2, '0'));",
+                  "pm.collectionVariables.set('plFuturo', fmt(new Date(hoy.getTime() + 3 * 86400000)) + 'T08:00:00');",
+                  "pm.collectionVariables.set('plMesFuturoAnio', String(new Date(hoy.getFullYear(), hoy.getMonth() + 1, 1).getFullYear()));",
+                  "pm.collectionVariables.set('plMesFuturoMes', String(new Date(hoy.getFullYear(), hoy.getMonth() + 1, 1).getMonth() + 1));",
+                  "pm.sendRequest({ url: pm.variables.get('baseUrl') + '/api/v1/planilla/planillas', method: 'GET', header: { Authorization: 'Bearer ' + pm.collectionVariables.get('plRrhhToken') } }, (err, res) => {",
+                  "  const todas = res.json() || [];",
+                  "  const usados = new Set(todas.map(p => p.anio * 100 + p.mes));",
+                  "  let anio = hoy.getFullYear(), mes = hoy.getMonth();",
+                  "  if (mes === 0) { mes = 12; anio--; }",
+                  "  while (usados.has(anio * 100 + mes)) { mes--; if (mes === 0) { mes = 12; anio--; } }",
+                  "  pm.collectionVariables.set('plAnio', String(anio));",
+                  "  pm.collectionVariables.set('plMes', String(mes));",
+                  "  const firmes = todas.filter(p => ['APROBADA', 'PAGADA', 'CERRADA'].includes(p.estado)).map(p => p.anio * 12 + (p.mes - 1));",
+                  "  const minimo = firmes.length ? Math.max(...firmes) + 1 : 0;",
+                  "  pm.sendRequest({ url: pm.variables.get('baseUrl') + '/api/v1/planilla/parametros?vigentes=false&codigo=RMV', method: 'GET', header: { Authorization: 'Bearer ' + pm.collectionVariables.get('plRrhhToken') } }, (e2, r2) => {",
+                  "    const fechas = (r2.json() || []).map(x => x.vigenteDesde).sort();",
+                  "    const ultima = fechas.length ? fechas[fechas.length - 1] : '2026-01-01';",
+                  "    const desdeVersion = Number(ultima.slice(0, 4)) * 12 + Number(ultima.slice(5, 7));",
+                  "    const indice = Math.max(desdeVersion, minimo);",
+                  "    pm.collectionVariables.set('plVigenciaNueva', Math.floor(indice / 12) + '-' + String((indice % 12) + 1).padStart(2, '0') + '-01');",
+                  "  });",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('El resumen trae los indicadores', () => { pm.expect(j).to.have.property('empleadosConContrato'); pm.expect(j).to.have.property('masaSalarialMensual'); pm.expect(j).to.have.property('planillasPendientesAprobacion'); });",
+                  "pm.test('Hay empleados con contrato por la demostración', () => pm.expect(j.empleadosConContrato).to.be.above(5));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sin token la planilla responde 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un paciente no ve el resumen de planilla (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico no ve el resumen de planilla (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La administración no ve el resumen de planilla (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/resumen",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "resumen"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La administración no ve las planillas (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "planillas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico no ve los contratos (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/contratos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "contratos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finanzas no ve los contratos con remuneración (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/contratos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "contratos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gerencia no ve los contratos (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/contratos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "contratos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico no ve la asistencia de todos (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/dias?desde={{plHace8Dias}}&hasta={{plHoy}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "dias"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "{{plHace8Dias}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{plHoy}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finanzas no ve las marcaciones (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/marcaciones?desde={{plHace8Dias}}&hasta={{plHoy}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "marcaciones"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "{{plHace8Dias}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{plHoy}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gerencia no ve la bitácora de planilla (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/auditoria",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "auditoria"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos consulta los parámetros vigentes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/parametros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "parametros"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('Trae los parámetros del régimen', () => ['RMV', 'ESSALUD_TASA', 'ONP_TASA', 'UIT', 'DIAS_MES'].forEach(c => pm.expect(lista.map(p => p.codigo)).to.include(c)));",
+                  "pm.test('Están marcados por validar', () => pm.expect(lista.find(p => p.codigo === 'ESSALUD_TASA').porValidar).to.be.a('boolean'));",
+                  "pm.collectionVariables.set('plUitId', lista.find(p => p.codigo === 'UIT').id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gerencia consulta los parámetros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/parametros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "parametros"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico no ve los parámetros (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/parametros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "parametros"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una vigencia que no empieza el primer día se rechaza (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/parametros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "parametros"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"RMV\",\n  \"valor\": 1200,\n  \"vigenteDesde\": \"2099-01-15\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un parámetro inexistente se rechaza (404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/parametros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "parametros"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"NO_EXISTE_{{plSufijo}}\",\n  \"valor\": 1,\n  \"vigenteDesde\": \"2099-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un valor negativo se rechaza (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/parametros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "parametros"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"RMV\",\n  \"valor\": -5,\n  \"vigenteDesde\": \"2099-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos crea una nueva versión del mínimo vital",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/parametros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "parametros"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"RMV\",\n  \"valor\": 1200,\n  \"vigenteDesde\": \"{{plVigenciaNueva}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('La nueva versión nace por validar', () => pm.expect(j.porValidar).to.eql(true));",
+                  "pm.collectionVariables.set('plParametroId', j.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos no valida parámetros (403)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/parametros/{{plParametroId}}/validar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "parametros",
+                "{{plParametroId}}",
+                "validar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finanzas valida el parámetro",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/parametros/{{plParametroId}}/validar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "parametros",
+                "{{plParametroId}}",
+                "validar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda validado', () => pm.expect(pm.response.json().porValidar).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un parámetro validado no se valida dos veces (409)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/parametros/{{plParametroId}}/validar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "parametros",
+                "{{plParametroId}}",
+                "validar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos consulta los conceptos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/conceptos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "conceptos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('Trae los conceptos del sistema', () => ['BASICO', 'PENSION', 'RENTA_5TA', 'ESSALUD'].forEach(c => pm.expect(lista.map(x => x.codigo)).to.include(c)));",
+                  "pm.collectionVariables.set('plConceptoSistemaId', lista.find(x => x.codigo === 'BASICO').id);",
+                  "pm.collectionVariables.set('plBonoDemoId', lista.find(x => x.codigo === 'BONO_PRODUCTIVIDAD').id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finanzas consulta los conceptos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/conceptos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "conceptos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico no ve los conceptos (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/conceptos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "conceptos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un código de concepto inválido se rechaza (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/conceptos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "conceptos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"bono con espacios\",\n  \"nombre\": \"X\",\n  \"tipo\": \"INGRESO\",\n  \"modo\": \"MONTO_FIJO\",\n  \"valorDefecto\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos crea un concepto de ingreso",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/conceptos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "conceptos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"BONO_{{plSufijo}}\",\n  \"nombre\": \"Bono de prueba {{plSufijo}}\",\n  \"tipo\": \"INGRESO\",\n  \"modo\": \"MONTO_FIJO\",\n  \"valorDefecto\": 100,\n  \"afectoRenta\": true,\n  \"afectoPension\": true,\n  \"afectoEssalud\": true,\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('plConceptoId', pm.response.json().id);",
+                  "pm.test('No es del sistema', () => pm.expect(pm.response.json().sistema).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un código de concepto repetido se rechaza (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/conceptos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "conceptos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"BONO_{{plSufijo}}\",\n  \"nombre\": \"Repetido\",\n  \"tipo\": \"INGRESO\",\n  \"modo\": \"MONTO_FIJO\",\n  \"valorDefecto\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Los aportes del empleador no se configuran (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/conceptos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "conceptos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"APORTE_{{plSufijo}}\",\n  \"nombre\": \"Aporte\",\n  \"tipo\": \"APORTE_EMPLEADOR\",\n  \"modo\": \"MONTO_FIJO\",\n  \"valorDefecto\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un porcentaje mayor a cien se rechaza (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/conceptos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "conceptos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"PCT_{{plSufijo}}\",\n  \"nombre\": \"Porcentaje\",\n  \"tipo\": \"DESCUENTO\",\n  \"modo\": \"PORCENTAJE_BASICO\",\n  \"valorDefecto\": 150\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos actualiza el concepto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/conceptos/{{plConceptoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "conceptos", "{{plConceptoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"BONO_{{plSufijo}}\",\n  \"nombre\": \"Bono renombrado {{plSufijo}}\",\n  \"tipo\": \"INGRESO\",\n  \"modo\": \"MONTO_FIJO\",\n  \"valorDefecto\": 120,\n  \"afectoRenta\": true,\n  \"afectoPension\": true,\n  \"afectoEssalud\": true,\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Cambia el nombre', () => pm.expect(pm.response.json().nombre).to.include('renombrado'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un concepto del sistema no se modifica (409)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/conceptos/{{plConceptoSistemaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "conceptos",
+                "{{plConceptoSistemaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"BASICO\",\n  \"nombre\": \"X\",\n  \"tipo\": \"INGRESO\",\n  \"modo\": \"MONTO_FIJO\",\n  \"valorDefecto\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finanzas no crea conceptos (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/conceptos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "conceptos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"NOPE\",\n  \"nombre\": \"X\",\n  \"tipo\": \"INGRESO\",\n  \"modo\": \"MONTO_FIJO\",\n  \"valorDefecto\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos lista los contratos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/contratos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "contratos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('Hay contratos por la demostración', () => pm.expect(lista.length).to.be.above(5));",
+                  "pm.test('Muestra la cuenta enmascarada', () => lista.filter(c => c.cuentaEnmascarada).forEach(c => pm.expect(c.cuentaEnmascarada).to.match(/^\\*{4}[0-9a-z]{4}$/i)));",
+                  "const c = lista.find(x => x.estado === 'VIGENTE' && x.empleadoNombre.includes('Luis'));",
+                  "pm.collectionVariables.set('plEmpleadoId', c.empleadoId);",
+                  "pm.collectionVariables.set('plContratoId', c.id);",
+                  "pm.collectionVariables.set('plCodigoMarcacion', c.codigoMarcacion);",
+                  "pm.test('Cada empleado tiene su código de marcación', () => pm.expect(c.codigoMarcacion).to.match(/^[A-Z0-9]{8}$/));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un contrato que se cruza con el vigente se rechaza (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/contratos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "contratos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{plEmpleadoId}}\",\n  \"regimen\": \"GENERAL\",\n  \"remuneracion\": 3000,\n  \"sistemaPensionario\": \"ONP\",\n  \"cargo\": \"Cargo\",\n  \"fechaInicio\": \"{{plHace8Dias}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un contrato con AFP sin nombre se rechaza (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/contratos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "contratos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{plEmpleadoId}}\",\n  \"regimen\": \"GENERAL\",\n  \"remuneracion\": 3000,\n  \"sistemaPensionario\": \"AFP\",\n  \"cargo\": \"Cargo\",\n  \"fechaInicio\": \"2099-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un contrato con fin anterior al inicio se rechaza (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/contratos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "contratos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{plEmpleadoId}}\",\n  \"regimen\": \"GENERAL\",\n  \"remuneracion\": 3000,\n  \"sistemaPensionario\": \"ONP\",\n  \"cargo\": \"Cargo\",\n  \"fechaInicio\": \"2099-02-01\",\n  \"fechaFin\": \"2099-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una remuneración negativa se rechaza (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/contratos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "contratos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{plEmpleadoId}}\",\n  \"regimen\": \"GENERAL\",\n  \"remuneracion\": -1,\n  \"sistemaPensionario\": \"ONP\",\n  \"cargo\": \"Cargo\",\n  \"fechaInicio\": \"2099-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un empleado inexistente se rechaza (404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/contratos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "contratos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"00000000-0000-4000-8000-000000000001\",\n  \"regimen\": \"GENERAL\",\n  \"remuneracion\": 3000,\n  \"sistemaPensionario\": \"ONP\",\n  \"cargo\": \"Cargo\",\n  \"fechaInicio\": \"2099-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico no crea contratos (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/contratos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "contratos"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"00000000-0000-4000-8000-000000000001\",\n  \"regimen\": \"GENERAL\",\n  \"remuneracion\": 1,\n  \"sistemaPensionario\": \"ONP\",\n  \"cargo\": \"X\",\n  \"fechaInicio\": \"2099-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos asigna el concepto al empleado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/empleados/{{plEmpleadoId}}/conceptos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "empleados",
+                "{{plEmpleadoId}}",
+                "conceptos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conceptoId\": \"{{plConceptoId}}\",\n  \"valor\": 250,\n  \"vigenteDesde\": \"{{plHace8Dias}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('plAsignacionId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un concepto del sistema no se asigna (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/empleados/{{plEmpleadoId}}/conceptos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "empleados",
+                "{{plEmpleadoId}}",
+                "conceptos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conceptoId\": \"{{plConceptoSistemaId}}\",\n  \"valor\": 1,\n  \"vigenteDesde\": \"{{plHace8Dias}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El empleado muestra sus conceptos recurrentes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/empleados/{{plEmpleadoId}}/conceptos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "empleados",
+                "{{plEmpleadoId}}",
+                "conceptos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye el concepto asignado', () => pm.expect(pm.response.json().map(a => a.id)).to.include(pm.collectionVariables.get('plAsignacionId')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finanzas no ve los conceptos de un empleado (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/empleados/{{plEmpleadoId}}/conceptos",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "empleados",
+                "{{plEmpleadoId}}",
+                "conceptos"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear una terminal de asistencia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/terminales",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "terminales"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Terminal {{plSufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('El token se muestra una sola vez', () => pm.expect(j.token).to.match(/^tm_/));",
+                  "pm.collectionVariables.set('plTerminalId', j.id);",
+                  "pm.collectionVariables.set('plTerminalToken', j.token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una terminal repetida se rechaza (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/terminales",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "terminales"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Terminal {{plSufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar las terminales sin exponer el token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/terminales",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "terminales"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('No muestra tokens', () => pm.response.json().forEach(t => { pm.expect(t).to.not.have.property('token'); pm.expect(t).to.not.have.property('tokenHash'); }));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico no gestiona terminales (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/terminales",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "terminales"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Marcar sin token de terminal responde 404",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/terminal/marcaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "terminal", "marcaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{plCodigoMarcacion}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Marcar con un token falso responde 404",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Terminal-Token",
+                "value": "tm_falso"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/terminal/marcaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "terminal", "marcaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{plCodigoMarcacion}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un código con formato inválido se rechaza (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Terminal-Token",
+                "value": "{{plTerminalToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/terminal/marcaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "terminal", "marcaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"<script>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un código desconocido responde igual que un token falso (404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Terminal-Token",
+                "value": "{{plTerminalToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/terminal/marcaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "terminal", "marcaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"ZZZZZZZZ\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La terminal registra la marcación del empleado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Terminal-Token",
+                "value": "{{plTerminalToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/terminal/marcaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "terminal", "marcaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{plCodigoMarcacion}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Marca o pide esperar un minuto', () => pm.expect([201, 409]).to.include(pm.response.code));",
+                  "if (pm.response.code === 201) { const j = pm.response.json(); pm.test('Responde solo con el nombre de pila', () => { pm.expect(j.tipo).to.be.oneOf(['ENTRADA', 'SALIDA']); pm.expect(j).to.not.have.property('empleadoId'); }); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Repetir la marcación enseguida se rechaza (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Terminal-Token",
+                "value": "{{plTerminalToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/terminal/marcaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "terminal", "marcaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{plCodigoMarcacion}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Desactivar la terminal",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/terminales/{{plTerminalId}}/estado?activo=false",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "asistencia",
+                "terminales",
+                "{{plTerminalId}}",
+                "estado"
+              ],
+              "query": [
+                {
+                  "key": "activo",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda desactivada', () => pm.expect(pm.response.json().activo).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una terminal desactivada ya no marca (404)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Terminal-Token",
+                "value": "{{plTerminalToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/terminal/marcaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "terminal", "marcaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"{{plCodigoMarcacion}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Marcación manual de recursos humanos con su motivo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/marcaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "marcaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{plEmpleadoId}}\",\n  \"tipo\": \"ENTRADA\",\n  \"fechaHora\": \"{{plInstante}}\",\n  \"observacion\": \"Olvidó marcar, verificado por jefatura\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Queda como manual', () => pm.expect(pm.response.json().origen).to.eql('MANUAL'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una marcación manual repetida se rechaza (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/marcaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "marcaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{plEmpleadoId}}\",\n  \"tipo\": \"ENTRADA\",\n  \"fechaHora\": \"{{plInstante}}\",\n  \"observacion\": \"Duplicada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una marcación en el futuro se rechaza (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/marcaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "marcaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{plEmpleadoId}}\",\n  \"tipo\": \"ENTRADA\",\n  \"fechaHora\": \"{{plFuturo}}\",\n  \"observacion\": \"Futura\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una marcación manual sin motivo se rechaza (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/marcaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "marcaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{plEmpleadoId}}\",\n  \"tipo\": \"SALIDA\",\n  \"fechaHora\": \"{{plInstante}}\",\n  \"observacion\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico no registra marcaciones manuales (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/marcaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "marcaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{plEmpleadoId}}\",\n  \"tipo\": \"ENTRADA\",\n  \"fechaHora\": \"{{plInstante}}\",\n  \"observacion\": \"X\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos lista las marcaciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/marcaciones?desde={{plHace8Dias}}&hasta={{plHoy}}&empleadoId={{plEmpleadoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "marcaciones"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "{{plHace8Dias}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{plHoy}}"
+                },
+                {
+                  "key": "empleadoId",
+                  "value": "{{plEmpleadoId}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye la marcación manual', () => pm.expect(pm.response.json().some(m => m.origen === 'MANUAL')).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un rango de asistencia demasiado largo se rechaza (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/dias?desde=2020-01-01&hasta={{plHoy}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "dias"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "2020-01-01"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{plHoy}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Consolidar la asistencia del rango",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/consolidar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "consolidar"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"desde\": \"{{plHace8Dias}}\",\n  \"hasta\": \"{{plHoy}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Informa los empleados y días', () => { const j = pm.response.json(); pm.expect(j).to.have.property('empleados'); pm.expect(j).to.have.property('dias'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos consulta la asistencia por día",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/dias?desde={{plHace8Dias}}&hasta={{plHoy}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "dias"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "{{plHace8Dias}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{plHoy}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ajustar un día inexistente responde 404",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/dias/00000000-0000-4000-8000-000000000001/ajuste",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "asistencia",
+                "dias",
+                "00000000-0000-4000-8000-000000000001",
+                "ajuste"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"justificacion\": \"Justificación de prueba\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un ajuste sin justificación se rechaza (400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/dias/00000000-0000-4000-8000-000000000001/ajuste",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "asistencia",
+                "dias",
+                "00000000-0000-4000-8000-000000000001",
+                "ajuste"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"faltaJustificada\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico ve solo su propia asistencia",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/mi-asistencia?desde={{plHace8Dias}}&hasta={{plHoy}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "mi-asistencia"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "{{plHace8Dias}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{plHoy}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Trae el resumen y su código de marcación', () => { pm.expect(j).to.have.property('diasPresente'); pm.expect(j.codigoMarcacion).to.match(/^[A-Z0-9]{8}$/); });",
+                  "pm.test('Solo aparece el propio médico', () => j.dias.forEach(d => pm.expect(d.empleadoNombre).to.include('García')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un paciente sin ficha laboral ve su asistencia vacía",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/mi-asistencia?desde={{plHace8Dias}}&hasta={{plHoy}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "mi-asistencia"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "{{plHace8Dias}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{plHoy}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Sin días ni código', () => { const j = pm.response.json(); pm.expect(j.dias).to.have.length(0); pm.expect(j.codigoMarcacion || null).to.eql(null); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El médico ve sus marcaciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/mis-marcaciones?desde={{plHace8Dias}}&hasta={{plHoy}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "mis-marcaciones"],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "{{plHace8Dias}}"
+                },
+                {
+                  "key": "hasta",
+                  "value": "{{plHoy}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos revisa las planillas existentes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "planillas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finanzas no calcula la planilla (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/calcular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "planillas", "calcular"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"anio\": {{plAnio}},\n  \"mes\": {{plMes}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico no calcula la planilla (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/calcular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "planillas", "calcular"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"anio\": {{plAnio}},\n  \"mes\": {{plMes}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un mes inválido se rechaza (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/calcular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "planillas", "calcular"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"anio\": 2026,\n  \"mes\": 13\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "No se calcula la planilla de un mes futuro (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/calcular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "planillas", "calcular"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"anio\": {{plMesFuturoAnio}},\n  \"mes\": {{plMesFuturoMes}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos calcula la planilla del mes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/calcular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "planillas", "calcular"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"anio\": {{plAnio}},\n  \"mes\": {{plMes}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda calculada con boletas', () => { pm.expect(j.estado).to.eql('CALCULADA'); pm.expect(j.cantidadBoletas).to.be.above(0); });",
+                  "pm.test('Los totales cuadran', () => pm.expect(Math.abs(j.totalIngresos - j.totalDescuentos - j.totalNeto)).to.be.below(0.05));",
+                  "pm.test('Tiene huella', () => pm.expect(j.hash).to.have.length(64));",
+                  "pm.collectionVariables.set('plPlanillaId', j.id);",
+                  "pm.collectionVariables.set('plPlanillaCodigo', j.codigo);",
+                  "pm.collectionVariables.set('plBoletasCalculo', String(j.cantidadBoletas));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recalcular conserva la planilla y la cantidad de boletas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/calcular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "planillas", "calcular"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"anio\": {{plAnio}},\n  \"mes\": {{plMes}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Es la misma planilla', () => pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get('plPlanillaId')));",
+                  "pm.test('Mantiene las boletas', () => pm.expect(String(pm.response.json().cantidadBoletas)).to.eql(pm.collectionVariables.get('plBoletasCalculo')));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finanzas ve la planilla con sus boletas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "planillas", "{{plPlanillaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Trae las boletas', () => pm.expect(j.boletas.length).to.eql(j.planilla.cantidadBoletas));",
+                  "pm.test('Cada boleta es positiva', () => j.boletas.forEach(b => pm.expect(b.neto).to.be.at.least(0)));",
+                  "const b = j.boletas.find(x => x.empleadoNombre.includes('Luis')) || j.boletas[0];",
+                  "pm.collectionVariables.set('plBoletaId', b.id);",
+                  "pm.collectionVariables.set('plBoletaNumero', b.numero);",
+                  "pm.collectionVariables.set('plBoletaEmpleadoId', b.empleadoId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gerencia ve los totales y no las boletas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "planillas", "{{plPlanillaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Sin boletas individuales', () => { const j = pm.response.json(); pm.expect(j.boletas).to.have.length(0); pm.expect(j.planilla.totalNeto).to.be.above(0); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un médico no ve la planilla (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "planillas", "{{plPlanillaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La boleta calculada trae sus líneas y su huella para finanzas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/boletas/{{plBoletaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "boletas", "{{plBoletaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test('Trae las líneas del cálculo', () => { pm.expect(b.lineas.length).to.be.above(2); pm.expect(b.lineas.map(l => l.codigo)).to.include('BASICO'); });",
+                  "pm.test('Los totales de la boleta cuadran', () => pm.expect(Math.abs(b.totalIngresos - b.totalDescuentos - b.neto)).to.be.below(0.02));",
+                  "pm.test('La cuenta va enmascarada', () => { if (b.cuentaEnmascarada) pm.expect(b.cuentaEnmascarada).to.match(/^\\*{4}[0-9a-z]{4}$/i); });",
+                  "pm.test('Trae la huella', () => pm.expect(b.hash).to.have.length(64));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un paciente no ve la boleta (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/boletas/{{plBoletaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "boletas", "{{plBoletaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La administración no ve la boleta (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/boletas/{{plBoletaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "boletas", "{{plBoletaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un empleado no ve la boleta de otro ni sin pagar (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/boletas/{{plBoletaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "boletas", "{{plBoletaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una boleta inexistente responde 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/boletas/00000000-0000-4000-8000-000000000001",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "boletas",
+                "00000000-0000-4000-8000-000000000001"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos no aprueba la planilla (403)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gerencia no aprueba la planilla (403)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos no paga la planilla (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/pagar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "pagar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaPago\": \"{{plHoy}}\",\n  \"referencia\": \"X\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una planilla calculada no se paga (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/pagar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "pagar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaPago\": \"{{plHoy}}\",\n  \"referencia\": \"ADELANTADO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una planilla calculada no genera el archivo bancario (409)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/archivo-bancario",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "archivo-bancario"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Devolver sin motivo se rechaza (400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/devolver",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "devolver"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finanzas devuelve la planilla con su motivo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/devolver",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "devolver"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Revisión de prueba\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Vuelve a borrador', () => pm.expect(pm.response.json().estado).to.eql('BORRADOR'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una planilla en borrador no se aprueba (409)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos vuelve a calcular tras la devolución",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/calcular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "planillas", "calcular"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"anio\": {{plAnio}},\n  \"mes\": {{plMes}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Queda calculada', () => pm.expect(pm.response.json().estado).to.eql('CALCULADA'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Quitar el concepto de prueba antes de aprobar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/empleados/{{plEmpleadoId}}/conceptos/{{plAsignacionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "empleados",
+                "{{plEmpleadoId}}",
+                "conceptos",
+                "{{plAsignacionId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finanzas aprueba la planilla",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda aprobada por finanzas', () => { pm.expect(j.estado).to.eql('APROBADA'); pm.expect(j.aprobadaPor).to.be.a('string'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una planilla aprobada no se aprueba otra vez (409)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/aprobar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "aprobar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una planilla aprobada no se recalcula (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/calcular",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "planillas", "calcular"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"anio\": {{plAnio}},\n  \"mes\": {{plMes}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una marcación en un mes aprobado se rechaza (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/asistencia/marcaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "asistencia", "marcaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{plEmpleadoId}}\",\n  \"tipo\": \"SALIDA\",\n  \"fechaHora\": \"{{plAnio}}-{{plMes}}-10T18:00:00\",\n  \"observacion\": \"Fuera de plazo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('plMes', String(pm.collectionVariables.get('plMes')).padStart(2, '0'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El contrato con planillas aprobadas no cambia sus condiciones (409)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/contratos/{{plContratoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "contratos", "{{plContratoId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"empleadoId\": \"{{plEmpleadoId}}\",\n  \"regimen\": \"GENERAL\",\n  \"remuneracion\": 99999,\n  \"sistemaPensionario\": \"ONP\",\n  \"cargo\": \"Cargo\",\n  \"fechaInicio\": \"2020-01-01\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.sendRequest({ url: pm.variables.get('baseUrl') + '/api/v1/planilla/contratos/' + pm.collectionVariables.get('plContratoId'), method: 'GET', header: { Authorization: 'Bearer ' + pm.collectionVariables.get('plRrhhToken') } }, (e, r) => { pm.collectionVariables.set('plContratoInicio', r.json().fechaInicio); });"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Se rechaza si el contrato ya está usado por la planilla aprobada', () => pm.expect([409, 400]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El archivo bancario de finanzas trae los abonos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/archivo-bancario",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "archivo-bancario"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Es un CSV con encabezado y filas', () => { pm.expect(j.formato).to.eql('CSV'); pm.expect(j.contenido).to.include('numero_boleta,empleado,banco,cuenta,monto,moneda,referencia'); pm.expect(j.filas).to.be.above(0); });",
+                  "pm.test('No está marcado por validar', () => pm.expect(j.porValidar).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos no genera el archivo bancario (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/archivo-bancario",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "archivo-bancario"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El archivo PLAME queda marcado por validar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/plame",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "plame"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Formato por validar', () => { const j = pm.response.json(); pm.expect(j.porValidar).to.eql(true); pm.expect(j.formato).to.eql('TXT'); pm.expect(j.filas).to.be.above(0); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finanzas no genera el archivo PLAME (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/plame",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "plame"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Quien aprobó no registra el pago (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/pagar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "pagar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaPago\": \"{{plHoy}}\",\n  \"referencia\": \"MISMA-PERSONA\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Explica la segregación', () => pm.expect(pm.response.json().message).to.include('aprobó'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registrar un usuario para el segundo aprobador",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "register"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Segundo\",\n  \"apellido\": \"Finanzas\",\n  \"email\": \"plfin{{plSufijo}}@prueba.com\",\n  \"password\": \"Paciente123!\",\n  \"telefono\": \"987654321\",\n  \"dni\": \"7{{plSufijo}}\",\n  \"fechaNacimiento\": \"1988-04-05\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La administración encuentra al usuario nuevo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/usuarios?q=plfin{{plSufijo}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "admin", "usuarios"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "plfin{{plSufijo}}"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const u = pm.response.json().find(x => x.email === 'plfin' + pm.collectionVariables.get('plSufijo') + '@prueba.com'); pm.test('Existe', () => pm.expect(u).to.exist); pm.collectionVariables.set('plUsuarioFinanzasId', u.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La administración le asigna el rol de finanzas",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/usuarios/{{plUsuarioFinanzasId}}/roles",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "usuarios",
+                "{{plUsuarioFinanzasId}}",
+                "roles"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roles\": [\"ROLE_FINANZAS\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login del segundo aprobador",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"plfin{{plSufijo}}@prueba.com\",\n  \"password\": \"Paciente123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('plFinanzas2Token', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un pago con fecha futura se rechaza (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/pagar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "pagar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzas2Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaPago\": \"2099-01-01\",\n  \"referencia\": \"FUTURO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El segundo aprobador registra el pago",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/pagar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "pagar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzas2Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaPago\": \"{{plHoy}}\",\n  \"referencia\": \"TRF-{{plSufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json();",
+                  "pm.test('Queda pagada con su referencia', () => { pm.expect(j.estado).to.eql('PAGADA'); pm.expect(j.referenciaPago).to.eql('TRF-' + pm.collectionVariables.get('plSufijo')); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una planilla pagada no se paga otra vez (409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/pagar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "pagar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzas2Token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fechaPago\": \"{{plHoy}}\",\n  \"referencia\": \"REPETIDO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Finanzas no cierra la planilla (403)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/cerrar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "cerrar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El empleado ve su boleta ya pagada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/mis-boletas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "mis-boletas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('Aparece la boleta de la planilla pagada', () => pm.expect(lista.some(b => b.planillaCodigo === pm.collectionVariables.get('plPlanillaCodigo'))).to.eql(true));",
+                  "pm.test('Solo trae boletas pagadas', () => lista.forEach(b => pm.expect(['PAGADA', 'CERRADA']).to.include(b.estadoPlanilla)));",
+                  "const propia = lista.find(b => b.planillaCodigo === pm.collectionVariables.get('plPlanillaCodigo')); pm.collectionVariables.set('plMiBoletaId', propia.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El empleado abre su propia boleta sin la cuenta bancaria",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/boletas/{{plMiBoletaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "boletas", "{{plMiBoletaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('No expone la cuenta', () => { const b = pm.response.json(); pm.expect(b.cuentaEnmascarada || null).to.eql(null); pm.expect(b.lineas.length).to.be.above(2); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El empleado descarga su boleta en PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/boleta-pago/{{plMiBoletaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "boleta-pago",
+                "{{plMiBoletaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plMedicoToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un paciente no descarga la boleta de otro (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/boleta-pago/{{plMiBoletaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "boleta-pago",
+                "{{plMiBoletaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La administración no descarga la boleta (403)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/boleta-pago/{{plMiBoletaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "boleta-pago",
+                "{{plMiBoletaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plAdminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Recursos humanos descarga cualquier boleta en PDF",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/documentos/boleta-pago/{{plBoletaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "documentos",
+                "boleta-pago",
+                "{{plBoletaId}}"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.sendRequest({ url: pm.variables.get('baseUrl') + '/api/v1/planilla/planillas/' + pm.collectionVariables.get('plPlanillaId'), method: 'GET', header: { Authorization: 'Bearer ' + pm.collectionVariables.get('plRrhhToken') } }, (e, r) => {",
+                  "  pm.collectionVariables.set('plBoletaId', r.json().boletas[0].id);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es un PDF', () => pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Un paciente no tiene boletas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/mis-boletas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "mis-boletas"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plPacienteToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Lista vacía', () => pm.expect(pm.response.json()).to.have.length(0));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gerencia cierra la planilla pagada",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/cerrar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "cerrar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Queda cerrada', () => pm.expect(pm.response.json().estado).to.eql('CERRADA'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Una planilla cerrada no se cierra otra vez (409)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/planillas/{{plPlanillaId}}/cerrar",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "api",
+                "v1",
+                "planilla",
+                "planillas",
+                "{{plPlanillaId}}",
+                "cerrar"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El asiento de la planilla aprobada queda contabilizado y balanceado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos?origen=PLANILLA",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "asientos"],
+              "query": [
+                {
+                  "key": "origen",
+                  "value": "PLANILLA"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const lista = pm.response.json();",
+                  "pm.test('Existe el asiento de la planilla', () => { const a = lista.find(x => (x.glosa || '').includes(pm.collectionVariables.get('plPlanillaCodigo'))); pm.expect(a).to.exist; pm.expect(Math.abs(a.totalDebe - a.totalHaber)).to.be.below(0.01); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El pago de la planilla genera su asiento y su movimiento de tesorería",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/asientos?origen=PAGO_PLANILLA",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "asientos"],
+              "query": [
+                {
+                  "key": "origen",
+                  "value": "PAGO_PLANILLA"
+                }
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Existe el asiento del pago', () => pm.expect(pm.response.json().some(x => (x.glosa || '').includes(pm.collectionVariables.get('plPlanillaCodigo')))).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "No quedan asientos pendientes de la planilla",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/contabilidad/pendientes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "contabilidad", "pendientes"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Sin pendientes de la planilla', () => pm.expect(pm.response.json().some(p => p.referenciaId === pm.collectionVariables.get('plPlanillaId'))).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La bitácora registra el ciclo de la planilla",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/auditoria/{{plPlanillaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "auditoria", "{{plPlanillaId}}"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plRrhhToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "const acciones = pm.response.json().map(a => a.accion);",
+                  "pm.test('Registra calcular, devolver, aprobar, pagar y cerrar', () => ['CALCULAR', 'DEVOLVER', 'APROBAR', 'PAGAR', 'CERRAR'].forEach(a => pm.expect(acciones).to.include(a)));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "La bitácora general muestra el concepto y el parámetro",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/planilla/auditoria",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "planilla", "auditoria"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es una lista', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Exportar la planilla a Excel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plFinanzasToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"reporte-planilla\",\n  \"formato\": \"XLSX\",\n  \"parametros\": { \"planillaId\": \"{{plPlanillaId}}\" }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Se acepta la exportación', () => pm.expect([200, 201, 202]).to.include(pm.response.code));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gerencia no exporta la planilla con detalle individual (403)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/exportaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "exportaciones"]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{plGerenciaToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"reporte-planilla\",\n  \"formato\": \"XLSX\",\n  \"parametros\": { \"planillaId\": \"{{plPlanillaId}}\" }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Código de estado 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
         }
       ]
     }

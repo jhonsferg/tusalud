@@ -49,8 +49,8 @@ public interface AsientoRepository extends JpaRepository<Asiento, UUID> {
               AND (:origen IS NULL OR a.origen = :origen)
               AND (:desde IS NULL OR a.fecha >= :desde)
               AND (:hasta IS NULL OR a.fecha <= :hasta)
-              AND (:q IS NULL OR LOWER(a.glosa) LIKE LOWER(CONCAT('%', :q, '%'))
-                   OR LOWER(COALESCE(a.numero, '')) LIKE LOWER(CONCAT('%', :q, '%')))
+              AND (:q IS NULL OR LOWER(a.glosa) LIKE :q
+                   OR LOWER(COALESCE(a.numero, '')) LIKE :q)
             ORDER BY a.fecha DESC, a.creadoEn DESC, a.id DESC
             """)
     List<Asiento> filtrar(
