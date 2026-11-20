@@ -47,6 +47,8 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Contenedores](#contenedores)
   - [Capas del backend](#capas-del-backend)
   - [Concurrencia con virtual threads](#concurrencia-con-virtual-threads)
+  - [Tareas programadas](#tareas-programadas)
+  - [Tipos de notificación](#tipos-de-notificación)
   - [Workspace del frontend](#workspace-del-frontend)
 - [Modelo de datos](#modelo-de-datos)
   - [Contexto de identidad y acceso](#contexto-de-identidad-y-acceso)
@@ -65,6 +67,12 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Contexto de compras](#contexto-de-compras)
   - [Contexto de contabilidad](#contexto-de-contabilidad)
   - [Contexto de planilla](#contexto-de-planilla)
+  - [Contexto de pediatría y odontología](#contexto-de-pediatría-y-odontología)
+  - [Contexto de quirófano y esterilización](#contexto-de-quirófano-y-esterilización)
+  - [Contexto de recetas y medicamentos](#contexto-de-recetas-y-medicamentos)
+  - [Contexto de historia clínica electrónica](#contexto-de-historia-clínica-electrónica)
+  - [Contexto de seguridad del paciente](#contexto-de-seguridad-del-paciente)
+  - [Contexto de planes de tratamiento](#contexto-de-planes-de-tratamiento)
   - [Reglas de integridad](#reglas-de-integridad)
 - [Seguridad](#seguridad)
   - [Modelo de amenazas resumido](#modelo-de-amenazas-resumido)
@@ -73,6 +81,7 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Auditoría y vigilancia](#auditoría-y-vigilancia)
   - [Archivos y documentos](#archivos-y-documentos)
   - [Gateway y red](#gateway-y-red)
+  - [Integridad, firma y segregación de funciones](#integridad-firma-y-segregación-de-funciones)
   - [Interfaz](#interfaz)
   - [Observabilidad segura](#observabilidad-segura)
   - [Límites y decisiones conocidas](#límites-y-decisiones-conocidas)
@@ -144,18 +153,31 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Compras y cuentas por pagar](#compras-y-cuentas-por-pagar-1)
   - [Contabilidad y tesorería](#contabilidad-y-tesorería-1)
   - [Planilla y asistencia](#planilla-y-asistencia-1)
+  - [Pediatría y odontología](#pediatría-y-odontología-1)
+  - [Quirófano y esterilización](#quirófano-y-esterilización-1)
+  - [Recetas electrónicas y catálogo de medicamentos](#recetas-electrónicas-y-catálogo-de-medicamentos-1)
+  - [Historia clínica electrónica](#historia-clínica-electrónica-1)
+  - [Seguridad del paciente y guías clínicas](#seguridad-del-paciente-y-guías-clínicas-1)
+  - [Planes de tratamiento y pacientes crónicos](#planes-de-tratamiento-y-pacientes-crónicos-1)
 - [Manejo de errores](#manejo-de-errores)
 - [Perfiles y configuración](#perfiles-y-configuración)
   - [Selección del perfil](#selección-del-perfil)
   - [Perfiles de Maven](#perfiles-de-maven)
 - [Migraciones con Flyway](#migraciones-con-flyway)
+  - [Migraciones de esquema](#migraciones-de-esquema)
+  - [Migraciones de demostración](#migraciones-de-demostración)
 - [Ejecución local](#ejecución-local)
 - [Docker](#docker)
   - [Servicios](#servicios)
   - [Archivos de Compose](#archivos-de-compose)
   - [Producción](#producción)
   - [Desarrollo y QA](#desarrollo-y-qa)
-  - [Despliegue de QA en un VPS](#despliegue-de-qa-en-un-vps)
+  - [Despliegue en un servidor propio](#despliegue-en-un-servidor-propio)
+  - [Firewall por país y acceso por red privada](#firewall-por-país-y-acceso-por-red-privada)
+  - [Protección contra bots](#protección-contra-bots)
+  - [Respaldos en el servidor](#respaldos-en-el-servidor)
+  - [Endurecimiento del servidor](#endurecimiento-del-servidor)
+  - [Proceso de actualización](#proceso-de-actualización)
   - [Almacenamiento de objetos](#almacenamiento-de-objetos)
   - [Gateway](#gateway)
   - [PostgreSQL 18](#postgresql-18)
@@ -171,6 +193,7 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Arquitectura del frontend](#arquitectura-del-frontend)
   - [Interceptores HTTP](#interceptores-http)
   - [Rutas](#rutas)
+  - [Menú y rutas de cada aplicación](#menú-y-rutas-de-cada-aplicación)
   - [Validaciones](#validaciones)
   - [Interfaz y componentes](#interfaz-y-componentes)
   - [Sistema de diseño y experiencia por rol](#sistema-de-diseño-y-experiencia-por-rol)
@@ -188,6 +211,7 @@ El repositorio es un monorepo con dos partes. El backend, en Java con Spring Boo
   - [Formateadores](#formateadores)
 - [Colección Postman](#colección-postman)
 - [Variables de entorno](#variables-de-entorno)
+  - [Propiedades sin variable de entorno propia](#propiedades-sin-variable-de-entorno-propia)
 
 ## Visión y principios
 
@@ -218,7 +242,7 @@ Las cifras salen del código y de las corridas de prueba más recientes.
 | Pruebas del backend                  | 1108  |
 | Pruebas unitarias del frontend       | 589   |
 | Pruebas de extremo a extremo         | 247   |
-| Carpetas de la colección de Postman  | 40    |
+| Carpetas de la colección de Postman  | 41    |
 
 ### Cómo leer este documento
 
@@ -439,7 +463,7 @@ TuSalud se organiza por áreas operativas de la clínica. Cada área agrupa mód
 - **Propósito.** Convierte la receta de la atención en un documento formal, numerado, firmado y verificable, y ayuda al médico a prescribir con seguridad. El médico asocia cada línea de la receta con un medicamento del catálogo, revisa las alertas de alergias, interacciones, duplicidad, dosis, embarazo, lactancia y función renal, justifica las graves y emite la receta, que farmacia dispensa total o parcialmente y que el paciente descarga con su código de verificación pública.
 - **Actores.** El médico de la atención emite y anula. Farmacia busca la receta y la dispensa, y ve solo lo necesario para hacerlo, sin diagnóstico, indicaciones ni firma. El paciente ve y descarga sus recetas, sin las alertas internas ni las justificaciones del médico. Administración gestiona el catálogo, los principios activos, las interacciones y la importación. Recepción, caja, enfermería, laboratorio y administración no ven el contenido de una receta.
 - **Catálogo.** Cada principio activo se identifica por su denominación común y trae su clase terapéutica, su grupo y sus alias de alergia, la dosis máxima diaria del adulto y por kilo en pediatría, la categoría en el embarazo, la compatibilidad con la lactancia y un aviso por función renal. Cada medicamento agrega forma farmacéutica, concentración, vía, presentación, categoría de control, estado de venta, si está en el petitorio y un vínculo opcional con un producto de la farmacia. La migración de demostración carga 130 principios activos, 199 presentaciones y 75 interacciones, con 12 presentaciones vinculadas a los productos de la farmacia. Esos datos de interacciones, dosis y categorías están por validar con un químico farmacéutico y con el petitorio vigente del MINSA.
-- **Alertas al prescribir.** Una alergia registrada que coincide con el principio activo, con sus alias o con su grupo es contraindicada. Una reacción cruzada básica entre penicilinas y cefalosporinas, o dentro de los antiinflamatorios, es grave. Una interacción toma la severidad registrada, contraindicada, grave, moderada o leve, también contra el tratamiento vigente de otras recetas. El mismo principio activo dos veces es una duplicidad grave y dos de la misma clase terapéutica es moderada. La dosis diaria que supera el máximo del adulto, o el pediátrico por el último peso registrado, es grave. Con embarazo marcado, las categorías X y D son contraindicada y grave, y con lactancia marcada, un medicamento contraindicado en la lactancia es grave. El aviso renal es informativo. Las alertas graves exigen una justificación de diez caracteres y las contraindicadas de treinta, y el servidor las recalcula al emitir, sin confiar en lo que envía el cliente. Cada alerta queda registrada con su justificación, su autor y su hora.
+- **Alertas al prescribir.** Una alergia registrada que coincide con el principio activo, con sus alias o con su grupo es contraindicada. Una reacción cruzada básica entre penicilinas y cefalosporinas, o dentro de los antiinflamatorios, es grave. Una interacción toma la severidad registrada, contraindicada, grave, moderada o leve, también contra el tratamiento vigente de otras recetas. El mismo principio activo dos veces es una duplicidad grave y dos de la misma clase terapéutica es moderada. La dosis diaria que supera el máximo del adulto, o el pediátrico por el último peso registrado, es grave. Con embarazo marcado, las categorías X y D son contraindicada y grave, y con lactancia marcada, un medicamento contraindicado en la lactancia es grave. El aviso renal es informativo. Las alertas graves exigen una justificación de diez caracteres y las contraindicadas de 30, y el servidor las recalcula al emitir, sin confiar en lo que envía el cliente. Cada alerta queda registrada con su justificación, su autor y su hora.
 - **Receta.** Tiene un número correlativo por año, con el formato RX seguido del año y seis dígitos, que no se repite aunque emitan varios médicos a la vez. Guarda un contenido canónico con el paciente, el médico, el diagnóstico CIE-10 principal y cada ítem, calcula su hash SHA-256 y lo firma con RSA y SHA-256. La vigencia es de 30 días por defecto y de siete con medicamentos de control especial, que son los psicotrópicos y los estupefacientes. Una receta emitida es inmutable. Se corrige anulándola con un motivo, solo mientras no tenga dispensaciones, y emitiendo otra que indica a cuál reemplaza. Mientras una atención tenga una receta vigente, su receta clínica no se puede modificar. El PDF lleva el QR, el código de verificación, el hash y el estado de la firma, y la verificación pública distingue una receta válida, anulada, vencida y alterada sin mostrar datos del paciente.
 - **Firma.** Es una firma electrónica del servidor con el certificado digital configurable de la clínica, el mismo mecanismo de la facturación electrónica, y en desarrollo con un certificado de prueba autofirmado. Cada receta guarda su firma y el certificado público con el que se verifica, de modo que sigue verificándose aunque el certificado cambie. No equivale a una firma digital con certificado de una entidad acreditada ante INDECOPI, y la interfaz y el PDF lo advierten mientras el certificado sea de prueba. No hay un certificado por médico todavía.
 - **Dispensación.** Farmacia busca por número, DNI o nombre y dispensa solo recetas vigentes, con la firma verificable y sin anular. Cada ítem admite varias dispensaciones parciales hasta completar la cantidad, y una cantidad mayor a lo pendiente se rechaza. La dispensación usa el flujo existente de farmacia, con su comprobante, su descuento de inventario y su anulación, que devuelve la cantidad a la receta. Los ítems de control especial se muestran con una advertencia. Un medicamento sin producto de farmacia vinculado no se puede dispensar.
@@ -542,24 +566,24 @@ TuSalud se organiza por áreas operativas de la clínica. Cada área agrupa mód
 
 Cada actor tiene su propia aplicación web. Todas se sirven bajo el mismo origen, el portal en la raíz y cada aplicación en su ruta base, así que comparten la sesión guardada en el navegador. La tabla indica para cada rol su aplicación, su página de inicio, lo que hace y lo que por diseño no ve. El control real lo ejerce siempre el backend con `@PreAuthorize`, la relación asistencial y los DTO por rol, y las aplicaciones solo muestran lo que el rol puede usar.
 
-| Rol                | Aplicación    | Base            | Inicio                | Qué hace                                                                                                                                               | Qué no ve                                                                                     |
-| ------------------ | ------------- | --------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
-| Sin sesión         | `portal`      | `/`             | `/auth/login`         | Inicia sesión, se registra como paciente y verifica el segundo factor. Después lo envía a la aplicación de su rol.                                     | Nada del sistema                                                                              |
-| `ROLE_PACIENTE`    | `paciente`    | `/paciente/`    | `/paciente/inicio`    | Reserva, reprograma y cancela citas, paga, consulta su historia, resultados, estudios, recetas, ingresos y seguros, y usa su calendario.               | Datos de otras personas, administración, agenda ajena y la indicación clínica de sus estudios |
-| `ROLE_MEDICO`      | `medico`      | `/medico/`      | `/medico/inicio`      | Agenda, cola de pacientes, atención con receta, pacientes con relación asistencial, estudios, hospitalización, preautorizaciones y bloqueos de agenda. | Pacientes sin relación, caja, finanzas, sueldos y datos de otros médicos                      |
-| `ROLE_ADMIN`       | `admin`       | `/admin/`       | `/admin/`             | Usuarios y roles, especialidades y tarifas, médicos, cupones, pagos, plantillas, seguridad, estado del sistema, camas, convenios y reportes.           | Historias clínicas, atenciones, resultados, informes, evoluciones y sueldos                   |
-| `ROLE_GERENCIA`    | `gerencia`    | `/gerencia/`    | `/gerencia/inicio`    | Los cuatro reportes, el resumen de recursos humanos y las fichas con sueldo en solo lectura.                                                           | Datos de pacientes y datos clínicos                                                           |
-| `ROLE_FINANZAS`    | `finanzas`    | `/finanzas/`    | `/finanzas/inicio`    | Reporte financiero, aseguradoras, convenios, cartera, liquidaciones y comprobantes.                                                                    | Datos clínicos y reportes de otras áreas                                                      |
-| `ROLE_OPERACIONES` | `operaciones` | `/operaciones/` | `/operaciones/inicio` | Reporte operativo con ocupación, esperas, demanda, agenda e inventario crítico.                                                                        | Datos de pacientes y reportes financieros o de calidad                                        |
-| `ROLE_CALIDAD`     | `calidad`     | `/calidad/`     | `/calidad/inicio`     | Reporte de calidad con valoraciones, tasas de cancelación y ausencia, tiempos de entrega y motivos de anulación.                                       | Nombres de pacientes y datos clínicos                                                         |
-| `ROLE_RRHH`        | `rrhh`        | `/rrhh/`        | `/rrhh/`              | Plantilla, fichas con sueldo, turnos, ausencias y vacaciones.                                                                                          | Datos de pacientes y datos clínicos                                                           |
-| `ROLE_RECEPCION`   | `recepcion`   | `/recepcion/`   | `/recepcion/`         | Llegadas, cola, sala de espera, alta de pacientes, citas de mostrador, pólizas y mapa de camas resumido.                                               | Diagnósticos, motivos de ingreso, evoluciones e historia clínica                              |
-| `ROLE_CAJA`        | `caja`        | `/caja/`        | `/caja/`              | Apertura y cierre de caja, cobros con copago, comprobantes, historial y reporte de ingresos.                                                           | Datos clínicos                                                                                |
-| `ROLE_ENFERMERIA`  | `enfermeria`  | `/enfermeria/`  | `/enfermeria/`        | Mapa de camas, emergencias y triaje, evoluciones de enfermería, evoluciones pendientes y traslados.                                                    | Datos clínicos de pacientes que no están hospitalizados                                       |
-| `ROLE_LABORATORIO` | `laboratorio` | `/laboratorio/` | `/laboratorio/`       | Cola de órdenes, toma de muestra, captura y validación de resultados y catálogo de exámenes.                                                           | Historia clínica y datos que no sean la orden                                                 |
-| `ROLE_IMAGENES`    | `imagenes`    | `/imagenes/`    | `/imagenes/`          | Cola, agenda de salas, toma con carga de imágenes, visor, informes con firma y catálogo.                                                               | Historia clínica y datos que no sean la orden                                                 |
-| `ROLE_FARMACIA`    | `farmacia`    | `/farmacia/`    | `/farmacia/`          | Recetas pendientes, dispensación, venta libre, historial y consulta de stock.                                                                          | El diagnóstico completo: solo ve lo ligado a la receta                                        |
-| `ROLE_ALMACEN`     | `almacen`     | `/almacen/`     | `/almacen/`           | Productos, lotes, ingresos, proveedores, kardex y alertas de reposición.                                                                               | Datos de pacientes                                                                            |
+| Rol                | Aplicación    | Base            | Inicio                | Qué hace                                                                                                                                                                                                                                                                                                                                                                                              | Qué no ve                                                                                     |
+| ------------------ | ------------- | --------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Sin sesión         | `portal`      | `/`             | `/auth/login`         | Inicia sesión, se registra como paciente y verifica el segundo factor. Después lo envía a la aplicación de su rol.                                                                                                                                                                                                                                                                                    | Nada del sistema                                                                              |
+| `ROLE_PACIENTE`    | `paciente`    | `/paciente/`    | `/paciente/inicio`    | Reserva, reprograma y cancela citas y teleconsultas, paga, consulta su historia clínica y la descarga en PDF, y ve sus resultados, estudios, recetas, documentos, consentimientos, carné de vacunación, crecimiento, salud dental, plan de tratamiento, cirugías, ingresos, seguros y comprobantes. Ejerce sus derechos de privacidad y usa su calendario.                                            | Datos de otras personas, administración, agenda ajena y la indicación clínica de sus estudios |
+| `ROLE_MEDICO`      | `medico`      | `/medico/`      | `/medico/inicio`      | Agenda, cola de pacientes, teleconsultas, atención con diagnósticos CIE-10 y recetas electrónicas, cierre y rectificación de la historia, documentos y consentimientos, pacientes con relación asistencial, laboratorio, imágenes, hospitalización, vacunación, crecimiento, odontograma, agenda quirúrgica, pacientes crónicos, eventos de seguridad, guías, preautorizaciones y bloqueos de agenda. | Pacientes sin relación, caja, finanzas, sueldos y datos de otros médicos                      |
+| `ROLE_ADMIN`       | `admin`       | `/admin/`       | `/admin/inicio`       | Usuarios y roles, especialidades y tarifas, médicos, cupones, pagos, plantillas, seguridad, estado del sistema, camas, convenios, catálogos de CIE-10, medicamentos, vacunación, odontología, quirófanos y esterilización, establecimientos, consentimientos y mensajes, respaldos, conservación y fusión de historias, y consulta de compras, comprobantes electrónicos y privacidad.                | Historias clínicas, atenciones, resultados, informes, evoluciones y sueldos                   |
+| `ROLE_GERENCIA`    | `gerencia`    | `/gerencia/`    | `/gerencia/inicio`    | Los reportes ejecutivo, financiero, operativo, de calidad y de morbilidad, el resumen de recursos humanos, las fichas con sueldo en solo lectura, los eventos adversos, las compras, la contabilidad con el cierre de periodos, la planilla en totales, la cartera de seguros y el registro de ventas.                                                                                                | Datos de pacientes y datos clínicos                                                           |
+| `ROLE_FINANZAS`    | `finanzas`    | `/finanzas/`    | `/finanzas/inicio`    | Reporte financiero, aseguradoras, convenios, cartera, liquidaciones, preautorizaciones, comprobantes electrónicos, compras y cuentas por pagar, contabilidad y tesorería, y la aprobación y el pago de la planilla.                                                                                                                                                                                   | Datos clínicos y reportes de otras áreas                                                      |
+| `ROLE_OPERACIONES` | `operaciones` | `/operaciones/` | `/operaciones/inicio` | Reporte operativo con ocupación, esperas, demanda, agenda e inventario crítico, morbilidad, respaldos y entregas de avisos.                                                                                                                                                                                                                                                                           | Datos de pacientes y reportes financieros o de calidad                                        |
+| `ROLE_CALIDAD`     | `calidad`     | `/calidad/`     | `/calidad/inicio`     | Reporte de calidad con valoraciones, tasas de cancelación y ausencia, tiempos de entrega y motivos de anulación, morbilidad, eventos adversos, guías clínicas, protección de datos y esterilización.                                                                                                                                                                                                  | Nombres de pacientes y datos clínicos                                                         |
+| `ROLE_RRHH`        | `rrhh`        | `/rrhh/`        | `/rrhh/inicio`        | Plantilla, fichas con sueldo, turnos, ausencias, vacaciones, contratos, asistencia, terminales, conceptos y parámetros, y el cálculo de la planilla.                                                                                                                                                                                                                                                  | Datos de pacientes y datos clínicos                                                           |
+| `ROLE_RECEPCION`   | `recepcion`   | `/recepcion/`   | `/recepcion/inicio`   | Llegadas, cola, sala de espera, alta de pacientes, citas de mostrador, pólizas, preautorizaciones, agenda de salas de imágenes y mapa de camas resumido.                                                                                                                                                                                                                                              | Diagnósticos, motivos de ingreso, evoluciones e historia clínica                              |
+| `ROLE_CAJA`        | `caja`        | `/caja/`        | `/caja/inicio`        | Apertura y cierre de caja, cobros con copago, comprobantes, comprobantes electrónicos, cobros odontológicos, historial y reporte de ingresos.                                                                                                                                                                                                                                                         | Datos clínicos                                                                                |
+| `ROLE_ENFERMERIA`  | `enfermeria`  | `/enfermeria/`  | `/enfermeria/inicio`  | Mapa de camas, emergencias y triaje, evoluciones de enfermería, evoluciones pendientes y traslados, vacunación, crecimiento, agenda quirúrgica, esterilización, eventos de seguridad y guías.                                                                                                                                                                                                         | Datos clínicos de pacientes que no están hospitalizados ni tienen una atención vigente        |
+| `ROLE_LABORATORIO` | `laboratorio` | `/laboratorio/` | `/laboratorio/inicio` | Cola de órdenes, toma de muestra, captura y validación de resultados y catálogo de exámenes.                                                                                                                                                                                                                                                                                                          | Historia clínica y datos que no sean la orden                                                 |
+| `ROLE_IMAGENES`    | `imagenes`    | `/imagenes/`    | `/imagenes/inicio`    | Cola, agenda de salas, toma con carga de imágenes, visor, informes con firma y catálogo.                                                                                                                                                                                                                                                                                                              | Historia clínica y datos que no sean la orden                                                 |
+| `ROLE_FARMACIA`    | `farmacia`    | `/farmacia/`    | `/farmacia/inicio`    | Recetas pendientes, dispensación, recetas electrónicas con dispensación parcial, venta libre, historial, consulta de stock y requisiciones.                                                                                                                                                                                                                                                           | El diagnóstico completo: solo ve lo ligado a la receta                                        |
+| `ROLE_ALMACEN`     | `almacen`     | `/almacen/`     | `/almacen/inicio`     | Productos, lotes, ingresos, proveedores, kardex, alertas de reposición, requisiciones, órdenes de compra, recepciones y devoluciones.                                                                                                                                                                                                                                                                 | Datos de pacientes                                                                            |
 
 Todo el personal cuenta además con Mi espacio, que muestra sus turnos, sus ausencias y su ficha, con el calendario personal, las notificaciones, el perfil y los documentos que su rol puede exportar.
 
@@ -659,6 +683,56 @@ La API corre sobre Java 25 con virtual threads activados mediante `spring.thread
 Desde Java 24 un bloque `synchronized` ya no fija el hilo virtual a su hilo del sistema, por lo que las librerías que todavía usan `synchronized` no anulan la ventaja. El límite real de concurrencia contra la base de datos lo marca el pool de conexiones de Hikari: cuando todas las conexiones están ocupadas, las peticiones adicionales esperan su turno sin consumir hilos del sistema.
 
 Las entidades nunca se serializan directamente. Cada respuesta se construye con un DTO, lo que evita ciclos en la serialización y problemas con relaciones perezosas. La propiedad `open-in-view` está desactivada, de modo que toda carga de datos ocurre dentro de la transacción del servicio.
+
+### Tareas programadas
+
+La API ejecuta 19 tareas con `@Scheduled`. Las que tienen una expresión cron se pueden mover o desactivar con la propiedad indicada.
+
+| Tarea                                       | Frecuencia                                                    | Qué hace                                                                              |
+| ------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Recordatorios de citas y eventos            | Cada 15 minutos                                               | Crea los avisos según la antelación elegida por cada usuario                          |
+| Purga de refresh tokens                     | Cada hora                                                     | Elimina los tokens vencidos desde hace más de un día                                  |
+| Purga de eventos de seguridad               | Cada seis horas                                               | Elimina los eventos anteriores a `app.seguridad.retencion-dias`                       |
+| Purga de exportaciones                      | Cada hora                                                     | Elimina las exportaciones vencidas junto con su archivo                               |
+| Latido del flujo de notificaciones          | Cada 25 segundos                                              | Envía un evento `ping` a las conexiones abiertas                                      |
+| Recordatorio de teleconsultas               | Cada minuto                                                   | Avisa de la teleconsulta próxima                                                      |
+| Cierre de teleconsultas vencidas            | Cada minuto                                                   | Cierra las sesiones cuya ventana terminó                                              |
+| Cierre de salas inactivas                   | Cada 15 segundos                                              | Cierra las salas de señalización sin actividad por `app.telemedicina.inactividad-seg` |
+| Vencimiento de preautorizaciones            | Todos los días a las 2:30                                     | Marca como vencidas las preautorizaciones aprobadas cuya vigencia terminó             |
+| Alertas del almacén                         | Todos los días a las 7:00, `app.almacen.cron-alertas`         | Avisa de stock bajo, lotes por vencer y lotes vencidos                                |
+| Cola de entregas de avisos                  | Cada 10 segundos, `app.canales.intervalo-cola-ms`             | Envía por correo, SMS y WhatsApp los avisos pendientes, con reintentos                |
+| Cola de facturación electrónica             | Cada 10 segundos, `app.facturacion.cola.intervalo-ms`         | Envía a SUNAT los comprobantes pendientes y reintenta los fallidos                    |
+| Resumen diario de boletas                   | Todos los días a las 0:30, `app.facturacion.cron-resumen`     | Arma y envía el resumen del día anterior                                              |
+| Retención de datos personales               | Todos los días a las 2:15, `app.privacidad.cron-retencion`    | Aplica las políticas de retención activas                                             |
+| Vigilancia de respaldos                     | Cada hora, `app.respaldos.intervalo-vigilancia-ms`            | Genera una alerta si el último respaldo o la última prueba de restauración vencieron  |
+| Cuentas por pagar vencidas                  | Todos los días a las 8:00, `app.compras.cron-vencimientos`    | Avisa a finanzas, una vez al día, si hay comprobantes vencidos                        |
+| Recordatorios de vacunación                 | Todos los días a las 8:00, `app.pediatria.recordatorios-cron` | Avisa a los pacientes con una dosis atrasada o próxima                                |
+| Alertas de esterilización                   | Todos los días a las 7:00, `app.quirofano.alertas-cron`       | Avisa a enfermería y a calidad de lotes bloqueados, vencidos o por vencer             |
+| Controles vencidos de planes de tratamiento | Todos los días a las 7:00, `app.cronicos.alerta-cron`         | Avisa al paciente y a su médico de los controles vencidos                             |
+
+### Tipos de notificación
+
+Las notificaciones se guardan con un tipo del enum `TipoNotificacion`, que tiene 63 valores. El tipo `SISTEMA` cubre los avisos genéricos de los módulos que no definen uno propio.
+
+| Área                        | Tipos                                                                                                                                       |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Citas y calendario          | `CITA_CREADA`, `CITA_CONFIRMADA`, `CITA_CANCELADA`, `CITA_ATENDIDA`, `CITA_REPROGRAMADA`, `RECORDATORIO_CITA`, `RECORDATORIO_EVENTO`        |
+| Cuenta y seguridad          | `INICIO_SESION`, `CONTRASENA_CAMBIADA`, `MFA_ACTIVADO`, `MFA_DESACTIVADO`, `PACIENTE_COMPARTIDO`, `ROLES_ACTUALIZADOS`, `SESION_SOSPECHOSA` |
+| Pagos y caja                | `PAGO_REGISTRADO`, `PAGO_REEMBOLSADO`, `COMPROBANTE_EMITIDO`, `CAJA_DIFERENCIA`, `COMPROBANTE_RECHAZADO`                                    |
+| Laboratorio e imágenes      | `ORDEN_LABORATORIO`, `RESULTADO_LABORATORIO`, `ORDEN_IMAGEN`, `ESTUDIO_INFORMADO`, `HALLAZGO_CRITICO`                                       |
+| Farmacia y almacén          | `RECETA_DISPENSADA`, `RECETA_EMITIDA`, `STOCK_BAJO`, `PRODUCTO_POR_VENCER`                                                                  |
+| Recepción y hospitalización | `PACIENTE_EN_ESPERA`, `TURNO_LLAMADO`, `INGRESO_HOSPITALARIO`, `ALTA_HOSPITALARIA`, `EMERGENCIA_TRIAJE`                                     |
+| Recursos humanos            | `SOLICITUD_AUSENCIA`, `AUSENCIA_RESUELTA`, `PLANILLA_POR_APROBAR`, `PLANILLA_APROBADA`, `BOLETA_DISPONIBLE`                                 |
+| Seguros                     | `PREAUTORIZACION_SOLICITADA`, `PREAUTORIZACION_RESUELTA`                                                                                    |
+| Telemedicina                | `TELECONSULTA_PROXIMA`, `TELECONSULTA_SALA_ABIERTA`, `TELECONSULTA_PACIENTE_EN_SALA`                                                        |
+| Documentos médicos          | `DOCUMENTO_EMITIDO`, `CONSENTIMIENTO_PENDIENTE`, `CONSENTIMIENTO_FIRMADO`                                                                   |
+| Respaldos                   | `RESPALDO_FALLIDO`, `RESPALDO_VENCIDO`                                                                                                      |
+| Protección de datos         | `ARCO_RECIBIDA`, `ARCO_RESUELTA`, `INCIDENTE_DATOS`                                                                                         |
+| Compras                     | `REQUISICION_ENVIADA`, `REQUISICION_RESUELTA`, `ORDEN_COMPRA_POR_APROBAR`, `ORDEN_COMPRA_RESUELTA`, `CUENTA_POR_PAGAR_VENCIDA`              |
+| Pediatría y odontología     | `VACUNA_PROXIMA`, `PLAN_ODONTOLOGICO_PRESENTADO`                                                                                            |
+| Quirófano y esterilización  | `CIRUGIA_PROGRAMADA`, `CIRUGIA_ASIGNADA`, `ESTERILIZACION_ALERTA`                                                                           |
+| Exportaciones               | `EXPORTACION_LISTA`                                                                                                                         |
+| Genérico                    | `SISTEMA`                                                                                                                                   |
 
 ### Workspace del frontend
 
@@ -1001,6 +1075,136 @@ erDiagram
 - `planillas` es única por año y mes, con su estado, totales, huella y quién hizo cada paso. `boletas_pago` y `boleta_lineas` congelan el cálculo, y `secuencias_planilla` numera las boletas por año.
 - `planilla_auditoria` registra quién hizo cada paso.
 
+### Contexto de pediatría y odontología
+
+```mermaid
+erDiagram
+    Paciente ||--o{ RegistroVacunacion : recibe
+    Vacuna ||--o{ RegistroVacunacion : aplica
+    EsquemaVacunacion ||--o{ EsquemaDosis : define
+    Vacuna ||--o{ EsquemaDosis : programa
+    Paciente ||--o{ RecordatorioVacunacion : avisa
+    Vacuna ||--o{ RecordatorioVacunacion : recuerda
+    Paciente ||--o{ CarneVacunacion : emite
+    Paciente ||--o{ MedicionCrecimiento : registra
+    Atencion ||--o{ MedicionCrecimiento : origina
+    Paciente ||--o{ OdontogramaEvento : acumula
+    Paciente ||--o{ PlanOdontologico : recibe
+    Medico ||--o{ PlanOdontologico : propone
+    PlanOdontologico ||--o{ PlanOdontologicoItem : detalla
+    ProcedimientoOdontologico ||--o{ PlanOdontologicoItem : cataloga
+    PlanOdontologico ||--o{ SesionOdontologica : ejecuta
+    SesionOdontologica ||--o{ PlanOdontologicoItem : realiza
+    PlanOdontologico ||--o{ PlanOdontologicoPago : cobra
+    SesionCaja ||--o{ PlanOdontologicoPago : recibe
+    Consentimiento ||--o{ PlanOdontologicoItem : autoriza
+```
+
+- `vacunas`, `esquemas_vacunacion` y `esquema_dosis` forman el catálogo configurable. Un esquema nuevo cierra la vigencia del anterior.
+- `registros_vacunacion` guarda cada dosis aplicada con su estado vigente o anulado y el motivo de la anulación. `recordatorios_vacunacion` evita avisar dos veces la misma dosis programada. `carnes_vacunacion` guarda cada emisión del PDF con su código de verificación y su huella.
+- `referencia_crecimiento` guarda los parámetros LMS por indicador, sexo y edad en meses, con su fuente y si está por validar. `mediciones_crecimiento` guarda el peso, la talla y el perímetro cefálico de cada medición, y el puntaje, el percentil y la alerta se calculan al consultar.
+- `odontograma_eventos` es una tabla de solo inserción: el estado actual de cada pieza y superficie sale del último evento.
+- `procedimientos_odontologicos` es el catálogo con su precio, el estado en que deja la pieza y si exige pieza, superficie o consentimiento. `planes_odontologicos`, `plan_odontologico_items`, `sesiones_odontologicas` y `planes_odontologicos_pagos` guardan el presupuesto, la ejecución y el cobro.
+
+### Contexto de quirófano y esterilización
+
+```mermaid
+erDiagram
+    Quirofano ||--o{ QuirofanoEquipo : dispone
+    Quirofano ||--o{ Cirugia : aloja
+    Paciente ||--o{ Cirugia : recibe
+    Medico ||--o{ Cirugia : solicita
+    IngresoHospitalario ||--o{ Cirugia : vincula
+    Cirugia ||--o{ CirugiaEquipo : asigna
+    Cirugia ||--o{ CirugiaChecklist : verifica
+    Cirugia ||--o{ CirugiaEvento : registra
+    Cirugia ||--o{ CirugiaInsumo : consume
+    Producto ||--o{ CirugiaInsumo : descuenta
+    Cirugia ||--o{ CirugiaSet : usa
+    LoteEsteril ||--o{ CirugiaSet : abastece
+    Esterilizador ||--o{ CicloEsterilizacion : ejecuta
+    CicloEsterilizacion ||--o{ LoteEsteril : produce
+    SetInstrumental ||--o{ LoteEsteril : esteriliza
+    Consentimiento ||--o{ Cirugia : autoriza
+```
+
+- `quirofanos` y `quirofano_equipos` son el catálogo de salas y de su equipamiento. `cirugias` guarda el estado, la programación, el tipo de anestesia, la nota operatoria y el registro anestésico, y los dos consentimientos que exige.
+- `cirugia_equipo` asigna a cada persona con su rol quirúrgico. `cirugia_checklists` guarda cada momento de la lista de verificación con sus puntos, y `cirugia_eventos` es la historia inmutable de la cirugía.
+- `cirugia_insumos` guarda el producto, la cantidad y la referencia del descuento de inventario. `cirugia_sets` guarda el lote esterilizado que se usó.
+- `esterilizadores`, `sets_instrumental`, `ciclos_esterilizacion` y `lotes_esteriles` forman el flujo de la central de esterilización, y `secuencias_quirofano` numera cirugías, ciclos y lotes.
+
+### Contexto de recetas y medicamentos
+
+```mermaid
+erDiagram
+    PrincipioActivo ||--o{ Medicamento : contiene
+    PrincipioActivo ||--o{ InteraccionMedicamentosa : origina
+    PrincipioActivo ||--o{ InteraccionMedicamentosa : recibe
+    Atencion ||--o{ RecetaElectronica : genera
+    Paciente ||--o{ RecetaElectronica : recibe
+    Medico ||--o{ RecetaElectronica : emite
+    RecetaElectronica ||--o| RecetaElectronica : reemplaza
+    RecetaElectronica ||--o{ RecetaElectronicaItem : detalla
+    Medicamento ||--o{ RecetaElectronicaItem : prescribe
+    RecetaElectronica ||--o{ RecetaAlerta : advierte
+    RecetaElectronicaItem ||--o{ RecetaDispensacion : entrega
+```
+
+- `principios_activos` y `medicamentos` forman el catálogo, y `interacciones_medicamentosas` guarda cada par con su severidad.
+- `recetas_electronicas` guarda el contenido canónico, la huella, la firma y el certificado público, y apunta a la receta que reemplaza cuando se corrige una anulada.
+- `receta_alertas` guarda cada alerta con su justificación, su autor y su hora. `receta_dispensaciones` guarda cada entrega parcial de un ítem.
+
+### Contexto de historia clínica electrónica
+
+```mermaid
+erDiagram
+    Atencion ||--o| AtencionCierre : cierra
+    Atencion ||--o{ AtencionVersion : rectifica
+    Usuario ||--o{ AtencionCierre : firma
+    Usuario ||--o{ AtencionVersion : autoriza
+    Paciente ||--o{ HceImpresion : imprime
+    Paciente ||--o{ PacienteFusion : recibe
+    Usuario ||--o{ PoliticaConservacion : actualiza
+```
+
+- `atencion_cierres` es única por atención y guarda el contenido canónico, la huella y la firma. `atencion_versiones` guarda cada adenda o corrección con su número, su motivo, el valor anterior y el nuevo.
+- `politicas_conservacion` guarda un plazo en años por cada tipo de registro. `paciente_fusiones` deja constancia de cada fusión y `hce_impresiones` de cada impresión de la historia.
+
+### Contexto de seguridad del paciente
+
+```mermaid
+erDiagram
+    EventoAdverso ||--o{ EventoCausa : analiza
+    EventoAdverso ||--o{ EventoAccion : corrige
+    Usuario ||--o{ EventoAdverso : notifica
+    Paciente |o--o{ EventoAdverso : involucra
+    Cirugia |o--o{ EventoAdverso : origina
+    Dispensacion |o--o{ EventoAdverso : origina
+    Usuario ||--o{ EventoAccion : responde
+    Especialidad |o--o{ GuiaClinica : orienta
+    GuiaClinica ||--o{ GuiaCie10 : codifica
+```
+
+- `eventos_adversos` guarda el reporte con su código, su tipo, su severidad, su área y su estado, y los vínculos opcionales con paciente, cirugía y dispensación, que un reporte anónimo no llena. `evento_causas` guarda el análisis y `evento_acciones` las acciones de mejora.
+- `guias_clinicas` guarda cada versión de una guía y `guia_cie10` guarda los códigos CIE-10 a los que aplica, que se comparan por prefijo con el diagnóstico.
+
+### Contexto de planes de tratamiento
+
+```mermaid
+erDiagram
+    Paciente ||--o{ PlanTratamiento : sigue
+    Medico ||--o{ PlanTratamiento : conduce
+    RecetaElectronica |o--o{ PlanTratamiento : medica
+    PlanTratamiento ||--o{ PlanMeta : fija
+    PlanTratamiento ||--o{ PlanControl : programa
+    PlanTratamiento ||--o{ PlanMedicion : registra
+    Cita |o--o{ PlanControl : cumple
+    Usuario ||--o{ PlanMedicion : registra
+```
+
+- `planes_tratamiento` guarda el programa, el diagnóstico, los objetivos, las intervenciones, la medicación y el estado, y el riesgo se calcula al consultar. `plan_metas` fija un rango por parámetro y `plan_controles` programa los controles con su estado.
+- `plan_mediciones` guarda cada medición con su origen y si quedó fuera de la meta.
+
 ### Reglas de integridad
 
 - La tabla `citas` tiene índices por médico y fecha y por paciente y fecha, y el campo `version` aplica bloqueo optimista para que dos operaciones concurrentes no sobrescriban la misma cita.
@@ -1010,6 +1214,8 @@ erDiagram
 - El diagnóstico codificado copia el código y la descripción en `atencion_diagnosticos`, de modo que una actualización del catálogo no reescribe una historia clínica ya firmada. La unicidad de un solo principal por atención se valida en el servicio y no con un índice parcial, para que la misma regla funcione en PostgreSQL y en H2.
 - Un documento médico emitido no se modifica: guarda el hash SHA-256 del contenido canónico y del PDF, y la numeración por tipo y año se asigna con un bloqueo pesimista sobre `secuencias_documentos_medicos`, de modo que dos emisiones simultáneas nunca repiten número. Los índices únicos parciales de número y de código de verificación lo respaldan en la base.
 - Los archivos no se guardan en la base de datos: la tabla `archivos` guarda los metadatos, el bucket, la clave, el tamaño, el hash y el propietario, y los bytes viven en el almacén de objetos.
+- Los cierres y versiones de la atención, las impresiones y fusiones de historias, los eventos del odontograma, los eventos, listas, insumos y sets de una cirugía y las mediciones de los planes de tratamiento están marcados como inmutables en JPA, de modo que Hibernate no emite actualizaciones sobre ellos.
+- Las numeraciones de los documentos médicos, las compras, la contabilidad, la planilla y el quirófano se asignan con bloqueo pesimista sobre las tablas `secuencias_documentos_medicos`, `secuencias_compras`, `secuencias_contables`, `secuencias_planilla` y `secuencias_quirofano`, de modo que dos operaciones simultáneas nunca repiten un número.
 
 ## Seguridad
 
@@ -1077,6 +1283,17 @@ La seguridad de TuSalud sigue la defensa en profundidad: el gateway filtra y lim
 - Entrega una política de seguridad de contenido estricta, `X-Content-Type-Options`, `Referrer-Policy` y las demás cabeceras de seguridad, y admite TLS con HSTS cuando se activa.
 - PostgreSQL solo se publica en el loopback del host.
 
+### Integridad, firma y segregación de funciones
+
+- **Documentos médicos.** Un documento emitido guarda el hash SHA-256 de su contenido y de su PDF, un número correlativo por tipo y año asignado con un bloqueo pesimista y un código de verificación aleatorio. No se edita: se anula con motivo y se emite otro que lo referencia.
+- **Recetas electrónicas e historia clínica.** La receta y el cierre de una atención guardan un contenido canónico, su huella SHA-256 y una firma electrónica del servidor con el certificado configurable de la clínica, junto con el certificado público, de modo que siguen verificándose si el certificado cambia. Una atención cerrada solo se rectifica con adendas y correcciones numeradas que conservan el valor anterior. Las alertas de la receta se recalculan siempre en el servidor.
+- **Comprobantes electrónicos.** El XML UBL 2.1 se firma con XMLDSig y un comprobante aceptado es inmutable: se corrige con una nota de crédito o de débito.
+- **Registros de solo inserción.** Los cambios del odontograma y los eventos de una cirugía son inmutables y no se editan. Una dosis o una medición equivocada se anula con motivo y queda a la vista.
+- **Asientos y planillas.** Un asiento contabilizado es inmutable y se corrige con una reversa. Cada boleta de planilla y la planilla completa llevan una huella que se verifica al aprobar.
+- **Segregación de funciones.** Quien solicita una compra no la aprueba, quien la aprueba no la recibe, quien registra asientos de un periodo no lo cierra y quien calcula una planilla no la aprueba ni quien la aprueba la paga.
+- **Verificación pública.** La verificación de documentos, recetas, carnés e historias impresas se hace con un código, tiene límite de tasa y nunca muestra datos del paciente.
+- **Reportes confidenciales.** Un reporte de evento adverso anónimo no vincula paciente, cirugía ni dispensación, y calidad no ve al notificante.
+
 ### Interfaz
 
 - **Bloqueo por inactividad.** Tras un tiempo configurable por aplicación, con aviso y cuenta regresiva, la pantalla se bloquea y exige la contraseña o el código de verificación. Hay también una duración máxima de sesión y el estado se sincroniza entre pestañas.
@@ -1098,6 +1315,9 @@ La telemetría registra método, ruta, estado y tamaño de cada petición. Los c
 - La combinación completa de `compose.yaml` en modo producción con TLS y credenciales reales no se ha probado de punta a punta.
 - La migración que pasó los archivos al almacén de objetos borró los bytes de las imágenes y avatares que estuvieran en la base, porque SQL no puede subir objetos. Las bases de desarrollo previas se recrean.
 - Un evento de seguridad se guarda en la misma transacción de la petición, de modo que se pierde si la petición revierte. Los casos de inicio de sesión fallido y de bloqueo están cubiertos para que no se pierdan.
+- La firma de las recetas y de la historia clínica es una firma electrónica del servidor con el certificado de la clínica, que fuera de producción es de prueba. No equivale a una firma digital acreditada ante INDECOPI y no existe un certificado por médico.
+- Los datos de referencia clínica y laboral de demostración, como los esquemas de vacunación, las curvas de crecimiento, el catálogo de medicamentos con sus interacciones, las guías clínicas, los parámetros de planilla y los plazos de conservación, están marcados por validar con profesionales antes de usarse en la práctica.
+- El despliegue de QA en un servidor propio deja habilitada la confirmación simulada de pagos y no ejecuta el contenedor de respaldos.
 
 ## Guía de extensión
 
@@ -1189,54 +1409,58 @@ La hoja de ruta muestra cómo evolucionó el sistema y hacia dónde va. Cada ít
 
 ### Lo ya hecho, por fases
 
-| Fase | Contenido                                                                                                                                                            | Estado |
-| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| 1    | Reserva de citas, agenda de médicos, especialidades con tarifa, atención, historia clínica, recetas, pagos con tarjeta y cupones, notificaciones, auditoría y perfil | Hecho  |
-| 2    | Pagos con Yape y Plin simulados, verificación en dos pasos, renovación de sesión, calendario y planificador, pacientes compartidos, reprogramación y valoraciones    | Hecho  |
-| 3    | Roles de personal con almacén, farmacia y laboratorio clínico                                                                                                        | Hecho  |
-| 4    | Recepción y turnos, caja y facturación, hospitalización y emergencias                                                                                                | Hecho  |
-| 5    | Identificadores UUID, auditoría clínica y relación asistencial, minimización de datos por rol y telemetría enmascarada                                               | Hecho  |
-| 6    | Frontend dividido en un portal y una aplicación por actor, con las librerías `core`, `ui` y `features`                                                               | Hecho  |
-| 7    | Cargos directivos: reportes y BI, recursos humanos, turnos y ausencias                                                                                               | Hecho  |
-| 8    | Imágenes diagnósticas con visor e informes                                                                                                                           | Hecho  |
-| 9    | Almacén de objetos con SeaweedFS y gateway nginx como único punto de entrada                                                                                         | Hecho  |
-| 10   | Documentos y reportes en PDF con Jasper y en Excel con POI, exportaciones asíncronas y plantillas                                                                    | Hecho  |
-| 11   | Rediseño de la interfaz con sistema de diseño, inicio por rol, bloqueo por inactividad y modo privacidad                                                             | Hecho  |
-| 12   | Seguridad operativa: eventos de seguridad, estado del sistema, evoluciones pendientes y motivos obligatorios                                                         | Hecho  |
-| 13   | Seguros y convenios con copago, preautorizaciones, cartera y liquidaciones                                                                                           | Hecho  |
-| 14   | Telemedicina con videoconsulta de uno a uno por WebRTC, consentimiento, sala de espera y modalidad virtual en las citas                                              | Hecho  |
-| 15   | Reescritura de la documentación como sistema clínico integral                                                                                                        | Hecho  |
-| 16   | Codificación clínica con CIE-10, diagnósticos por atención y reporte de morbilidad                                                                                   | Hecho  |
-| 17   | Documentos médicos formales y consentimientos informados con firma manuscrita y verificación pública                                                                 | Hecho  |
-| 18   | Canales externos de notificación por correo, SMS y WhatsApp, y respaldos cifrados con prueba de restauración automática                                              | Hecho  |
-| 19   | Facturación electrónica con SUNAT y protección de datos personales según la Ley 29733                                                                                | Hecho  |
-| 20   | Compras con requisiciones, cotizaciones, órdenes con aprobación por monto, recepción y devoluciones, y cuentas por pagar                                             | Hecho  |
-| 21   | Contabilidad y tesorería con asientos automáticos, periodos con cierre, estados financieros, conciliación bancaria, flujo de caja y libros electrónicos              | Hecho  |
-| 22   | Planilla y asistencia con contratos, parámetros por vigencia, boletas, aprobación y pago con segregación y asiento contable                                          | Hecho  |
-| 23   | Pediatría y odontología con carné de vacunación, curvas de crecimiento, odontograma y planes de tratamiento con cobro                                                | Hecho  |
-| 24   | Quirófano y esterilización con programación quirúrgica, consentimientos, lista de verificación, nota operatoria y trazabilidad del instrumental                      | Hecho  |
-| 25   | Recetas electrónicas firmadas con verificación pública, catálogo de medicamentos con alertas al prescribir y dispensación parcial                                    | Hecho  |
-| 26   | Historia clínica electrónica con cierre firmado, rectificación con rastro, conservación, fusión de duplicados e impresión verificable                                | Hecho  |
-| 27   | Seguridad del paciente con eventos adversos, análisis de causa y acciones de mejora, y guías de práctica clínica versionadas                                         | Hecho  |
-| 28   | Planes de tratamiento y seguimiento de pacientes crónicos con controles, mediciones y tablero de riesgo                                                              | Hecho  |
+| Fase | Contenido                                                                                                                                                                | Estado |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
+| 1    | Reserva de citas, agenda de médicos, especialidades con tarifa, atención, historia clínica, recetas, pagos con tarjeta y cupones, notificaciones, auditoría y perfil     | Hecho  |
+| 2    | Pagos con Yape y Plin simulados, verificación en dos pasos, renovación de sesión, calendario y planificador, pacientes compartidos, reprogramación y valoraciones        | Hecho  |
+| 3    | Roles de personal con almacén, farmacia y laboratorio clínico                                                                                                            | Hecho  |
+| 4    | Recepción y turnos, caja y facturación, hospitalización y emergencias                                                                                                    | Hecho  |
+| 5    | Identificadores UUID, auditoría clínica y relación asistencial, minimización de datos por rol y telemetría enmascarada                                                   | Hecho  |
+| 6    | Frontend dividido en un portal y una aplicación por actor, con las librerías `core`, `ui` y `features`                                                                   | Hecho  |
+| 7    | Cargos directivos: reportes y BI, recursos humanos, turnos y ausencias                                                                                                   | Hecho  |
+| 8    | Imágenes diagnósticas con visor e informes                                                                                                                               | Hecho  |
+| 9    | Almacén de objetos con SeaweedFS y gateway nginx como único punto de entrada                                                                                             | Hecho  |
+| 10   | Documentos y reportes en PDF con Jasper y en Excel con POI, exportaciones asíncronas y plantillas                                                                        | Hecho  |
+| 11   | Rediseño de la interfaz con sistema de diseño, inicio por rol, bloqueo por inactividad y modo privacidad                                                                 | Hecho  |
+| 12   | Seguridad operativa: eventos de seguridad, estado del sistema, evoluciones pendientes y motivos obligatorios                                                             | Hecho  |
+| 13   | Seguros y convenios con copago, preautorizaciones, cartera y liquidaciones                                                                                               | Hecho  |
+| 14   | Telemedicina con videoconsulta de uno a uno por WebRTC, consentimiento, sala de espera y modalidad virtual en las citas                                                  | Hecho  |
+| 15   | Reescritura de la documentación como sistema clínico integral                                                                                                            | Hecho  |
+| 16   | Codificación clínica con CIE-10, diagnósticos por atención y reporte de morbilidad                                                                                       | Hecho  |
+| 17   | Documentos médicos formales y consentimientos informados con firma manuscrita y verificación pública                                                                     | Hecho  |
+| 18   | Canales externos de notificación por correo, SMS y WhatsApp, y respaldos cifrados con prueba de restauración automática                                                  | Hecho  |
+| 19   | Facturación electrónica con SUNAT y protección de datos personales según la Ley 29733                                                                                    | Hecho  |
+| 20   | Compras con requisiciones, cotizaciones, órdenes con aprobación por monto, recepción y devoluciones, y cuentas por pagar                                                 | Hecho  |
+| 21   | Contabilidad y tesorería con asientos automáticos, periodos con cierre, estados financieros, conciliación bancaria, flujo de caja y libros electrónicos                  | Hecho  |
+| 22   | Planilla y asistencia con contratos, parámetros por vigencia, boletas, aprobación y pago con segregación y asiento contable                                              | Hecho  |
+| 23   | Pediatría y odontología con carné de vacunación, curvas de crecimiento, odontograma y planes de tratamiento con cobro                                                    | Hecho  |
+| 24   | Quirófano y esterilización con programación quirúrgica, consentimientos, lista de verificación, nota operatoria y trazabilidad del instrumental                          | Hecho  |
+| 25   | Recetas electrónicas firmadas con verificación pública, catálogo de medicamentos con alertas al prescribir y dispensación parcial                                        | Hecho  |
+| 26   | Historia clínica electrónica con cierre firmado, rectificación con rastro, conservación, fusión de duplicados e impresión verificable                                    | Hecho  |
+| 27   | Seguridad del paciente con eventos adversos, análisis de causa y acciones de mejora, y guías de práctica clínica versionadas                                             | Hecho  |
+| 28   | Planes de tratamiento y seguimiento de pacientes crónicos con controles, mediciones y tablero de riesgo                                                                  | Hecho  |
+| 29   | Despliegue de QA en un servidor propio con la API y la web en subdominios, firewall por país, acceso por red privada, protección contra bots y verificación del arranque | Hecho  |
 
 ### Planificado, en orden de prioridad
 
-| Ítem                                                                                                                                          | Estado      |
-| --------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| Antivirus para las subidas de archivos                                                                                                        | Planificado |
-| Réplica del almacén de objetos a otro sitio y ensayo de recuperación ante desastres en una máquina nueva                                      | Planificado |
-| Contratar y conectar un proveedor real de SMS y WhatsApp y el servidor de correo de producción                                                | Planificado |
-| Prueba de punta a punta de `compose.yaml` en modo producción con TLS y credenciales reales                                                    | Planificado |
-| Más reportes y BI, con tableros guardados y exportaciones programadas                                                                         | Planificado |
-| Integración real de verificación de cobertura con aseguradoras y de confirmación de pagos con billeteras                                      | Planificado |
-| Certificado digital real y homologación de la facturación electrónica ante SUNAT                                                              | Planificado |
-| Integración con un reloj biométrico físico y planillas propias de gratificación y CTS                                                         | Planificado |
-| Citas recurrentes y lista de espera                                                                                                           | Planificado |
-| Mensajería interna entre el personal                                                                                                          | Planificado |
-| Encuestas de satisfacción del paciente                                                                                                        | Planificado |
-| Ambulancias y traslados                                                                                                                       | Planificado |
-| Conmutador de densidad de tablas, prefijo propio de las librerías y recarga automática del navegador en el desarrollo con varias aplicaciones | Planificado |
+| Ítem                                                                                                                                                                                                                               | Estado      |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| Antivirus para las subidas de archivos                                                                                                                                                                                             | Planificado |
+| Réplica del almacén de objetos a otro sitio y ensayo de recuperación ante desastres en una máquina nueva                                                                                                                           | Planificado |
+| Contratar y conectar un proveedor real de SMS y WhatsApp y el servidor de correo de producción                                                                                                                                     | Planificado |
+| Prueba de punta a punta de `compose.yaml` en modo producción con TLS y credenciales reales                                                                                                                                         | Planificado |
+| Más reportes y BI, con tableros guardados y exportaciones programadas                                                                                                                                                              | Planificado |
+| Integración real de verificación de cobertura con aseguradoras y de confirmación de pagos con billeteras                                                                                                                           | Planificado |
+| Certificado digital real y homologación de la facturación electrónica ante SUNAT                                                                                                                                                   | Planificado |
+| Integración con un reloj biométrico físico y planillas propias de gratificación y CTS                                                                                                                                              | Planificado |
+| Citas recurrentes y lista de espera                                                                                                                                                                                                | Planificado |
+| Mensajería interna entre el personal                                                                                                                                                                                               | Planificado |
+| Encuestas de satisfacción del paciente                                                                                                                                                                                             | Planificado |
+| Ambulancias y traslados                                                                                                                                                                                                            | Planificado |
+| Conmutador de densidad de tablas, prefijo propio de las librerías y recarga automática del navegador en el desarrollo con varias aplicaciones                                                                                      | Planificado |
+| Firma digital acreditada con un certificado por médico para las recetas y el cierre de la historia clínica                                                                                                                         | Planificado |
+| Validar con profesionales los datos de referencia de demostración: esquemas de vacunación, curvas de crecimiento, petitorio e interacciones, guías clínicas, parámetros laborales, plazos de conservación y listas de verificación | Planificado |
+| Integración con el registro nacional de recetas y con el reporte nacional de eventos adversos                                                                                                                                      | Planificado |
 
 ### Cómo se incorpora un ítem nuevo
 
@@ -1273,14 +1497,15 @@ Estas son las decisiones que más condicionan el diseño y el motivo de cada una
 tusalud/
 ├── src/                Código fuente y pruebas del backend, con las migraciones de Flyway en db/migration y db/demo
 ├── .githooks/          Hooks de Git para formatear antes de commit y push
-├── docker/             Gateway nginx, almacén de objetos, contenedor de respaldos, agente y Collector de OpenTelemetry, y pgAdmin
-├── scripts/            Utilidades del repositorio, como la generación del certificado de desarrollo
+├── docker/             Gateway nginx, almacén de objetos, contenedor de respaldos, agente y Collector de OpenTelemetry, pgAdmin y la configuración del servidor propio
+├── scripts/            Utilidades del repositorio, como la generación del certificado de desarrollo, y los scripts del despliegue en un servidor propio
 ├── postman/            Colección de Postman
 ├── web/                Workspace de Angular con el portal, una aplicación por rol, las librerías compartidas y las pruebas e2e
 ├── compose.yaml        Stack completo en modo producción
 ├── compose.dev.yaml    Sobrescritura para el perfil dev
 ├── compose.hot.yaml    Sobrescritura para el desarrollo con el frontend montado desde el código fuente
 ├── compose.qa.yaml     Sobrescritura para el perfil qa
+├── compose.vps.yaml    Despliegue de QA en un servidor propio
 ├── Dockerfile          Imagen del backend
 ├── users.txt           Usuarios, roles y datos de ejemplo para probar
 └── pom.xml             Build de Maven del backend
@@ -1314,6 +1539,16 @@ El backend y el frontend se construyen por separado. El `.dockerignore` de la ra
 | Spotless Maven Plugin             | 3.10.4                       |
 | palantir-java-format              | 2.102.0                      |
 | Prettier                          | 3.9.10                       |
+| JasperReports                     | 7.1.1                        |
+| Apache POI                        | 5.5.1                        |
+| ZXing                             | 3.5.3                        |
+| Bouncy Castle                     | 1.82                         |
+| PrimeNG                           | 21                           |
+| TypeScript                        | 5.9                          |
+| Vitest                            | 4                            |
+| Playwright                        | 1.65                         |
+| SeaweedFS                         | 4.54                         |
+| coturn                            | 4.7.0                        |
 
 ## Reglas de negocio
 
@@ -1594,6 +1829,81 @@ La documentación interactiva está en `http://localhost:8080/swagger-ui.html` y
 | `GET`                          | `/api/v1/perfil`                                                                                                                                                                                                                                                                                                                    | Autenticado                                                                                                  | 200       |
 | `PUT`                          | `/api/v1/perfil`                                                                                                                                                                                                                                                                                                                    | Autenticado                                                                                                  | 200       |
 | `PUT`                          | `/api/v1/perfil/password`                                                                                                                                                                                                                                                                                                           | Autenticado                                                                                                  | 204       |
+| `PATCH`                        | `/api/v1/asistencia/terminales/{id}/estado`                                                                                                                                                                                                                                                                                         | Recursos humanos                                                                                             | 200       |
+| `POST`                         | `/api/v1/canales/contactos/{canal}/verificar`                                                                                                                                                                                                                                                                                       | Autenticado                                                                                                  | 200       |
+| `PUT`                          | `/api/v1/contabilidad/cuentas/{id}`                                                                                                                                                                                                                                                                                                 | Finanzas                                                                                                     | 200       |
+| `POST`                         | `/api/v1/contabilidad/periodos/{id}/reabrir`                                                                                                                                                                                                                                                                                        | Gerencia                                                                                                     | 200       |
+| `POST`                         | `/api/v1/contabilidad/asientos/{id}/contabilizar`                                                                                                                                                                                                                                                                                   | Finanzas                                                                                                     | 200       |
+| `POST`                         | `/api/v1/contabilidad/asientos/{id}/reversar`                                                                                                                                                                                                                                                                                       | Finanzas                                                                                                     | 200       |
+| `POST`                         | `/api/v1/compras/comprobantes/{id}/pagos`                                                                                                                                                                                                                                                                                           | Finanzas                                                                                                     | 201       |
+| `PATCH`                        | `/api/v1/facturacion/series/{id}`                                                                                                                                                                                                                                                                                                   | Administración, finanzas                                                                                     | 200       |
+| `GET`                          | `/api/v1/facturacion/documentos/{id}/cdr`                                                                                                                                                                                                                                                                                           | Administración, finanzas                                                                                     | 200       |
+| `GET`                          | `/api/v1/facturacion/documentos/{id}/pdf`                                                                                                                                                                                                                                                                                           | Administración, finanzas, caja, gerencia, paciente                                                           | 200       |
+| `POST`                         | `/api/v1/facturacion/documentos/{id}/reenviar`                                                                                                                                                                                                                                                                                      | Administración, finanzas, caja                                                                               | 200       |
+| `PUT`                          | `/api/v1/facturacion/documentos/{id}/cliente`                                                                                                                                                                                                                                                                                       | Administración, finanzas, caja                                                                               | 200       |
+| `POST`                         | `/api/v1/facturacion/documentos/{id}/baja`                                                                                                                                                                                                                                                                                          | Administración, finanzas                                                                                     | 200       |
+| `PUT`                          | `/api/v1/imagenes/ordenes/{id}/realizar`                                                                                                                                                                                                                                                                                            | Imágenes                                                                                                     | 200       |
+| `PUT`                          | `/api/v1/laboratorio/ordenes/{id}/items/{itemId}/resultados`                                                                                                                                                                                                                                                                        | Laboratorio                                                                                                  | 200       |
+| `PUT`                          | `/api/v1/laboratorio/ordenes/{id}/validar`                                                                                                                                                                                                                                                                                          | Laboratorio                                                                                                  | 200       |
+| `GET`                          | `/api/v1/compras/ordenes/{id}/auditoria`                                                                                                                                                                                                                                                                                            | Finanzas, gerencia, administración                                                                           | 200       |
+| `POST`                         | `/api/v1/compras/ordenes/{id}/enviar-aprobacion`                                                                                                                                                                                                                                                                                    | Almacén                                                                                                      | 200       |
+| `POST`                         | `/api/v1/compras/ordenes/{id}/aprobar`                                                                                                                                                                                                                                                                                              | Finanzas, gerencia                                                                                           | 200       |
+| `POST`                         | `/api/v1/compras/ordenes/{id}/rechazar`                                                                                                                                                                                                                                                                                             | Finanzas, gerencia                                                                                           | 200       |
+| `POST`                         | `/api/v1/compras/ordenes/{id}/anular`                                                                                                                                                                                                                                                                                               | Almacén, finanzas, gerencia                                                                                  | 200       |
+| `POST`                         | `/api/v1/compras/ordenes/{id}/cerrar`                                                                                                                                                                                                                                                                                               | Almacén                                                                                                      | 200       |
+| `GET`                          | `/api/v1/compras/recepciones/{id}`                                                                                                                                                                                                                                                                                                  | Almacén, finanzas, gerencia, administración                                                                  | 200       |
+| `PUT`                          | `/api/v1/pacientes/{pacienteId}/datos-medicos`                                                                                                                                                                                                                                                                                      | Médico                                                                                                       | 200       |
+| `PUT`                          | `/api/v1/planilla/conceptos/{id}`                                                                                                                                                                                                                                                                                                   | Recursos humanos                                                                                             | 200       |
+| `GET`                          | `/api/v1/planilla/contratos/{id}`                                                                                                                                                                                                                                                                                                   | Recursos humanos                                                                                             | 200       |
+| `PUT`                          | `/api/v1/planilla/contratos/{id}`                                                                                                                                                                                                                                                                                                   | Recursos humanos                                                                                             | 200       |
+| `DELETE`                       | `/api/v1/planilla/empleados/{empleadoId}/conceptos/{asignacionId}`                                                                                                                                                                                                                                                                  | Recursos humanos                                                                                             | 204       |
+| `POST`                         | `/api/v1/planilla/planillas/{id}/devolver`                                                                                                                                                                                                                                                                                          | Finanzas                                                                                                     | 200       |
+| `POST`                         | `/api/v1/planilla/planillas/{id}/aprobar`                                                                                                                                                                                                                                                                                           | Finanzas                                                                                                     | 200       |
+| `POST`                         | `/api/v1/planilla/planillas/{id}/pagar`                                                                                                                                                                                                                                                                                             | Finanzas                                                                                                     | 200       |
+| `POST`                         | `/api/v1/planilla/planillas/{id}/cerrar`                                                                                                                                                                                                                                                                                            | Recursos humanos, gerencia                                                                                   | 200       |
+| `GET`                          | `/api/v1/planilla/planillas/{id}/archivo-bancario`                                                                                                                                                                                                                                                                                  | Finanzas                                                                                                     | 200       |
+| `GET`                          | `/api/v1/planilla/planillas/{id}/plame`                                                                                                                                                                                                                                                                                             | Recursos humanos                                                                                             | 200       |
+| `GET`                          | `/api/v1/privacidad/consentimientos/historial`                                                                                                                                                                                                                                                                                      | Paciente                                                                                                     | 200       |
+| `POST`                         | `/api/v1/privacidad/consentimientos/{finalidadId}/revocar`                                                                                                                                                                                                                                                                          | Paciente                                                                                                     | 200       |
+| `POST`                         | `/api/v1/privacidad/gestion/solicitudes/{id}/tomar`                                                                                                                                                                                                                                                                                 | Administración, calidad                                                                                      | 200       |
+| `POST`                         | `/api/v1/privacidad/gestion/solicitudes/{id}/resolver`                                                                                                                                                                                                                                                                              | Administración, calidad                                                                                      | 200       |
+| `PUT`                          | `/api/v1/privacidad/gestion/bancos/{id}`                                                                                                                                                                                                                                                                                            | Administración, calidad                                                                                      | 200       |
+| `PUT`                          | `/api/v1/privacidad/gestion/finalidades/{id}`                                                                                                                                                                                                                                                                                       | Administración, calidad                                                                                      | 200       |
+| `PUT`                          | `/api/v1/privacidad/gestion/encargados/{id}`                                                                                                                                                                                                                                                                                        | Administración, calidad                                                                                      | 200       |
+| `PUT`                          | `/api/v1/privacidad/gestion/politicas/{id}`                                                                                                                                                                                                                                                                                         | Administración, calidad                                                                                      | 200       |
+| `POST`                         | `/api/v1/privacidad/gestion/politicas/{id}/publicar`                                                                                                                                                                                                                                                                                | Administración, calidad                                                                                      | 200       |
+| `PUT`                          | `/api/v1/privacidad/gestion/retencion/{id}`                                                                                                                                                                                                                                                                                         | Administración, calidad                                                                                      | 200       |
+| `POST`                         | `/api/v1/privacidad/gestion/retencion/ejecutar`                                                                                                                                                                                                                                                                                     | Administración, calidad                                                                                      | 200       |
+| `GET`                          | `/api/v1/privacidad/gestion/retencion/historial`                                                                                                                                                                                                                                                                                    | Administración, calidad                                                                                      | 200       |
+| `PUT`                          | `/api/v1/privacidad/gestion/incidentes/{id}`                                                                                                                                                                                                                                                                                        | Administración, calidad                                                                                      | 200       |
+| `PUT`                          | `/api/v1/recepcion/turnos/{id}/finalizar`                                                                                                                                                                                                                                                                                           | Médico                                                                                                       | 200       |
+| `PUT`                          | `/api/v1/recepcion/turnos/{id}/ausente`                                                                                                                                                                                                                                                                                             | Recepción, administración, médico                                                                            | 200       |
+| `PUT`                          | `/api/v1/recepcion/turnos/{id}/cancelar`                                                                                                                                                                                                                                                                                            | Recepción, administración, médico                                                                            | 200       |
+| `GET`                          | `/api/v1/compras/requisiciones/sugeridas`                                                                                                                                                                                                                                                                                           | Almacén, farmacia                                                                                            | 200       |
+| `GET`                          | `/api/v1/compras/requisiciones/{id}`                                                                                                                                                                                                                                                                                                | Almacén, farmacia, finanzas, gerencia, administración                                                        | 200       |
+| `PUT`                          | `/api/v1/compras/requisiciones/{id}`                                                                                                                                                                                                                                                                                                | Almacén, farmacia                                                                                            | 200       |
+| `POST`                         | `/api/v1/compras/requisiciones/{id}/enviar`                                                                                                                                                                                                                                                                                         | Almacén, farmacia                                                                                            | 200       |
+| `POST`                         | `/api/v1/compras/requisiciones/{id}/rechazar`                                                                                                                                                                                                                                                                                       | Almacén                                                                                                      | 200       |
+| `POST`                         | `/api/v1/compras/requisiciones/{id}/anular`                                                                                                                                                                                                                                                                                         | Almacén, farmacia                                                                                            | 200       |
+| `GET`                          | `/api/v1/compras/requisiciones/{id}/cotizaciones`                                                                                                                                                                                                                                                                                   | Almacén, finanzas, gerencia, administración                                                                  | 200       |
+| `GET`                          | `/api/v1/compras/requisiciones/{id}/comparativa`                                                                                                                                                                                                                                                                                    | Almacén, finanzas, gerencia, administración                                                                  | 200       |
+| `POST`                         | `/api/v1/compras/requisiciones/{id}/cotizaciones`                                                                                                                                                                                                                                                                                   | Almacén                                                                                                      | 201       |
+| `PUT`                          | `/api/v1/rrhh/ausencias/{id}/rechazar`                                                                                                                                                                                                                                                                                              | Recursos humanos                                                                                             | 200       |
+| `PUT`                          | `/api/v1/rrhh/ausencias/{id}/cancelar`                                                                                                                                                                                                                                                                                              | Recursos humanos                                                                                             | 200       |
+| `PUT`                          | `/api/v1/seguros/aseguradoras/{id}`                                                                                                                                                                                                                                                                                                 | Administración, finanzas                                                                                     | 200       |
+| `GET`                          | `/api/v1/seguros/convenios/{id}`                                                                                                                                                                                                                                                                                                    | Administración, finanzas, gerencia, caja, recepción                                                          | 200       |
+| `PUT`                          | `/api/v1/seguros/convenios/{id}`                                                                                                                                                                                                                                                                                                    | Administración, finanzas                                                                                     | 200       |
+| `GET`                          | `/api/v1/seguros/preautorizaciones/mias`                                                                                                                                                                                                                                                                                            | Médico, paciente                                                                                             | 200       |
+| `PUT`                          | `/api/v1/seguros/preautorizaciones/{id}/rechazar`                                                                                                                                                                                                                                                                                   | Finanzas, recepción                                                                                          | 200       |
+| `GET`                          | `/api/v1/seguros/liquidaciones/{id}`                                                                                                                                                                                                                                                                                                | Finanzas, gerencia, administración                                                                           | 200       |
+| `GET`                          | `/api/v1/seguros/liquidaciones/{id}/cuentas`                                                                                                                                                                                                                                                                                        | Finanzas, gerencia, administración                                                                           | 200       |
+| `PUT`                          | `/api/v1/seguros/liquidaciones/{id}/enviar`                                                                                                                                                                                                                                                                                         | Finanzas                                                                                                     | 200       |
+| `PUT`                          | `/api/v1/seguros/liquidaciones/{id}/pago`                                                                                                                                                                                                                                                                                           | Finanzas                                                                                                     | 200       |
+| `PUT`                          | `/api/v1/contabilidad/tesoreria/cuentas/{id}`                                                                                                                                                                                                                                                                                       | Finanzas                                                                                                     | 200       |
+| `GET`                          | `/api/v1/contabilidad/tesoreria/conciliacion/{cuentaId}/sugerencias`                                                                                                                                                                                                                                                                | Finanzas, gerencia                                                                                           | 200       |
+| `GET`                          | `/api/v1/contabilidad/tesoreria/conciliacion/{cuentaId}/sin-conciliar`                                                                                                                                                                                                                                                              | Finanzas, gerencia                                                                                           | 200       |
+| `GET`                          | `/api/v1/contabilidad/tesoreria/conciliacion/{cuentaId}/resumen`                                                                                                                                                                                                                                                                    | Finanzas, gerencia                                                                                           | 200       |
+| `POST`                         | `/api/v1/contabilidad/tesoreria/conciliacion/lineas/{lineaId}/ignorar`                                                                                                                                                                                                                                                              | Finanzas                                                                                                     | 200       |
 
 Las fechas de los parámetros usan el formato `yyyy-MM-dd` y `fechaHora` usa `yyyy-MM-ddTHH:mm:ss`. Las rutas de creación responden con el header `Location` apuntando al recurso nuevo.
 
@@ -2413,7 +2723,7 @@ Un bloqueo quita de la disponibilidad del médico los turnos que se solapan con 
 
 ### Personal de la institución
 
-Además de pacientes, médicos y administradores existen doce roles de personal: `ROLE_LABORATORIO`, `ROLE_FARMACIA`, `ROLE_ALMACEN`, `ROLE_RECEPCION`, `ROLE_CAJA`, `ROLE_ENFERMERIA`, `ROLE_GERENCIA`, `ROLE_FINANZAS`, `ROLE_OPERACIONES`, `ROLE_RRHH`, `ROLE_CALIDAD` y `ROLE_IMAGENES`. El administrador los registra con `POST /api/v1/admin/personal` indicando uno o más de esos roles o el de administrador, y los asigna o cambia después desde la gestión de roles. Ese alta no admite roles de médico ni de paciente porque cada uno tiene su propio registro. Cada rol entra a su módulo al iniciar sesión, solo ve en el menú lo que le corresponde y puede agendar reuniones, tareas, recordatorios y eventos personales en el calendario.
+Además de pacientes, médicos y administradores existen 12 roles de personal: `ROLE_LABORATORIO`, `ROLE_FARMACIA`, `ROLE_ALMACEN`, `ROLE_RECEPCION`, `ROLE_CAJA`, `ROLE_ENFERMERIA`, `ROLE_GERENCIA`, `ROLE_FINANZAS`, `ROLE_OPERACIONES`, `ROLE_RRHH`, `ROLE_CALIDAD` y `ROLE_IMAGENES`. El administrador los registra con `POST /api/v1/admin/personal` indicando uno o más de esos roles o el de administrador, y los asigna o cambia después desde la gestión de roles. Ese alta no admite roles de médico ni de paciente porque cada uno tiene su propio registro. Cada rol entra a su módulo al iniciar sesión, solo ve en el menú lo que le corresponde y puede agendar reuniones, tareas, recordatorios y eventos personales en el calendario.
 
 ### Almacén e inventario
 
@@ -2601,7 +2911,7 @@ Los reportes aceptan los mismos `desde`, `hasta` y `agrupacion` que la consulta 
 
 #### Plantillas
 
-Las diecinueve plantillas viven en `src/main/resources/reportes` y se usan por defecto. El administrador puede reemplazar cualquiera desde la web o con la API. La versión nueva se guarda en el bucket `plantillas` y manda sobre la del sistema hasta que se restaure.
+Las 23 plantillas viven en `src/main/resources/reportes` y se usan por defecto. El administrador puede reemplazar cualquiera desde la web o con la API. La versión nueva se guarda en el bucket `plantillas` y manda sobre la del sistema hasta que se restaure.
 
 - `GET /api/v1/plantillas` lista las plantillas, su versión vigente y si están personalizadas.
 - `GET /api/v1/plantillas/{codigo}/descargar` baja el JRXML vigente.
@@ -2627,7 +2937,7 @@ La administración ve en un solo lugar lo que ocurre con la seguridad de la plat
 
 - Cada evento de seguridad se guarda en la tabla `eventos_seguridad` con su tipo, severidad, cuenta afectada, quién lo causó, la IP enmascarada, un resumen del dispositivo y un detalle corto. Las IP se guardan sin el último segmento, por ejemplo `190.236.14.x`, nunca se guarda la contraseña intentada y un intento con una cuenta inexistente no conserva el correo escrito.
 - Se registran los inicios de sesión fallidos y los repetidos, los intentos con una cuenta inactiva, el primer inicio desde un dispositivo o una dirección nuevos, el bloqueo por intentos de verificación, la activación y desactivación de la verificación en dos pasos, el cambio de contraseña, el cambio de roles, la activación y desactivación de cuentas, los accesos denegados y su repetición, y las descargas masivas de archivos.
-- Los umbrales son configurables: cinco inicios fallidos en quince minutos, cinco accesos denegados en diez minutos y treinta descargas en cinco minutos. Cada umbral genera un solo evento de severidad alta por ventana. Una tarea programada purga los eventos más antiguos que `SEGURIDAD_RETENCION_DIAS`, 90 por defecto.
+- Los umbrales son configurables: cinco inicios fallidos en 15 minutos, cinco accesos denegados en diez minutos y 30 descargas en cinco minutos. Cada umbral genera un solo evento de severidad alta por ventana. Una tarea programada purga los eventos más antiguos que `SEGURIDAD_RETENCION_DIAS`, 90 por defecto.
 - `GET /api/v1/admin/seguridad/eventos` lista los eventos con filtros por tipo, severidad, rango de fechas y cuenta, y con paginación de hasta 100 filas. `GET /api/v1/admin/seguridad/resumen` entrega los conteos por tipo y severidad de las últimas 24 horas y de los últimos siete días, y los inicios de sesión inusuales. Ambos son solo para el administrador.
 - `GET /api/v1/admin/sistema/estado` informa la salud de la base de datos y del almacén de objetos con su latencia, la versión, el tiempo en marcha y las migraciones aplicadas, sin rutas internas ni secretos. `GET /api/v1/admin/almacenamiento/uso` suma los objetos y los bytes por bucket y por propósito desde la tabla `archivos`.
 - `GET /api/v1/hospitalizacion/evoluciones-pendientes` lista los ingresos con cama cuya última evolución de enfermería superó las horas indicadas, ocho por defecto y configurables con `HOSPITALIZACION_HORAS_EVOLUCION`. Si un ingreso nunca tuvo evolución, cuentan las horas desde que ingresó. Solo enfermería y administración lo consultan y recibe lo mínimo, el paciente, la cama y las horas.
@@ -2920,6 +3230,254 @@ Para recortar el RPO basta con programar `BACKUP_CRON` con más frecuencia. El R
 
 **Límites.** Los parámetros son de demostración y deben validarse con un contador. La renta es simplificada, no hay planillas propias de gratificación, CTS ni utilidades, ni subsidios de EsSalud. El archivo PLAME y el bancario son genéricos. No hay integración con un reloj biométrico físico y la asistencia no considera feriados.
 
+### Pediatría y odontología
+
+Los endpoints se agrupan en tres controladores: `VacunacionController`, `CrecimientoController` y `OdontologiaController`. En todos, la columna de acceso indica los roles que admite el endpoint, y el servicio aplica además la relación asistencial. El médico necesita una cita o un ingreso con el paciente, la enfermería necesita una atención o un ingreso vigente en una ventana de `app.pediatria.ventana-enfermeria-horas`, que vale 24 horas, y el paciente solo accede a lo suyo.
+
+**Vacunación.** El esquema nacional vive en las tablas `esquemas_vacunacion` y `esquema_dosis`, con la vacuna, el número de dosis, la edad mínima, la recomendada y la máxima, y el intervalo mínimo desde la dosis anterior. La migración V29 siembra un esquema de resumen con 13 vacunas y 25 dosis, marcado como por validar. Un esquema nuevo cierra la vigencia del anterior y se valida antes de guardarse. Cada dosis aplicada es una fila de `registros_vacunacion` con estado vigente o anulado, y el carné se calcula con el esquema vigente. La tabla `carnes_vacunacion` guarda cada emisión del PDF con su código de verificación, su huella y quién la emitió. El estado de cada dosis es aplicada, próxima, atrasada, pendiente o fuera de edad, y la tolerancia de atraso se ajusta con `app.pediatria.tolerancia-atraso-dias`, que vale 30.
+
+**Recordatorios.** Una tarea diaria a las 8:00, configurable con `app.pediatria.recordatorios-cron`, avisa con la notificación `VACUNA_PROXIMA` a los pacientes de hasta 19 años cuya dosis está atrasada o vence en los próximos siete días. La tabla `recordatorios_vacunacion` garantiza un solo aviso por dosis programada.
+
+**Carné en PDF.** El endpoint del PDF responde sin caché y el documento lleva un código de verificación y un QR que valida la página pública `/verificar`, sin mostrar datos del paciente.
+
+**Crecimiento.** Hay cuatro indicadores: peso para la edad, talla para la edad, perímetro cefálico para la edad e índice de masa corporal para la edad. Cada medición calcula el puntaje z y el percentil con los parámetros LMS de `referencia_crecimiento`, interpolados por edad en meses, y el nivel de alerta resultante es normal, atención o alerta. Una medición vacía, de una persona de 228 meses de edad o más, o anterior al nacimiento se rechaza. Anular una medición o una dosis exige un motivo de cinco a 300 caracteres. El paciente necesita fecha de nacimiento y sexo para calcular las curvas, y el perímetro cefálico se registra solo hasta los 60 meses.
+
+**Odontograma.** Cada cambio es una fila de `odontograma_eventos` con la pieza en numeración FDI, la superficie, el estado, el autor y la fecha. Las superficies son vestibular, lingual o palatina, mesial, distal y oclusal o incisal. Los estados sano, caries, obturado, sellante y fractura se registran por superficie, y corona, endodoncia, implante, prótesis, extracción indicada y ausente se registran sobre la pieza completa y dejan sin efecto las superficies anteriores. El estado actual sale del último evento y el historial no se edita.
+
+**Planes odontológicos.** Un plan pasa de borrador a presentado y luego a aceptado o rechazado por el paciente, y al ejecutar sesiones queda en curso y finalmente completado, o cancelado. Solo el borrador se edita y solo un plan aceptado o en curso admite sesiones. Cada ítem es pendiente, realizado o cancelado. El catálogo trae 12 procedimientos con precio, si requieren pieza, superficie o consentimiento y el estado en que dejan la pieza. Presentar el plan avisa al paciente con `PLAN_ODONTOLOGICO_PRESENTADO`. Los cobros se registran en `planes_odontologicos_pagos` contra una sesión de caja abierta.
+
+| Método   | Ruta                                                               | Acceso                                       | Respuesta |
+| -------- | ------------------------------------------------------------------ | -------------------------------------------- | --------- |
+| `GET`    | `/api/v1/vacunacion/vacunas`                                       | Médico, enfermería, paciente, administración | 200       |
+| `GET`    | `/api/v1/vacunacion/esquema`                                       | Médico, enfermería, paciente, administración | 200       |
+| `GET`    | `/api/v1/vacunacion/esquemas`                                      | Administración                               | 200       |
+| `POST`   | `/api/v1/vacunacion/esquemas`                                      | Administración                               | 201       |
+| `GET`    | `/api/v1/vacunacion/pacientes?q=`                                  | Médico, enfermería                           | 200       |
+| `GET`    | `/api/v1/vacunacion/pacientes/{pacienteId}/carne`                  | Médico, enfermería, paciente                 | 200       |
+| `GET`    | `/api/v1/vacunacion/pacientes/{pacienteId}/carne/pdf`              | Médico, enfermería, paciente                 | 200       |
+| `GET`    | `/api/v1/vacunacion/mio`                                           | Paciente                                     | 200       |
+| `POST`   | `/api/v1/vacunacion/dosis`                                         | Médico, enfermería                           | 201       |
+| `POST`   | `/api/v1/vacunacion/dosis/{id}/anular`                             | Médico, con motivo                           | 200       |
+| `GET`    | `/api/v1/crecimiento/pacientes/{pacienteId}`                       | Médico, enfermería, paciente                 | 200       |
+| `GET`    | `/api/v1/crecimiento/mio`                                          | Paciente                                     | 200       |
+| `POST`   | `/api/v1/crecimiento/mediciones`                                   | Médico, enfermería                           | 201       |
+| `POST`   | `/api/v1/crecimiento/mediciones/{id}/anular`                       | Médico, con motivo                           | 200       |
+| `GET`    | `/api/v1/odontologia/procedimientos`                               | Médico, caja, administración                 | 200       |
+| `POST`   | `/api/v1/odontologia/procedimientos`                               | Administración                               | 201       |
+| `PUT`    | `/api/v1/odontologia/procedimientos/{id}`                          | Administración                               | 200       |
+| `GET`    | `/api/v1/odontologia/pacientes/{pacienteId}/odontograma`           | Médico, paciente                             | 200       |
+| `GET`    | `/api/v1/odontologia/mio/odontograma`                              | Paciente                                     | 200       |
+| `GET`    | `/api/v1/odontologia/pacientes/{pacienteId}/odontograma/historial` | Médico, paciente                             | 200       |
+| `POST`   | `/api/v1/odontologia/pacientes/{pacienteId}/odontograma/cambios`   | Médico                                       | 201       |
+| `GET`    | `/api/v1/odontologia/pacientes/{pacienteId}/planes`                | Médico, paciente                             | 200       |
+| `GET`    | `/api/v1/odontologia/mios/planes`                                  | Paciente                                     | 200       |
+| `GET`    | `/api/v1/odontologia/planes/por-cobrar`                            | Caja                                         | 200       |
+| `POST`   | `/api/v1/odontologia/planes`                                       | Médico                                       | 201       |
+| `GET`    | `/api/v1/odontologia/planes/{id}`                                  | Médico, paciente                             | 200       |
+| `POST`   | `/api/v1/odontologia/planes/{id}/items`                            | Médico                                       | 201       |
+| `DELETE` | `/api/v1/odontologia/planes/{id}/items/{itemId}`                   | Médico                                       | 200       |
+| `PUT`    | `/api/v1/odontologia/planes/{id}/items/{itemId}/consentimiento`    | Médico                                       | 200       |
+| `POST`   | `/api/v1/odontologia/planes/{id}/presentar`                        | Médico                                       | 200       |
+| `POST`   | `/api/v1/odontologia/planes/{id}/aceptar`                          | Paciente                                     | 200       |
+| `POST`   | `/api/v1/odontologia/planes/{id}/rechazar`                         | Paciente                                     | 200       |
+| `POST`   | `/api/v1/odontologia/planes/{id}/cancelar`                         | Médico                                       | 200       |
+| `POST`   | `/api/v1/odontologia/planes/{id}/sesiones`                         | Médico                                       | 201       |
+| `POST`   | `/api/v1/odontologia/planes/{id}/pagos`                            | Caja                                         | 201       |
+
+**Límites.** Los esquemas y las tablas de referencia de crecimiento son un resumen por validar con un pediatra y con la norma técnica vigente. El cobro de un plan no emite comprobante electrónico ni asiento contable. Una sesión odontológica puede vincularse a una cita, pero no existe una agenda propia de odontología.
+
+### Quirófano y esterilización
+
+Los endpoints se reparten entre `QuirofanoController` y `EsterilizacionController`. Las cirugías, los ciclos y los lotes tienen códigos correlativos que no se repiten con operaciones simultáneas: `CIR-000001` para la cirugía, `CE-000001` para el ciclo y `LE-000001` para el lote, que genera `SecuenciasQuirofano`.
+
+**Estados de la cirugía.** Son solicitada, programada, en preparación, en curso, finalizada, suspendida y cancelada. Solo ocupan el quirófano las cirugías programadas, en preparación y en curso. Una cirugía finalizada o cancelada deja de estar abierta. El tipo es electiva o de urgencia y el quirófano puede estar disponible, en mantenimiento o fuera de servicio.
+
+**Equipo.** Los roles quirúrgicos son cirujano, ayudante, anestesiólogo, instrumentista y circulante. Los tres primeros son médicos y los dos últimos son de enfermería. La anestesia puede ser general, regional, local, sedación o ninguna, y todas menos ninguna exigen el consentimiento anestésico.
+
+**Lista de verificación.** Se completa en tres momentos, antes de la inducción, antes de la incisión y antes de la salida, y cada momento tiene cinco puntos fijos. Antes de la inducción se confirman la identidad, el sitio marcado, los consentimientos, el equipo de anestesia y las alergias. Antes de la incisión se confirman la presentación del equipo, el procedimiento, el antibiótico, la esterilidad y las imágenes. Antes de la salida se confirman el procedimiento registrado, el conteo del instrumental, las muestras etiquetadas, los problemas del equipo y el plan postoperatorio.
+
+**Insumos y sets.** Registrar un insumo descuenta el inventario del almacén con el motivo consumo quirúrgico y el código de la cirugía como referencia. Registrar un set usa un lote esterilizado y queda en la trazabilidad.
+
+**Esterilización.** Un ciclo es de vapor, plasma u óxido de etileno y guarda los resultados de sus indicadores químico y biológico, cada uno pendiente, conforme o no conforme. El resultado del ciclo es en proceso, conforme o no conforme. Cada ciclo genera lotes de los sets de instrumental, y la vigencia de la esterilidad de cada set se cuenta desde el fin del ciclo. El estado efectivo de un lote es estéril, en espera de indicador, en uso, usado, bloqueado o vencido.
+
+**Alertas.** El endpoint de alertas reúne lotes no conformes que ya se usaron, que son críticas, lotes bloqueados, que son altas, lotes vencidos y ciclos sin indicador, que son medias, y lotes por vencer en los próximos tres días, que son bajas. Una tarea diaria a las 7:00, configurable con `app.quirofano.alertas-cron`, avisa a enfermería y a calidad con la notificación `ESTERILIZACION_ALERTA`.
+
+**Notificaciones.** Solicitar una cirugía avisa a enfermería con una notificación del sistema. Programarla avisa al paciente con `CIRUGIA_PROGRAMADA` y a cada miembro del equipo con `CIRUGIA_ASIGNADA`.
+
+| Método | Ruta                                                  | Acceso                                      | Respuesta |
+| ------ | ----------------------------------------------------- | ------------------------------------------- | --------- |
+| `GET`  | `/api/v1/quirofano/quirofanos`                        | Médico, enfermería, administración          | 200       |
+| `POST` | `/api/v1/quirofano/quirofanos`                        | Administración                              | 201       |
+| `PUT`  | `/api/v1/quirofano/quirofanos/{id}`                   | Administración                              | 200       |
+| `GET`  | `/api/v1/quirofano/personal`                          | Médico, enfermería                          | 200       |
+| `GET`  | `/api/v1/quirofano/insumos`                           | Médico, enfermería                          | 200       |
+| `GET`  | `/api/v1/quirofano/cirugias/agenda`                   | Médico, enfermería                          | 200       |
+| `GET`  | `/api/v1/quirofano/cirugias/mias`                     | Paciente                                    | 200       |
+| `GET`  | `/api/v1/quirofano/cirugias/{id}`                     | Médico, enfermería                          | 200       |
+| `GET`  | `/api/v1/quirofano/cirugias/{id}/historial`           | Médico, enfermería                          | 200       |
+| `POST` | `/api/v1/quirofano/cirugias`                          | Médico                                      | 201       |
+| `POST` | `/api/v1/quirofano/cirugias/{id}/programar`           | Médico, enfermería                          | 200       |
+| `POST` | `/api/v1/quirofano/cirugias/{id}/consentimientos`     | Médico                                      | 200       |
+| `POST` | `/api/v1/quirofano/cirugias/{id}/preparar`            | Médico, enfermería                          | 200       |
+| `POST` | `/api/v1/quirofano/cirugias/{id}/checklist`           | Médico, enfermería                          | 200       |
+| `POST` | `/api/v1/quirofano/cirugias/{id}/iniciar`             | Médico, solo el cirujano del equipo         | 200       |
+| `POST` | `/api/v1/quirofano/cirugias/{id}/finalizar`           | Médico, solo el cirujano del equipo         | 200       |
+| `POST` | `/api/v1/quirofano/cirugias/{id}/suspender`           | Médico, enfermería, con motivo              | 200       |
+| `POST` | `/api/v1/quirofano/cirugias/{id}/cancelar`            | Médico, enfermería, con motivo              | 200       |
+| `PUT`  | `/api/v1/quirofano/cirugias/{id}/nota-operatoria`     | Médico, solo el cirujano del equipo         | 200       |
+| `PUT`  | `/api/v1/quirofano/cirugias/{id}/registro-anestesico` | Médico, solo el anestesiólogo del equipo    | 200       |
+| `POST` | `/api/v1/quirofano/cirugias/{id}/insumos`             | Médico, enfermería, solo el equipo          | 201       |
+| `POST` | `/api/v1/quirofano/cirugias/{id}/sets`                | Médico, enfermería, solo el equipo          | 201       |
+| `GET`  | `/api/v1/esterilizacion/esterilizadores`              | Enfermería, calidad, administración         | 200       |
+| `POST` | `/api/v1/esterilizacion/esterilizadores`              | Administración                              | 201       |
+| `PUT`  | `/api/v1/esterilizacion/esterilizadores/{id}`         | Administración                              | 200       |
+| `GET`  | `/api/v1/esterilizacion/sets`                         | Médico, enfermería, calidad, administración | 200       |
+| `POST` | `/api/v1/esterilizacion/sets`                         | Administración                              | 201       |
+| `PUT`  | `/api/v1/esterilizacion/sets/{id}`                    | Administración                              | 200       |
+| `GET`  | `/api/v1/esterilizacion/ciclos`                       | Enfermería, calidad                         | 200       |
+| `GET`  | `/api/v1/esterilizacion/ciclos/{id}`                  | Enfermería, calidad                         | 200       |
+| `POST` | `/api/v1/esterilizacion/ciclos`                       | Enfermería                                  | 201       |
+| `PUT`  | `/api/v1/esterilizacion/ciclos/{id}/indicadores`      | Enfermería                                  | 200       |
+| `GET`  | `/api/v1/esterilizacion/ciclos/{id}/trazabilidad`     | Enfermería, calidad                         | 200       |
+| `GET`  | `/api/v1/esterilizacion/lotes`                        | Médico, enfermería, calidad                 | 200       |
+| `GET`  | `/api/v1/esterilizacion/lotes/{id}/trazabilidad`      | Enfermería, calidad                         | 200       |
+| `GET`  | `/api/v1/esterilizacion/alertas`                      | Enfermería, calidad                         | 200       |
+
+**Límites.** La esterilización la opera enfermería porque no existe un rol de central de esterilización. Una cirugía de urgencia sigue exigiendo los consentimientos. No hay facturación ni asiento contable de la cirugía, y el vínculo con hospitalización guarda el ingreso sin generar evoluciones por sí mismo. Las listas de verificación siguen el modelo de la OMS y deben validarse con el comité de calidad.
+
+### Recetas electrónicas y catálogo de medicamentos
+
+Los endpoints se reparten entre `MedicamentosController`, que administra el catálogo, y `RecetasElectronicasController`, que cubre la prescripción, la consulta y la dispensación. La ficha del mapa de módulos describe las reglas de alertas, de numeración y de firma, y esta sección agrega los estados, las tablas y los endpoints.
+
+**Tablas.** `principios_activos` guarda la denominación común con su clase terapéutica, su grupo y sus alias de alergia, las dosis máximas y la categoría de embarazo. `medicamentos` agrega la presentación y se vincula de forma opcional con un producto de la farmacia. `interacciones_medicamentosas` relaciona dos principios activos con su severidad. `recetas_electronicas` y `receta_electronica_items` guardan la receta firmada, `receta_alertas` registra cada alerta con su justificación y `receta_dispensaciones` registra cada entrega parcial de un ítem.
+
+**Categorías de control.** Un medicamento puede ser sin control, antibiótico, psicotrópico o estupefaciente, y solo los dos últimos son de control especial y acortan la vigencia a siete días. El estado de venta es vigente, suspendido o retirado. La categoría de embarazo es A, B, C, D, X o sin clasificar, y la compatibilidad con la lactancia es compatible, precaución, contraindicado o sin clasificar.
+
+**Alertas.** Hay siete tipos: alergia, interacción, duplicidad, dosis máxima, embarazo, lactancia y función renal. La severidad es informativa, moderada, grave o contraindicada. El endpoint de alertas calcula las del borrador sin guardar nada, y la emisión las recalcula en el servidor.
+
+**Estados de la receta.** Es emitida, dispensada de forma parcial, dispensada o anulada. Emitirla avisa al paciente con `RECETA_EMITIDA`.
+
+**Importación del catálogo.** La administración descarga una plantilla CSV, sube su archivo para ver una vista previa y luego confirma la importación.
+
+| Método   | Ruta                                              | Acceso                                                | Respuesta |
+| -------- | ------------------------------------------------- | ----------------------------------------------------- | --------- |
+| `GET`    | `/api/v1/medicamentos?q=`                         | Médico, enfermería, farmacia, almacén, administración | 200       |
+| `GET`    | `/api/v1/medicamentos/{id}`                       | Médico, enfermería, farmacia, almacén, administración | 200       |
+| `POST`   | `/api/v1/medicamentos`                            | Administración                                        | 201       |
+| `PUT`    | `/api/v1/medicamentos/{id}`                       | Administración                                        | 200       |
+| `GET`    | `/api/v1/medicamentos/principios-activos`         | Médico, farmacia, administración                      | 200       |
+| `POST`   | `/api/v1/medicamentos/principios-activos`         | Administración                                        | 201       |
+| `PUT`    | `/api/v1/medicamentos/principios-activos/{id}`    | Administración                                        | 200       |
+| `GET`    | `/api/v1/medicamentos/interacciones`              | Médico, farmacia, administración                      | 200       |
+| `POST`   | `/api/v1/medicamentos/interacciones`              | Administración                                        | 201       |
+| `DELETE` | `/api/v1/medicamentos/interacciones/{id}`         | Administración                                        | 204       |
+| `GET`    | `/api/v1/medicamentos/importaciones/plantilla`    | Administración                                        | 200       |
+| `POST`   | `/api/v1/medicamentos/importaciones/vista-previa` | Administración, multipart con `archivo`               | 200       |
+| `POST`   | `/api/v1/medicamentos/importaciones`              | Administración, multipart con `archivo`               | 200       |
+| `POST`   | `/api/v1/recetas/alertas`                         | Médico                                                | 200       |
+| `POST`   | `/api/v1/recetas`                                 | Médico de la atención                                 | 201       |
+| `GET`    | `/api/v1/recetas/mias`                            | Paciente                                              | 200       |
+| `GET`    | `/api/v1/recetas/emitidas`                        | Médico                                                | 200       |
+| `GET`    | `/api/v1/recetas/paciente/{pacienteId}`           | Médico con relación asistencial                       | 200       |
+| `GET`    | `/api/v1/recetas/atencion/{atencionId}`           | Médico                                                | 200       |
+| `GET`    | `/api/v1/recetas/{id}`                            | Médico, paciente propio                               | 200       |
+| `GET`    | `/api/v1/recetas/{id}/pdf`                        | Médico, paciente propio, farmacia                     | 200       |
+| `GET`    | `/api/v1/recetas/{id}/firma`                      | Médico, paciente propio                               | 200       |
+| `POST`   | `/api/v1/recetas/{id}/anular`                     | Médico emisor, con motivo                             | 200       |
+| `GET`    | `/api/v1/recetas/farmacia?q=`                     | Farmacia                                              | 200       |
+| `GET`    | `/api/v1/recetas/farmacia/{id}`                   | Farmacia                                              | 200       |
+| `POST`   | `/api/v1/recetas/farmacia/{id}/dispensar`         | Farmacia                                              | 201       |
+
+**Límites.** Los datos del catálogo son de demostración y están por validar con un químico farmacéutico y con el petitorio vigente del MINSA. La firma es electrónica del servidor y no hay un certificado por médico. No existe integración con un registro nacional de recetas, y una receta no se puede dispensar en otro establecimiento.
+
+### Historia clínica electrónica
+
+Todos los endpoints están en `HceController`. El cierre, las adendas y las correcciones se apoyan en las tablas `atencion_cierres` y `atencion_versiones`, y la atención original en `atenciones` no cambia nunca después del cierre.
+
+**Cierre.** Cada atención tiene como máximo un cierre, que guarda el contenido canónico, la huella SHA-256, la firma con su algoritmo, el certificado público con el que se verifica y si es de prueba, el autor y la fecha. Cerrar dos veces o por otro médico se rechaza.
+
+**Versiones.** Hay dos tipos: la adenda, que agrega un texto, y la corrección, que cambia uno de cuatro campos, el diagnóstico, el tratamiento, las indicaciones o las observaciones, y conserva el valor anterior. Una corrección exige un cambio real, el cierre previo y un motivo. Una corrección sobre otra conserva la cadena de valores.
+
+**Conservación.** La tabla `politicas_conservacion` trae nueve tipos de registro con su plazo referencial en años: historia clínica, atención, consentimiento, hospitalización y cirugía a 20 años, y receta, documento médico, laboratorio e imágenes a diez años. Todos están marcados por confirmar con el asesor legal. La administración puede ajustar los años de cada tipo, entre uno y 100, con su referencia y si queda por confirmar, pero la depuración queda siempre bloqueada.
+
+**Fusión de duplicados.** El endpoint de duplicados lista las historias con el mismo nombre, apellido y fecha de nacimiento. La fusión se rechaza si el origen y el destino son el mismo paciente. Deja una fila en `paciente_fusiones` con el motivo, el autor, la fecha y el resumen de lo movido, junto con los datos de la historia de origen.
+
+**Impresión.** Cada impresión de la historia completa en PDF queda en `hce_impresiones` con su código de verificación y su huella, y en la bitácora de accesos del paciente.
+
+| Método | Ruta                                       | Acceso                                | Respuesta |
+| ------ | ------------------------------------------ | ------------------------------------- | --------- |
+| `POST` | `/api/v1/hce/atenciones/{id}/cierre`       | Médico de la atención                 | 201       |
+| `GET`  | `/api/v1/hce/atenciones/{id}/cierre`       | Médico con relación, paciente titular | 200       |
+| `POST` | `/api/v1/hce/atenciones/{id}/adendas`      | Médico de la atención, con motivo     | 201       |
+| `POST` | `/api/v1/hce/atenciones/{id}/correcciones` | Médico de la atención, con motivo     | 201       |
+| `GET`  | `/api/v1/hce/atenciones/{id}/versiones`    | Médico con relación, paciente titular | 200       |
+| `GET`  | `/api/v1/hce/mi-historia/impresion`        | Paciente                              | 200       |
+| `GET`  | `/api/v1/hce/pacientes/{id}/impresion`     | Médico con relación, paciente titular | 200       |
+| `GET`  | `/api/v1/hce/conservacion`                 | Administración                        | 200       |
+| `PUT`  | `/api/v1/hce/conservacion/{tipo}`          | Administración                        | 200       |
+| `GET`  | `/api/v1/hce/pacientes/duplicados`         | Administración                        | 200       |
+| `GET`  | `/api/v1/hce/pacientes/fusiones`           | Administración                        | 200       |
+| `POST` | `/api/v1/hce/pacientes/fusion`             | Administración, con motivo            | 201       |
+
+**Límites.** Los plazos de conservación son referenciales y los requisitos del marco técnico del MINSA están por confirmar. La firma es electrónica del servidor y falta la firma digital acreditada. El sistema nunca destruye un registro clínico.
+
+### Seguridad del paciente y guías clínicas
+
+Todos los endpoints están en `SeguridadPacienteController`. Cualquier persona autenticada que no sea paciente puede notificar y consultar las guías, calidad y gerencia gestionan los reportes, y calidad y administración publican guías.
+
+**Tablas.** `eventos_adversos` guarda el reporte, `evento_causas` guarda el análisis, `evento_acciones` guarda las acciones de mejora, `guias_clinicas` guarda cada versión de una guía y `guia_cie10` relaciona cada guía con los códigos CIE-10 a los que aplica.
+
+**Tipos y severidad.** Un reporte es un evento adverso, un casi incidente o un incidente sin daño. La severidad es leve, moderada, grave o centinela. El reporte se puede hacer de forma anónima, y entonces no vincula paciente, cirugía ni dispensación.
+
+**Estados.** El reporte pasa de notificado a en análisis, en acción y cerrado. El análisis usa los cinco porqués o la espina de pescado. Una acción es pendiente o hecha, y no puede tener una fecha límite en el pasado.
+
+**Guías.** Una guía es vigente, obsoleta o borrador, y cada versión nueva deja obsoleta la anterior. El endpoint de sugeridas compara el diagnóstico de la atención con los códigos de cada guía. La migración de demostración carga diez guías por validar.
+
+**Avisos.** Calidad recibe un aviso interno por cada reporte nuevo y el responsable recibe otro por cada acción que se le asigna. Ambos usan la notificación del sistema.
+
+| Método | Ruta                                                       | Acceso                            | Respuesta |
+| ------ | ---------------------------------------------------------- | --------------------------------- | --------- |
+| `POST` | `/api/v1/seguridad-paciente/eventos`                       | Todo el personal                  | 201       |
+| `GET`  | `/api/v1/seguridad-paciente/eventos/mios`                  | Todo el personal                  | 200       |
+| `GET`  | `/api/v1/seguridad-paciente/eventos`                       | Calidad, gerencia                 | 200       |
+| `GET`  | `/api/v1/seguridad-paciente/eventos/{id}`                  | Notificante, calidad, gerencia    | 200       |
+| `POST` | `/api/v1/seguridad-paciente/eventos/{id}/analisis`         | Calidad                           | 200       |
+| `POST` | `/api/v1/seguridad-paciente/eventos/{id}/acciones`         | Calidad                           | 200       |
+| `POST` | `/api/v1/seguridad-paciente/acciones/{accionId}/completar` | Responsable de la acción, calidad | 200       |
+| `POST` | `/api/v1/seguridad-paciente/eventos/{id}/cierre`           | Calidad                           | 200       |
+| `GET`  | `/api/v1/seguridad-paciente/tablero`                       | Calidad, gerencia                 | 200       |
+| `GET`  | `/api/v1/seguridad-paciente/eventos/exportacion`           | Calidad, gerencia                 | 200       |
+| `GET`  | `/api/v1/seguridad-paciente/guias`                         | Todo el personal                  | 200       |
+| `GET`  | `/api/v1/seguridad-paciente/guias/sugeridas`               | Todo el personal                  | 200       |
+| `GET`  | `/api/v1/seguridad-paciente/guias/{id}`                    | Todo el personal                  | 200       |
+| `POST` | `/api/v1/seguridad-paciente/guias`                         | Calidad, administración           | 201       |
+| `POST` | `/api/v1/seguridad-paciente/guias/{id}/versiones`          | Calidad, administración           | 201       |
+
+**Límites.** La acción de mejora se asigna desde la interfaz a quien la crea y el resto de las asignaciones se hacen por la API. Las guías de demostración son resúmenes por validar con el comité médico. Falta la integración con el reporte nacional de eventos.
+
+### Planes de tratamiento y pacientes crónicos
+
+Todos los endpoints están en `PlanesTratamientoController`. El plan se guarda en `planes_tratamiento`, sus metas en `plan_metas`, sus controles en `plan_controles` y las mediciones en `plan_mediciones`. Un plan puede vincular la receta electrónica de su medicación.
+
+**Programas y parámetros.** Los programas son hipertensión, diabetes, asma y otro. Los parámetros que se miden son la presión sistólica, la presión diastólica, la glucosa en ayunas, la hemoglobina glicosilada, el peso en kilos y el flujo espiratorio.
+
+**Estados.** Un plan es activo, suspendido o completado. Un control es pendiente, cumplido u omitido. Cada medición guarda su origen, que es el paciente o el personal.
+
+**Alertas.** Una tarea diaria a las 7:00, configurable con `app.cronicos.alerta-cron` y desactivable con `app.cronicos.alertas-habilitadas`, avisa al paciente y a su médico de cada control pendiente vencido de un plan activo, una sola vez por control. Una medición fuera de la meta avisa al médico cuando la registra el paciente y al paciente cuando la registra el médico, siempre con una notificación del sistema.
+
+| Método | Ruta                                                            | Acceso                  | Respuesta |
+| ------ | --------------------------------------------------------------- | ----------------------- | --------- |
+| `POST` | `/api/v1/planes-tratamiento`                                    | Médico con relación     | 201       |
+| `GET`  | `/api/v1/planes-tratamiento/mios`                               | Paciente                | 200       |
+| `GET`  | `/api/v1/planes-tratamiento/tablero`                            | Médico                  | 200       |
+| `GET`  | `/api/v1/planes-tratamiento/paciente/{pacienteId}`              | Médico con relación     | 200       |
+| `GET`  | `/api/v1/planes-tratamiento/{id}`                               | Médico, paciente propio | 200       |
+| `POST` | `/api/v1/planes-tratamiento/{id}/mediciones`                    | Médico, paciente propio | 201       |
+| `POST` | `/api/v1/planes-tratamiento/{id}/controles/{controlId}/cumplir` | Médico                  | 200       |
+| `PUT`  | `/api/v1/planes-tratamiento/{id}/estado`                        | Médico                  | 200       |
+
+**Límites.** El plan no genera citas de forma automática y no hay datos de demostración. Las metas iniciales de la pantalla dependen del programa y el resto se ajusta desde la API.
+
 ## Manejo de errores
 
 `GlobalExceptionHandler` traduce cada excepción a una respuesta con el mismo formato. Los errores 401 y 403 que produce Spring Security antes de llegar a un controlador usan ese mismo formato.
@@ -2994,10 +3552,10 @@ Al cambiar de perfil de Maven conviene ejecutar `./mvnw clean` antes, para que n
 
 Todos los perfiles que usan PostgreSQL crean y evolucionan la base con Flyway. Los scripts viven en `src/main/resources/db` y se ejecutan al arrancar la API, antes de que Hibernate valide el modelo. La migración V17 crea la tabla `archivos`, mueve la foto de perfil y las imágenes diagnósticas a ella y elimina la columna `avatar` y los bytes que se guardaban en la base.
 
-| Carpeta        | Perfiles                      | Contenido                                                                                                                                                                 |
-| -------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `db/migration` | `local`, `dev`, `qa` y `prod` | `V1__esquema_inicial.sql` con todas las tablas, restricciones e índices, y `V2__datos_base.sql` con los tres roles y las siete especialidades                             |
-| `db/demo`      | `local`, `dev` y `qa`         | `V100__datos_demostracion.sql` con usuarios, médicos, horarios, pacientes, citas, atenciones, recetas, pagos, cupones, tarjetas, valoraciones y notificaciones de ejemplo |
+| Carpeta        | Perfiles                      | Contenido                                                                                                                                                 |
+| -------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `db/migration` | `local`, `dev`, `qa` y `prod` | Las 34 migraciones de esquema, de `V1__esquema_inicial.sql` a `V34__planes_tratamiento_cronicos.sql`, descritas en la lista de abajo                      |
+| `db/demo`      | `local`, `dev` y `qa`         | Las 24 migraciones de demostración, de `V100__datos_demostracion.sql` a `V124__eventos_adversos_y_guias_demostracion.sql`, descritas en la lista de abajo |
 
 Reglas de uso:
 
@@ -3007,6 +3565,80 @@ Reglas de uso:
 - La configuración `test` desactiva Flyway porque las pruebas usan H2 con el esquema generado por Hibernate y sus propios inicializadores.
 - Producción solo aplica `db/migration`, de modo que nunca recibe datos de demostración.
 - Los perfiles `local`, `dev` y `qa` activan `out-of-order`, porque una migración nueva de esquema, como la V27, tiene un número menor que las de demostración ya aplicadas, como la V123, y Flyway la rechazaría en una base que ya existía. Producción no lo activa.
+
+### Migraciones de esquema
+
+Las 34 migraciones de `db/migration` se aplican en todos los perfiles que usan PostgreSQL, producción incluida. Cada una crea o amplía las tablas de un módulo.
+
+| Versión | Archivo                                                 | Contenido                                                                                                                                                    |
+| ------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| V1      | `V1__esquema_inicial.sql`                               | Usuarios, roles, pacientes, médicos, especialidades, horarios, citas, atenciones, pagos, cupones, métodos de pago, valoraciones, notificaciones y sesiones   |
+| V2      | `V2__datos_base.sql`                                    | Los tres roles iniciales y las siete especialidades base                                                                                                     |
+| V3      | `V3__especialidades_precio_mfa_billeteras.sql`          | Precio por especialidad, especialidades de cada médico, pacientes compartidos, intenciones de pago con billetera y verificación en dos pasos con sus códigos |
+| V4      | `V4__refresh_tokens.sql`                                | Refresh tokens opacos con rotación                                                                                                                           |
+| V5      | `V5__eventos_calendario.sql`                            | Eventos personales y bloqueos de agenda                                                                                                                      |
+| V6      | `V6__roles_de_personal.sql`                             | Los roles de laboratorio, farmacia y almacén                                                                                                                 |
+| V7      | `V7__almacen_farmacia.sql`                              | Proveedores, productos, ingresos, lotes, movimientos de inventario y dispensaciones con sus ítems                                                            |
+| V8      | `V8__laboratorio.sql`                                   | Catálogo de exámenes con parámetros, órdenes, ítems y resultados                                                                                             |
+| V9      | `V9__roles_fase2.sql`                                   | Los roles de enfermería, caja y recepción                                                                                                                    |
+| V10     | `V10__recepcion.sql`                                    | Turnos de la cola de espera                                                                                                                                  |
+| V11     | `V11__caja.sql`                                         | Sesiones de caja, comprobantes y sus ítems                                                                                                                   |
+| V12     | `V12__hospitalizacion.sql`                              | Camas, ingresos hospitalarios y evoluciones                                                                                                                  |
+| V13     | `V13__auditoria_clinica.sql`                            | Bitácora de lecturas de datos clínicos ajenos                                                                                                                |
+| V14     | `V14__roles_gerenciales_e_indices_reportes.sql`         | Los roles de finanzas, gerencia, operaciones, calidad y recursos humanos, y los índices de los reportes                                                      |
+| V15     | `V15__recursos_humanos.sql`                             | Empleados, plantillas de turno, turnos, ausencias y bitácora de recursos humanos                                                                             |
+| V16     | `V16__imagenes_diagnosticas.sql`                        | El rol de imágenes, el catálogo de estudios, órdenes, ítems, archivos e informes con versiones                                                               |
+| V17     | `V17__almacenamiento_archivos.sql`                      | La tabla `archivos` con los metadatos del almacén de objetos, que reemplaza los bytes guardados en la base                                                   |
+| V18     | `V18__documentos_exportaciones.sql`                     | Plantillas de documentos con versiones y exportaciones asíncronas                                                                                            |
+| V19     | `V19__seguridad_operativa_y_motivos.sql`                | Eventos de seguridad y las columnas de motivo de cancelación y anulación                                                                                     |
+| V20     | `V20__seguros_convenios.sql`                            | Aseguradoras, convenios, reglas de cobertura, exclusiones, pólizas, verificaciones, preautorizaciones, liquidaciones y cuentas por cobrar                    |
+| V21     | `V21__telemedicina.sql`                                 | Teleconsultas, consentimiento de telemedicina, modalidad de la cita y tarifa virtual                                                                         |
+| V22     | `V22__cie10.sql`                                        | Versiones y catálogo CIE-10, diagnósticos de la atención y el sexo del paciente                                                                              |
+| V23     | `V23__documentos_medicos.sql`                           | Establecimientos de salud, numeración de documentos, documentos médicos, referencias, plantillas de consentimiento y consentimientos                         |
+| V24     | `V24__canales_notificacion_y_respaldos.sql`             | Contactos y preferencias por canal, configuración, plantillas de mensaje, bitácora de entregas y ejecuciones de respaldo                                     |
+| V25     | `V25__facturacion_electronica_y_privacidad.sql`         | Configuración fiscal, series, comprobantes electrónicos, resúmenes e intercambios con SUNAT, y toda la protección de datos personales                        |
+| V26     | `V26__compras_y_cuentas_por_pagar.sql`                  | Requisiciones, cotizaciones, órdenes de compra, recepciones, comprobantes y pagos a proveedores, devoluciones, auditoría y los datos de pago del proveedor   |
+| V27     | `V27__contabilidad_y_tesoreria.sql`                     | Plan contable, periodos, asientos, plantillas de asiento, asientos pendientes, tesorería, extractos bancarios y auditoría contable                           |
+| V28     | `V28__planilla_y_asistencia.sql`                        | Parámetros y conceptos de planilla, contratos, terminales, marcaciones, asistencia diaria, planillas, boletas y bitácora                                     |
+| V29     | `V29__pediatria_y_odontologia.sql`                      | Vacunas, esquemas, carnés, registros y recordatorios de vacunación, referencia y mediciones de crecimiento, y todo el módulo de odontología                  |
+| V30     | `V30__quirofano_y_esterilizacion.sql`                   | Quirófanos, cirugías con su equipo, listas de verificación, insumos y eventos, esterilizadores, sets de instrumental, ciclos y lotes esteriles               |
+| V31     | `V31__recetas_electronicas_y_catalogo_medicamentos.sql` | Principios activos, medicamentos, interacciones, recetas electrónicas con sus ítems, alertas y dispensaciones                                                |
+| V32     | `V32__hce_cierre_versiones_conservacion.sql`            | Cierres y versiones de la atención, políticas de conservación, fusiones de pacientes e impresiones de la historia                                            |
+| V33     | `V33__eventos_adversos_y_guias_clinicas.sql`            | Eventos adversos con causas y acciones, guías clínicas y su relación con los códigos CIE-10                                                                  |
+| V34     | `V34__planes_tratamiento_cronicos.sql`                  | Planes de tratamiento con metas, controles y mediciones                                                                                                      |
+
+### Migraciones de demostración
+
+Las 24 migraciones de `db/demo` solo las aplican `local`, `dev` y `qa`. La numeración parte de V100 y no existe una V116. Cada una carga los datos de ejemplo de un módulo, con fechas relativas al día de ejecución cuando corresponde.
+
+| Versión | Archivo                                             | Contenido                                                                                                                                     |
+| ------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| V100    | `V100__datos_demostracion.sql`                      | Usuarios, médicos con sus especialidades y horarios, pacientes, pacientes compartidos, citas, atenciones, pagos y cupones                     |
+| V101    | `V101__eventos_demostracion.sql`                    | Eventos de calendario                                                                                                                         |
+| V102    | `V102__personal_demostracion.sql`                   | Usuarios del personal de laboratorio, farmacia y almacén                                                                                      |
+| V103    | `V103__almacen_farmacia_demostracion.sql`           | Proveedores, productos, ingresos, lotes, movimientos y dispensaciones                                                                         |
+| V104    | `V104__laboratorio_demostracion.sql`                | Exámenes con sus parámetros, órdenes y resultados                                                                                             |
+| V105    | `V105__personal_fase2_demostracion.sql`             | Usuarios del personal de enfermería, caja y recepción                                                                                         |
+| V106    | `V106__recepcion_demostracion.sql`                  | Turnos de la cola y las citas que los originan                                                                                                |
+| V107    | `V107__caja_demostracion.sql`                       | Sesiones de caja y comprobantes con sus ítems                                                                                                 |
+| V108    | `V108__hospitalizacion_demostracion.sql`            | Camas, ingresos y evoluciones                                                                                                                 |
+| V109    | `V109__personal_gerencial_demostracion.sql`         | Usuarios del personal de finanzas, gerencia, operaciones, calidad y recursos humanos                                                          |
+| V110    | `V110__recursos_humanos_demostracion.sql`           | Empleados, turnos y ausencias                                                                                                                 |
+| V111    | `V111__imagenes_diagnosticas_demostracion.sql`      | Usuarios de imágenes, catálogo de estudios, órdenes e informes                                                                                |
+| V112    | `V112__seguridad_operativa_demostracion.sql`        | Eventos de seguridad                                                                                                                          |
+| V113    | `V113__seguros_demostracion.sql`                    | Aseguradoras, convenios, reglas y exclusiones, pólizas, preautorizaciones, liquidaciones y cuentas por cobrar                                 |
+| V114    | `V114__cie10_demostracion.sql`                      | La versión y la muestra de 263 códigos del catálogo CIE-10, el sexo de los pacientes y los diagnósticos de las atenciones                     |
+| V115    | `V115__documentos_medicos_demostracion.sql`         | Establecimientos de salud y las seis plantillas de consentimiento                                                                             |
+| V117    | `V117__facturacion_y_privacidad_demostracion.sql`   | Configuración fiscal y series, política de privacidad, finalidades, bancos de datos y encargados del tratamiento                              |
+| V118    | `V118__compras_demostracion.sql`                    | Proveedores, requisiciones, órdenes de compra, comprobantes y pagos de proveedor                                                              |
+| V119    | `V119__contabilidad_demostracion.sql`               | Periodos, asientos, cuentas y movimientos de tesorería y extractos bancarios                                                                  |
+| V120    | `V120__planilla_demostracion.sql`                   | Contratos laborales y conceptos asignados a los trabajadores                                                                                  |
+| V121    | `V121__pediatria_y_odontologia_demostracion.sql`    | Médicos, pacientes y citas de apoyo, registros de vacunación, mediciones de crecimiento, odontogramas, planes odontológicos, sesiones y pagos |
+| V122    | `V122__quirofano_y_esterilizacion_demostracion.sql` | Quirófanos, cirugías con su equipo y sus listas, esterilizadores, sets, ciclos y lotes                                                        |
+| V123    | `V123__recetas_electronicas_demostracion.sql`       | 130 principios activos, 199 presentaciones y 75 interacciones                                                                                 |
+| V124    | `V124__eventos_adversos_y_guias_demostracion.sql`   | Eventos adversos y las diez guías clínicas con sus códigos CIE-10                                                                             |
+
+El módulo de planes de tratamiento de crónicos no tiene migración de demostración.
 
 Para volver a un estado limpio con los datos de demostración basta con recrear el volumen de PostgreSQL:
 
@@ -3054,6 +3686,7 @@ Para enviar trazas a Jaeger desde el IDE, levanta también `otel-collector` y `j
 | `otel-collector` | `otel/opentelemetry-collector-contrib:0.162.0`                | 4317 gRPC, 4318 HTTP y 13133 health                                           |
 | `jaeger`         | `jaegertracing/jaeger:2.22.0`                                 | 16686                                                                         |
 | `backup`         | `tusalud-backup`, construida con `docker/backup/Dockerfile`   | Ninguno, guarda en el volumen `backup-data`                                   |
+| `turn`           | `coturn/coturn:4.7.0-alpine`                                  | 3478 en UDP y TCP y el rango de relé en UDP                                   |
 | `mailpit`        | `axllent/mailpit`, solo en desarrollo                         | 8025 en el loopback para ver los correos                                      |
 | `pgadmin`        | `dpage/pgadmin4`, solo con el perfil `tools`                  | 5050                                                                          |
 
@@ -3102,25 +3735,74 @@ docker compose -f compose.yaml -f compose.qa.yaml up -d --build
 
 Para no repetir `-f` en cada comando, define `COMPOSE_FILE` en `.env` o en la terminal, por ejemplo `COMPOSE_FILE=compose.yaml:compose.dev.yaml`. En Windows el separador es `;`.
 
-### Despliegue de QA en un VPS
+### Despliegue en un servidor propio
 
-`compose.vps.yaml` despliega la API, la aplicación web y un servidor TURN en un servidor que ya tiene PostgreSQL, MinIO y un nginx público. No incluye base de datos, almacén, gateway, Jaeger ni OpenTelemetry. Como es un entorno de QA, la API carga también los datos de demostración de `db/demo` mediante `SPRING_FLYWAY_LOCATIONS`, y `scripts/vps/datos-volumen.sql` agrega un volumen grande de datos de prueba.
+`compose.vps.yaml` despliega la API, la aplicación web, un servidor TURN y un filtro contra bots en un servidor que ya tiene PostgreSQL, un almacén compatible con S3 y un nginx público. No incluye base de datos, almacén, gateway, Jaeger ni OpenTelemetry, y la API arranca con `OTEL_SDK_DISABLED`. Es un entorno de QA: la API usa el perfil `prod` pero carga también los datos de demostración de `db/demo` mediante `SPRING_FLYWAY_LOCATIONS`, activa `SPRING_FLYWAY_OUT_OF_ORDER` y deja habilitada la confirmación simulada de pagos. `scripts/vps/datos-volumen.sql` agrega un volumen grande de datos de prueba.
 
-| Pieza          | Detalle                                                                                                                                  |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Web            | `tusalud.codesoftlabs.com`, imagen `tusalud-web:vps`, compilada con la configuración `vps`, que apunta a la API por su dominio completo  |
-| API            | `api.tusalud.codesoftlabs.com`, imagen `tusalud-api:vps`, con CORS limitado al dominio de la web y sin la documentación OpenAPI expuesta |
-| Base de datos  | Base y usuario propios en el PostgreSQL del servidor, creados por `scripts/vps/preparar-servidor.sh`                                     |
-| Almacenamiento | Cinco buckets con prefijo `tusalud-` y un usuario de MinIO limitado a ellos, accesibles mediante el contenedor `almacen-proxy`           |
-| nginx público  | Configuraciones en `docker/vps/nginx`, con certificados de Let's Encrypt por webroot, bloqueo por país y WebSocket para la señalización  |
+La web y la API se publican en subdominios distintos de un dominio propio, por ejemplo `tusalud.ejemplo.pe` para la web y `api.tusalud.ejemplo.pe` para la API. El navegador llama a la API por su dominio completo, y por eso la API limita el CORS al dominio de la web.
 
-Las imágenes se construyen en local con `docker compose -f compose.vps.yaml build` y se suben al servidor con `docker save` y `docker load` por SSH. Todos los secretos se generan en el servidor, en un `.env` con permisos restringidos, y nunca viajan por el repositorio. `scripts/vps/crear-admin.sh` crea el administrador inicial, y el resto de usuarios se crean desde la aplicación.
+| Pieza          | Detalle                                                                                                                                                                          |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Web            | Imagen `tusalud-web:vps`, compilada con la configuración `vps`, que apunta a la API por su dominio completo. Solo es alcanzable desde la red interna de Docker                   |
+| API            | Imagen `tusalud-api:vps`, con el puerto publicado solo en el loopback del servidor, CORS limitado al dominio de la web y sin la documentación OpenAPI expuesta                   |
+| Base de datos  | Base y usuario propios en el PostgreSQL del servidor, creados por `scripts/vps/preparar-servidor.sh`                                                                             |
+| Almacenamiento | Cinco buckets con prefijo `tusalud-` y un usuario del almacén limitado a ellos, accesibles mediante el contenedor `almacen-proxy`                                                |
+| TURN           | Contenedor `coturn` con credenciales temporales y el secreto en un archivo montado que no se versiona                                                                            |
+| Anubis         | Filtro contra bots delante de la web, descrito más abajo                                                                                                                         |
+| nginx público  | Configuraciones en `docker/vps/nginx`, una por dominio, con certificados de Let's Encrypt por webroot, bloqueo por país, WebSocket para la señalización y el desafío contra bots |
 
-El servidor TURN usa los puertos 3478 en UDP y TCP y el rango 49160 a 49200 en UDP, que deben estar abiertos en el firewall del servidor. Los respaldos de TuSalud no corren en este despliegue. El almacén necesita el contenedor `almacen-proxy` porque el nombre del contenedor de MinIO lleva guion bajo y el cliente S3 de Java lo rechaza como host.
+Los contenedores se conectan a tres redes de Docker: `databases` y `storages`, que ya existen en el servidor y son externas, e `interna`, propia de TuSalud. La API es el único contenedor que alcanza la base de datos, y solo `almacen-proxy` alcanza el almacén. Cada contenedor tiene un límite de memoria.
+
+Las imágenes se construyen en local con `docker compose -f compose.vps.yaml build`. Todos los secretos se generan en el servidor, en un `.env` con permisos restringidos, y nunca viajan por el repositorio. `scripts/vps/preparar-servidor.sh` crea ese archivo, la base y el usuario de la base, y los buckets con su usuario limitado, y `scripts/vps/crear-admin.sh` crea el administrador inicial. El resto de usuarios se crean desde la aplicación.
+
+| Variable                                                                        | Uso                                                          |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `TUSALUD_DB_NAME`, `TUSALUD_DB_USER`, `TUSALUD_DB_PASSWORD`                     | Base, usuario y clave de PostgreSQL que usa la API           |
+| `TUSALUD_STORAGE_ACCESS_KEY`, `TUSALUD_STORAGE_SECRET_KEY`                      | Usuario del almacén limitado a los buckets de TuSalud        |
+| `ANUBIS_CLAVE`                                                                  | Clave con la que Anubis firma sus desafíos                   |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD`                                                 | Cuenta del administrador inicial que crea `crear-admin.sh`   |
+| `JWT_SECRET`, `MFA_CLAVE_CIFRADO`, `CANALES_SECRETO`, `CANALES_WEBHOOK_SECRETO` | Secretos de la API, generados al preparar el servidor        |
+| `RESPALDO_TOKEN`, `TURN_SECRET`, `TURN_EXTERNAL_IP`                             | Secreto de los reportes de respaldo, secreto de TURN y su IP |
+
+El servidor TURN usa los puertos 3478 en UDP y TCP y el rango 49160 a 49200 en UDP, que deben estar abiertos en el firewall del servidor. El almacén necesita el contenedor `almacen-proxy` porque el nombre del contenedor del almacén lleva guion bajo y el cliente S3 de Java lo rechaza como host.
 
 `datos-volumen.sql` crea 220 pacientes, ocho médicos con sus horarios y alrededor de 6000 citas entre pasadas y futuras, con atenciones, diagnósticos CIE-10, recetas, pagos, valoraciones y órdenes de laboratorio con resultados. Se ejecuta una sola vez con `psql` sobre la base del servidor y no es idempotente.
 
-El servidor bloquea de forma permanente todo el tráfico entrante que no venga de Perú con una tabla de nftables, instalada por `scripts/vps/geoblock`. Las listas de redes peruanas se extraen de la base GeoLite2 que ya usa nginx, de modo que el firewall y nginx coinciden, y se refrescan cada domingo. Quedan abiertos el puerto 80, porque nginx ya filtra por país y Let's Encrypt necesita validar, y el puerto 443 para los webhooks de GitHub.
+### Firewall por país y acceso por red privada
+
+El servidor descarta todo el tráfico entrante que no venga del país configurado, por defecto Perú, con una tabla de nftables que instala `scripts/vps/geoblock`. Las listas de redes del país se extraen de la base GeoLite2 que ya usa nginx, de modo que el firewall y nginx coinciden, y se refrescan cada domingo con un temporizador. Antes de aplicar una lista nueva, el script comprueba que no sea demasiado corta y que contenga la dirección del administrador, para no dejar al servidor sin acceso.
+
+Quedan abiertos el puerto del túnel de la red privada, el puerto 80, porque nginx ya filtra por país y la validación de los certificados lo necesita, y el puerto 443 para los webhooks del repositorio de código, cuyos rangos se descargan de la API pública de ese servicio. El resto del tráfico entrante y el reenviado a los contenedores de Docker se descarta con un contador.
+
+El acceso administrativo por SSH se puede cerrar al tráfico público y dejar solo por la red privada, un túnel de WireGuard. Con esa marca puesta, el firewall descarta el puerto de SSH que llega por la interfaz pública.
+
+**Guardián del acceso.** Para que un fallo de la red privada no deje al servidor inalcanzable, `scripts/vps/ssh-guardian` ejecuta una vez, cuatro minutos después de cada arranque, una comprobación del túnel, que debe existir, estar activo, tener su dirección y escuchar, del servicio SSH y de la tabla del firewall. Si algo falla, reabre el SSH de forma temporal solo a las redes del país y deja una marca y un registro. `guardian-cerrar.sh` se ejecuta a mano para cerrarlo de nuevo cuando el túnel se recupera, y `--simular-fallo` permite ensayar el procedimiento sin tocar el firewall.
+
+**Verificación del arranque.** `scripts/vps/verificar-arranque.sh` revisa tras un reinicio el kernel en uso, los contenedores esperados con su salud y sus reinicios, PostgreSQL, las unidades de systemd, el túnel, el firewall, los servicios de vigilancia del servidor, nginx, la respuesta de cada sitio y la memoria y el disco, y termina con un resultado de fallos y avisos.
+
+### Protección contra bots
+
+La web pasa por Anubis, que pide un desafío de prueba de trabajo a los clientes antes de entregar la página. Se integra con el nginx público por `auth_request`, con los archivos de `docker/vps/nginx`, y si Anubis cae el filtro falla abierto y la web sigue sirviendo. La política de `docker/vps/anubis-politica.yaml` permite sin desafío las rutas `.well-known` y el favicon, deniega los clientes sin agente de usuario, los rastreadores de inteligencia artificial, las herramientas automáticas y los bots declarados, y desafía a cualquier otro cliente con dificultad `4`. La cookie que prueba el desafío es segura, de tipo `Lax` y dura siete días. La API no pasa por Anubis, para no interferir con las llamadas del navegador, y se protege con los límites de tasa, el firewall por país y la autenticación.
+
+### Respaldos en el servidor
+
+El contenedor de respaldos de TuSalud no corre en este despliegue. Para que la vigilancia de la API no genere alertas por un respaldo que no existe, `compose.vps.yaml` fija valores muy altos en `RESPALDOS_MAX_HORAS` y `RESPALDOS_MAX_DIAS_SIN_PRUEBA`. Quien opera el servidor debe incluir la base de datos y el almacén en su propia política de respaldos.
+
+### Endurecimiento del servidor
+
+- Los puertos de la API y de la web solo se publican en el loopback del servidor, y el nginx público es el único que los alcanza.
+- El nginx público termina TLS con certificados de Let's Encrypt. El del dominio de la API envía `Strict-Transport-Security`, `X-Content-Type-Options`, `X-Frame-Options` y `Referrer-Policy`, responde 404 a `/v3/api-docs`, `/swagger-ui`, `/h2-console` y `/actuator`, acota el tamaño de las peticiones a 30 megabytes y mantiene abierto el WebSocket de la señalización hasta una hora.
+- Docker corre con el remapeo de usuarios activo, de modo que el usuario de un contenedor no equivale al de un administrador del servidor.
+- Los secretos viven en un `.env` con permisos restringidos generado en el servidor. El secreto de TURN va en un archivo montado y no en la línea de comandos. Para rotarlo hay que cambiarlo en ambos lugares y recrear la API y el servidor TURN, porque deben compartir el mismo valor.
+- coturn rechaza como destino de relé las redes privadas, de loopback y de enlace local, y no admite conexiones multicast.
+- La base de datos y el almacén tienen usuarios propios, con acceso limitado a sus recursos.
+
+### Proceso de actualización
+
+1. Construir las imágenes en local con `docker compose -f compose.vps.yaml build`.
+2. Subir cada imagen al servidor con `docker save` y `docker load` por SSH, que puede estar limitado a la red privada.
+3. Recrear los servicios afectados con `docker compose -f compose.vps.yaml up -d`. La API aplica al arrancar las migraciones de esquema y de demostración que falten.
+4. Comprobar los contenedores y los sitios, y tras un reinicio completo ejecutar `scripts/vps/verificar-arranque.sh`.
 
 ### Almacenamiento de objetos
 
@@ -3248,6 +3930,7 @@ web/
     ├── calidad/              Aplicación de calidad
     ├── rrhh/                 Aplicación de recursos humanos
     ├── recepcion/            Aplicación de recepción
+    ├── imagenes/             Aplicación de imágenes diagnósticas
     ├── caja/                 Aplicación de caja
     ├── enfermeria/           Aplicación de enfermería y hospitalización
     ├── laboratorio/          Aplicación del laboratorio
@@ -3255,7 +3938,7 @@ web/
     └── almacen/              Aplicación del almacén
 ```
 
-Cada aplicación tiene solo cinco archivos propios: `app.config.ts`, `app.routes.ts`, `app.id.ts`, `nav.config.ts` y su prueba de humo. Todo lo demás viene de las librerías.
+Cada aplicación tiene solo sus archivos propios: `app.config.ts`, `app.routes.ts`, `app.id.ts`, `nav.config.ts`, su prueba de humo y la carpeta `inicio` con su tablero. Todo lo demás viene de las librerías.
 
 ### Aplicaciones por rol
 
@@ -3275,7 +3958,7 @@ La página `Mis exportaciones` está en `/mis-exportaciones` de las aplicaciones
 Una nueva especialidad con flujos propios, o un nuevo cargo, se agrega como un proyecto más:
 
 1. Generar el proyecto con `ng generate application nombre` y copiar el `angular.json` de una aplicación existente para heredar sus configuraciones de build, la ruta base y los entornos.
-2. Crear los cinco archivos de la aplicación copiándolos de una existente. `app.routes.ts` compone las rutas desde `@tusalud/features` y protege la entrada con `entradaModulo`, y `nav.config.ts` define el menú y los pasos de la guía de ese rol.
+2. Crear los archivos de la aplicación y su tablero de inicio copiándolos de una existente. `app.routes.ts` compone las rutas desde `@tusalud/features` y protege la entrada con `entradaModulo`, y `nav.config.ts` define el menú y los pasos de la guía de ese rol.
 3. Registrar el módulo en `MODULOS` de `@tusalud/core` con su rol, su ruta base, su etiqueta y su icono.
 4. Agregar la aplicación a `build:all` y a `test:apps` en `package.json`, a la lista de bases de `nginx/default.conf.template` y al `Dockerfile`.
 5. Si la aplicación necesita una pantalla que no existe, se crea en un entry point de `@tusalud/features` o, si es solo suya, dentro del propio proyecto.
@@ -3408,13 +4091,187 @@ Todas las pantallas se cargan de forma diferida. Los parámetros de ruta llegan 
 | `/rrhh/turnos`                                                                                                               | Recursos humanos, admin                                     | Turnos semanales del personal                                                                   |
 | `/rrhh/ausencias`                                                                                                            | Recursos humanos, admin                                     | Bandeja y calendario de ausencias                                                               |
 | `/mi-espacio`                                                                                                                | Todo el personal                                            | Mis turnos, mis ausencias y mi ficha                                                            |
+| `/historial-clinico/:atencionId`                                                                                             | Médico                                                      | Historial de versiones, adendas y correcciones de una atención cerrada                          |
+| `/hce`                                                                                                                       | Admin                                                       | Conservación y duplicados de las historias clínicas                                             |
+| `/mi-historia-impresa`                                                                                                       | Paciente                                                    | Descarga de la historia clínica completa en PDF                                                 |
+| `/vacunacion`, `/crecimiento`                                                                                                | Médico, enfermería                                          | Carné de vacunación y curvas de crecimiento de un paciente                                      |
+| `/mi-vacunacion`, `/mi-crecimiento`                                                                                          | Paciente                                                    | Carné de vacunación y curvas de crecimiento propios                                             |
+| `/esquemas-vacunacion`                                                                                                       | Admin                                                       | Esquemas de vacunación por vigencia                                                             |
+| `/odontograma`, `/planes-odontologicos`                                                                                      | Médico                                                      | Odontograma con historial y planes de tratamiento odontológico                                  |
+| `/mi-salud-dental`                                                                                                           | Paciente                                                    | Odontograma y planes odontológicos propios                                                      |
+| `/cobros-odontologicos`                                                                                                      | Caja                                                        | Planes aceptados con saldo y registro del cobro                                                 |
+| `/procedimientos-odontologicos`                                                                                              | Admin                                                       | Catálogo de procedimientos odontológicos con precios                                            |
+| `/quirofano` y `/quirofano/:id`                                                                                              | Médico, enfermería                                          | Agenda quirúrgica y detalle de la cirugía                                                       |
+| `/quirofano/nueva`                                                                                                           | Médico                                                      | Solicitud de una cirugía con su diagnóstico CIE-10                                              |
+| `/mis-cirugias`                                                                                                              | Paciente                                                    | Cirugías y consentimientos del paciente                                                         |
+| `/quirofanos`, `/esterilizacion-catalogo`                                                                                    | Admin                                                       | Catálogo de quirófanos y equipos, y de esterilizadores y sets                                   |
+| `/esterilizacion`                                                                                                            | Enfermería, calidad                                         | Ciclos, lotes, trazabilidad y alertas de esterilización                                         |
+| `/recetas`, `/recetas/emitir/:citaId` y `/recetas/:id`                                                                       | Médico                                                      | Recetas emitidas, emisión desde la atención con alertas y detalle de la receta                  |
+| `/mis-recetas` y `/mis-recetas/:id`                                                                                          | Paciente                                                    | Recetas electrónicas propias y su detalle                                                       |
+| `/recetas-electronicas`                                                                                                      | Farmacia                                                    | Búsqueda y dispensación de recetas electrónicas                                                 |
+| `/catalogo-medicamentos`                                                                                                     | Admin                                                       | Catálogo de medicamentos, principios activos, interacciones e importación                       |
+| `/eventos-seguridad`                                                                                                         | Médico, enfermería                                          | Notificación de un evento adverso o casi incidente                                              |
+| `/seguridad-paciente`                                                                                                        | Calidad, gerencia                                           | Gestión de eventos adversos, análisis, acciones y tablero                                       |
+| `/guias`                                                                                                                     | Médico, enfermería, calidad, admin                          | Biblioteca de guías de práctica clínica                                                         |
+| `/pacientes-cronicos` y `/mi-plan`                                                                                           | Médico y paciente                                           | Tablero de pacientes crónicos y plan de tratamiento propio                                      |
 | `/acceso-denegado`                                                                                                           | Todos                                                       | Aviso de permisos insuficientes                                                                 |
 
-Quien no inició sesión va al login, y si intentaba abrir una ruta protegida, la URL viaja como `returnUrl`. Un usuario autenticado que abre la ruta base de la aplicación de otro rol vuelve a la página de inicio de su propio módulo, por ejemplo el paciente que escribe `/admin/` regresa a `/paciente/citas`. Una ruta que no existe dentro de su aplicación muestra la página no encontrada, y solo si la página de inicio de un rol es la ruta prohibida se muestra `/acceso-denegado`. El menú lateral muestra solo lo que cada rol puede abrir.
+Quien no inició sesión va al login, y si intentaba abrir una ruta protegida, la URL viaja como `returnUrl`. Un usuario autenticado que abre la ruta base de la aplicación de otro rol vuelve a la página de inicio de su propio módulo, por ejemplo el paciente que escribe `/admin/` regresa a `/paciente/inicio`. Una ruta que no existe dentro de su aplicación muestra la página no encontrada, y solo si la página de inicio de un rol es la ruta prohibida se muestra `/acceso-denegado`. El menú lateral muestra solo lo que cada rol puede abrir.
 
 La primera vez que un usuario entra, una guía paso a paso resalta las partes de la interfaz que le corresponden según su rol. Se puede volver a abrir desde el menú del avatar o desde la tarjeta al pie del menú lateral, y el avance se guarda en las preferencias con `tourCompletado`.
 
 Las citas se ven en lista o en un calendario propio con vistas de mes, semana, día y agenda. La vista de día y la de semana muestran una línea con la hora actual y las citas que se cruzan se resaltan y se cuentan en la cabecera. El calendario es un componente propio que se parece a Google Calendar: tiene un mini calendario lateral, filtros por tipo de calendario, una fila para los eventos de todo el día, el número de semana y el sombreado del horario en que el médico no atiende. Con la edición activa se arrastra sobre la cuadrícula para crear un evento, se mueve o se estira un evento para reprogramarlo con pasos de 15 minutos, y los atajos T, M, S, D y A llevan a hoy y a cada vista. La página `/calendario` está disponible para todos los roles y junta las citas con las reuniones, tareas y recordatorios personales, y los médicos añaden además sus bloqueos de agenda. La disponibilidad de un médico y la reserva usan el mismo componente en modo de selección. Al reservar, el paciente elige el hueco libre directamente en el calendario: los huecos que chocan con sus propias citas no aparecen, así que no puede elegir una fecha al azar.
+
+### Menú y rutas de cada aplicación
+
+El menú lateral de cada aplicación se define en su `nav.config.ts` y agrupa las pantallas por tema. Las rutas son las internas de la aplicación y en el navegador van precedidas de su ruta base. Cada pantalla solo aparece en el menú de los roles que pueden abrirla.
+
+**Paciente.** Base `/paciente/`.
+
+- Principal: Inicio `/inicio`, Mis citas `/citas`, Reservar cita `/citas/nueva`, Teleconsultas `/teleconsultas`, Calendario `/calendario`.
+- Mi historia impresa: Mi plan de tratamiento `/mi-plan`, Mi historia en PDF `/mi-historia-impresa`.
+- Mi salud: Historia clínica `/historia-clinica`, Mis resultados `/mis-resultados`, Mis estudios `/mis-estudios`, Mis hospitalizaciones `/mis-ingresos`, Mis medicamentos `/mis-medicamentos`, Mis pagos `/pagos`, Métodos de pago `/pagos/metodos`.
+- Vacunas y salud dental: Mi carné de vacunación `/mi-vacunacion`, Mi crecimiento `/mi-crecimiento`, Mi salud dental `/mi-salud-dental`.
+- Directorio: Médicos `/medicos`, Especialidades `/especialidades`.
+- Mi seguro: Mis seguros `/mis-seguros`, Mis recetas `/mis-recetas`, Mis documentos `/mis-documentos`, Mis consentimientos `/mis-consentimientos`.
+- Mi privacidad y pagos: Mis comprobantes `/mis-comprobantes`, Mi privacidad `/privacidad`.
+- Mis procedimientos: Mis cirugías `/mis-cirugias`.
+- Cuenta: Notificaciones `/notificaciones`, Mi perfil `/perfil`.
+
+**Médico.** Base `/medico/`.
+
+- Principal: Inicio `/inicio`, Mi agenda `/agenda`, Cola de pacientes `/cola`, Teleconsultas `/teleconsultas`, Calendario `/calendario`, Mis pacientes `/pacientes`.
+- Calidad y seguridad: Guías clínicas `/guias`, Pacientes crónicos `/pacientes-cronicos`, Notificar un evento `/eventos-seguridad`.
+- Hospitalización: Mapa de camas `/hospitalizacion`, Emergencias `/hospitalizacion/emergencias`, Ingresos `/hospitalizacion/ingresos`, Camas `/hospitalizacion/camas`.
+- Laboratorio: Órdenes `/laboratorio`, Solicitar exámenes `/laboratorio/solicitar`, Catálogo de exámenes `/laboratorio/examenes`.
+- Imágenes diagnósticas: Mis estudios de imagen `/imagenes`, Solicitar estudio `/imagenes/solicitar`.
+- Seguros: Preautorizaciones `/preautorizaciones`, Recetas electrónicas `/recetas`, Documentos médicos `/documentos`, Consentimientos `/consentimientos`.
+- Especialidades: Vacunación `/vacunacion`, Crecimiento `/crecimiento`, Odontograma `/odontograma`, Planes odontológicos `/planes-odontologicos`.
+- Quirófano: Agenda quirúrgica `/quirofano`.
+- Cuenta: Mi espacio `/mi-espacio/turnos`, Mis boletas `/mis-boletas`, Mi asistencia `/mi-asistencia`, Notificaciones `/notificaciones`, Mis exportaciones `/mis-exportaciones`, Mi perfil `/perfil`.
+
+**Administración.** Base `/admin/`.
+
+- Principal: Inicio `/inicio`, Panel `/admin/panel`, Auditoría `/admin/auditoria`, Seguridad `/admin/seguridad`, Calendario `/calendario`.
+- Historia clínica: Conservación y duplicados `/hce`, Guías clínicas `/guias`.
+- Recepción: Recepción `/recepcion`, Pacientes `/recepcion/pacientes`, Reservar en mostrador `/recepcion/citas/nueva`, Sala de espera `/recepcion/pantalla`.
+- Caja: Comprobantes `/caja/comprobantes`, Historial de caja `/caja/historial`, Reporte de ingresos `/caja/reportes`.
+- Imágenes diagnósticas: Agenda de salas `/imagenes/agenda`, Catálogo de estudios `/imagenes/catalogo`.
+- Hospitalización: Mapa de camas `/hospitalizacion`, Emergencias `/hospitalizacion/emergencias`, Ingresos `/hospitalizacion/ingresos`, Camas `/hospitalizacion/camas`.
+- Laboratorio: Órdenes `/laboratorio`, Catálogo de exámenes `/laboratorio/examenes`.
+- Farmacia: Historial `/farmacia/historial`.
+- Almacén: Resumen `/almacen`, Productos `/almacen/productos`, Ingresos `/almacen/ingresos`, Proveedores `/almacen/proveedores`, Kardex `/almacen/movimientos`.
+- Gestión: Usuarios `/admin/usuarios`, Pagos `/admin/pagos`, Catálogo CIE-10 `/cie10`, Catálogo de medicamentos `/catalogo-medicamentos`, Esquemas de vacunación `/esquemas-vacunacion`, Procedimientos odontológicos `/procedimientos-odontologicos`, Cupones `/admin/cupones`.
+- Documentos: Plantillas de documentos `/plantillas`, Establecimientos de salud `/establecimientos`, Plantillas de consentimiento `/consentimientos`.
+- Comunicaciones y respaldos: Plantillas de mensajes `/canales/plantillas`, Entregas de avisos `/canales/entregas`, Respaldos `/respaldos`.
+- Directorio: Médicos `/medicos`, Especialidades `/especialidades`.
+- Reportes: Ejecutivo `/reportes/ejecutivo`, Financiero `/reportes/financiero`, Operativo `/reportes/operativo`, Calidad `/reportes/calidad`, Morbilidad `/reportes/morbilidad`.
+- Recursos humanos: Resumen de plantilla `/rrhh`, Empleados `/rrhh/empleados`, Turnos `/rrhh/turnos`, Ausencias `/rrhh/ausencias`.
+- Seguros y convenios: Aseguradoras y convenios `/seguros/aseguradoras`, Cartera `/seguros/cartera`, Liquidaciones `/seguros/liquidaciones`.
+- Facturación electrónica: Comprobantes electrónicos `/comprobantes-electronicos`, Resúmenes y bajas `/resumenes-sunat`, Registro de ventas `/registro-ventas`, Configuración fiscal `/configuracion-fiscal`.
+- Protección de datos: Solicitudes ARCO `/privacidad/solicitudes`, Registro de tratamientos `/privacidad/registro`, Retención de datos `/privacidad/retencion`, Incidentes de datos `/privacidad/incidentes`, Política de privacidad `/privacidad/politica`.
+- Compras y pagos: Requisiciones `/compras/requisiciones`, Órdenes de compra `/compras/ordenes`, Recepciones `/compras/recepciones`, Cuentas por pagar `/compras/cuentas-por-pagar`, Compras por proveedor `/compras/reporte`.
+- Quirófano: Quirófanos y equipos `/quirofanos`, Esterilizadores y sets `/esterilizacion-catalogo`.
+- Cuenta: Mi espacio `/mi-espacio/turnos`, Notificaciones `/notificaciones`, Mis exportaciones `/mis-exportaciones`, Mi perfil `/perfil`.
+
+**Gerencia.** Base `/gerencia/`.
+
+- Principal: Inicio `/inicio`, Calendario `/calendario`.
+- Seguridad del paciente: Eventos adversos `/seguridad-paciente`.
+- Reportes: Ejecutivo `/reportes/ejecutivo`, Financiero `/reportes/financiero`, Operativo `/reportes/operativo`, Calidad `/reportes/calidad`, Morbilidad `/reportes/morbilidad`.
+- Recursos humanos: Resumen de plantilla `/rrhh`, Empleados `/rrhh/empleados`.
+- Seguros: Cartera `/seguros/cartera`, Liquidaciones `/seguros/liquidaciones`.
+- Ventas: Registro de ventas `/registro-ventas`.
+- Compras: Órdenes de compra `/compras/ordenes`, Cuentas por pagar `/compras/cuentas-por-pagar`, Compras por proveedor `/compras/reporte`.
+- Contabilidad: Resumen contable `/contabilidad`, Libros y estados `/contabilidad/libros`, Periodos y cierre `/contabilidad/periodos`, Tesorería `/contabilidad/tesoreria`, Flujo de caja `/contabilidad/flujo-caja`.
+- Planilla: Planilla mensual `/planilla`, Parámetros laborales `/parametros-planilla`.
+- Cuenta: Mi espacio `/mi-espacio/turnos`, Mis boletas `/mis-boletas`, Mi asistencia `/mi-asistencia`, Notificaciones `/notificaciones`, Mis exportaciones `/mis-exportaciones`, Mi perfil `/perfil`.
+
+**Finanzas.** Base `/finanzas/`.
+
+- Principal: Inicio `/inicio`, Calendario `/calendario`.
+- Finanzas: Reporte financiero `/reportes/financiero`.
+- Seguros y convenios: Aseguradoras y convenios `/seguros/aseguradoras`, Cartera `/seguros/cartera`, Liquidaciones `/seguros/liquidaciones`, Preautorizaciones `/seguros/preautorizaciones`.
+- Facturación electrónica: Comprobantes electrónicos `/comprobantes-electronicos`, Resúmenes y bajas `/resumenes-sunat`, Registro de ventas `/registro-ventas`, Configuración fiscal `/configuracion-fiscal`.
+- Compras y pagos: Órdenes de compra `/compras/ordenes`, Cuentas por pagar `/compras/cuentas-por-pagar`, Compras por proveedor `/compras/reporte`, Requisiciones `/compras/requisiciones`, Recepciones `/compras/recepciones`.
+- Contabilidad: Resumen contable `/contabilidad`, Asientos `/contabilidad/asientos`, Libros y estados `/contabilidad/libros`, Periodos `/contabilidad/periodos`, Plan contable `/contabilidad/plan-cuentas`, Plantillas de asiento `/contabilidad/plantillas`, Libros electrónicos `/contabilidad/libros-electronicos`.
+- Tesorería: Cuentas y movimientos `/contabilidad/tesoreria`, Conciliación `/contabilidad/conciliacion`, Flujo de caja `/contabilidad/flujo-caja`.
+- Planilla: Planilla mensual `/planilla`, Conceptos de planilla `/conceptos-planilla`, Parámetros laborales `/parametros-planilla`.
+- Cuenta: Mi espacio `/mi-espacio/turnos`, Mis boletas `/mis-boletas`, Mi asistencia `/mi-asistencia`, Notificaciones `/notificaciones`, Mis exportaciones `/mis-exportaciones`, Mi perfil `/perfil`.
+
+**Operaciones.** Base `/operaciones/`.
+
+- Principal: Inicio `/inicio`, Calendario `/calendario`.
+- Operaciones: Reporte operativo `/reportes/operativo`, Morbilidad `/reportes/morbilidad`, Respaldos `/respaldos`, Entregas de avisos `/canales/entregas`.
+- Cuenta: Mi espacio `/mi-espacio/turnos`, Mis boletas `/mis-boletas`, Mi asistencia `/mi-asistencia`, Notificaciones `/notificaciones`, Mis exportaciones `/mis-exportaciones`, Mi perfil `/perfil`.
+
+**Calidad.** Base `/calidad/`.
+
+- Principal: Inicio `/inicio`, Calendario `/calendario`.
+- Seguridad del paciente: Eventos adversos `/seguridad-paciente`, Guías clínicas `/guias`.
+- Calidad: Reporte de calidad `/reportes/calidad`, Morbilidad `/reportes/morbilidad`.
+- Protección de datos: Solicitudes ARCO `/privacidad/solicitudes`, Registro de tratamientos `/privacidad/registro`, Retención de datos `/privacidad/retencion`, Incidentes de datos `/privacidad/incidentes`, Política de privacidad `/privacidad/politica`.
+- Esterilización: Esterilización `/esterilizacion`.
+- Cuenta: Mi espacio `/mi-espacio/turnos`, Mis boletas `/mis-boletas`, Mi asistencia `/mi-asistencia`, Notificaciones `/notificaciones`, Mis exportaciones `/mis-exportaciones`, Mi perfil `/perfil`.
+
+**Recursos humanos.** Base `/rrhh/`.
+
+- Principal: Inicio `/inicio`, Calendario `/calendario`.
+- Recursos humanos: Resumen de plantilla `/rrhh`, Empleados `/rrhh/empleados`, Turnos `/rrhh/turnos`, Ausencias `/rrhh/ausencias`, Planilla mensual `/planilla`, Contratos laborales `/contratos-laborales`, Asistencia `/asistencia`, Terminales de asistencia `/terminales-asistencia`, Conceptos de planilla `/conceptos-planilla`, Parámetros laborales `/parametros-planilla`.
+- Cuenta: Mi espacio `/mi-espacio/turnos`, Mis boletas `/mis-boletas`, Mi asistencia `/mi-asistencia`, Notificaciones `/notificaciones`, Mis exportaciones `/mis-exportaciones`, Mi perfil `/perfil`.
+
+**Recepción.** Base `/recepcion/`.
+
+- Principal: Inicio `/inicio`, Calendario `/calendario`.
+- Recepción: Recepción `/recepcion`, Pacientes `/recepcion/pacientes`, Reservar en mostrador `/recepcion/citas/nueva`, Sala de espera `/recepcion/pantalla`.
+- Imágenes diagnósticas: Agenda de salas `/imagenes/agenda`.
+- Hospitalización: Mapa de camas `/hospitalizacion`, Emergencias `/hospitalizacion/emergencias`, Ingresos `/hospitalizacion/ingresos`.
+- Seguros: Pólizas `/seguros/polizas`, Preautorizaciones `/seguros/preautorizaciones`.
+- Cuenta: Mi espacio `/mi-espacio/turnos`, Mis boletas `/mis-boletas`, Mi asistencia `/mi-asistencia`, Notificaciones `/notificaciones`, Mi perfil `/perfil`.
+
+**Caja.** Base `/caja/`.
+
+- Principal: Inicio `/inicio`, Calendario `/calendario`.
+- Caja: Caja `/caja`, Cobrar `/caja/cobrar`, Comprobantes `/caja/comprobantes`, Historial de caja `/caja/historial`, Reporte de ingresos `/caja/reportes`.
+- Odontología: Cobros odontológicos `/cobros-odontologicos`.
+- Facturación electrónica: Comprobantes electrónicos `/comprobantes-electronicos`.
+- Cuenta: Mi espacio `/mi-espacio/turnos`, Mis boletas `/mis-boletas`, Mi asistencia `/mi-asistencia`, Notificaciones `/notificaciones`, Mis exportaciones `/mis-exportaciones`, Mi perfil `/perfil`.
+
+**Enfermería.** Base `/enfermeria/`.
+
+- Principal: Inicio `/inicio`, Calendario `/calendario`.
+- Calidad y seguridad: Guías clínicas `/guias`, Notificar un evento `/eventos-seguridad`.
+- Hospitalización: Mapa de camas `/hospitalizacion`, Emergencias `/hospitalizacion/emergencias`, Ingresos `/hospitalizacion/ingresos`, Camas `/hospitalizacion/camas`.
+- Vacunación y crecimiento: Vacunación `/vacunacion`, Crecimiento `/crecimiento`.
+- Quirófano y esterilización: Agenda quirúrgica `/quirofano`, Esterilización `/esterilizacion`.
+- Cuenta: Mi espacio `/mi-espacio/turnos`, Mis boletas `/mis-boletas`, Mi asistencia `/mi-asistencia`, Notificaciones `/notificaciones`, Mi perfil `/perfil`.
+
+**Laboratorio.** Base `/laboratorio/`.
+
+- Principal: Inicio `/inicio`, Calendario `/calendario`.
+- Laboratorio: Órdenes `/laboratorio`, Catálogo de exámenes `/laboratorio/examenes`.
+- Cuenta: Mi espacio `/mi-espacio/turnos`, Mis boletas `/mis-boletas`, Mi asistencia `/mi-asistencia`, Notificaciones `/notificaciones`, Mi perfil `/perfil`.
+
+**Imágenes.** Base `/imagenes/`.
+
+- Principal: Inicio `/inicio`, Calendario `/calendario`.
+- Imágenes diagnósticas: Órdenes `/imagenes`, Agenda de salas `/imagenes/agenda`, Catálogo de estudios `/imagenes/catalogo`.
+- Cuenta: Mi espacio `/mi-espacio/turnos`, Mis boletas `/mis-boletas`, Mi asistencia `/mi-asistencia`, Notificaciones `/notificaciones`, Mi perfil `/perfil`.
+
+**Farmacia.** Base `/farmacia/`.
+
+- Principal: Inicio `/inicio`, Calendario `/calendario`.
+- Farmacia: Farmacia `/farmacia`, Dispensar `/farmacia/dispensar`, Recetas electrónicas `/recetas-electronicas`, Historial `/farmacia/historial`.
+- Almacén: Productos `/almacen/productos`, Kardex `/almacen/movimientos`.
+- Compras: Requisiciones `/compras/requisiciones`.
+- Cuenta: Mi espacio `/mi-espacio/turnos`, Mis boletas `/mis-boletas`, Mi asistencia `/mi-asistencia`, Notificaciones `/notificaciones`, Mi perfil `/perfil`.
+
+**Almacén.** Base `/almacen/`.
+
+- Principal: Inicio `/inicio`, Calendario `/calendario`.
+- Almacén: Resumen `/almacen`, Productos `/almacen/productos`, Ingresos `/almacen/ingresos`, Proveedores `/almacen/proveedores`, Kardex `/almacen/movimientos`.
+- Compras: Requisiciones `/compras/requisiciones`, Órdenes de compra `/compras/ordenes`, Recepciones y devoluciones `/compras/recepciones`.
+- Cuenta: Mi espacio `/mi-espacio/turnos`, Mis boletas `/mis-boletas`, Mi asistencia `/mi-asistencia`, Notificaciones `/notificaciones`, Mis exportaciones `/mis-exportaciones`, Mi perfil `/perfil`.
 
 ### Validaciones
 
@@ -3489,13 +4346,52 @@ La interfaz está pensada para una clínica seria: sobria, legible y rápida de 
 
 ### Pruebas del frontend
 
-Las 579 pruebas unitarias corren con Vitest, repartidas entre los proyectos, y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, el enrutamiento entre aplicaciones, las rutas de cada aplicación con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API. Cada aplicación tiene una prueba de humo que resuelve todos sus componentes perezosos.
+Las 589 pruebas unitarias corren con Vitest, repartidas entre los proyectos, y cubren las utilidades, los validadores, `AuthService`, los interceptores, los guards, el enrutamiento entre aplicaciones, las rutas de cada aplicación con sus redirecciones por rol, los stores, la renovación del token, el calendario, la guía de bienvenida y cada uno de los endpoints de los clientes de la API. Cada aplicación tiene una prueba de humo que resuelve todos sus componentes perezosos.
 
 ```bash
 npm test
 ```
 
-Las 241 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal, los flujos de almacén, farmacia y laboratorio, los de recepción, caja y hospitalización, el recorrido completo de un estudio de imagen con carga de imágenes e informe, los reportes gerenciales, los turnos, las ausencias y Mi espacio, y la subida y descarga de archivos, el aislamiento del almacén, las cabeceras de seguridad, el límite de tasa y los tamaños del gateway, y la seguridad operativa con los eventos de seguridad, el estado del sistema, las evoluciones pendientes y los motivos obligatorios, la telemedicina con dos navegadores que se conectan por video, chatean y finalizan, y la codificación CIE-10 con la atención codificada por el médico, la minimización por rol, la importación del catálogo y la exportación de morbilidad. Requieren el stack levantado con datos de prueba y atraviesan el portal y las aplicaciones por sus rutas base. El helper `ir` de `e2e/support.ts` construye la dirección real de cada pantalla a partir de la aplicación en la que está el usuario y de su prefijo oculto.
+Las 247 pruebas de extremo a extremo usan Playwright con Chromium, en escritorio y en un viewport móvil, y recorren el login, el registro, la reserva y cancelación de una cita, la agenda del médico, la auditoría, el alta, edición y baja de especialidades, el alta de médicos con sus horarios, el ciclo completo de una cita entre paciente y médico, la edición del perfil, las preferencias de recordatorio, los filtros de fechas y el cambio de contraseña, las notificaciones en tiempo real, los pagos con cupón, la historia clínica, el panel de administración, los filtros y los permisos por rol, la verificación en dos pasos, la guía de bienvenida, los pagos con Yape y Plin, la gestión de tarifas y roles, los pacientes compartidos, el calendario, el planificador de eventos con arrastre, la reprogramación, la renovación de sesión, el alta de personal, los flujos de almacén, farmacia y laboratorio, los de recepción, caja y hospitalización, el recorrido completo de un estudio de imagen con carga de imágenes e informe, los reportes gerenciales, los turnos, las ausencias y Mi espacio, y la subida y descarga de archivos, el aislamiento del almacén, las cabeceras de seguridad, el límite de tasa y los tamaños del gateway, y la seguridad operativa con los eventos de seguridad, el estado del sistema, las evoluciones pendientes y los motivos obligatorios, la telemedicina con dos navegadores que se conectan por video, chatean y finalizan, y la codificación CIE-10 con la atención codificada por el médico, la minimización por rol, la importación del catálogo y la exportación de morbilidad. Requieren el stack levantado con datos de prueba y atraviesan el portal y las aplicaciones por sus rutas base. El helper `ir` de `e2e/support.ts` construye la dirección real de cada pantalla a partir de la aplicación en la que está el usuario y de su prefijo oculto.
+
+Las 34 especificaciones suman 245 pruebas en escritorio, y las dos pruebas marcadas como adaptables corren además en un viewport móvil, lo que da las 247 ejecuciones. La tabla muestra cuántas pruebas de escritorio tiene cada especificación.
+
+| Especificación                | Pruebas | Qué recorre                                                                                                             |
+| ----------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `auth.spec.ts`                | 7       | Login, errores de credenciales, validación, cierre de sesión por rol y registro de un paciente                          |
+| `flujos.spec.ts`              | 8       | Reserva y cancelación de una cita, agenda del médico, especialidades y horarios del administrador                       |
+| `cobertura.spec.ts`           | 7       | Médicos y horarios, filtros de la auditoría, ciclo de vida de una cita y disponibilidad pública                         |
+| `modulos.spec.ts`             | 19      | Tarjetas, cupones, billeteras, historia clínica, notificaciones, tarifas, roles, pacientes compartidos y administración |
+| `perfil.spec.ts`              | 6       | Datos personales, recordatorios, consultorio del médico y cambio de contraseña                                          |
+| `permisos.spec.ts`            | 4       | Permisos por rol sobre datos médicos, dispensación y hospitalización                                                    |
+| `seguridad.spec.ts`           | 6       | Acceso por rol, guía de bienvenida, verificación en dos pasos y renovación de sesión                                    |
+| `calendario.spec.ts`          | 10      | Vistas del calendario, elección de hueco y reprogramación                                                               |
+| `planificador.spec.ts`        | 9       | Eventos personales, arrastre, filtros, atajos y bloqueos de agenda                                                      |
+| `clinicos.spec.ts`            | 10      | Alta de personal, almacén, farmacia y laboratorio                                                                       |
+| `operacion.spec.ts`           | 6       | Recepción, caja y hospitalización                                                                                       |
+| `imagenes.spec.ts`            | 5       | Estudio de imagen con carga, visor e informe                                                                            |
+| `gerencial.spec.ts`           | 15      | Reportes gerenciales, recursos humanos, Mi espacio y acceso a los módulos gerenciales                                   |
+| `experiencia.spec.ts`         | 20      | Tablero de inicio de los quince roles, modo privacidad, bloqueo por inactividad y aviso de auditoría                    |
+| `archivos.spec.ts`            | 10      | Foto de perfil, archivos disfrazados, descargas, aislamiento del almacén y pruebas del gateway                          |
+| `seguridad-operativa.spec.ts` | 6       | Eventos de seguridad, estado del sistema, evoluciones pendientes y motivos obligatorios                                 |
+| `documentos.spec.ts`          | 8       | Exportaciones a PDF y Excel, descargas, aislamiento y plantillas                                                        |
+| `seguros.spec.ts`             | 6       | Pólizas, copago, preautorizaciones, liquidaciones y menú por rol                                                        |
+| `telemedicina.spec.ts`        | 3       | Teleconsulta con dos navegadores, tickets de un solo uso y tarjeta de inicio                                            |
+| `cie10.spec.ts`               | 5       | Atención codificada, minimización por rol, importación del catálogo y morbilidad                                        |
+| `documentos-medicos.spec.ts`  | 4       | Certificados, descansos, consentimientos con firma, referencias y accesos indebidos                                     |
+| `canales.spec.ts`             | 9       | Canales con consentimiento, preferencias, bajas, plantillas, entregas y respaldos                                       |
+| `facturacion.spec.ts`         | 7       | Comprobante firmado, RUC incorrecto, nota de crédito, bandeja de caja y configuración fiscal                            |
+| `privacidad.spec.ts`          | 6       | Política pública, consentimientos, solicitud de acceso, cancelación, registro de tratamientos e incidentes              |
+| `compras.spec.ts`             | 6       | Ciclo de compra con distintos usuarios, orden mayor al límite, rechazo y RUC inválido                                   |
+| `contabilidad.spec.ts`        | 6       | Asientos con reversa, cierre de periodos, conciliación y tesorería                                                      |
+| `planilla.spec.ts`            | 5       | Ciclo de la planilla con segregación, terminal, asistencia propia y vista de gerencia                                   |
+| `pediatria.spec.ts`           | 7       | Carné con dosis atrasadas, registro y anulación de dosis, PDF, curvas de crecimiento y accesos indebidos                |
+| `odontologia.spec.ts`         | 6       | Odontograma con teclado, cambios con historial, plan aceptado por el paciente, cobros de caja y catálogo                |
+| `quirofano.spec.ts`           | 8       | Quirófanos, solicitud con CIE-10, preparación, agenda, Mis cirugías, ciclo de esterilización y accesos indebidos        |
+| `recetas.spec.ts`             | 5       | Emisión con alertas y justificación, verificación pública, dispensación parcial, catálogo y paciente                    |
+| `hce.spec.ts`                 | 3       | Cierre con adenda y corrección, historia en PDF y conservación con la depuración bloqueada                              |
+| `seguridad-paciente.spec.ts`  | 2       | Notificación, análisis, acción y cierre de un evento, y búsqueda de una guía                                            |
+| `planes-tratamiento.spec.ts`  | 1       | Plan con meta, medición fuera de la meta del paciente y tablero del médico                                              |
 
 Las ocho pruebas de documentos exportan un reporte a PDF y a Excel desde la web, descargan un comprobante y un listado, bajan los resultados de laboratorio, comprueban que un paciente o un médico sin relación no obtiene la receta ajena, que el token en la dirección no autentica y que una exportación es solo de quien la pidió, y suben, rechazan y restauran una plantilla. Cada una limpia lo que crea para poder repetirse.
 
@@ -3539,7 +4435,7 @@ Todos los comandos se ejecutan dentro de la carpeta `web`. Cada compilación gen
 
 ### Desarrollo con recarga en caliente
 
-`compose.hot.yaml` reemplaza la imagen de nginx por un contenedor de desarrollo que monta la carpeta `web` como volumen. Al arrancar compila una vez el portal y las quince aplicaciones con el entorno `local` y las sirve todas con `scripts/serve-dist.mjs` en el puerto 4200 interno de ese contenedor, detrás del gateway, que es quien publica el puerto 4200 del host y reenvía `/api` al servicio `app`. Compilar todas una vez cuesta menos de dos minutos y casi no ocupa memoria.
+`compose.hot.yaml` reemplaza la imagen de nginx por un contenedor de desarrollo que monta la carpeta `web` como volumen. Al arrancar compila una vez el portal y las 15 aplicaciones con el entorno `local` y las sirve todas con `scripts/serve-dist.mjs` en el puerto 4200 interno de ese contenedor, detrás del gateway, que es quien publica el puerto 4200 del host y reenvía `/api` al servicio `app`. Compilar todas una vez cuesta menos de dos minutos y casi no ocupa memoria.
 
 La recarga se activa solo en las aplicaciones en las que se trabaja con la variable `WEB_WATCH`, que acepta una lista separada por comas o `all`. Cada una de ellas ejecuta `ng build --watch` con sondeo y vuelve a compilar al guardar un archivo, y el navegador se actualiza al recargar la página. Vigilar todas las aplicaciones a la vez consume más de 13 GB de memoria con solo diez, y crece con cada una, por eso no es el comportamiento por defecto.
 
@@ -3551,7 +4447,7 @@ La API, PostgreSQL y los datos de prueba quedan en el mismo stack. Los volúmene
 
 ### Imagen Docker y Compose
 
-El `Dockerfile` de `web` compila las librerías, el portal y las quince aplicaciones con `node:24-alpine`, con una cache de npm entre builds, copia cada aplicación a su carpeta y sirve el resultado con `nginxinc/nginx-unprivileged:1.30-alpine-slim`, la rama estable de nginx en su variante mínima. El contenedor corre con el usuario `nginx`, sin privilegios de root, escucha en el puerto 8080 y la imagen final pesa unos 30 MB. El argumento de build `BUILD_CONFIGURATION` elige la configuración de Angular y vale `production` por defecto.
+El `Dockerfile` de `web` compila las librerías, el portal y las 15 aplicaciones con `node:24-alpine`, con una cache de npm entre builds, copia cada aplicación a su carpeta y sirve el resultado con `nginxinc/nginx-unprivileged:1.30-alpine-slim`, la rama estable de nginx en su variante mínima. El contenedor corre con el usuario `nginx`, sin privilegios de root, escucha en el puerto 8080 y la imagen final pesa unos 30 MB. El argumento de build `BUILD_CONFIGURATION` elige la configuración de Angular y vale `production` por defecto.
 
 La aplicación web forma parte del stack de Compose como servicio `web` y queda disponible en `http://localhost:4200` al levantar cualquier entorno:
 
@@ -3638,7 +4534,7 @@ En los perfiles `local`, `dev` y `qa` los datos se cargan con las migraciones de
 
 - Cinco médicos más, de Medicina General, Dermatología, Traumatología, Ginecología y Oftalmología, cada uno con sus horarios.
 - Ocho pacientes más con nombres, DNI y fechas de nacimiento ficticios.
-- Veintiuna citas en los cuatro estados, repartidas desde tres semanas atrás hasta nueve días adelante. Cada cita cae en un día y una hora de atención del médico, y las fechas se calculan a partir del día en que arranca la API.
+- 21 citas en los cuatro estados, repartidas desde tres semanas atrás hasta nueve días adelante. Cada cita cae en un día y una hora de atención del médico, y las fechas se calculan a partir del día en que arranca la API.
 
 El archivo `users.txt` de la raíz lista todos los usuarios con su correo, contraseña y rol, junto con las citas de ejemplo. Para volver a un estado limpio basta con recrear el volumen de la base de datos:
 
@@ -3653,14 +4549,14 @@ docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml up -d --b
 ./mvnw test
 ```
 
-Las 1082 pruebas usan el perfil `test` con H2 en memoria y no necesitan PostgreSQL ni Docker.
+Las 1108 pruebas usan el perfil `test` con H2 en memoria y no necesitan PostgreSQL ni Docker.
 
 | Clase                                                                                                                   | Qué verifica                                                                                                                                                                                                                                                                                                                                                    |
 | ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `VirtualThreadsTest`                                                                                                    | Que Tomcat atiende las peticiones con virtual threads                                                                                                                                                                                                                                                                                                           |
 | `TusaludApplicationTests`                                                                                               | Que el contexto de Spring arranca                                                                                                                                                                                                                                                                                                                               |
 | `ValidadorPlantillaTest`                                                                                                | La lista blanca de plantillas: scripts, importaciones, entidades externas, tamaño y recursos externos                                                                                                                                                                                                                                                           |
-| `MotorPlantillasTest`                                                                                                   | La compilación y el llenado de las diecinueve plantillas, las tildes en el PDF y el límite de filas                                                                                                                                                                                                                                                             |
+| `MotorPlantillasTest`                                                                                                   | La compilación y el llenado de las 23 plantillas, las tildes en el PDF y el límite de filas                                                                                                                                                                                                                                                                     |
 | `LibroExcelTest`                                                                                                        | La escritura en flujo, la neutralización de fórmulas y el reempaquetado del libro                                                                                                                                                                                                                                                                               |
 | `DocumentoServiceTest`                                                                                                  | La autorización de cada documento, las exportaciones, la purga, los límites y las plantillas                                                                                                                                                                                                                                                                    |
 | `SeguridadOperativaSeguridadTest`, `EventoSeguridadServiceTest`                                                         | Eventos de seguridad sin correos ni claves, enmascarado de IP, umbrales, purga, permisos de administración, estado del sistema, evoluciones pendientes y motivos obligatorios                                                                                                                                                                                   |
@@ -3690,6 +4586,29 @@ Las 1082 pruebas usan el perfil `test` con H2 en memoria y no necesitan PostgreS
 | `DetectorContenidoTest`, `NombresArchivoTest`                                                                           | Detección por firma de imágenes, PDF, Office, CSV y JRXML, rechazo de ejecutables, SVG, HTML y XML con DOCTYPE, y sanitización de nombres                                                                                                                                                                                                                       |
 | `LocalStorageServiceTest`, `S3StorageServiceTest`                                                                       | Guardado, lectura por rangos, borrado, claves con recorrido de directorio y errores del almacén con un cliente S3 simulado                                                                                                                                                                                                                                      |
 | `ArchivoServiceTest`, `ArchivosSeguridadTest`                                                                           | Validación por propósito, acceso por relación y propietario, rangos, ETag, avatar del perfil y accesos indebidos por HTTP                                                                                                                                                                                                                                       |
+| `CitaCalendarioServiceTest`, `ReprogramarCitaServiceTest`, `ValoracionServiceImplTest`                                  | Los solapamientos parciales y adyacentes de las citas, la reprogramación con las mismas validaciones de horario y las valoraciones únicas con el promedio redondeado                                                                                                                                                                                            |
+| `AtencionServiceImplTest`, `AtencionDiagnosticosTest`                                                                   | El registro de la atención que marca la cita como atendida, los conflictos, el diagnóstico principal codificado sin duplicados y el aviso por sexo o edad que no encajan                                                                                                                                                                                        |
+| `HistoriaClinicaServiceImplTest`, `AccesoDatosClinicosSeguridadTest`                                                    | La historia ordenada por fecha, los datos médicos que solo edita el médico con relación asistencial y la auditoría de cada acceso                                                                                                                                                                                                                               |
+| `PacienteCompartidoServiceImplTest`                                                                                     | Compartir y revocar el acceso a un paciente entre médicos, sin duplicados                                                                                                                                                                                                                                                                                       |
+| `PagoServiceImplTest`, `PagoQrServiceImplTest`, `MetodoPagoServiceImplTest`, `CuponServiceImplTest`                     | El pago con comprobante y cupón, los pagos con Yape y Plin con su expiración, la validación de Luhn y los cupones                                                                                                                                                                                                                                               |
+| `EventoCalendarioServiceTest`, `RecordatorioServiceImplTest`                                                            | Los eventos propios y los bloqueos de agenda, los límites de rango y los recordatorios sin repetirse                                                                                                                                                                                                                                                            |
+| `NotificacionServiceImplTest`, `NotificacionStreamServiceImplTest`                                                      | Los avisos por evento de la cita, el orden de la bandeja y la publicación al flujo en vivo sin fallar sin conexiones                                                                                                                                                                                                                                            |
+| `PerfilServiceImplTest`, `AdminServiciosTest`                                                                           | El perfil de cada rol, el cambio de contraseña, los usuarios por rol, la desactivación de cuentas y las estadísticas                                                                                                                                                                                                                                            |
+| `MfaServiceImplTest`, `TotpServiceTest`, `RefreshTokenServiceTest`, `RefreshYCalendarioHttpTest`                        | La verificación en dos pasos con códigos de recuperación y bloqueo, el TOTP del RFC 6238, la rotación del refresh token y la revocación de la familia al reutilizarlo                                                                                                                                                                                           |
+| `SesionServiceImplTest`, `SesionSecurityIntegrationTest`, `LoginFallidoSinTransaccionTest`                              | Las sesiones por dispositivo, la alerta de un dispositivo nuevo, el cierre de sesión y el login fallido sin transacción                                                                                                                                                                                                                                         |
+| `IdentificadoresUuidTest`                                                                                               | Que las entidades se identifican con UUID aleatorios y que un identificador inválido responde 400 y uno inexistente 404                                                                                                                                                                                                                                         |
+| `AlmacenServiceTest`, `FarmaciaServiceTest`, `AlmacenFarmaciaSeguridadTest`                                             | Productos, lotes y salidas por FEFO, la dispensación parcial y total, la venta libre y los permisos de almacén y farmacia                                                                                                                                                                                                                                       |
+| `LaboratorioServiceTest`, `LaboratorioSeguridadTest`                                                                    | La orden con su total, el flujo hasta la validación con los valores fuera de rango y los permisos por rol                                                                                                                                                                                                                                                       |
+| `Cie10ServiceTest`, `Cie10SeguridadTest`, `MorbilidadReporteTest`                                                       | La búsqueda sin tildes ni mayúsculas, la importación, el reporte de morbilidad que oculta las celdas con menos de cinco casos y los permisos                                                                                                                                                                                                                    |
+| `ReporteServiceTest`, `ReportesRrhhSeguridadTest`, `RrhhServiceTest`                                                    | Los reportes ejecutivo, financiero, operativo y de calidad, la ficha laboral sin sueldo para quien no corresponde y la auditoría sin montos                                                                                                                                                                                                                     |
+| `TeleconsultaServiceTest`, `TeleconsultaSeguridadTest`, `SenalizacionWebSocketTest`                                     | La sala única por cita, el consentimiento versionado, el ticket de un solo uso, la sala de espera, la señalización y los accesos indebidos                                                                                                                                                                                                                      |
+| `CalculadoraEsquemaVacunacionTest`, `CalculadoraCrecimientoTest`, `OrdenInteraccionesTest`                              | La próxima dosis, los atrasos y la tolerancia, el puntaje z y el percentil con la interpolación de la referencia, y el orden de los identificadores en PostgreSQL                                                                                                                                                                                               |
+| `PediatriaServiceTest`, `OdontologiaServiceTest`, `PediatriaOdontologiaSeguridadTest`                                   | El carné y las dosis con su intervalo, las mediciones con alertas, el odontograma inmutable, los planes odontológicos con consentimiento y cobro, y los permisos por rol y por relación                                                                                                                                                                         |
+| `QuirofanoServiceTest`, `QuirofanoSeguridadTest`                                                                        | Los solapamientos de quirófano y de personal, los roles del equipo, el ciclo completo con descuento de inventario, la trazabilidad de lotes y los permisos por rol                                                                                                                                                                                              |
+| `RecetaElectronicaServiceTest`, `RecetasSeguridadTest`                                                                  | Las alertas de alergia, interacción, dosis, duplicidad, embarazo y lactancia, la emisión firmada y numerada, la dispensación parcial y los permisos por rol                                                                                                                                                                                                     |
+| `HceServiceTest`                                                                                                        | El cierre firmado, la rectificación con rastro, la conservación sin depuración, la fusión de duplicados y la impresión verificable                                                                                                                                                                                                                              |
+| `CalidadServiceTest`                                                                                                    | El reporte anónimo, el cierre con análisis y acciones, la numeración y las guías versionadas                                                                                                                                                                                                                                                                    |
+| `PlanesTratamientoServiceTest`                                                                                          | Los controles programados, las metas, las mediciones fuera de rango, la adherencia y la alerta de controles vencidos                                                                                                                                                                                                                                            |
 
 ## Flujo de trabajo con Git
 
@@ -3806,86 +4725,140 @@ El archivo `.env.example` documenta todas las variables con valores para desarro
 cp .env.example .env
 ```
 
-| Variable                                                                           | Uso                                                                                   | Valor por defecto                                     |
-| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `SPRING_PROFILES_ACTIVE`                                                           | Perfil de Spring en tiempo de ejecución                                               | El perfil de Maven                                    |
-| `DB_URL`                                                                           | URL JDBC de PostgreSQL, obligatoria en `prod`                                         | Según el perfil                                       |
-| `DB_USERNAME`                                                                      | Usuario de PostgreSQL, obligatorio en `prod`                                          | `postgres`                                            |
-| `DB_PASSWORD`                                                                      | Clave de PostgreSQL, obligatoria en `prod`                                            | `postgres`                                            |
-| `JWT_SECRET`                                                                       | Clave HMAC en Base64 de al menos 256 bits, obligatoria en `prod`                      | Solo fuera de `prod`                                  |
-| `JWT_EXPIRATION_MS`                                                                | Vigencia del token de acceso en milisegundos                                          | `900000`                                              |
-| `JWT_REFRESH_EXPIRATION_MS`                                                        | Vigencia del refresh token en milisegundos                                            | `604800000`                                           |
-| `MFA_CLAVE_CIFRADO`                                                                | Clave para cifrar los secretos de la verificación en dos pasos, obligatoria en `prod` | Solo fuera de `prod`                                  |
-| `PAGOS_SIMULACION_HABILITADA`                                                      | Habilita la confirmación simulada de pagos con Yape y Plin                            | `true`, y `false` en `prod`                           |
-| `CORS_ALLOWED_ORIGINS`                                                             | Orígenes permitidos, separados por comas                                              | `http://localhost:4200`                               |
-| `SERVER_PORT`                                                                      | Puerto HTTP de la API dentro del contenedor                                           | `8080`                                                |
-| `JDK_JAVA_OPTIONS`                                                                 | Opciones adicionales de la JVM de la API                                              | `-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError` |
-| `OTEL_SERVICE_NAME`                                                                | Nombre del servicio en las trazas                                                     | `tusalud-api`                                         |
-| `APP_PORT`                                                                         | Puerto de la API en el host, solo en desarrollo                                       | `8080`                                                |
-| `WEB_PORT`                                                                         | Puerto del gateway en el host en desarrollo                                           | `4200`                                                |
-| `GATEWAY_PORT`                                                                     | Puerto HTTP del gateway en el host en producción                                      | `80`                                                  |
-| `GATEWAY_TLS_PORT`                                                                 | Puerto HTTPS del gateway en el host                                                   | `443`, y `4443` en desarrollo                         |
-| `GATEWAY_TLS`                                                                      | Activa HTTPS con los certificados de `GATEWAY_CERTS_DIR`                              | `off`                                                 |
-| `GATEWAY_CERTS_DIR`                                                                | Carpeta con `tls.crt` y `tls.key`                                                     | `docker/gateway/certs`                                |
-| `GATEWAY_SERVER_NAME`                                                              | Nombre de servidor del gateway                                                        | `_`                                                   |
-| `GATEWAY_HTTPS_REDIRECT_PORT`                                                      | Puerto, con los dos puntos, al que redirige el HTTP cuando no es el 443               | Vacío                                                 |
-| `GATEWAY_EXPONER_DOCS`                                                             | Expone Swagger UI y OpenAPI por el gateway                                            | `off`, y `on` en desarrollo y qa                      |
-| `GATEWAY_MAX_BODY_DEFAULT`                                                         | Tamaño máximo de una petición en la API                                               | `1m`                                                  |
-| `GATEWAY_MAX_BODY_UPLOAD`                                                          | Tamaño máximo en las rutas de carga de archivos                                       | `25m`                                                 |
-| `RATE_LOGIN`                                                                       | Límite de intentos de inicio de sesión y cambio de contraseña por dirección           | `10r/m`, y `240r/m` en desarrollo                     |
-| `RATE_REFRESH`                                                                     | Límite de renovaciones del token                                                      | `30r/m`                                               |
-| `RATE_MFA`                                                                         | Límite de verificaciones de la verificación en dos pasos                              | `10r/m`                                               |
-| `RATE_REGISTRO`                                                                    | Límite de registros de pacientes                                                      | `5r/m`                                                |
-| `RATE_VERIFICACION`                                                                | Límite de consultas a la verificación pública de documentos                           | `30r/m`                                               |
-| `APP_COMPRAS_LIMITE_FINANZAS`                                                      | Monto hasta el cual finanzas aprueba una orden de compra, en soles                    | `5000.00`                                             |
-| `APP_COMPRAS_CRON_VENCIMIENTOS`                                                    | Expresión cron del aviso diario de cuentas por pagar vencidas                         | `0 0 8 * * *`                                         |
-| `APP_CONTABILIDAD_PLAZO_COBRO_ASEGURADORA_DIAS`                                    | Días tras un consumo en que se espera el cobro de la aseguradora en el flujo de caja  | `30`                                                  |
-| `RATE_GENERAL`                                                                     | Límite del resto de la API                                                            | `600r/m`, y `12000r/m` en desarrollo                  |
-| `RATE_BURST_AUTH`                                                                  | Ráfaga permitida en las rutas de autenticación                                        | `5`, y `60` en desarrollo                             |
-| `RATE_BURST_GENERAL`                                                               | Ráfaga permitida en el resto de la API                                                | `100`, y `1000` en desarrollo                         |
-| `STORAGE_TIPO`                                                                     | Almacén de archivos, `s3` o `local`                                                   | `local`, y `s3` en `prod` y en Compose                |
-| `STORAGE_ENDPOINT`                                                                 | URL interna de la puerta de enlace S3, obligatoria con `s3`                           | `http://storage:8333` en Compose                      |
-| `STORAGE_ENDPOINT_PUBLICO`                                                         | Host público para firmar direcciones prefirmadas, opcional                            | Vacío                                                 |
-| `STORAGE_ACCESS_KEY`                                                               | Clave de acceso S3, sin valor por defecto en producción                               | Solo en `compose.dev.yaml` y `compose.qa.yaml`        |
-| `STORAGE_SECRET_KEY`                                                               | Clave secreta S3, sin valor por defecto en producción                                 | Solo en `compose.dev.yaml` y `compose.qa.yaml`        |
-| `STORAGE_REGION`                                                                   | Región que firman las peticiones S3                                                   | `us-east-1`                                           |
-| `STORAGE_DIRECTORIO_LOCAL`                                                         | Directorio del almacén con `STORAGE_TIPO=local`                                       | Una carpeta temporal                                  |
-| `TURN_SECRET`                                                                      | Secreto compartido para las credenciales TURN, obligatorio en producción              | Solo en desarrollo y QA                               |
-| `TURN_HOST`                                                                        | Host público del servidor TURN que reciben los navegadores                            | `localhost`                                           |
-| `TURN_PORT`                                                                        | Puerto de coturn                                                                      | `3478`                                                |
-| `TURN_EXTERNAL_IP`                                                                 | Dirección pública del servidor TURN en producción                                     | Vacío                                                 |
-| `TURN_RELAY_MIN`, `TURN_RELAY_MAX`                                                 | Rango de puertos UDP de relé                                                          | `49160` a `49200`                                     |
-| `TELEMEDICINA_VENTANA_ANTES_MIN`                                                   | Minutos antes de la hora en que se habilita la sala                                   | `10`, `43200` en desarrollo                           |
-| `STORAGE_ADMIN_PORT`                                                               | Puerto de la interfaz de SeaweedFS en `127.0.0.1`, solo en desarrollo                 | `9333`                                                |
-| `CANALES_URL_BASE`                                                                 | URL pública de la aplicación que llevan los mensajes, obligatoria en `prod`           | `http://localhost:4200` en desarrollo                 |
-| `CANALES_SECRETO`                                                                  | Secreto para firmar los enlaces de baja y los códigos, obligatorio en `prod`          | Solo en desarrollo y QA                               |
-| `CANALES_WEBHOOK_SECRETO`                                                          | Secreto de la firma del webhook de entrega, sin él se rechaza todo                    | Vacío, y un valor de desarrollo en `compose.dev.yaml` |
-| `CANALES_LIMITE_POR_HORA`                                                          | Máximo de avisos por hora y destinatario en cada canal                                | `10`                                                  |
-| `CANALES_CENTRO`                                                                   | Nombre del centro que firman los mensajes                                             | `TuSalud`                                             |
-| `CANALES_CORREO_PROVEEDOR`                                                         | Proveedor del correo, `smtp` o `simulado`                                             | `simulado`, y `smtp` en desarrollo con Mailpit        |
-| `CANALES_CORREO_REMITENTE`                                                         | Dirección del remitente                                                               | `no-responder@tusalud.local`                          |
-| `SMTP_HOST`, `SMTP_PORT`                                                           | Servidor SMTP que usa la API con `smtp`                                               | `mailpit` y `1025` en desarrollo                      |
-| `SMTP_USUARIO`, `SMTP_CLAVE`                                                       | Credenciales del servidor SMTP                                                        | Vacío                                                 |
-| `CANALES_SMS_PROVEEDOR`                                                            | Proveedor de SMS, `http` o `simulado`                                                 | `simulado`                                            |
-| `CANALES_SMS_URL`, `_AUTENTICACION`, `_USUARIO`, `_SECRETO`, `_FORMATO`, `_CUERPO` | Configuración del proveedor HTTP de SMS                                               | Vacío                                                 |
-| `CANALES_WHATSAPP_PROVEEDOR`                                                       | Proveedor de WhatsApp, `http` o `simulado`                                            | `simulado`                                            |
-| `CANALES_WHATSAPP_URL`, `_SECRETO`, `_CUERPO`                                      | Configuración del proveedor HTTP de WhatsApp                                          | Vacío                                                 |
-| `MAILPIT_UI_PORT`                                                                  | Puerto de Mailpit en el loopback, solo en desarrollo                                  | `8025`                                                |
-| `RESPALDO_TOKEN`                                                                   | Secreto con el que el contenedor de respaldos reporta a la API, obligatorio en `prod` | Solo en desarrollo y QA                               |
-| `FACTURACION_CERTIFICADO_RUTA`, `_CLAVE`, `_ALIAS`                                 | Certificado digital PKCS12 con el que se firman los comprobantes                      | Certificado de prueba fuera de producción             |
-| `FACTURACION_SOL_USUARIO`, `_CLAVE`                                                | Credenciales SOL para el envío a SUNAT                                                | Sin ellas solo funciona la simulación                 |
-| `FACTURACION_COLA_HABILITADA`, `FACTURACION_CRON_RESUMEN`                          | Tarea de envío y horario del resumen diario                                           | Activa y a las 00:30                                  |
-| `PRIVACIDAD_RETENCION_HABILITADA`, `PRIVACIDAD_CRON_RETENCION`                     | Tarea diaria de retención de datos                                                    | Activa y a las 02:15                                  |
-| `RESPALDO_PASSPHRASE`                                                              | Clave con la que se cifran los respaldos, sin ella el contenedor no arranca           | Solo en desarrollo y QA                               |
-| `BACKUP_CRON`, `TEST_CRON`                                                         | Horario del respaldo y de la prueba de restauración                                   | `0 2 * * *` y `30 3 * * 0`                            |
-| `RETENCION_DIARIOS`, `RETENCION_SEMANALES`, `RETENCION_MENSUALES`                  | Cuántos respaldos se conservan de cada categoría                                      | `7`, `4` y `6`                                        |
-| `RESPALDO_REMOTO_ENDPOINT`, `_BUCKET`, `_ACCESS_KEY`, `_SECRET_KEY`                | Segundo destino S3 opcional para los respaldos                                        | Vacío                                                 |
-| `RESPALDOS_MAX_HORAS`, `RESPALDOS_MAX_DIAS_SIN_PRUEBA`                             | Antigüedad máxima de un respaldo y de una prueba antes de alertar                     | `26` y `8`                                            |
-| `POSTGRES_PORT`                                                                    | Puerto de PostgreSQL en el host                                                       | `5432`                                                |
-| `JAEGER_UI_PORT`                                                                   | Puerto de la interfaz de Jaeger en el host                                            | `16686`                                               |
-| `OTEL_GRPC_PORT`                                                                   | Puerto OTLP gRPC del Collector en el host                                             | `4317`                                                |
-| `OTEL_HTTP_PORT`                                                                   | Puerto OTLP HTTP del Collector en el host                                             | `4318`                                                |
-| `OTEL_HEALTH_PORT`                                                                 | Puerto del healthcheck del Collector en el host                                       | `13133`                                               |
-| `PGADMIN_PORT`                                                                     | Puerto de pgAdmin en el host                                                          | `5050`                                                |
-| `PGADMIN_EMAIL`                                                                    | Usuario de pgAdmin                                                                    | `admin@tusalud.com`                                   |
-| `PGADMIN_PASSWORD`                                                                 | Clave de pgAdmin                                                                      | `admin`                                               |
+| Variable                                                                                                                                  | Uso                                                                                                 | Valor por defecto                                               |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `SPRING_PROFILES_ACTIVE`                                                                                                                  | Perfil de Spring en tiempo de ejecución                                                             | El perfil de Maven                                              |
+| `DB_URL`                                                                                                                                  | URL JDBC de PostgreSQL, obligatoria en `prod`                                                       | Según el perfil                                                 |
+| `DB_USERNAME`                                                                                                                             | Usuario de PostgreSQL, obligatorio en `prod`                                                        | `postgres`                                                      |
+| `DB_PASSWORD`                                                                                                                             | Clave de PostgreSQL, obligatoria en `prod`                                                          | `postgres`                                                      |
+| `JWT_SECRET`                                                                                                                              | Clave HMAC en Base64 de al menos 256 bits, obligatoria en `prod`                                    | Solo fuera de `prod`                                            |
+| `JWT_EXPIRATION_MS`                                                                                                                       | Vigencia del token de acceso en milisegundos                                                        | `900000`                                                        |
+| `JWT_REFRESH_EXPIRATION_MS`                                                                                                               | Vigencia del refresh token en milisegundos                                                          | `604800000`                                                     |
+| `MFA_CLAVE_CIFRADO`                                                                                                                       | Clave para cifrar los secretos de la verificación en dos pasos, obligatoria en `prod`               | Solo fuera de `prod`                                            |
+| `PAGOS_SIMULACION_HABILITADA`                                                                                                             | Habilita la confirmación simulada de pagos con Yape y Plin                                          | `true`, y `false` en `prod`                                     |
+| `CORS_ALLOWED_ORIGINS`                                                                                                                    | Orígenes permitidos, separados por comas                                                            | `http://localhost:4200`                                         |
+| `SERVER_PORT`                                                                                                                             | Puerto HTTP de la API dentro del contenedor                                                         | `8080`                                                          |
+| `JDK_JAVA_OPTIONS`                                                                                                                        | Opciones adicionales de la JVM de la API                                                            | `-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError`           |
+| `OTEL_SERVICE_NAME`                                                                                                                       | Nombre del servicio en las trazas                                                                   | `tusalud-api`                                                   |
+| `APP_PORT`                                                                                                                                | Puerto de la API en el host, solo en desarrollo                                                     | `8080`                                                          |
+| `WEB_PORT`                                                                                                                                | Puerto del gateway en el host en desarrollo                                                         | `4200`                                                          |
+| `GATEWAY_PORT`                                                                                                                            | Puerto HTTP del gateway en el host en producción                                                    | `80`                                                            |
+| `GATEWAY_TLS_PORT`                                                                                                                        | Puerto HTTPS del gateway en el host                                                                 | `443`, y `4443` en desarrollo                                   |
+| `GATEWAY_TLS`                                                                                                                             | Activa HTTPS con los certificados de `GATEWAY_CERTS_DIR`                                            | `off`                                                           |
+| `GATEWAY_CERTS_DIR`                                                                                                                       | Carpeta con `tls.crt` y `tls.key`                                                                   | `docker/gateway/certs`                                          |
+| `GATEWAY_SERVER_NAME`                                                                                                                     | Nombre de servidor del gateway                                                                      | `_`                                                             |
+| `GATEWAY_HTTPS_REDIRECT_PORT`                                                                                                             | Puerto, con los dos puntos, al que redirige el HTTP cuando no es el 443                             | Vacío                                                           |
+| `GATEWAY_EXPONER_DOCS`                                                                                                                    | Expone Swagger UI y OpenAPI por el gateway                                                          | `off`, y `on` en desarrollo y qa                                |
+| `GATEWAY_MAX_BODY_DEFAULT`                                                                                                                | Tamaño máximo de una petición en la API                                                             | `1m`                                                            |
+| `GATEWAY_MAX_BODY_UPLOAD`                                                                                                                 | Tamaño máximo en las rutas de carga de archivos                                                     | `25m`                                                           |
+| `RATE_LOGIN`                                                                                                                              | Límite de intentos de inicio de sesión y cambio de contraseña por dirección                         | `10r/m`, y `240r/m` en desarrollo                               |
+| `RATE_REFRESH`                                                                                                                            | Límite de renovaciones del token                                                                    | `30r/m`                                                         |
+| `RATE_MFA`                                                                                                                                | Límite de verificaciones de la verificación en dos pasos                                            | `10r/m`                                                         |
+| `RATE_REGISTRO`                                                                                                                           | Límite de registros de pacientes                                                                    | `5r/m`                                                          |
+| `RATE_VERIFICACION`                                                                                                                       | Límite de consultas a la verificación pública de documentos                                         | `30r/m`                                                         |
+| `APP_COMPRAS_LIMITE_FINANZAS`                                                                                                             | Monto hasta el cual finanzas aprueba una orden de compra, en soles                                  | `5000.00`                                                       |
+| `APP_COMPRAS_CRON_VENCIMIENTOS`                                                                                                           | Expresión cron del aviso diario de cuentas por pagar vencidas                                       | `0 0 8 * * *`                                                   |
+| `APP_CONTABILIDAD_PLAZO_COBRO_ASEGURADORA_DIAS`                                                                                           | Días tras un consumo en que se espera el cobro de la aseguradora en el flujo de caja                | `30`                                                            |
+| `RATE_GENERAL`                                                                                                                            | Límite del resto de la API                                                                          | `600r/m`, y `12000r/m` en desarrollo                            |
+| `RATE_BURST_AUTH`                                                                                                                         | Ráfaga permitida en las rutas de autenticación                                                      | `5`, y `60` en desarrollo                                       |
+| `RATE_BURST_GENERAL`                                                                                                                      | Ráfaga permitida en el resto de la API                                                              | `100`, y `1000` en desarrollo                                   |
+| `STORAGE_TIPO`                                                                                                                            | Almacén de archivos, `s3` o `local`                                                                 | `local`, y `s3` en `prod` y en Compose                          |
+| `STORAGE_ENDPOINT`                                                                                                                        | URL interna de la puerta de enlace S3, obligatoria con `s3`                                         | `http://storage:8333` en Compose                                |
+| `STORAGE_ENDPOINT_PUBLICO`                                                                                                                | Host público para firmar direcciones prefirmadas, opcional                                          | Vacío                                                           |
+| `STORAGE_ACCESS_KEY`                                                                                                                      | Clave de acceso S3, sin valor por defecto en producción                                             | Solo en `compose.dev.yaml` y `compose.qa.yaml`                  |
+| `STORAGE_SECRET_KEY`                                                                                                                      | Clave secreta S3, sin valor por defecto en producción                                               | Solo en `compose.dev.yaml` y `compose.qa.yaml`                  |
+| `STORAGE_REGION`                                                                                                                          | Región que firman las peticiones S3                                                                 | `us-east-1`                                                     |
+| `STORAGE_DIRECTORIO_LOCAL`                                                                                                                | Directorio del almacén con `STORAGE_TIPO=local`                                                     | Una carpeta temporal                                            |
+| `TURN_SECRET`                                                                                                                             | Secreto compartido para las credenciales TURN, obligatorio en producción                            | Solo en desarrollo y QA                                         |
+| `TURN_HOST`                                                                                                                               | Host público del servidor TURN que reciben los navegadores                                          | `localhost`                                                     |
+| `TURN_PORT`                                                                                                                               | Puerto de coturn                                                                                    | `3478`                                                          |
+| `TURN_EXTERNAL_IP`                                                                                                                        | Dirección pública del servidor TURN en producción                                                   | Vacío                                                           |
+| `TURN_RELAY_MIN`, `TURN_RELAY_MAX`                                                                                                        | Rango de puertos UDP de relé                                                                        | `49160` a `49200`                                               |
+| `TELEMEDICINA_VENTANA_ANTES_MIN`                                                                                                          | Minutos antes de la hora en que se habilita la sala                                                 | `10`, `43200` en desarrollo                                     |
+| `STORAGE_ADMIN_PORT`                                                                                                                      | Puerto de la interfaz de SeaweedFS en `127.0.0.1`, solo en desarrollo                               | `9333`                                                          |
+| `CANALES_URL_BASE`                                                                                                                        | URL pública de la aplicación que llevan los mensajes, obligatoria en `prod`                         | `http://localhost:4200` en desarrollo                           |
+| `CANALES_SECRETO`                                                                                                                         | Secreto para firmar los enlaces de baja y los códigos, obligatorio en `prod`                        | Solo en desarrollo y QA                                         |
+| `CANALES_WEBHOOK_SECRETO`                                                                                                                 | Secreto de la firma del webhook de entrega, sin él se rechaza todo                                  | Vacío, y un valor de desarrollo en `compose.dev.yaml`           |
+| `CANALES_LIMITE_POR_HORA`                                                                                                                 | Máximo de avisos por hora y destinatario en cada canal                                              | `10`                                                            |
+| `CANALES_CENTRO`                                                                                                                          | Nombre del centro que firman los mensajes                                                           | `TuSalud`                                                       |
+| `CANALES_CORREO_PROVEEDOR`                                                                                                                | Proveedor del correo, `smtp` o `simulado`                                                           | `simulado`, y `smtp` en desarrollo con Mailpit                  |
+| `CANALES_CORREO_REMITENTE`                                                                                                                | Dirección del remitente                                                                             | `no-responder@tusalud.local`                                    |
+| `SMTP_HOST`, `SMTP_PORT`                                                                                                                  | Servidor SMTP que usa la API con `smtp`                                                             | `mailpit` y `1025` en desarrollo                                |
+| `SMTP_USUARIO`, `SMTP_CLAVE`                                                                                                              | Credenciales del servidor SMTP                                                                      | Vacío                                                           |
+| `CANALES_SMS_PROVEEDOR`                                                                                                                   | Proveedor de SMS, `http` o `simulado`                                                               | `simulado`                                                      |
+| `CANALES_SMS_URL`, `_AUTENTICACION`, `_USUARIO`, `_SECRETO`, `_FORMATO`, `_CUERPO`                                                        | Configuración del proveedor HTTP de SMS                                                             | Vacío                                                           |
+| `CANALES_WHATSAPP_PROVEEDOR`                                                                                                              | Proveedor de WhatsApp, `http` o `simulado`                                                          | `simulado`                                                      |
+| `CANALES_WHATSAPP_URL`, `_SECRETO`, `_CUERPO`                                                                                             | Configuración del proveedor HTTP de WhatsApp                                                        | Vacío                                                           |
+| `MAILPIT_UI_PORT`                                                                                                                         | Puerto de Mailpit en el loopback, solo en desarrollo                                                | `8025`                                                          |
+| `RESPALDO_TOKEN`                                                                                                                          | Secreto con el que el contenedor de respaldos reporta a la API, obligatorio en `prod`               | Solo en desarrollo y QA                                         |
+| `FACTURACION_CERTIFICADO_RUTA`, `_CLAVE`, `_ALIAS`                                                                                        | Certificado digital PKCS12 con el que se firman los comprobantes                                    | Certificado de prueba fuera de producción                       |
+| `FACTURACION_SOL_USUARIO`, `_CLAVE`                                                                                                       | Credenciales SOL para el envío a SUNAT                                                              | Sin ellas solo funciona la simulación                           |
+| `FACTURACION_COLA_HABILITADA`, `FACTURACION_CRON_RESUMEN`                                                                                 | Tarea de envío y horario del resumen diario                                                         | Activa y a las 00:30                                            |
+| `PRIVACIDAD_RETENCION_HABILITADA`, `PRIVACIDAD_CRON_RETENCION`                                                                            | Tarea diaria de retención de datos                                                                  | Activa y a las 02:15                                            |
+| `RESPALDO_PASSPHRASE`                                                                                                                     | Clave con la que se cifran los respaldos, sin ella el contenedor no arranca                         | Solo en desarrollo y QA                                         |
+| `BACKUP_CRON`, `TEST_CRON`                                                                                                                | Horario del respaldo y de la prueba de restauración                                                 | `0 2 * * *` y `30 3 * * 0`                                      |
+| `RETENCION_DIARIOS`, `RETENCION_SEMANALES`, `RETENCION_MENSUALES`                                                                         | Cuántos respaldos se conservan de cada categoría                                                    | `7`, `4` y `6`                                                  |
+| `RESPALDO_REMOTO_ENDPOINT`, `_BUCKET`, `_ACCESS_KEY`, `_SECRET_KEY`                                                                       | Segundo destino S3 opcional para los respaldos                                                      | Vacío                                                           |
+| `RESPALDOS_MAX_HORAS`, `RESPALDOS_MAX_DIAS_SIN_PRUEBA`                                                                                    | Antigüedad máxima de un respaldo y de una prueba antes de alertar                                   | `26` y `8`                                                      |
+| `POSTGRES_PORT`                                                                                                                           | Puerto de PostgreSQL en el host                                                                     | `5432`                                                          |
+| `JAEGER_UI_PORT`                                                                                                                          | Puerto de la interfaz de Jaeger en el host                                                          | `16686`                                                         |
+| `OTEL_GRPC_PORT`                                                                                                                          | Puerto OTLP gRPC del Collector en el host                                                           | `4317`                                                          |
+| `OTEL_HTTP_PORT`                                                                                                                          | Puerto OTLP HTTP del Collector en el host                                                           | `4318`                                                          |
+| `OTEL_HEALTH_PORT`                                                                                                                        | Puerto del healthcheck del Collector en el host                                                     | `13133`                                                         |
+| `PGADMIN_PORT`                                                                                                                            | Puerto de pgAdmin en el host                                                                        | `5050`                                                          |
+| `PGADMIN_EMAIL`                                                                                                                           | Usuario de pgAdmin                                                                                  | `admin@tusalud.com`                                             |
+| `PGADMIN_PASSWORD`                                                                                                                        | Clave de pgAdmin                                                                                    | `admin`                                                         |
+| `DB_POOL_MAX_SIZE`, `DB_POOL_MIN_IDLE`                                                                                                    | Tamaño máximo del pool de conexiones y conexiones inactivas mínimas, solo en `prod`                 | `20` y `5`                                                      |
+| `RATE_KEY`                                                                                                                                | Clave con la que el gateway cuenta las peticiones                                                   | La dirección remota del cliente                                 |
+| `STORAGE_BUCKET_AVATARES`, `STORAGE_BUCKET_IMAGENES`, `STORAGE_BUCKET_DOCUMENTOS`, `STORAGE_BUCKET_REPORTES`, `STORAGE_BUCKET_PLANTILLAS` | Nombre de cada bucket del almacén                                                                   | `avatares`, `imagenes`, `documentos`, `reportes` y `plantillas` |
+| `STORAGE_VOLUME_MB`                                                                                                                       | Tamaño límite de cada volumen de SeaweedFS en megabytes                                             | `1024`                                                          |
+| `TURN_HABILITADO`                                                                                                                         | Incluye el servidor TURN entre los servidores que la API entrega a los navegadores                  | `true`                                                          |
+| `TELEMEDICINA_VENTANA_DESPUES_MIN`                                                                                                        | Minutos después de la hora en que se cierra la sala                                                 | `30`                                                            |
+| `DOCUMENTOS_URL_VERIFICACION`                                                                                                             | Dirección base que lleva el código QR de los documentos                                             | `http://localhost:4600/verificar/`                              |
+| `DESCANSO_MAX_DIAS`, `DESCANSO_RETROACTIVO_DIAS`                                                                                          | Días máximos de un descanso médico y días hacia atrás que se admiten                                | `30` y `3`                                                      |
+| `VERIFICACION_POR_MINUTO`                                                                                                                 | Consultas por minuto que admite la API a la verificación pública de documentos                      | `20`                                                            |
+| `CANALES_WORKER_HABILITADO`                                                                                                               | Activa el envío de avisos por los canales externos                                                  | `true`                                                          |
+| `CANALES_CORREO_NOMBRE`                                                                                                                   | Nombre del remitente del correo                                                                     | `TuSalud`                                                       |
+| `SMTP_AUTENTICACION`, `SMTP_STARTTLS`                                                                                                     | Autenticación y STARTTLS del servidor SMTP, en Compose                                              | `true` y `true`                                                 |
+| `CANALES_SMS_CAMPO_ID`                                                                                                                    | Campo de la respuesta del proveedor de SMS que trae el identificador del mensaje                    | `sid`                                                           |
+| `CANALES_WHATSAPP_AUTENTICACION`, `CANALES_WHATSAPP_USUARIO`, `CANALES_WHATSAPP_FORMATO`, `CANALES_WHATSAPP_CAMPO_ID`                     | Autenticación, usuario, formato del cuerpo y campo del identificador del proveedor HTTP de WhatsApp | `BEARER`, vacío, `JSON` y `messages.0.id`                       |
+| `FACTURACION_SEDE`                                                                                                                        | Sede que se usa cuando una operación no indica otra                                                 | `PRINCIPAL`                                                     |
+| `FACTURACION_URL_CONSULTA`                                                                                                                | Dirección pública de consulta de validez de comprobantes                                            | La consulta pública de SUNAT                                    |
+| `FACTURACION_CERTIFICADO_PRUEBA`                                                                                                          | Genera un certificado de prueba autofirmado si no hay uno configurado                               | `true`, y `false` en `prod`                                     |
+| `FACTURACION_COLA_INTERVALO_MS`                                                                                                           | Intervalo de la cola de envío a SUNAT en milisegundos                                               | `10000`                                                         |
+| `RESPALDOS_VIGILANCIA_HABILITADA`                                                                                                         | Activa la tarea que vigila la antigüedad de los respaldos                                           | `true`                                                          |
+| `ITERACIONES_CLAVE`                                                                                                                       | Iteraciones de la derivación de clave con la que se cifran los respaldos                            | `200000`, y `10000` en desarrollo y qa                          |
+
+### Propiedades sin variable de entorno propia
+
+Estas propiedades de `application.yaml` o de los servicios se pueden cambiar con la variable que Spring deriva de su nombre, por ejemplo `APP_PEDIATRIA_TOLERANCIA_ATRASO_DIAS`, o con un argumento de la JVM.
+
+| Propiedad                                   | Uso                                                                                            | Valor por defecto |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------- |
+| `app.almacen.cron-alertas`                  | Horario de las alertas diarias del almacén                                                     | `0 0 7 * * *`     |
+| `app.canales.intervalo-cola-ms`             | Intervalo de la cola de entregas de avisos en milisegundos                                     | `10000`           |
+| `app.cronicos.alerta-cron`                  | Horario del aviso de controles vencidos de planes de tratamiento                               | `0 0 7 * * *`     |
+| `app.cronicos.alertas-habilitadas`          | Activa el aviso de controles vencidos                                                          | `true`            |
+| `app.pediatria.recordatorios-cron`          | Horario de los recordatorios de vacunación                                                     | `0 0 8 * * *`     |
+| `app.pediatria.tolerancia-atraso-dias`      | Días de tolerancia antes de considerar atrasada una dosis                                      | `30`              |
+| `app.pediatria.ventana-enfermeria-horas`    | Ventana en horas de una atención o un ingreso para que enfermería vea al paciente              | `24`              |
+| `app.quirofano.alertas-cron`                | Horario de las alertas diarias de esterilización                                               | `0 0 7 * * *`     |
+| `app.respaldos.intervalo-vigilancia-ms`     | Intervalo de la vigilancia de respaldos en milisegundos                                        | `3600000`         |
+| `app.respaldos.rpo-objetivo-horas`          | Objetivo de punto de recuperación que muestra la pantalla de respaldos                         | `24`              |
+| `app.respaldos.rto-objetivo-minutos`        | Objetivo de tiempo de recuperación que muestra la pantalla de respaldos                        | `60`              |
+| `app.privacidad.horas-notificar-autoridad`  | Horas desde la detección de un incidente de datos hasta el plazo para notificar a la autoridad | `48`              |
+| `app.seguridad.accesos-denegados-umbral`    | Accesos denegados en diez minutos que generan un evento de seguridad                           | `5`               |
+| `app.seguridad.login-fallidos-umbral`       | Inicios de sesión fallidos en quince minutos que generan un evento                             | `5`               |
+| `app.seguridad.descargas-umbral`            | Descargas en cinco minutos que generan un evento                                               | `30`              |
+| `app.pagos.expiracion-qr-minutos`           | Minutos de vigencia de un código QR de pago                                                    | `5`               |
+| `app.telemedicina.ticket-ttl-seg`           | Segundos de vigencia del ticket de la sala                                                     | `30`              |
+| `app.telemedicina.max-mensajes-por-ventana` | Mensajes permitidos por ventana de diez segundos en la sala de señalización                    | `120`             |
+| `app.telemedicina.inactividad-seg`          | Segundos de inactividad tras los que se cierra una sala                                        | `90`              |
+| `app.telemedicina.turn.ttl-seg`             | Segundos de vigencia de las credenciales TURN                                                  | `3600`            |
+| `app.canales.codigo.ttl-min`                | Minutos de vigencia del código de verificación de un canal                                     | `10`              |
+| `app.canales.codigo.max-intentos`           | Intentos permitidos al ingresar el código                                                      | `5`               |
+| `app.canales.codigo.reenvios-por-hora`      | Reenvíos del código por hora                                                                   | `5`               |
+| `app.canales.reintentos.maximo`             | Reintentos de una entrega fallida                                                              | `5`               |
+| `app.facturacion.cola.intentos-maximos`     | Intentos de envío de un comprobante a SUNAT                                                    | `6`               |
+| `app.documentos.maximo-concurrentes`        | Exportaciones en curso por usuario                                                             | `3`               |
+| `app.documentos.maximo-por-hora`            | Exportaciones por hora y usuario                                                               | `20`              |
