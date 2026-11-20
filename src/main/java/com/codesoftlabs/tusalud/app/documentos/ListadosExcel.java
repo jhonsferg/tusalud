@@ -20,6 +20,7 @@ import com.codesoftlabs.tusalud.app.services.interfaces.ProductoService;
 import com.codesoftlabs.tusalud.app.services.interfaces.TurnoPersonalService;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -35,11 +36,14 @@ public class ListadosExcel {
     private final AusenciaService ausenciaService;
     private final TurnoPersonalService turnoService;
     private final CitaService citaService;
+    private final com.codesoftlabs.tusalud.app.services.compras.ReportesComprasService comprasService;
+    private final com.codesoftlabs.tusalud.app.services.compras.OrdenCompraService ordenCompraService;
 
     public Listado armar(UsuarioPrincipal actor, TipoDocumento tipo, ParametrosDocumento parametros) {
         return switch (tipo) {
             case LISTADO_COMPROBANTES -> comprobantes(parametros);
             case KARDEX -> kardex(parametros);
+            case REPORTE_COMPRAS -> compras(parametros);
             case STOCK -> stock(actor, parametros);
             case AUSENCIAS -> ausencias(actor, parametros);
             case TURNOS -> turnos(parametros);
@@ -82,6 +86,57 @@ public class ListadosExcel {
                     c.cajeroNombre());
         }
         return new Listado(List.of(hoja), "comprobantes-" + rango[0] + "-a-" + rango[1], "Listado de comprobantes");
+    }
+
+    private Listado compras(ParametrosDocumento p) {
+        LocalDate[] rango = p.rango(LocalDate.now().minusDays(90), LocalDate.now());
+        UUID proveedorId = p.uuid("proveedorId");
+        HojaExcel resumen = HojaExcel.de(
+                "Por proveedor",
+                "Proveedor",
+                "RUC",
+                "Órdenes",
+                "Monto ordenado",
+                "Monto recibido",
+                "Facturado",
+                "Pagado",
+                "Saldo");
+        for (var r : comprasService.porProveedor(rango[0], rango[1], proveedorId)) {
+            resumen.fila(
+                    r.proveedorNombre(),
+                    r.proveedorRuc(),
+                    r.ordenes(),
+                    r.montoOrdenado(),
+                    r.montoRecibido(),
+                    r.facturado(),
+                    r.pagado(),
+                    r.saldo());
+        }
+        HojaExcel ordenes = HojaExcel.de(
+                "Órdenes",
+                "Orden",
+                "Estado",
+                "Proveedor",
+                "Total",
+                "Creada por",
+                "Requisición",
+                "Creada",
+                "Aprobada",
+                "Recibido %");
+        for (var o : ordenCompraService.listar(null, proveedorId, rango[0], rango[1])) {
+            ordenes.fila(
+                    o.codigo() == null ? "Borrador" : o.codigo(),
+                    o.estado().name(),
+                    o.proveedorNombre(),
+                    o.total(),
+                    o.creadaPorNombre(),
+                    o.requisicionCodigo() == null ? "" : o.requisicionCodigo(),
+                    o.creadaEn(),
+                    o.aprobadaEn() == null ? "" : o.aprobadaEn(),
+                    o.porcentajeRecibido());
+        }
+        return new Listado(
+                List.of(resumen, ordenes), "compras-" + rango[0] + "-a-" + rango[1], "Compras por proveedor");
     }
 
     private Listado kardex(ParametrosDocumento p) {

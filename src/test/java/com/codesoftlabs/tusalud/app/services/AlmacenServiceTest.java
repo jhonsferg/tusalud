@@ -206,13 +206,18 @@ class AlmacenServiceTest {
         assertThatThrownBy(() -> ingreso(producto.id(), "L-3", 100, 1)).isInstanceOf(ConflictException.class);
 
         ProveedorResponse proveedor = proveedorService.crear(new ProveedorRequest(
-                "2051234" + (1000 + ServiceTestFixture.siguiente() % 8999),
+                ServiceTestFixture.rucValido(),
                 "Proveedor",
                 null,
                 null,
                 null,
                 null,
-                false));
+                false,
+                null,
+                null,
+                null,
+                null,
+                null));
         ProductoResponse otro = producto("d", TipoProducto.MEDICAMENTO, 1);
         assertThatThrownBy(() -> almacenService.registrarIngreso(
                         almacen,
@@ -365,19 +370,20 @@ class AlmacenServiceTest {
                 .contains(bajo.id())
                 .doesNotContain(holgado.id());
 
-        String ruc = "2060000" + (1000 + ServiceTestFixture.siguiente() % 8999);
-        ProveedorResponse creado =
-                proveedorService.crear(new ProveedorRequest(ruc, "Droguería Prueba", "Ana", "999", null, null, null));
+        String ruc = ServiceTestFixture.rucValido();
+        ProveedorResponse creado = proveedorService.crear(new ProveedorRequest(
+                ruc, "Droguería Prueba", "Ana", "999", null, null, null, null, null, null, null, null));
         assertThat(creado.activo()).isTrue();
         assertThat(proveedorService.listar(ruc, true)).hasSize(1);
         assertThat(proveedorService.listar("drogue", false)).isEmpty();
-        assertThatThrownBy(
-                        () -> proveedorService.crear(new ProveedorRequest(ruc, "Otra", null, null, null, null, null)))
+        assertThatThrownBy(() -> proveedorService.crear(
+                        new ProveedorRequest(ruc, "Otra", null, null, null, null, null, null, null, null, null, null)))
                 .isInstanceOf(ConflictException.class);
         ProveedorResponse otro = proveedorService.crear(new ProveedorRequest(
-                "2070000" + (1000 + ServiceTestFixture.siguiente() % 8999), "Otra", null, null, null, null, null));
+                ServiceTestFixture.rucValido(), "Otra", null, null, null, null, null, null, null, null, null, null));
         assertThatThrownBy(() -> proveedorService.actualizar(
-                        otro.id(), new ProveedorRequest(ruc, "Otra", null, null, null, null, null)))
+                        otro.id(),
+                        new ProveedorRequest(ruc, "Otra", null, null, null, null, null, null, null, null, null, null)))
                 .isInstanceOf(ConflictException.class);
     }
 }

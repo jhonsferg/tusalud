@@ -34,6 +34,7 @@ public class AlmacenProveedorController {
     private final ProveedorService proveedorService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ALMACEN', 'ADMIN', 'FINANZAS', 'GERENCIA')")
     @Operation(
             summary = "Listar proveedores",
             description = "Permite buscar por razón social o RUC y filtrar por estado.")

@@ -63,6 +63,18 @@ public class ServiceTestFixture {
         return SECUENCIA.incrementAndGet();
     }
 
+    public static String rucValido() {
+        int[] pesos = {5, 4, 3, 2, 7, 6, 5, 4, 3, 2};
+        String base = String.format("20%08d", 10_000_000 + (int) (System.nanoTime() % 80_000_000L) + siguiente());
+        int suma = 0;
+        for (int i = 0; i < 10; i++) {
+            suma += (base.charAt(i) - '0') * pesos[i];
+        }
+        int digito = 11 - (suma % 11);
+        digito = digito == 10 ? 0 : digito == 11 ? 1 : digito;
+        return base + digito;
+    }
+
     public Rol rol(RolNombre nombre) {
         return rolRepository
                 .findByNombre(nombre)

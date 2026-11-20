@@ -8,7 +8,8 @@ public enum MotivoMovimiento {
     AJUSTE_NEGATIVO(TipoMovimiento.AJUSTE),
     AJUSTE_POSITIVO(TipoMovimiento.AJUSTE),
     DISPENSACION(TipoMovimiento.SALIDA),
-    ANULACION_DISPENSACION(TipoMovimiento.ENTRADA);
+    ANULACION_DISPENSACION(TipoMovimiento.ENTRADA),
+    DEVOLUCION_PROVEEDOR(TipoMovimiento.SALIDA);
 
     private final TipoMovimiento tipo;
 

@@ -11,7 +11,12 @@ public record ProveedorResponse(
         String telefono,
         String email,
         String direccion,
-        boolean activo) {
+        boolean activo,
+        int condicionPagoDias,
+        Integer plazoEntregaDias,
+        String banco,
+        String cuentaBancaria,
+        String notas) {
 
     public static ProveedorResponse from(Proveedor proveedor) {
         return new ProveedorResponse(
@@ -22,6 +27,11 @@ public record ProveedorResponse(
                 proveedor.getTelefono(),
                 proveedor.getEmail(),
                 proveedor.getDireccion(),
-                proveedor.isActivo());
+                proveedor.isActivo(),
+                proveedor.getCondicionPagoDias(),
+                proveedor.getPlazoEntregaDias(),
+                proveedor.getBanco(),
+                proveedor.getCuentaBancaria(),
+                proveedor.getNotas());
     }
 }

@@ -51,6 +51,21 @@ public class Proveedor {
     @Builder.Default
     private boolean activo = true;
 
+    @Column(name = "condicion_pago_dias", nullable = false)
+    private int condicionPagoDias;
+
+    @Column(name = "plazo_entrega_dias")
+    private Integer plazoEntregaDias;
+
+    @Column(length = 80)
+    private String banco;
+
+    @Column(name = "cuenta_bancaria", length = 40)
+    private String cuentaBancaria;
+
+    @Column(length = 300)
+    private String notas;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

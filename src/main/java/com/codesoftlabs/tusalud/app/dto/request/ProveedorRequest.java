@@ -2,6 +2,8 @@ package com.codesoftlabs.tusalud.app.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -31,4 +33,21 @@ public record ProveedorRequest(
         @Size(max = 200, message = "La dirección no puede superar 200 caracteres")
         String direccion,
 
-        Boolean activo) {}
+        Boolean activo,
+
+        @Min(value = 0, message = "La condición de pago no puede ser negativa")
+        @Max(value = 365, message = "La condición de pago no puede superar 365 días")
+        Integer condicionPagoDias,
+
+        @Min(value = 0, message = "El plazo de entrega no puede ser negativo")
+        @Max(value = 365, message = "El plazo de entrega no puede superar 365 días")
+        Integer plazoEntregaDias,
+
+        @Size(max = 80, message = "El banco no puede superar 80 caracteres")
+        String banco,
+
+        @Size(max = 40, message = "La cuenta no puede superar 40 caracteres")
+        String cuentaBancaria,
+
+        @Size(max = 300, message = "Las notas no pueden superar 300 caracteres")
+        String notas) {}

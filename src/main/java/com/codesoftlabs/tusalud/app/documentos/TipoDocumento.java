@@ -110,6 +110,20 @@ public enum TipoDocumento {
             Set.of(FormatoDocumento.XLSX),
             false,
             EnumSet.of(RolNombre.ROLE_CAJA, RolNombre.ROLE_ADMIN)),
+    ORDEN_COMPRA(
+            "orden-compra",
+            "orden-compra",
+            true,
+            Set.of(FormatoDocumento.PDF),
+            false,
+            EnumSet.of(RolNombre.ROLE_ALMACEN, RolNombre.ROLE_FINANZAS, RolNombre.ROLE_GERENCIA, RolNombre.ROLE_ADMIN)),
+    REPORTE_COMPRAS(
+            "reporte-compras",
+            null,
+            false,
+            Set.of(FormatoDocumento.XLSX),
+            false,
+            EnumSet.of(RolNombre.ROLE_FINANZAS, RolNombre.ROLE_GERENCIA, RolNombre.ROLE_ADMIN)),
     KARDEX(
             "kardex",
             null,

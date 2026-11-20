@@ -46,12 +46,14 @@ public class DocumentosClinicos {
     private final com.codesoftlabs.tusalud.app.repositories.LiquidacionRepository liquidacionRepository;
     private final com.codesoftlabs.tusalud.app.repositories.CuentaAseguradoraRepository cuentaAseguradoraRepository;
     private final HistoriaClinicaService historiaClinicaService;
+    private final com.codesoftlabs.tusalud.app.repositories.OrdenCompraRepository ordenCompraRepository;
 
     @Transactional(readOnly = true)
     public DocumentoPreparado preparar(UsuarioPrincipal actor, TipoDocumento tipo, UUID id) {
         return switch (tipo) {
             case COMPROBANTE -> comprobante(actor, id);
             case LIQUIDACION -> liquidacion(id);
+            case ORDEN_COMPRA -> ordenCompra(id);
             case RECETA -> receta(actor, id);
             case RESULTADOS_LABORATORIO -> resultadosLaboratorio(actor, id);
             case INFORME_IMAGEN -> informeImagen(actor, id);
@@ -131,6 +133,50 @@ public class DocumentosClinicos {
             ficha.total("Glosa", Formato.moneda(liquidacion.getMontoGlosa()));
         }
         return new DocumentoPreparado(ficha, null, id.toString(), "liquidacion-" + liquidacion.getCodigo());
+    }
+
+    private DocumentoPreparado ordenCompra(UUID id) {
+        com.codesoftlabs.tusalud.app.entities.OrdenCompra orden = ordenCompraRepository
+                .findConDetalle(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Orden de compra", "id", id));
+        FichaDocumento ficha = FichaDocumento.de(TipoDocumento.ORDEN_COMPRA)
+                .titulo("Orden de compra " + orden.codigoVisible(), "Adquisición de insumos y medicamentos")
+                .par("Proveedor", orden.getProveedor().getRazonSocial())
+                .par("RUC", orden.getProveedor().getRuc())
+                .par("Estado", orden.getEstado().name())
+                .par("Creada por", orden.getCreadaPor().getNombreCompleto())
+                .par(
+                        "Aprobada por",
+                        orden.getAprobadaPor() == null
+                                ? "Pendiente"
+                                : orden.getAprobadaPor().getNombreCompleto())
+                .par(
+                        "Aprobación",
+                        orden.getAprobadaEn() == null ? "Pendiente" : Formato.fechaHora(orden.getAprobadaEn()))
+                .par("Pago", orden.getCondicionPagoDias() == 0 ? "Contado" : orden.getCondicionPagoDias() + " días")
+                .par(
+                        "Entrega estimada",
+                        orden.getFechaEntregaEstimada() == null
+                                ? "Sin fecha"
+                                : Formato.fecha(orden.getFechaEntregaEstimada()));
+        orden.getItems()
+                .forEach(item -> ficha.fila(
+                        item.getProducto().getCodigo() + " · "
+                                + item.getProducto().getNombre(),
+                        String.valueOf(item.getCantidad()),
+                        Formato.moneda(item.getPrecioUnitario()),
+                        Formato.moneda(item.getSubtotal())));
+        ficha.total("Subtotal", Formato.moneda(orden.getSubtotal()))
+                .total("IGV 18 %", Formato.moneda(orden.getIgv()))
+                .total("Total", Formato.moneda(orden.getTotal()));
+        if (orden.getEstado() == com.codesoftlabs.tusalud.app.entities.enums.ComprasEnums.EstadoOrdenCompra.ANULADA) {
+            ficha.banner("ORDEN ANULADA").nota("Motivo de la anulación", Formato.texto(orden.getMotivoResolucion()));
+        } else if (orden.getHash() != null) {
+            ficha.nota("Huella de la orden", orden.getHash());
+        } else {
+            ficha.banner("BORRADOR SIN APROBAR");
+        }
+        return new DocumentoPreparado(ficha, null, id.toString(), "orden-compra-" + orden.codigoVisible());
     }
 
     private DocumentoPreparado receta(UsuarioPrincipal actor, UUID id) {
