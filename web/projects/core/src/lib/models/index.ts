@@ -31,3 +31,5 @@ export * from './facturacion.model';
 export * from './proteccion-datos.model';
 export * from './compras.model';
 export * from './contabilidad.model';
+export * from './pediatria.model';
+export * from './odontologia.model';

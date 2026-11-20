@@ -47,6 +47,8 @@ export type TipoNotificacion =
   | 'ORDEN_COMPRA_POR_APROBAR'
   | 'ORDEN_COMPRA_RESUELTA'
   | 'CUENTA_POR_PAGAR_VENCIDA'
+  | 'VACUNA_PROXIMA'
+  | 'PLAN_ODONTOLOGICO_PRESENTADO'
   | 'SISTEMA';
 
 export interface NotificacionResponse {

@@ -94,6 +94,29 @@ export const NAV_GROUPS: readonly NavGroup[] = [
     ],
   },
   {
+    title: 'Vacunas y salud dental',
+    items: [
+      {
+        label: 'Mi carné de vacunación',
+        icon: 'pi-shield',
+        link: '/mi-vacunacion',
+        roles: ['ROLE_PACIENTE'],
+      },
+      {
+        label: 'Mi crecimiento',
+        icon: 'pi-chart-line',
+        link: '/mi-crecimiento',
+        roles: ['ROLE_PACIENTE'],
+      },
+      {
+        label: 'Mi salud dental',
+        icon: 'pi-heart',
+        link: '/mi-salud-dental',
+        roles: ['ROLE_PACIENTE'],
+      },
+    ],
+  },
+  {
     title: 'Directorio',
     items: [
       {

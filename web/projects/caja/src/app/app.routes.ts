@@ -36,6 +36,12 @@ export const routes: Routes = [
           import('@tusalud/features/facturacion').then((m) => m.COMPROBANTES_ELECTRONICOS_ROUTES),
       },
       {
+        path: 'cobros-odontologicos',
+        canMatch: [roleGuard('ROLE_CAJA')],
+        loadChildren: () =>
+          import('@tusalud/features/odontologia').then((m) => m.COBROS_ODONTOLOGICOS_ROUTES),
+      },
+      {
         path: 'calendario',
         loadChildren: () => import('@tusalud/features/calendario').then((m) => m.CALENDARIO_ROUTES),
       },

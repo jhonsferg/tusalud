@@ -48,6 +48,8 @@ export const ICONO_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   ORDEN_COMPRA_POR_APROBAR: 'pi-shopping-cart',
   ORDEN_COMPRA_RESUELTA: 'pi-shopping-cart',
   CUENTA_POR_PAGAR_VENCIDA: 'pi-wallet',
+  VACUNA_PROXIMA: 'pi-shield',
+  PLAN_ODONTOLOGICO_PRESENTADO: 'pi-file-edit',
   INCIDENTE_DATOS: 'pi-exclamation-triangle',
   SISTEMA: 'pi-info-circle',
 };
@@ -100,6 +102,8 @@ export const COLOR_NOTIFICACION: Readonly<Record<TipoNotificacion, string>> = {
   ORDEN_COMPRA_POR_APROBAR: '#d97706',
   ORDEN_COMPRA_RESUELTA: '#16a34a',
   CUENTA_POR_PAGAR_VENCIDA: '#dc2626',
+  VACUNA_PROXIMA: '#0f766e',
+  PLAN_ODONTOLOGICO_PRESENTADO: '#1d4ed8',
   INCIDENTE_DATOS: '#dc2626',
   SISTEMA: '#64748b',
 };
