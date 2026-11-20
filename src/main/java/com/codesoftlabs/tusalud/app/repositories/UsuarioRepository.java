@@ -21,6 +21,12 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.roles WHERE u.id = :id")
     Optional<Usuario> findByIdConRoles(@Param("id") UUID id);
 
+    @Query("""
+            SELECT DISTINCT u FROM Usuario u JOIN u.roles r
+            WHERE r.nombre = :rol AND u.estado = com.codesoftlabs.tusalud.app.entities.enums.EstadoUsuario.ACTIVO
+            """)
+    List<Usuario> activosPorRol(@Param("rol") com.codesoftlabs.tusalud.app.entities.enums.RolNombre rol);
+
     @Query("SELECT COUNT(u) FROM Usuario u JOIN u.roles r WHERE r.nombre = :rol")
     long contarPorRol(@Param("rol") com.codesoftlabs.tusalud.app.entities.enums.RolNombre rol);
 

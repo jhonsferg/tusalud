@@ -9,7 +9,8 @@ public enum MotivoMovimiento {
     AJUSTE_POSITIVO(TipoMovimiento.AJUSTE),
     DISPENSACION(TipoMovimiento.SALIDA),
     ANULACION_DISPENSACION(TipoMovimiento.ENTRADA),
-    DEVOLUCION_PROVEEDOR(TipoMovimiento.SALIDA);
+    DEVOLUCION_PROVEEDOR(TipoMovimiento.SALIDA),
+    CONSUMO_QUIRURGICO(TipoMovimiento.SALIDA);
 
     private final TipoMovimiento tipo;
 

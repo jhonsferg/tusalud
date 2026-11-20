@@ -40,6 +40,11 @@ public final class PlantillasPorDefecto {
                 TipoNotificacion.DOCUMENTO_EMITIDO,
                 new Texto("Tiene un documento nuevo", "Se emitió un documento a su nombre."));
         TEXTOS.put(
+                TipoNotificacion.CIRUGIA_PROGRAMADA,
+                new Texto(
+                        "Tiene un procedimiento programado",
+                        "Se programó un procedimiento a su nombre. Revise los detalles en la aplicación."));
+        TEXTOS.put(
                 TipoNotificacion.VACUNA_PROXIMA,
                 new Texto(
                         "Tiene una vacuna próxima",

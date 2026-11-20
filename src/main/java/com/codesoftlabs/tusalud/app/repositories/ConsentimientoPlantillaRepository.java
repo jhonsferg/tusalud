@@ -12,4 +12,6 @@ public interface ConsentimientoPlantillaRepository extends JpaRepository<Consent
     List<ConsentimientoPlantilla> findByActivaTrueOrderByNombreAsc();
 
     boolean existsByCodigoIgnoreCase(String codigo);
+
+    java.util.Optional<com.codesoftlabs.tusalud.app.entities.ConsentimientoPlantilla> findByCodigo(String codigo);
 }

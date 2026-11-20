@@ -134,8 +134,14 @@ public class OdontogramaService {
         if (superficie != null && !estado.admiteSuperficie()) {
             throw new DatosInvalidosException("El estado " + estado.etiqueta() + " se registra en toda la pieza");
         }
+        LocalDateTime registradoEn = LocalDateTime.now();
+        LocalDateTime anterior = eventos.ultimoRegistro(paciente.getId()).orElse(null);
+        if (anterior != null && !registradoEn.isAfter(anterior)) {
+            registradoEn = anterior.plusNanos(1000);
+        }
         return eventos.save(OdontogramaEvento.builder()
                 .paciente(paciente)
+                .registradoEn(registradoEn)
                 .pieza((short) pieza)
                 .superficie(superficie)
                 .estado(estado)
