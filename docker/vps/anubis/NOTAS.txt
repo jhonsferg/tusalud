@@ -1,0 +1,21 @@
+ANUBIS COMPARTIDO (modo auth_request) - VPS
+
+Archivos en el VPS (/root/anubis): compose.yaml, politica.yaml, .env (600, ANUBIS_CLAVE), sitio.sh, probe.sh, baseline.txt
+Archivos nginx: /etc/nginx/conf.d/anubis-map.conf, /etc/nginx/snippets/anubis-gate.conf
+Copias previas: /root/nginx-backups/nginx-pre-anubis-* y /root/nginx-backups/anubis-sites/*.pre-anubis
+
+Agregar un dominio web: la linea include /etc/nginx/snippets/anubis-gate.conf; dentro del server 443 (el script la pone tras geoip-block.conf):
+  /root/anubis/sitio.sh on NOMBRE.conf
+  agregar el dominio a REDIRECT_DOMAINS en compose.yaml y ejecutar: cd /root/anubis && docker compose up -d
+  agregar excepciones de ruta en anubis-map.conf si hay clientes no navegador
+
+Quitar Anubis de un dominio: /root/anubis/sitio.sh off NOMBRE.conf
+
+Revertir todo:
+  for f in zonagol.codesoftlabs.com codesoftlabs.com wayki.codesoftlabs.com warlay.codesoftlabs.com console.minio.codesoftlabs.com git.codesoftlabs.com; do /root/anubis/sitio.sh off $f.conf; done  
+  cd /root/anubis && docker compose down
+  rm /etc/nginx/conf.d/anubis-map.conf /etc/nginx/snippets/anubis-gate.conf
+  docker exec nginx nginx -t && docker exec nginx nginx -s reload
+
+Si Anubis cae, el gate falla abierto (los sitios siguen sirviendo sin desafio).
+tusalud.codesoftlabs.com sigue con la instancia piloto en modo proxy (/root/tusalud, servicio anubis).

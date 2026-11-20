@@ -1,0 +1,34 @@
+bots:
+  - name: well-known
+    path_regex: ^/\.well-known/.*$
+    action: ALLOW
+  - name: favicon
+    path_regex: ^/favicon\.ico$
+    action: ALLOW
+  - name: sin-user-agent
+    user_agent_regex: ^$
+    action: DENY
+  - name: scrapers-de-ia
+    user_agent_regex: (?i)(GPTBot|ChatGPT|OAI-SearchBot|ClaudeBot|Claude-Web|anthropic|CCBot|Bytespider|PerplexityBot|Amazonbot|Google-Extended|Applebot|meta-external|FacebookBot|cohere|Diffbot|ImagesiftBot|omgili|Timpibot|YouBot)
+    action: DENY
+  - name: clientes-automaticos
+    user_agent_regex: (?i)(curl|wget|python-requests|python-urllib|aiohttp|httpx|scrapy|libwww|Go-http-client|okhttp|Java/|Apache-HttpClient|node-fetch|axios|undici|HeadlessChrome|PhantomJS|Selenium|puppeteer|playwright|Postman|insomnia)
+    action: DENY
+  - name: rastreadores-y-bots-declarados
+    user_agent_regex: (?i)(bot|crawler|spider|scraper|slurp|archiver|monitor|scan)
+    action: DENY
+  - name: cualquier-otro-cliente
+    path_regex: .*
+    action: CHALLENGE
+    challenge:
+      difficulty: 4
+      algorithm: fast
+
+dnsbl: false
+
+status_codes:
+  CHALLENGE: 200
+  DENY: 403
+
+store:
+  backend: memory

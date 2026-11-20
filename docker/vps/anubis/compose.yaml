@@ -1,0 +1,26 @@
+name: anubis
+
+services:
+  anubis:
+    image: ghcr.io/techarohq/anubis:latest
+    container_name: anubis-compartido
+    restart: unless-stopped
+    mem_limit: 128m
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "127.0.0.1:10020:8923"
+    volumes:
+      - ./politica.yaml:/etc/anubis/politica.yaml:ro
+    environment:
+      BIND: ":8923"
+      TARGET: " "
+      DIFFICULTY: "4"
+      ED25519_PRIVATE_KEY_HEX: ${ANUBIS_CLAVE}
+      COOKIE_SECURE: "true"
+      COOKIE_SAME_SITE: Lax
+      COOKIE_PARTITIONED: "false"
+      COOKIE_EXPIRATION_TIME: 168h
+      POLICY_FNAME: /etc/anubis/politica.yaml
+      REDIRECT_DOMAINS: "wayki.codesoftlabs.com,www.wayki.codesoftlabs.com,warlay.codesoftlabs.com,codesoftlabs.com,www.codesoftlabs.com,zonagol.codesoftlabs.com,www.zonagol.codesoftlabs.com,console.minio.codesoftlabs.com,www.console.minio.codesoftlabs.com,git.codesoftlabs.com"
+      SLOG_LEVEL: INFO
