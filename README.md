@@ -3018,7 +3018,7 @@ Para no repetir `-f` en cada comando, define `COMPOSE_FILE` en `.env` o en la te
 
 ### Despliegue de QA en un VPS
 
-`compose.vps.yaml` despliega solo la API y la aplicación web en un servidor que ya tiene PostgreSQL, MinIO y un nginx público. No incluye base de datos, almacén, gateway, Jaeger ni OpenTelemetry, y la API arranca con el perfil `prod`, que no carga datos de demostración.
+`compose.vps.yaml` despliega la API, la aplicación web y un servidor TURN en un servidor que ya tiene PostgreSQL, MinIO y un nginx público. No incluye base de datos, almacén, gateway, Jaeger ni OpenTelemetry. Como es un entorno de QA, la API carga también los datos de demostración de `db/demo` mediante `SPRING_FLYWAY_LOCATIONS`, y `scripts/vps/datos-volumen.sql` agrega un volumen grande de datos de prueba.
 
 | Pieza          | Detalle                                                                                                                                  |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -3030,7 +3030,9 @@ Para no repetir `-f` en cada comando, define `COMPOSE_FILE` en `.env` o en la te
 
 Las imágenes se construyen en local con `docker compose -f compose.vps.yaml build` y se suben al servidor con `docker save` y `docker load` por SSH. Todos los secretos se generan en el servidor, en un `.env` con permisos restringidos, y nunca viajan por el repositorio. `scripts/vps/crear-admin.sh` crea el administrador inicial, y el resto de usuarios se crean desde la aplicación.
 
-Con esta configuración la telemedicina no usa servidor TURN, porque el servidor no expone los puertos UDP necesarios, y las copias de seguridad de TuSalud no corren. El almacén necesita el contenedor `almacen-proxy` porque el nombre del contenedor de MinIO lleva guion bajo y el cliente S3 de Java lo rechaza como host.
+El servidor TURN usa los puertos 3478 en UDP y TCP y el rango 49160 a 49200 en UDP, que deben estar abiertos en el firewall del servidor. Los respaldos de TuSalud no corren en este despliegue. El almacén necesita el contenedor `almacen-proxy` porque el nombre del contenedor de MinIO lleva guion bajo y el cliente S3 de Java lo rechaza como host.
+
+`datos-volumen.sql` crea 220 pacientes, 8 médicos con sus horarios y alrededor de 6000 citas entre pasadas y futuras, con atenciones, diagnósticos CIE-10, recetas, pagos, valoraciones y órdenes de laboratorio con resultados. Se ejecuta una sola vez con `psql` sobre la base del servidor y no es idempotente.
 
 ### Almacenamiento de objetos
 
