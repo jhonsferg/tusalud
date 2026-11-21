@@ -170,7 +170,13 @@ public class ImagenesServiceImpl implements ImagenesService {
         BigDecimal total = estudios.stream().map(EstudioImagen::getPrecio).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         OrdenImagen nueva = OrdenImagen.builder()
-                .codigo("PEND-" + System.nanoTime())
+                .codigo("PEND-"
+                        + java.util
+                                .UUID
+                                .randomUUID()
+                                .toString()
+                                .replace("-", "")
+                                .substring(0, 15))
                 .fecha(LocalDateTime.now())
                 .estado(EstadoOrdenImagen.SOLICITADA)
                 .prioridad(request.prioridad())

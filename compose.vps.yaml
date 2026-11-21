@@ -24,6 +24,7 @@ services:
       SERVER_PORT: 8080
       SPRING_FLYWAY_LOCATIONS: classpath:db/migration,classpath:db/demo
       SPRING_FLYWAY_OUT_OF_ORDER: "true"
+      FACTURACION_CERTIFICADO_PRUEBA: ${FACTURACION_CERTIFICADO_PRUEBA:-false}
       DB_URL: jdbc:postgresql://databases_postgres:5432/${TUSALUD_DB_NAME}
       DB_USERNAME: ${TUSALUD_DB_USER}
       DB_PASSWORD: ${TUSALUD_DB_PASSWORD}

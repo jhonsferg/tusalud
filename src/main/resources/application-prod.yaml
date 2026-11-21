@@ -37,7 +37,7 @@ app:
     secreto: ${CANALES_SECRETO:}
   facturacion:
     certificado:
-      generar-de-prueba: false
+      generar-de-prueba: ${FACTURACION_CERTIFICADO_PRUEBA:false}
   storage:
     tipo: ${STORAGE_TIPO:s3}
 

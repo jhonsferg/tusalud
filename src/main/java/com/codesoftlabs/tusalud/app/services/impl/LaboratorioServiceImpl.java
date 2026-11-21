@@ -139,7 +139,13 @@ public class LaboratorioServiceImpl implements LaboratorioService {
         BigDecimal total = examenes.stream().map(ExamenLab::getPrecio).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         OrdenLaboratorio nueva = OrdenLaboratorio.builder()
-                .codigo("PEND-" + System.nanoTime())
+                .codigo("PEND-"
+                        + java.util
+                                .UUID
+                                .randomUUID()
+                                .toString()
+                                .replace("-", "")
+                                .substring(0, 15))
                 .fecha(LocalDateTime.now())
                 .estado(EstadoOrdenLab.SOLICITADA)
                 .prioridad(request.prioridad())

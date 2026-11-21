@@ -168,7 +168,13 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
         }
 
         IngresoHospitalario nuevo = IngresoHospitalario.builder()
-                .codigo("PEND-" + System.nanoTime())
+                .codigo("PEND-"
+                        + java.util
+                                .UUID
+                                .randomUUID()
+                                .toString()
+                                .replace("-", "")
+                                .substring(0, 15))
                 .tipo(TipoIngresoHosp.PROGRAMADO)
                 .estado(EstadoIngresoHosp.ACTIVO)
                 .paciente(paciente)
@@ -409,7 +415,13 @@ public class HospitalizacionServiceImpl implements HospitalizacionService {
         LocalDateTime ahora = LocalDateTime.now();
 
         IngresoHospitalario nuevo = IngresoHospitalario.builder()
-                .codigo("PEND-" + System.nanoTime())
+                .codigo("PEND-"
+                        + java.util
+                                .UUID
+                                .randomUUID()
+                                .toString()
+                                .replace("-", "")
+                                .substring(0, 15))
                 .tipo(TipoIngresoHosp.EMERGENCIA)
                 .estado(EstadoIngresoHosp.ACTIVO)
                 .paciente(paciente)
