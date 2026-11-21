@@ -1508,7 +1508,6 @@ tusalud/
 ├── compose.qa.yaml     Sobrescritura para el perfil qa
 ├── compose.vps.yaml    Despliegue de QA en un servidor propio
 ├── Dockerfile          Imagen del backend
-├── users.txt           Usuarios, roles y datos de ejemplo para probar
 └── pom.xml             Build de Maven del backend
 ```
 
@@ -4554,7 +4553,7 @@ En los perfiles `local`, `dev` y `qa` los datos se cargan con las migraciones de
 - Ocho pacientes más con nombres, DNI y fechas de nacimiento ficticios.
 - 21 citas en los cuatro estados, repartidas desde tres semanas atrás hasta nueve días adelante. Cada cita cae en un día y una hora de atención del médico, y las fechas se calculan a partir del día en que arranca la API.
 
-El archivo `users.txt` de la raíz lista todos los usuarios con su correo, contraseña y rol, junto con las citas de ejemplo. Para volver a un estado limpio basta con recrear el volumen de la base de datos:
+Los usuarios y las citas de ejemplo salen de esas migraciones de demostración. Para volver a un estado limpio basta con recrear el volumen de la base de datos:
 
 ```bash
 docker compose -f compose.yaml -f compose.dev.yaml -f compose.hot.yaml down -v
