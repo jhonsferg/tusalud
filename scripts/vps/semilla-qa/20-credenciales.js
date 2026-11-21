@@ -338,9 +338,7 @@ async function main() {
   w(
     "  dr.garcia@, dr.salazar@: GET /api/v1/medicamentos?q=amoxicilina y POST /api/v1/recetas/alertas con el paciente y los medicamentos. juan.perez@ es alérgico a la penicilina: Amoxicilina da alerta contraindicada que exige justificación. carlos.mendoza@ es alérgico al ibuprofeno.",
   );
-  w(
-    "  Atenciones listas para recetar (cuando el entorno tenga certificado), con su médico y su paciente:",
-  );
+  w("  Atenciones listas para recetar, con su médico y su paciente:");
   for (const k of ["R01", "R02", "R03", "R04", "R05", "R07", "R14"]) {
     const e = enc(k);
     if (e.medico)
@@ -352,7 +350,7 @@ async function main() {
 
   sub("5.2 Historia clínica electrónica");
   w(
-    "  Estado: Cerrar y firmar, adendas y correcciones NO funcionan por la falta del certificado (apartado 6). Sí funcionan la línea de tiempo, el PDF de la historia, los plazos de conservación y la detección y fusión de duplicados.",
+    "  Estado: Cerrar y firmar, las adendas y las correcciones funcionan con el certificado de prueba del entorno. Las atenciones R01 a R22 siguen abiertas para que QA las cierre y pruebe esas transiciones. También funcionan la línea de tiempo, el PDF de la historia, los plazos de conservación y la detección y fusión de duplicados.",
   );
   w(
     "  juan.perez@: descarga su historia en PDF desde Mi historia en PDF (GET /api/v1/hce/mi-historia/impresion). dr.garcia@: GET /api/v1/hce/pacientes/{id}/impresion.",
@@ -361,7 +359,7 @@ async function main() {
     "  admin.qa@: Conservación y duplicados en /admin/hce. Duplicado pendiente de fusionar: marcos.cardenas@ y marcos.cardenas2@ (Marcos Cárdenas Vela, 30/09/1975). Fusión ya hecha como ejemplo: Rosa Quispe Huamán, historial HC-000239 fusionado en HC-000238.",
   );
   w(
-    "  Atenciones abiertas para probar el cierre cuando haya certificado: R01 a R22 (cita de cada atención en la tabla del apartado 5.1).",
+    "  Atenciones abiertas para probar el cierre: R01 a R22 (cita de cada atención en la tabla del apartado 5.1).",
   );
 
   sub("5.3 Eventos adversos y guías clínicas");
@@ -580,7 +578,7 @@ async function main() {
 
   sub("5.10 Facturación electrónica y caja");
   w(
-    "  caja@ y caja2@ cobran en /caja/cobrar. finanzas@ y admin.qa@ configuran el emisor y las series, finanzas@ emite notas y comunica bajas. Estado: los comprobantes electrónicos quedan en ERROR por la falta del certificado (apartado 6); los cobros sí se registran.",
+    "  caja@ y caja2@ cobran en /caja/cobrar. finanzas@ y admin.qa@ configuran el emisor y las series, finanzas@ emite notas y comunica bajas. Estado: hay comprobantes aceptados, aceptados con observaciones, rechazado y anulado, con el proveedor simulado; los cobros se registran.",
   );
   for (const k of [
     "boleta-juan",
@@ -743,10 +741,10 @@ async function main() {
     "  - La firma de recetas, documentos y comprobantes es electrónica del propio servidor y no equivale a una firma digital acreditada ante INDECOPI ni a un certificado reconocido por SUNAT.",
   );
   w(
-    "  - FALLO CONOCIDO, certificado digital: en este entorno no hay certificado configurado. Por eso fallan con error 500 la emisión de recetas electrónicas, Cerrar y firmar una atención y, como consecuencia, las adendas y correcciones; y los comprobantes electrónicos de caja quedan en estado ERROR sin llegar a aceptarse, por lo que tampoco hay notas de crédito, bajas ni aceptados u observados por SUNAT. Es un defecto de configuración del entorno y no de la prueba: repórtalo si lo ves, ya está identificado.",
+    "  - Certificado digital: el entorno usa un certificado de prueba autofirmado. Las recetas, el cierre de atenciones y los comprobantes funcionan, pero la firma no es válida ante SUNAT ni equivale a una firma digital acreditada.",
   );
   w(
-    "  - FALLO CONOCIDO, códigos de orden: crear órdenes de laboratorio y órdenes de imágenes falla con un error de conflicto 409 porque el código temporal de la orden excede la longitud de la columna, y los ingresos y emergencias de hospitalización usan el mismo mecanismo y se espera que fallen igual. Aplica a las órdenes nuevas; las de demostración sí se ven y se procesan.",
+    "  - Órdenes de laboratorio e imágenes nuevas: ya funcionan. Si una orden de imágenes da 409, suele ser una regla de negocio legítima, como la preautorización del convenio o una sala ocupada en ese horario.",
   );
   w(
     "  - caja@ tiene su caja abierta; caja2@ no: debe abrir su caja antes de cobrar y, mientras no la abra, el resumen de su pantalla de inicio responde 409.",
